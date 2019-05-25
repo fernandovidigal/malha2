@@ -1,0 +1,39 @@
+{
+  "name": "malha2",
+  "version": "1.0.0",
+  "description": "Aplicação para gestão de Torneios de Malha",
+  "main": "app.js",
+  "bin": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fernandovidigal/malha2.git"
+  },
+  "author": "Fernando Vidigal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fernandovidigal/malha2/issues"
+  },
+  "homepage": "https://github.com/fernandovidigal/malha2#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "connect-flash": "^0.1.1",
+    "ejs": "^2.6.1",
+    "express": "^4.17.0",
+    "sequelize": "^5.8.6",
+    "sqlite3": "^4.0.8"
+  },
+  "pkg": {
+    "scripts": [],
+    "assets": [
+      "views/**/*",
+      "assets/**/*"
+    ]
+  },
+  "devDependencies": {
+    "faker": "^4.1.0"
+  }
+}

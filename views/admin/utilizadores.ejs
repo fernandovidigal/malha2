@@ -1,0 +1,39 @@
+<%- include('../includes/header.ejs') %>
+
+<div class="buttons_bar">
+    <div class="action_btns a-right">
+        <a href="/admin/utilizadores/adicionarUtilizador" class="btn primary_btn"><i class="fa fa-plus"></i>Adicionar Utilizador</a>
+    </div>
+</div>
+<table  class="listTable">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Username</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    <% if(users.length > 0) { %>
+        <% users.forEach(function(user){ %>
+            <tr>
+                <td class="w5 table_cell_center"><% if(user.level === 10) { %><img src="/imagens/icons/key.png" alt="Administrador" class="admin_key"><% } %></td>
+                <td><%= user.username %></td>
+                <td class="w10"><a href="/admin/utilizadores/editarUtilizador/<%= user.userId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
+                <td class="w10">
+                    <form action="/admin/utilizadores/<%= user.userId %>?_method=DELETE" method="POST">
+                        <button type="submit" class="btn delete_btn"><i class="fa fa-trash"></i>Apagar</button>
+                    </form>
+                </td>
+            </tr>
+        <% }); %>
+    <% } else { %>
+        <tr>
+            <td colspan="4">Não existem utilizadores registados</td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+
+<%- include('../includes/footer.ejs') %>

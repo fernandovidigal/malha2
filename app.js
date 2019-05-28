@@ -44,12 +44,24 @@ app.use(passport.session());
 // Flash Messages
 app.use(flash());
 
+
+app.use(function(req, res, next) {
+    res.locals.user = req.user || null;
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    res.locals.info = req.flash('info');
+    res.locals.warning = req.flash('warning');
+    next();
+});
+
 // Routes
 const login = require('./routes/login');
 const index = require('./routes/index');
+const adminUtilizadores = require('./routes/admin/utilizadores');
 
 app.use('/login', login);
 app.use('/', index);
+app.use('/admin/utilizadores', adminUtilizadores);
 
 sequelize
     .sync()

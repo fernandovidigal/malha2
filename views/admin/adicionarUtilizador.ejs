@@ -1,0 +1,23 @@
+<%- include('includes/header.ejs') %>
+
+<% if(validationErrors.length > 0) { %>
+    <% validationErrors.forEach(function(error){ %>
+        <div class="warning_msg">
+            <%= error.msg %>
+            <a href="#" class="msg_close">x</a>
+        </div>
+    <% }); %>
+<% } %>
+
+<form action="/admin/utilizadores/adicionarUtilizador" method="post">
+    <label for="username">Username</label>
+    <input type="text" name="username" required <% if(oldData) { %>value="<%= oldData.username %>"<% } %>><br>
+    <label for="password">Password</label>
+    <input type="password" name="password" required><br>
+    <label for="password">Verificar Password</label>
+    <input type="password" name="verify_password" required><br>
+    <input type="checkbox" name="status">Administrador<br>
+    <input type="submit" value="Registar">
+</form>
+
+<%- include('includes/footer.ejs') %>

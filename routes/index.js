@@ -1,22 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const {userAuthenticated, checkAdminStatus} = require('../../helpers/authentication');
+const {userAuthenticated, checkAdminStatus} = require('../helpers/auth');
 
 router.all('/*', userAuthenticated, (req, res, next) => {
-    req.app.locals.layout = 'home';
-    next();
-});
-
-router.all('/admin(/*)?', checkAdminStatus, (req, res, next) => {
     next();
 });
 
 router.get('/', (req, res) => {
-    res.render('home/index');
+    res.render('index');
 });
 
 router.get('/admin', (req, res) => {
-    res.render('home/admin/index');
+    res.render('admin/index');
 });
 
 router.get('/logout', (req, res) => {

@@ -1,3 +1,4 @@
+
 /**
  * Element.closest() polyfill
  * https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#Polyfill
@@ -18,6 +19,17 @@ if (!Element.prototype.closest) {
 	};
 }
 
+const deleteBtn = document.querySelectorAll('.deleteBtn');
+console.log(deleteBtn);
+deleteBtn[3].addEventListener('click', function(){
+    swal.fire({
+        title: 'Tem a certeza?',
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonText: "Sim, apagar!",
+        cancelButtonText: 'Não'
+    });
+});
 
 var msgCloseBtn = document.querySelector('.msg_close');
 

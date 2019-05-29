@@ -1,27 +1,27 @@
 <%- include('../includes/header.ejs') %>
 
 <% if(typeof validationErrors !== 'undefined' && validationErrors.length > 0) { %>
-    
-        <div class="validationErrors">
-            <% validationErrors.forEach(function(error){ %>
-            <p class="validationErrors_msg"><%= error.msg %></p>
-            <% }); %>
-        </div>
+    <div class="validationErrors">
+        <% validationErrors.forEach(function(error){ %>
+        <p class="validationErrors_msg"><%= error.msg %></p>
+        <% }); %>
+    </div>
 <% } %>
 
-<form action="/admin/utilizadores/adicionarUtilizador" method="post">
-    <label for="username">Username</label>
-    <input type="text" name="username" required <% if(typeof oldData !== 'undefined') { %>value="<%= oldData.username %>"<% } %>><br>
-    <label for="password">Password</label>
+<form action="/admin/utilizadores/editarUtilizador/<%= user.userId %>?_method=PUT" method="post">
+    <label for="username">Username: </label>
+    <%= user.username %>
+    <input type="hidden" name="username" required value="<%= user.username %>"><br>
+    <label for="password">Password: </label>
     <input type="password" name="password" required><br>
-    <label for="password">Verificar Password</label>
+    <label for="password">Verificar Password: </label>
     <input type="password" name="confirmPassword" required><br>
     <input type="radio" name="level" value="0" required checked >Utilizador<br>
-    <input type="radio" name="level" value="5" <% if(typeof oldData !== 'undefined' && oldData.level == 5) { %> 
+    <input type="radio" name="level" value="5" <% if(user.level == 5) { %> 
                                                     checked 
                                                 <% } %>
                                                 >Gestor<br>
-    <input type="radio" name="level" value="10" <% if(typeof oldData !== 'undefined' && oldData.level == 10) { %> 
+    <input type="radio" name="level" value="10" <% if(user.level == 10) { %> 
                                                     checked 
                                                 <% } %>
                                                 >Administrador<br>

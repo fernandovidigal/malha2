@@ -47,6 +47,7 @@ h3 {
 .msg_text {
     padding: 10px 30px;
     margin: 0;
+    letter-spacing: .5px;
 }
 
 
@@ -167,4 +168,17 @@ h3 {
     height: 30px;
     transform: scale(1);
     transition: all .2s;
+}
+
+.validationErrors {
+    padding: 6px 20px;
+    margin-bottom: 30px;
+    background-color: #f2dede;
+    border-radius: 8px;
+    border: solid 1px #ebccd1;
+    color: #a94442;
+}
+
+.validationErrors_msg{
+    margin: 8px 0;
 }

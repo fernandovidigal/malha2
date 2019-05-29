@@ -5,10 +5,10 @@
             <li><a href="/equipas"><i class="fas fa-user-friends"></i>Equipas</a></li>
             <li><a href="/torneio"><i class="fas fa-trophy"></i>Torneio</a></li>
             <li><a href="/listagens"><i class="fas fa-list"></i>Listagens</a></li>
-            <% if(user.level === 10 || user.level === 5){ %>
+            <% if(loggedUser.level === 10 || loggedUser.level === 5){ %>
                 <li class="admin_menu_item"><a href="/admin"><i class="fas fa-user-cog"></i>Administração</a>
                     <ul>
-                        <% if(user.level === 10){ %>
+                        <% if(loggedUser.level === 10){ %>
                             <li><a href="/admin/utilizadores">Utilizadores</a></li>
                         <% } %>
                         <li><a href="/admin/escaloes">Escalões</a></li>
@@ -22,7 +22,7 @@
 
     <div class="user__wrapper">
         <div class="user">
-            <% if(user){ %><i class="fa fa-user-circle"></i><%= user.username %><% } %>
+            <% if(loggedUser){ %><i class="fa fa-user-circle"></i><%= loggedUser.username %><% } %>
         </div>
         <div class="user_nav">
             <ul>

@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
 const flash = require('connect-flash');
+const methodOverride = require('method-override');
 
 const util = require('./helpers/util');
 const fileStruct = require('./helpers/fileStruct');
@@ -44,9 +45,11 @@ app.use(passport.session());
 // Flash Messages
 app.use(flash());
 
+// METHOD OVERRIDE
+app.use(methodOverride('_method'));
 
 app.use(function(req, res, next) {
-    res.locals.user = req.user || null;
+    res.locals.loggedUser = req.user || null;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     res.locals.info = req.flash('info');

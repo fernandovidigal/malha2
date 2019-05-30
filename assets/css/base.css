@@ -151,7 +151,8 @@ h3 {
     justify-content: space-between;
 }
 
-.print_btn {
+.print_btn,
+.change_btn {
     color: #fff;
     background-color: #f0ad4e;
     border: solid 1px #eea236;

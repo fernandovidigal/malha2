@@ -194,6 +194,8 @@ small {
 
 .w10 { width: 10%; }
 
+.w15 { width: 15%; }
+
 .w20 { width: 20%; }
 
 .w30 { width: 30%; }
@@ -717,46 +719,84 @@ small {
 }
 
 .loading {
-    margin: 0 auto;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .loading > div {
-    width: 10px;
-    height: 10px;
-    margin: 0 2px;
-    background-color: #455cc7;
-  
-    border-radius: 100%;
-    display: inline-block;
-    -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-    animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-  }
-  
-  .loading .bounce1 {
-    -webkit-animation-delay: -0.32s;
-    animation-delay: -0.32s;
-  }
-  
-  .loading .bounce2 {
-    -webkit-animation-delay: -0.16s;
-    animation-delay: -0.16s;
-  }
-  
-  @-webkit-keyframes sk-bouncedelay {
-    0%, 80%, 100% { -webkit-transform: scale(0) }
-    40% { -webkit-transform: scale(1.0) }
-  }
-  
-  @keyframes sk-bouncedelay {
-    0%, 80%, 100% { 
-      -webkit-transform: scale(0);
-      transform: scale(0);
-    } 40% { 
-      -webkit-transform: scale(1.0);
-      transform: scale(1.0);
-    }
-  }
+margin: 0 auto;
+text-align: center;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+.loading > div {
+width: 10px;
+height: 10px;
+margin: 0 2px;
+background-color: #455cc7;
+
+border-radius: 100%;
+display: inline-block;
+-webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+}
+
+.loading .bounce1 {
+-webkit-animation-delay: -0.32s;
+animation-delay: -0.32s;
+}
+
+.loading .bounce2 {
+-webkit-animation-delay: -0.16s;
+animation-delay: -0.16s;
+}
+
+@-webkit-keyframes sk-bouncedelay {
+0%, 80%, 100% { -webkit-transform: scale(0) }
+40% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes sk-bouncedelay {
+0%, 80%, 100% { 
+    -webkit-transform: scale(0);
+    transform: scale(0);
+} 40% { 
+    -webkit-transform: scale(1.0);
+    transform: scale(1.0);
+}
+}
+
+.level_change_switch {
+    position: relative;
+    padding: 2px 5px;
+    cursor: pointer;
+}
+
+.level_change_wrapper {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    background-color: #f4f5f9;
+    border: solid 1px #dddfe8;
+    display: none;
+    font-family: 'Lato', sans-serif;
+    font-size: 90%;
+    letter-spacing: .4px;
+    box-shadow: 0 2px 16px rgba(69, 92, 199, .2);
+}
+
+.level_change_switch:hover > .level_change_wrapper {
+    display: block;
+}
+
+.level_change_item {
+    display: block;
+    padding: 12px 20px;
+    color: #333333;
+}
+
+.level_change_item:not(:last-child){
+    border-bottom: solid 1px #dddfe8;
+}
+
+.level_change_item:hover {
+    background-color: #8f9de2;
+    color: #ffffff;
+}

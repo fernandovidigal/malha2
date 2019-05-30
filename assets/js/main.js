@@ -19,9 +19,9 @@ if (!Element.prototype.closest) {
 	};
 }
 
-const deleteBtn = document.querySelectorAll('.deleteBtn');
+/*const deleteBtn = document.querySelectorAll('.deleteBtn');
 console.log(deleteBtn);
-deleteBtn[3].addEventListener('click', function(){
+deleteBtn[1].addEventListener('click', function(){
     swal.fire({
         title: 'Tem a certeza?',
         type: 'warning',
@@ -29,7 +29,7 @@ deleteBtn[3].addEventListener('click', function(){
         confirmButtonText: "Sim, apagar!",
         cancelButtonText: 'Não'
     });
-});
+});*/
 
 var msgCloseBtn = document.querySelector('.msg_close');
 

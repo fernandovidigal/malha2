@@ -770,6 +770,7 @@ animation-delay: -0.16s;
 }
 
 .level_change_wrapper {
+    min-width: 180px;
     position: absolute;
     top: 0;
     left: 100%;
@@ -799,4 +800,9 @@ animation-delay: -0.16s;
 .level_change_item:hover {
     background-color: #8f9de2;
     color: #ffffff;
+}
+
+.username {
+    font-weight: bold;
+    font-size: 120%;
 }

@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { userAuthenticated } = require('../../helpers/auth');
+const { userAuthenticated, checkAdminStatus } = require('../../helpers/auth');
 const { check } = require('express-validator/check');
 const UsersController = require('../../controllers/admin/utilizadores');
 
-router.all('/*', userAuthenticated, (req, res, next) => {
+router.all('/*', [userAuthenticated, checkAdminStatus], (req, res, next) => {
     next();
 });
 
@@ -28,9 +28,9 @@ router.post('/adicionarUtilizador', [
 ], UsersController.createUser);
 
 // EDITAR UTILIZADOR
-router.get('/editarUtilizador/:id', UsersController.fetchUser);
+router.get('/alterarPasswordUtilizador/:id', UsersController.fetchUser);
 
-router.put('/editarUtilizador/:id', [
+router.put('/alterarPasswordUtilizador/:id', [
     check('password').not().isEmpty().withMessage('Deve inidicar a password'),
     check('confirmPassword').custom((value, { req }) => {
             if(value !== req.body.password){
@@ -39,9 +39,12 @@ router.put('/editarUtilizador/:id', [
 
             return true;
         })
-], UsersController.updateUser);
+], UsersController.updateUserPassword);
 
 // APAGAR UTILIZADOR
-router.delete('/:id', UsersController.deleteUser);
+router.delete('/deleteUser', UsersController.deleteUser);
+
+// ALTERAR LEVEL
+router.get('/changeLevel/:userid/level/:level', UsersController.changeUserLevel);
 
 module.exports = router;

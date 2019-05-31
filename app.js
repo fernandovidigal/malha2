@@ -70,7 +70,7 @@ sequelize
     .sync()
     .then(async (result) =>{
         await User.findOrCreate({
-            where: {username: 'gestor'},
+            where: {username: 'admin'},
             defaults: {
                 password: util.encrypt('12345'),
                 level: 10

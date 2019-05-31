@@ -19,25 +19,21 @@ if (!Element.prototype.closest) {
 	};
 }
 
-/*const deleteBtn = document.querySelectorAll('.deleteBtn');
-console.log(deleteBtn);
-deleteBtn[1].addEventListener('click', function(){
-    swal.fire({
-        title: 'Tem a certeza?',
-        type: 'warning',
-        showCancelButton: true,
-        confirmButtonText: "Sim, apagar!",
-        cancelButtonText: 'Não'
-    });
-});*/
 
 var msgCloseBtn = document.querySelector('.msg_close');
 
 if(msgCloseBtn){
+    var msgBlock = msgCloseBtn.parentNode;
+    let showTimer;
+
+    showTimer = setTimeout(() => {
+        msgBlock.remove();
+    }, 10000);
+
     msgCloseBtn.addEventListener('click', function(e){
         e.preventDefault();
-        var msgBlock = this.parentNode;
         msgBlock.remove();
+        showTimer.clearTimeout;
     });
 }
 

@@ -56,7 +56,13 @@ exports.fetchUser = (req, res, next) => {
 
     User.findByPk(userId)
         .then( user => {
-            res.render('admin/editarUtilizador', {user: user});
+            if(user){
+                res.render('admin/alterarPasswordUtilizador', {user: user});
+            } else {
+                req.flash('error', 'Utilizador inválido.');
+                res.redirect('/admin/utilizadores');
+            }
+            
         })
         .catch(err => {
             console.log(err);
@@ -65,67 +71,81 @@ exports.fetchUser = (req, res, next) => {
         });
 }
 
-exports.updateUser = (req, res, next) => {
+exports.updateUserPassword = (req, res, next) => {
     const userId = req.params.id;
-    const username = req.body.username;
     const password = req.body.password;
-    const level = req.body.level;
     const errors = validationResult(req);
 
-    console.log(req.body);
+    User.findByPk(userId)
+        .then(user => {
+            if(!user){
+                req.flash('error', 'Utilizador inexistente.');
+                return res.redirect('/admin/utilizadores');
+            }
 
-    if (!errors.isEmpty()) {
-        const oldData = {
-            userId: userId,
-            username: username,
-            level: level
-        }
-        res.render('admin/editarUtilizador', {validationErrors: errors.array(), user: oldData});
-    } else {
-        User.findByPk(userId)
-            .then( user => {
-                if (user.userId.toString() !== userId.toString()) {
-                    req.flash('error', 'Não foi possível actualizar o utilizador');
-                    return res.redirect('/admin/utilizadores');
-                }
-
+            if (!errors.isEmpty()) {
+                res.render('admin/alterarPasswordUtilizador', {validationErrors: errors.array(), user: user});
+            } else {
                 user.password = util.encrypt(password);
-                user.level = level;
-
                 user.save()
                 .then(result => {
-                    req.flash('success', 'Utilizador actualizado com sucesso');
-                    res.redirect('/admin/utilizadores');
+                    if(result){
+                        req.flash('success', 'Password actualizada com sucesso.');
+                        res.redirect('/admin/utilizadores');
+                    } else {
+                        req.flash('error', 'Ocurreu um erro durante a actualização da password do utilizador.');
+                        res.redirect('/admin/utilizadores');
+                    } 
                 })
                 .catch(err => {
-                    console.log(err);
-                    req.flash('error', 'Não foi possível actualizar o utilizador!');
+                    req.flash('error', 'Não foi possível actualizar a password do utilizador.');
                     res.redirect('/admin/utilizadores');
                 });
-            })
-            .catch(err => {
-                console.log(err);
-                req.flash('error', 'Não foi possível actualizar o utilizador.');
-                res.redirect('/admin/utilizadores');
-            });
+            }
+            
+        })
+        .catch(err => {
+            req.flash('error', 'Não foi possível actualizar a password do utilizador.');
+            res.redirect('/admin/utilizadores');
+        });
+}
+
+exports.changeUserLevel = (req, res, next) => {
+    const userId = req.params.userid;
+    const level = req.params.level;
+
+    if(req.user.level == 10) {
+        User.update(
+            {level: level},
+            {where: {userId: userId}}
+        )
+        .then(result => {
+            req.flash('success', 'Nível de acesso do utilizador foi actualizado com sucesso.');
+            res.redirect('/admin/utilizadores');
+        })
+        .catch(err => {
+            console.log(err);
+            req.flash('error', 'Não foi possível alterar o nível de acesso do utilizador.');
+            res.redirect('/admin/utilizadores');
+        });
+    } else {
+        req.flash('error', 'Não tem permissão para alterar o nível de acesso dos utilizadores.');
+        es.redirect('/admin/utilizadores');
     }
 }
 
 exports.deleteUser = (req, res, next) => {
-    const userId = req.params.id;
-    User.destroy({where: {userId: userId}})
+    const userId = req.body.id;
+
+    User.destroy({where: {userId: userId}, limit: 1})
         .then(result => {
             if(result){
-                req.flash('success', `Utilizador eliminado com sucesso`)
-                res.redirect('/admin/utilizadores');
+                res.status(200).json({success: true});
             } else {
-                req.flash('error', 'Não foi possível eliminar o utilizador.');
-                es.redirect('/admin/utilizadores');
+                res.status(200).json({success: false});
             }
         })
         .catch(err => { 
-            console.log(err);
-            req.flash('error', 'Não foi possível eliminar o utilizador.');
-            res.redirect('/admin/utilizadores');
+            res.status(200).json({success: false});
         });
 }

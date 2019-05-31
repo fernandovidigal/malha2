@@ -9,7 +9,7 @@ module.exports = {
     },
 
     checkAdminStatus: function(req, res, next){
-        if(req.user.status == 10) {
+        if(req.user.level == 10) {
             return next();
         }
 

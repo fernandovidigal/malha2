@@ -29,6 +29,11 @@ h3 {
     color: #dddddd;
 }
 
+:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 .success_msg,
 .error_msg,
 .info_msg,

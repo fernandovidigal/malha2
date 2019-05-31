@@ -1,13 +1,5 @@
 <%- include('../includes/header.ejs') %>
-
-<% if(typeof validationErrors !== 'undefined' && validationErrors.length > 0) { %>
-    
-        <div class="validationErrors">
-            <% validationErrors.forEach(function(error){ %>
-            <p class="validationErrors_msg"><%= error.msg %></p>
-            <% }); %>
-        </div>
-<% } %>
+<%- include('../includes/validationErrors.ejs') %>
 
 <form action="/admin/utilizadores/adicionarUtilizador" method="post">
     <label for="username">Username</label>

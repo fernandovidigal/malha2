@@ -8,7 +8,8 @@ exports.getAllUsers = (req, res, next) => {
         res.render('admin/utilizadores', {users: users});
     })
     .catch(err => {
-        req.flash('error', 'Ocurreu um erro ao registar o utilizador!');
+        console.log(err);
+        req.flash('error', 'Ocurreu um erro ao obter dados dos utilizadores!');
         res.redirect('/admin/utilizadores');
     });
 }

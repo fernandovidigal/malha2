@@ -11,7 +11,10 @@ const Localidade = sequelize.define('localidades', {
     nome: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true
+        unique: {
+            args: true,
+            msg: "A localidade já existe."
+        }
     }
 });
 

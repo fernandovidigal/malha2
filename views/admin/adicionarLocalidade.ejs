@@ -3,7 +3,7 @@
 
 <form action="/admin/localidades/adicionarLocalidade" method="post">
     <label for="localidade">Localidade</label>
-    <input type="text" name="localidade"><br>
+    <input type="text" name="localidade" pattern="^[^0-9]+$" required><br>
     <input type="submit" name="adicionar" value="Adicionar">
 </form>
 

@@ -39,7 +39,7 @@ exports.createUser = (req, res, next) => {
                         level: level
                     })
                     .then(user => {
-                        req.flash('success', 'Utilizador Adicionado com sucesso');
+                        req.flash('success', 'Utilizador adicionado com sucesso');
                         res.redirect('/admin/utilizadores');
                     })
                     .catch(err => {

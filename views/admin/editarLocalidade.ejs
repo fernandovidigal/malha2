@@ -1,0 +1,10 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/validationErrors.ejs') %>
+
+<form action="/admin/localidades/editarLocalidade<%= localidade.localidadeId %>?_method=PUT" method="post">
+    <label for="localidade">Localidade</label>
+    <input type="text" name="localidade" pattern="^[^0-9]+$" value="<%= localidade.nome %>" required><br>
+    <input type="submit" name="actualizar" value="Actualizar">
+</form>
+
+<%- include('../includes/footer.ejs') %>

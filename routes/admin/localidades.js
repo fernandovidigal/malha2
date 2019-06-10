@@ -15,8 +15,9 @@ router.get('/adicionarLocalidade', (req, res) => {
 });
 
 router.post('/adicionarLocalidade', [
-    check('localidade').not().isEmpty().withMessage('Deve indicar o nome da localidade'),
-    check('localidade').isAlpha().withMessage('Nome da localidade inválido')
+    check('localidade').not().isEmpty().withMessage('Deve indicar o nome da localidade')
+    .not().isNumeric().withMessage('Nome da localidade inválido')
 ],LocalidadesController.createLocalidade);
 
+router.get('/editarLocalidade/:id', LocalidadesController.getLocalidade);
 module.exports = router;

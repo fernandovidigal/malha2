@@ -38,7 +38,7 @@ exports.getLocalidade = (req, res, next) => {
 }
 
 exports.createLocalidade = (req, res, next) => {
-    const localidade = req.body.localidade;
+    const localidade = req.body.localidade.trim();
     const errors = validationResult(req);
 
     if(!errors.isEmpty()){
@@ -55,8 +55,74 @@ exports.createLocalidade = (req, res, next) => {
             res.redirect('/admin/localidades');
         })
         .catch(err => {
-            req.flash('error', err.errors[0].message);
+            if(err.errors[0].validatorKey == 'not_unique'){
+                req.flash('error', err.errors[0].message);
+            } else {
+                req.flash('error', "Ocurreu um erro ao adicionar a localidade");
+            }
             res.redirect('/admin/localidades');
         });
     }
+}
+
+exports.updateLocalidade = (req, res, next) => {
+    const localidadeId = req.params.id;
+    const nomeLocalidade = req.body.localidade;
+    const errors = validationResult(req);
+    
+    const localidade = {
+        localidadeId: localidadeId,
+        nome: nomeLocalidade
+    }
+
+    if(!errors.isEmpty()){
+        res.render('admin/editarLocalidade', {validationErrors: errors.array(), localidade: localidade});
+    } else {
+        Localidade.findByPk(localidadeId)
+        .then(localidade => {
+            localidade.nome = nomeLocalidade.trim();
+            localidade.save()
+            .then(result => {
+                if(result){
+                    req.flash('success', 'Localidade actualizada com sucesso.');
+                    res.redirect('/admin/localidades');
+                } else {
+                    req.flash('error', 'Ocurreu um erro durante a actualização da localidade.');
+                    res.redirect('/admin/localidades');
+                } 
+            })
+            .catch(err => {
+                if(err.errors[0].validatorKey == 'not_unique'){
+                    const uniqueError = [{
+                            msg: err.errors[0].message
+                        }];
+                    res.render('admin/editarLocalidade', {validationErrors: uniqueError, localidade: localidade});
+                } else {
+                    req.flash('error', "Ocurreu um erro ao adicionar a localidade.");
+                    res.redirect('/admin/localidades');
+                }
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            req.flash('error', 'Não foi possível actualizar a localidade.');
+            res.redirect('/admin/localidades');
+        });
+    }
+}
+
+exports.deleteLocalidade = (req, res, next) => {
+    const localidadeId = req.body.id;
+
+    Localidade.destroy({where: {localidadeId: localidadeId}, limit: 1})
+        .then(result => {
+            if(result){
+                res.status(200).json({success: true});
+            } else {
+                res.status(200).json({success: false});
+            }
+        })
+        .catch(err => { 
+            res.status(200).json({success: false});
+        });
 }

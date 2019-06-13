@@ -4,13 +4,13 @@ const deleteBtns = document.querySelectorAll('.delete_btn');
 deleteBtns.forEach(function(item, index){
     item.addEventListener('click', function(e){
         e.preventDefault();
-        const userId = this.dataset.user;
+        const localidadeId = this.dataset.localidade;
         const row = this.closest('tr');
-        const username = row.querySelector('.username').textContent;
+        const localidade = row.querySelector('.localidade').textContent;
 
         swal.fire({
             title: 'Tem a certeza?',
-            html: "O utilizador <strong>" + username + "</strong> será eliminado!",
+            html: "O localidade <strong>" + localidade + "</strong> será eliminada!",
             type: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Sim, eliminar!',
@@ -21,21 +21,21 @@ deleteBtns.forEach(function(item, index){
         })
         .then(result => {
             if(result.value){
-                fetch("/admin/utilizadores/deleteUser", {
+                fetch("/admin/localidades/deleteLocalidade", {
                     headers: {'Content-Type': 'application/json'},
                     method: 'DELETE',
-                    body: JSON.stringify({id: userId})
+                    body: JSON.stringify({id: localidadeId})
                 })
                 .then(response => {
                     if(response.status != 200){
-                        throw new Error("Não foi possível eliminar o utilizador.");
+                        throw new Error("Não foi possível eliminar a localidade.");
                     }
 
                     return response.json();
                 })
                 .then(data => {
                     if(!data.success){
-                        throw new Error("Não foi possível eliminar o utilizador.");
+                        throw new Error("Não foi possível eliminar o localidade.");
                     }
 
                     location.reload();

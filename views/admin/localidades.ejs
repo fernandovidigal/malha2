@@ -17,13 +17,9 @@
         <% if(localidades.length > 0) { %>
             <% localidades.forEach(function(localidade){ %>
                 <tr>
-                    <td><%= localidade.nome %></td>
+                    <td class="localidade"><%= localidade.nome %></td>
                     <td class="w10"><a href="/admin/localidades/editarLocalidade/<%= localidade.localidadeId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
-                    <td class="w10">
-                        <form action="/admin/localidades/<%= localidade.localidadeId %>?_method=DELETE" method="POST">
-                            <button type="submit" class="btn delete_btn"><i class="fa fa-trash"></i>Apagar</button>
-                        </form>
-                    </td>
+                    <td class="w10"><a href="" class="btn delete_btn" data-localidade="<%= localidade.localidadeId %>"><i class="fa fa-trash"></i>Eliminar</a></td>
                 </tr>
             <% }); %>
     <% } else { %>
@@ -34,6 +30,5 @@
     </tbody>
 </table>
 
-
-
+<script src="/js/localidades.js"></script>
 <%- include('../includes/footer.ejs') %>

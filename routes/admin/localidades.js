@@ -16,8 +16,17 @@ router.get('/adicionarLocalidade', (req, res) => {
 
 router.post('/adicionarLocalidade', [
     check('localidade').not().isEmpty().withMessage('Deve indicar o nome da localidade')
-    .not().isNumeric().withMessage('Nome da localidade inválido')
-],LocalidadesController.createLocalidade);
+    .matches(/^[^0-9]+$/).withMessage('Nome da localidade inválido')
+], LocalidadesController.createLocalidade);
 
 router.get('/editarLocalidade/:id', LocalidadesController.getLocalidade);
+
+router.put('/editarLocalidade/:id', [
+    check('localidade').not().isEmpty().withMessage('Deve indicar o nome da localidade')
+    .matches(/^[^0-9]+$/).withMessage('Nome da localidade inválido')
+], LocalidadesController.updateLocalidade);
+
+// APAGAR LOCALIDADE
+router.delete('/deleteLocalidade', LocalidadesController.deleteLocalidade);
+
 module.exports = router;

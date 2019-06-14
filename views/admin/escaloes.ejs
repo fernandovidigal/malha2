@@ -1,0 +1,40 @@
+<%- include('../includes/header.ejs') %>
+
+<div class="buttons_bar">
+    <div class="action_btns a-right">
+        <a href="/admin/escaloes/adicionarEscalao" class="btn primary_btn"><i class="fa fa-plus"></i>Adicionar Escalão</a>
+    </div>
+</div>
+
+<table class="listTable">
+    <thead>
+        <tr>
+            <th>Escalão</th>
+            <th>Sexo</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    <% if(escaloes.length > 0) { %>
+        <% escaloes.forEach(function(escalao){ %>
+            <tr>
+                <td class="escalao"><%= escalao.designacao %></td>
+                <td class="w30 table_cell_center"><%= escalao.sexo == 0 ? 'Feminino' : 'Masculino' %></td>
+                <td class="w10"><a href="/admin/escaloes/editarEscalao/<%= escalao.escalaoId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
+                <td class="w10">
+                    <form action="/admin/escaloes/<%= escalao.escalaoId %>?_method=DELETE" method="POST">
+                        <button type="submit" class="btn delete_btn"><i class="fa fa-trash"></i>Apagar</button>
+                    </form>
+                </td>
+            </tr>
+        <% }); %>
+    <% } else { %>
+        <tr>
+            <td colspan="4">Não existem escalões registados</td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+
+<%- include('../includes/footer.ejs') %>

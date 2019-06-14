@@ -17,6 +17,7 @@ fileStruct.dataDirectoryCheck();
 // Models
 const User = require('./models/user');
 const Localidade = require('./models/Localidade');
+const Escaloes = require('./models/Escaloes');
 
 // Database
 const sequelize = require('./helpers/database');
@@ -63,11 +64,13 @@ const login = require('./routes/login');
 const index = require('./routes/index');
 const adminUtilizadores = require('./routes/admin/utilizadores');
 const adminLocalidades = require('./routes/admin/localidades');
+const adminEscaloes = require('./routes/admin/escaloes');
 
 app.use('/login', login);
 app.use('/', index);
 app.use('/admin/utilizadores', adminUtilizadores);
 app.use('/admin/localidades', adminLocalidades);
+app.use('/admin/escaloes', adminEscaloes);
 
 sequelize
     .sync()

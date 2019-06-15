@@ -16,7 +16,7 @@ router.get('/adicionarUtilizador', (req, res) => {
 });
 
 router.post('/adicionarUtilizador', [
-    check('username').not().isEmpty().withMessage('Deve indicar o nome de utilizador'),
+    check('username').trim().escape().not().isEmpty().withMessage('Deve indicar o nome de utilizador'),
     check('password').not().isEmpty().withMessage('Deve inidicar a password'),
     check('confirmPassword').custom((value, { req }) => {
             if(value !== req.body.password){

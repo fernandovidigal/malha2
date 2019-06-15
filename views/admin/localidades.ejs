@@ -14,14 +14,14 @@
         </tr>
     </thead>
     <tbody>
-        <% if(localidades.length > 0) { %>
-            <% localidades.forEach(function(localidade){ %>
-                <tr>
-                    <td class="localidade"><%= localidade.nome %></td>
-                    <td class="w10"><a href="/admin/localidades/editarLocalidade/<%= localidade.localidadeId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
-                    <td class="w10"><a href="" class="btn delete_btn" data-localidade="<%= localidade.localidadeId %>"><i class="fa fa-trash"></i>Eliminar</a></td>
-                </tr>
-            <% }); %>
+    <% if(localidades.length > 0) { %>
+        <% localidades.forEach(function(localidade){ %>
+            <tr>
+                <td class="localidade"><%= localidade.nome %></td>
+                <td class="w10"><a href="/admin/localidades/editarLocalidade/<%= localidade.localidadeId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
+                <td class="w10"><a href="" class="btn delete_btn" data-localidade="<%= localidade.localidadeId %>"><i class="fa fa-trash"></i>Eliminar</a></td>
+            </tr>
+        <% }); %>
     <% } else { %>
         <tr>
             <td colspan="3">Não existem localidades registadas</td>

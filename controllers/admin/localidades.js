@@ -45,7 +45,7 @@ exports.createLocalidade = (req, res, next) => {
         const oldData = {
             localidade: localidade
         }
-        res.render('admin/adicionarLocalidade', {validationErrors: errors.array(), oldData: oldData});
+        res.render('admin/adicionarLocalidade', {validationErrors: errors.array({ onlyFirstError: true }), oldData: oldData});
     } else {
         Localidade.create({
             nome: localidade
@@ -76,7 +76,7 @@ exports.updateLocalidade = (req, res, next) => {
     }
 
     if(!errors.isEmpty()){
-        res.render('admin/editarLocalidade', {validationErrors: errors.array(), localidade: localidade});
+        res.render('admin/editarLocalidade', {validationErrors: errors.array({ onlyFirstError: true }), localidade: localidade});
     } else {
         Localidade.findByPk(localidadeId)
         .then(localidade => {

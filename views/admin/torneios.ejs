@@ -1,0 +1,42 @@
+<%- include('../includes/header.ejs') %>
+
+<div class="buttons_bar">
+    <div class="action_btns a-right">
+        <a href="/admin/torneios/adicionarTorneio" class="btn primary_btn"><i class="fa fa-plus"></i>Adicionar Torneio</a>
+    </div>
+</div>
+
+<table  class="listTable">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Designação</th>
+            <th>Localidade</th>
+            <th>Campos</th>
+            <th>Ano</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    <% if(torneios.length > 0) { %>
+        <% torneios.forEach(function(torneio){ %>
+            <tr>
+                <td><a href="/admin/torneios/activaTorneio/<%= torneio.torneioId %>"><i class="fas fa-check-square <%= torneio.activo == 1 ? 'torneio-active' : 'torneio-not-active' %>"></i></a></td>
+                <td class="torneio"><%= torneio.designacao %></td>
+                <td class="w30 table_cell_center"><%= torneio.localidade %></td>
+                <td class="w10 table_cell_center"><%= torneio.campos %></td>
+                <td class="w10 table_cell_center"><%= torneio.ano %></td>
+                <td class="w10"><a href="/admin/torneios/editarTorneio/<%= torneio.torneioId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
+                <td class="w10"><a href="" class="btn delete_btn" data-torneio="<%= torneio.torneioId %>"><i class="fa fa-trash"></i>Eliminar</a></td>
+            </tr>
+        <% }); %>
+    <% } else { %>
+        <tr>
+            <td colspan="6">Não existem torneios registados</td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+
+<%- include('../includes/footer.ejs') %>

@@ -85,7 +85,7 @@ exports.updateEscalao = (req, res, next) => {
     if(!errors.isEmpty()){
         res.render('admin/editarEscalao', {validationErrors: errors.array(), escalao: escalao});
     } else {
-        Escaloes.findAll({
+        Escaloes.findOne({
             where: {
                 designacao: designacao,
                 sexo: sexo

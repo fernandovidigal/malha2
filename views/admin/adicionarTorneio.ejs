@@ -1,0 +1,17 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/validationErrors.ejs') %>
+
+<form action="/admin/torneios/adicionarTorneio" method="post">
+    <label for="designacao">Designação: </label>
+    <input type="text" name="designacao"><br>
+    <label for="localidade">Localidade: </label>
+    <input type="text" name="localidade" pattern="^[^0-9]+$"><br>
+    <label for="ano">Ano: </label>
+    <input type="text" name="ano" pattern="^[0-9]{4}$"><small>(AAAA)</small><br>
+    <label for="campos">Número de campos: </label>
+    <input type="text" name="campos" pattern="^[0-9]+$"><br>
+    <input type="submit" name="adicionar" value="Adicionar">
+    <input type="submit" name="adicionar_activar" value="Adicionar e Activar">
+</form>
+
+<%- include('../includes/footer.ejs') %>

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { userAuthenticated, checkAdminStatus } = require('../../helpers/auth');
-const { check, oneOf } = require('express-validator/check');
+const { check } = require('express-validator/check');
 const LocalidadesController = require('../../controllers/admin/localidades');
 
 router.all('/*', [userAuthenticated, checkAdminStatus], (req, res, next) => {
@@ -14,17 +14,17 @@ router.get('/adicionarLocalidade', (req, res) => {
     res.render('admin/adicionarLocalidade');
 });
 
-router.post('/adicionarLocalidade', oneOf([
-    check('localidade').not().isEmpty().withMessage('Deve indicar o nome da localidade'),
-    check('localidade').matches(/^[^0-9]+$/).withMessage('Nome da localidade inválido')
-]), LocalidadesController.createLocalidade);
+router.post('/adicionarLocalidade', [
+    check('localidade').trim().escape().not().isEmpty().withMessage('Deve indicar o nome da localidade'),
+    check('localidade').escape().matches(/^[^0-9]+$/).withMessage('Nome da localidade inválido')
+], LocalidadesController.createLocalidade);
 
 router.get('/editarLocalidade/:id', LocalidadesController.getLocalidade);
 
-router.put('/editarLocalidade/:id', oneOf([
-    check('localidade').not().isEmpty().withMessage('Deve indicar o nome da localidade'),
-    check('localidade').matches(/^[^0-9]+$/).withMessage('Nome da localidade inválido')
-]), LocalidadesController.updateLocalidade);
+router.put('/editarLocalidade/:id', [
+    check('localidade').trim().escape().not().isEmpty().withMessage('Deve indicar o nome da localidade'),
+    check('localidade').escape().matches(/^[^0-9]+$/).withMessage('Nome da localidade inválido')
+], LocalidadesController.updateLocalidade);
 
 // APAGAR LOCALIDADE
 router.delete('/deleteLocalidade', LocalidadesController.deleteLocalidade);

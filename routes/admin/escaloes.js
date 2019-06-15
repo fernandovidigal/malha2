@@ -16,7 +16,7 @@ router.get('/adicionarEscalao', (req, res) => {
 
 
 router.post('/adicionarEscalao', [
-    check('designacao').trim().not().isEmpty().withMessage('Deve indicar a designação do escalão'),
+    check('designacao').trim().escape().not().isEmpty().withMessage('Deve indicar a designação do escalão'),
     check('sexo').custom((value, { req }) => {
         if(value !== '0' && value !== '1'){
             throw new Error('Deve selecionar o género a que corresponde o escalão');
@@ -29,7 +29,7 @@ router.post('/adicionarEscalao', [
 router.get('/editarEscalao/:id', EscaloesController.getEscalao);
 
 router.put('/editarEscalao/:id', [
-    check('designacao').trim().not().isEmpty().withMessage('Deve indicar a designação do escalão'),
+    check('designacao').trim().escape().not().isEmpty().withMessage('Deve indicar a designação do escalão'),
     check('sexo').custom((value, { req }) => {
         if(value !== '0' && value !== '1'){
             throw new Error('Deve selecionar o género a que corresponde o escalão');

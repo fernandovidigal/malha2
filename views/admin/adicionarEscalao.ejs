@@ -3,13 +3,30 @@
 
 <form action="/admin/escaloes/adicionarEscalao" method="post">
     <label for="designacao">Designação</label>
-    <input type="text" name="designacao">
+    <input type="text" name="designacao" required
+                <% if(typeof escalao !== 'undefined'){ %>
+                    value="<%= escalao.designacao %>"
+                <% } %>
+    >
     <br>
-    <input type="radio" name="sexo" id="rs1" value="1">
+    <input type="radio" name="sexo" id="rs1" value="1" required
+            <% if(typeof escalao === 'undefined'){ %>
+                checked
+            <% } else {
+                if(escalao.sexo == 1){ %>
+                    checked
+            <%  }
+            } %>
+    >
     <label for="r1">Masculino</label><br>
-    <input type="radio" name="sexo" id="rs2" value="0">
+    <input type="radio" name="sexo" id="rs2" value="0" required
+            <% if(typeof escalao !== 'undefined' && escalao.sexo == 0){ %>
+                checked
+            <% } %>
+    >
     <label for="r2">Feminino</label><br>
     <input type="submit" value="Adicionar">
+    <a href="/admin/escaloes">Cancelar</a>
 </form>
 
 <%- include('../includes/footer.ejs') %>

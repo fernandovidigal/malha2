@@ -1,0 +1,18 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/validationErrors.ejs') %>
+
+<% if(typeof escalao !== 'undefined'){ %>
+<form action="/admin/escaloes/editarEscalao/<%= escalao.escalaoId %>?_method=PUT" method="post">
+    <label for="designacao">Designação</label>
+    <input type="text" name="designacao" value="<%= escalao.designacao %>"><br>
+    <input type="radio" name="sexo" value="1" <% if(escalao.sexo == 1) { %>checked<% } %> required> Masculino<br>
+    <input type="radio" name="sexo" value="0" <% if(escalao.sexo == 0) { %>checked<% } %> required> Feminino<br>
+    <input type="submit" value="Actualizar">
+    <a href="/admin/escaloes">Cancelar</a>
+</form>
+<% } else { %>
+    <h1>Oops...Algo correu mal!</h1>
+    <a href="/admin/escaloes">Voltar</a>
+<% } %>
+
+<%- include('../includes/footer.ejs') %>

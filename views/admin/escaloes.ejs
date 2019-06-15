@@ -20,13 +20,9 @@
         <% escaloes.forEach(function(escalao){ %>
             <tr>
                 <td class="escalao"><%= escalao.designacao %></td>
-                <td class="w30 table_cell_center"><%= escalao.sexo == 0 ? 'Feminino' : 'Masculino' %></td>
+                <td class="w30 table_cell_center sexo"><%= escalao.sexo == 0 ? 'Feminino' : 'Masculino' %></td>
                 <td class="w10"><a href="/admin/escaloes/editarEscalao/<%= escalao.escalaoId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
-                <td class="w10">
-                    <form action="/admin/escaloes/<%= escalao.escalaoId %>?_method=DELETE" method="POST">
-                        <button type="submit" class="btn delete_btn"><i class="fa fa-trash"></i>Apagar</button>
-                    </form>
-                </td>
+                <td class="w10"><a href="" class="btn delete_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fa fa-trash"></i>Eliminar</a></td>
             </tr>
         <% }); %>
     <% } else { %>
@@ -37,4 +33,5 @@
     </tbody>
 </table>
 
+<script src="/js/escaloes.js"></script>
 <%- include('../includes/footer.ejs') %>

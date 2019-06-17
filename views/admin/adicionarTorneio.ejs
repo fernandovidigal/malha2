@@ -3,11 +3,11 @@
 
 <form action="/admin/torneios/adicionarTorneio" method="post">
     <label for="designacao">Designação: </label>
-    <input type="text" name="designacao"><br>
+    <input type="text" name="designacao" required><br>
     <label for="localidade">Localidade: </label>
-    <input type="text" name="localidade" pattern="^[^0-9]+$"><br>
+    <input type="text" name="localidade" pattern="^[^0-9]+$" required><br>
     <label for="ano">Ano: </label>
-    <input type="text" name="ano" pattern="^[0-9]{4}$"><small>(AAAA)</small><br>
+    <input type="text" name="ano" maxlength="4" pattern="^[0-9]{4}$" required><small>(AAAA)</small><br>
     <label for="campos">Número de campos: </label>
     <input type="text" name="campos" pattern="^[0-9]+$"><br>
     <input type="submit" name="adicionar" value="Adicionar">

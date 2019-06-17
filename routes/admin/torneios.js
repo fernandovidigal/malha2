@@ -23,4 +23,6 @@ router.post('/adicionarTorneio', [
     check('campos').optional({ checkFalsy: true }).isNumeric().withMessage('Número de campos inválido')
 ], TorneiosController.createTorneio);
 
+router.get('/activaTorneio/:id', TorneiosController.ActivaTorneio);
+
 module.exports = router;

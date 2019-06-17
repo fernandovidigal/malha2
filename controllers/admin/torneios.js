@@ -1,5 +1,25 @@
+const sequelize = require('../../helpers/database');
 const Torneio = require('../../models/Torneios');
 const { validationResult } = require('express-validator/check');
+
+function setTorneioActivo(id){
+    return sequelize.transaction(t => {
+        return sequelize.query("UPDATE torneios SET activo = 0", {transaction: t})
+        .then(() => {
+            Torneio.update(
+                {activo: 1},
+                {where: {torneioId: id}, limit: 1},
+                {transaction: t}
+            )
+        })
+    })
+    .then(result => {
+        return true;
+    })
+    .catch(err => {
+        return false;
+    });
+}
 
 exports.getAllTorneios = (req, res, next) => {
     Torneio.findAll({
@@ -42,30 +62,42 @@ exports.createTorneio = (req, res, next) => {
             ano: ano,
             campos: campos
         })
-        .then(torneio => {
+        .then(async torneio => {
+
             // Escolheu adicionar e activar o torneios
             if(req.body.adicionar_activar){
-                torneio.activo = 1;
-                torneio.save()
-                .then(result => {
-                    if(result){
-                        req.flash('success', 'Torneio adicionado e activado com sucesso!')
-                        res.redirect('/admin/torneios');
+                if(await setTorneioActivo(torneio.torneioId)){
+                    req.flash('success', 'Torneio adicionado e activado com sucesso!')
+                    res.redirect('/admin/torneios');
+                } else {
+                    req.flash('error', 'Não foi possível activar o torneio!');
+                    res.redirect('/admin/torneios');
+                }
+            } else {
+                // Escolheu só adicionar o torneio
+
+                // Se só existe 1 torneio registado este fica activo
+                Torneio.count()
+                .then(async count => {
+                    if(count == 1){
+                        if(await setTorneioActivo(torneio.torneioId)){
+                            req.flash('success', 'Torneio adicionado e activado com sucesso!')
+                            res.redirect('/admin/torneios');
+                        } else {
+                            req.flash('error', 'Não foi possível activar o torneio!');
+                            res.redirect('/admin/torneios');
+                        }
                     } else {
-                        req.flash('error', 'Não foi possível activar o torneio!');
+                        // Existem mais que 1 torneios registados, adicionar apenas
+                        req.flash('success', 'Torneio adicionado e activado com sucesso!')
                         res.redirect('/admin/torneios');
                     }
                 })
                 .catch(err => {
                     console.log(err);
-                    req.flash('error', 'Não foi possível activar o torneio!');
+                    req.flash('error', 'Não foi possível activar o torneio');
                     res.redirect('/admin/torneios');
                 });
-            } else {
-                // Escolheu só adicionar o torneio
-                /*Torneio.count()
-                .then()
-                .catch();*/
             }
         })
         .catch(err => {
@@ -74,4 +106,29 @@ exports.createTorneio = (req, res, next) => {
             res.redirect('/admin/torneios');
         });
     }
+}
+
+exports.ActivaTorneio = (req, res, next) => {
+    const torneioId = req.params.id;
+
+    Torneio.findByPk(torneioId)
+    .then(async torneio => {
+        if(torneio){
+            if(await setTorneioActivo(torneio.torneioId)){
+                req.flash('success', 'Torneio activado com sucesso!')
+                res.redirect('/admin/torneios');
+            } else {
+                req.flash('error', 'Não foi possível activar o torneio');
+                res.redirect('/admin/torneios');
+            }
+        } else{
+            req.flash('error', 'Torneio inexistente.')
+            res.redirect('/admin/torneios');
+        }
+    })
+    .catch(err => {
+        console.log(err);
+        req.flash('error', 'Não foi possível activar o torneio.')
+        res.redirect('/admin/torneios');
+    });
 }

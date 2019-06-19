@@ -28,7 +28,7 @@ router.post('/adicionarUtilizador', [
 ], UsersController.createUser);
 
 // EDITAR UTILIZADOR
-router.get('/alterarPasswordUtilizador/:id', UsersController.fetchUser);
+router.get('/alterarPasswordUtilizador/:id', UsersController.getUser);
 
 router.put('/alterarPasswordUtilizador/:id', [
     check('password').not().isEmpty().withMessage('Deve inidicar a password'),

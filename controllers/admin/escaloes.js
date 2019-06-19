@@ -6,7 +6,7 @@ exports.getAllEscaloes = (req, res, next) => {
         order: [['sexo', 'DESC']]
     })
     .then(escaloes => {
-        res.render('admin/escaloes', {escaloes: escaloes});
+        res.render('admin/escaloes', {escaloes: escaloes, filtro: -1});
     })
     .catch(err => {
         console.log(err);
@@ -32,6 +32,27 @@ exports.getEscalao = (req, res, next) => {
         req.flash('error', 'Não foi possível aceder ao escalão.');
         res.redirect('/admin/escaloes');
     })
+}
+
+exports.getEscalaoBySexo = (req, res, next) => {
+    const genero = req.params.sexo;
+    let sexo = 1;
+    if(genero == 'F'){
+        sexo = 0;
+    }
+
+    Escaloes.findAll({
+        where: {sexo: sexo},
+        raw: true
+    })
+    .then(escaloes => {
+        res.render('admin/escaloes', {escaloes: escaloes, filtro: sexo});
+    })
+    .catch(err => {
+        console.log(err);
+        req.flash('error', 'Não foi possível obter os dados dos escalões.');
+        res.redirect('/admin/escaloes');
+    });
 }
 
 exports.createEscalao = (req, res, next) => {
@@ -89,14 +110,14 @@ exports.updateEscalao = (req, res, next) => {
             where: {
                 designacao: designacao,
                 sexo: sexo
-            }     
+            }, raw: true    
         }).then(escaloes => {
             // Existe escalão com a mesma designação e sexo
-            if(escaloes.length > 0){
+            if(escaloes != null){
                 const errors = [{
                     msg: 'Escalão já existente.'
                 }]
-                res.render('admin/editarEscalao', {validationErrors: errors, escalao: oldData});
+                res.render('admin/editarEscalao', {validationErrors: errors, escalao: escalao});
             } else {
                 // Não existe escalão com a mesma designação e sexo
                 // Actualiza-se o escalão
@@ -126,7 +147,7 @@ exports.updateEscalao = (req, res, next) => {
                     res.redirect('/admin/escaloes');
                 });
             }
-        })
+        });
     }
 }
 

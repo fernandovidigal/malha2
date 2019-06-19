@@ -6,7 +6,7 @@ deleteBtns.forEach(function(item, index){
         e.preventDefault();
         const userId = this.dataset.user;
         const row = this.closest('tr');
-        const username = row.querySelector('.username').textContent;
+        const username = row.querySelector('.utilizadores_username').textContent;
 
         swal.fire({
             title: 'Tem a certeza?',

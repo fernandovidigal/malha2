@@ -10,6 +10,8 @@ router.all('/*', [userAuthenticated, checkAdminStatus], (req, res, next) => {
 
 router.get('/', EscaloesController.getAllEscaloes);
 
+router.get('/filtro/:sexo', EscaloesController.getEscalaoBySexo);
+
 router.get('/adicionarEscalao', (req, res) => {
     res.render('admin/adicionarEscalao');
 });

@@ -14,45 +14,7 @@ exports.getAllUsers = (req, res, next) => {
     });
 }
 
-exports.createUser = (req, res, next) => {
-    const username = req.body.username;
-    const password = req.body.password;
-    const level = req.body.level;
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-        const oldData = {
-            username: username,
-            level: level
-        }
-        res.render('admin/adicionarUtilizador', {validationErrors: errors.array(), oldData: oldData});
-    } else {
-        User.findOne({where: {username: username}})
-            .then( user => {
-                if(user){
-                    req.flash('error', 'Nome de utilizador já existe, por favor escolha outro');
-                    res.redirect('/admin/utilizadores/adicionarUtilizador');
-                } else {
-                    User.create({
-                        username: username,
-                        password: util.encrypt(password),
-                        level: level
-                    })
-                    .then(user => {
-                        req.flash('success', 'Utilizador adicionado com sucesso');
-                        res.redirect('/admin/utilizadores');
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        req.flash('error', 'Não foi possível registar o utilizador');
-                        res.redirect('/admin/utilizadores');
-                    });
-                }
-            });
-    }
-}
-
-exports.fetchUser = (req, res, next) => {
+exports.getUser = (req, res, next) => {
     const userId = req.params.id;
 
     User.findByPk(userId)
@@ -70,6 +32,46 @@ exports.fetchUser = (req, res, next) => {
             req.flash('error', 'Não foi possível aceder aos dados do utilizador.');
             res.redirect('/admin/utilizadores');
         });
+}
+
+exports.createUser = (req, res, next) => {
+    const username = req.body.username;
+    const password = req.body.password;
+    const level = req.body.level;
+    const errors = validationResult(req);
+
+    const oldData = {
+        username: username,
+        level: level
+    }
+
+    if (!errors.isEmpty()) {
+        res.render('admin/adicionarUtilizador', {validationErrors: errors.array(), utilizador: oldData});
+    } else {
+        User.findOrCreate({
+            where: { username: username },
+            defaults: {
+                password: util.encrypt(password),
+                level: level
+            }
+        })
+        .then(([user, created]) => {
+            if(created){
+                req.flash('success', 'Utilizador adicionado com sucesso');
+                res.redirect('/admin/utilizadores');
+            } else {
+                const errors = [{
+                    msg: 'Nome de utilizador já existe.'
+                }]
+                res.render('admin/adicionarUtilizador', {validationErrors: errors, utilizador: oldData});
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            req.flash('error', 'Não foi possível registar o utilizador');
+            res.redirect('/admin/utilizadores');
+        });
+    }
 }
 
 exports.updateUserPassword = (req, res, next) => {

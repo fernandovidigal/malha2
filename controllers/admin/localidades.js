@@ -1,4 +1,4 @@
-const Localidade = require('../../models/Localidade');
+const Localidade = require('../../models/Localidades');
 const { validationResult } = require('express-validator/check');
 const util = require('../../helpers/util');
 
@@ -80,28 +80,33 @@ exports.updateLocalidade = (req, res, next) => {
     } else {
         Localidade.findByPk(localidadeId)
         .then(localidade => {
-            localidade.nome = nomeLocalidade.trim();
-            localidade.save()
-            .then(result => {
-                if(result){
-                    req.flash('success', 'Localidade actualizada com sucesso.');
-                    res.redirect('/admin/localidades');
-                } else {
-                    req.flash('error', 'Ocurreu um erro durante a actualização da localidade.');
-                    res.redirect('/admin/localidades');
-                } 
-            })
-            .catch(err => {
-                if(err.errors[0].validatorKey == 'not_unique'){
-                    const uniqueError = [{
-                            msg: err.errors[0].message
-                        }];
-                    res.render('admin/editarLocalidade', {validationErrors: uniqueError, localidade: localidade});
-                } else {
-                    req.flash('error', "Ocurreu um erro ao adicionar a localidade.");
-                    res.redirect('/admin/localidades');
-                }
-            });
+            if(localidade){
+                localidade.nome = nomeLocalidade.trim();
+                localidade.save()
+                .then(result => {
+                    if(result){
+                        req.flash('success', 'Localidade actualizada com sucesso.');
+                        res.redirect('/admin/localidades');
+                    } else {
+                        req.flash('error', 'Ocurreu um erro durante a actualização da localidade.');
+                        res.redirect('/admin/localidades');
+                    } 
+                })
+                .catch(err => {
+                    if(err.errors[0].validatorKey == 'not_unique'){
+                        const uniqueError = [{
+                                msg: err.errors[0].message
+                            }];
+                        res.render('admin/editarLocalidade', {validationErrors: uniqueError, localidade: localidade});
+                    } else {
+                        req.flash('error', "Ocurreu um erro ao adicionar a localidade.");
+                        res.redirect('/admin/localidades');
+                    }
+                });
+            } else {
+                req.flash('error', 'Localidade não existente');
+                res.redirect('/admin/localidades');
+            }
         })
         .catch(err => {
             console.log(err);

@@ -1,0 +1,26 @@
+<%- include('../includes/header.ejs') %>
+
+<% if(torneio != null){ %>
+    <div class="title__bar">
+        <h1><%= torneio.designacao %> - <%= torneio.localidade %></h1>
+        <h3><%= torneio.ano %></h3>
+    </div>
+
+    <% if(escaloes == null || escaloes.length == 0){ %>
+        <div class="messages">
+            Não existem escalões registados. Deve adicionar escalões para poder adicionar equipas.<br><a href="/admin/escaloes" class="btn primary_btn msg_link">Adicionar escalões</a>
+        </div>
+    <% } %>
+
+    <% if(localidades == null || localidades.length == 0){ %>
+        <div class="messages">
+            Não existem localidades registadas. Deve adicionar localidades para poder adicionar equipas.<br><a href="/admin/localidades" class="btn primary_btn msg_link">Adicionar localidades</a>
+        </div>
+    <% } %>
+
+<% } else { %>
+    <h2>Oops.. Algo correu mal!</h2>
+    <p>Verifique se existem torneios registados.</p>
+<% } %>
+
+<%- include('../includes/footer.ejs') %>

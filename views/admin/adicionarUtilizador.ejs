@@ -3,17 +3,17 @@
 
 <form action="/admin/utilizadores/adicionarUtilizador" method="post">
     <label for="username">Username</label>
-    <input type="text" name="username" required <% if(typeof oldData !== 'undefined') { %>value="<%= oldData.username %>"<% } %>><br>
+    <input type="text" name="username" required <% if(typeof utilizador !== 'undefined') { %>value="<%= utilizador.username %>"<% } %>><br>
     <label for="password">Password</label>
     <input type="password" name="password" required><br>
     <label for="password">Verificar Password</label>
     <input type="password" name="confirmPassword" required><br>
     <input type="radio" name="level" value="0" required checked >Utilizador<br>
-    <input type="radio" name="level" value="5" <% if(typeof oldData !== 'undefined' && oldData.level == 5) { %> 
+    <input type="radio" name="level" value="5" <% if(typeof utilizador !== 'undefined' && utilizador.level == 5) { %> 
                                                     checked 
                                                 <% } %>
                                                 >Gestor<br>
-    <input type="radio" name="level" value="10" <% if(typeof oldData !== 'undefined' && oldData.level == 10) { %> 
+    <input type="radio" name="level" value="10" <% if(typeof utilizador !== 'undefined' && utilizador.level == 10) { %> 
                                                     checked 
                                                 <% } %>
                                                 >Administrador<br>

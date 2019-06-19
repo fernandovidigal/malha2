@@ -25,4 +25,17 @@ router.post('/adicionarTorneio', [
 
 router.get('/activaTorneio/:id', TorneiosController.ActivaTorneio);
 
+router.get('/editarTorneio/:id', TorneiosController.getTorneio);
+
+router.put('/editarTorneio/:id', [
+    check('designacao').not().isEmpty().withMessage('Deve indicar a designação do torneio.'),
+    check('localidade').not().isEmpty().withMessage('Deve indicar a localidade do torneio.'),
+    check('localidade').matches(/^[^0-9]+$/).withMessage('Nome da localidade inválido'),
+    check('ano').not().isEmpty().withMessage('Deve indicar o ano do torneio.'),
+    check('ano').isNumeric().isLength({ min: 4, max:4 }).withMessage('Ano do torneio inválido'),
+    check('campos').optional({ checkFalsy: true }).isNumeric().withMessage('Número de campos inválido')
+] ,TorneiosController.updateTorneio);
+
+router.delete('/deleteTorneio', TorneiosController.deleteTorneio);
+
 module.exports = router;

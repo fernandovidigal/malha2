@@ -4,13 +4,14 @@ const deleteBtns = document.querySelectorAll('.delete_btn');
 deleteBtns.forEach(function(item, index){
     item.addEventListener('click', function(e){
         e.preventDefault();
-        const localidadeId = this.dataset.localidade;
+        const torneioId = this.dataset.torneio;
         const row = this.closest('tr');
-        const localidade = row.querySelector('.localidade').textContent;
+        const designacao = row.querySelector('.torneio_designacao').textContent;
+        const localidade = row.querySelector('.torneio_localidade').textContent;
 
         swal.fire({
             title: 'Tem a certeza?',
-            html: "O localidade <strong>" + localidade + "</strong> será eliminada!",
+            html: "O torneio <strong>" + designacao + " (" + localidade + ")</strong> será eliminado!",
             type: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Sim, eliminar!',
@@ -21,21 +22,21 @@ deleteBtns.forEach(function(item, index){
         })
         .then(result => {
             if(result.value){
-                fetch("/admin/localidades/deleteLocalidade", {
+                fetch("/admin/torneios/deleteTorneio", {
                     headers: {'Content-Type': 'application/json'},
                     method: 'DELETE',
-                    body: JSON.stringify({id: localidadeId})
+                    body: JSON.stringify({id: torneioId})
                 })
                 .then(response => {
                     if(response.status != 200){
-                        throw new Error("Não foi possível eliminar a localidade.");
+                        throw new Error("Não foi possível eliminar o torneio.");
                     }
 
                     return response.json();
                 })
                 .then(data => {
                     if(!data.success){
-                        throw new Error("Não foi possível eliminar a localidade.");
+                        throw new Error("Não foi possível eliminar o torneio.");
                     }
 
                     location.reload();

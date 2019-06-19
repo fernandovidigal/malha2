@@ -1,6 +1,11 @@
 <%- include('../includes/header.ejs') %>
 
 <div class="buttons_bar">
+        <div class="select_escalao">
+            <a href="/admin/escaloes" class="option_btn <%= (filtro < 0) ? 'option_btn__selected' : '' %>"><i class="fa fa-users"></i>Todos</a>
+            <a href="/admin/escaloes/filtro/M" class="option_btn <%= (filtro == 1) ? 'option_btn__selected' : '' %>"><i class="fa fa-male"></i>Masculino</a>
+            <a href="/admin/escaloes/filtro/F" class="option_btn <%= (filtro == 0) ? 'option_btn__selected' : '' %>"><i class="fa fa-female"></i>Feminino</a>
+        </div>
     <div class="action_btns a-right">
         <a href="/admin/escaloes/adicionarEscalao" class="btn primary_btn"><i class="fa fa-plus"></i>Adicionar Escalão</a>
     </div>

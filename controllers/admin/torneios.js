@@ -36,14 +36,33 @@ exports.getAllTorneios = (req, res, next) => {
     });
 }
 
+exports.getTorneio = (req, res, next) => {
+    const torneioId = req.params.id;
+
+    Torneio.findByPk(torneioId)
+    .then(torneio => {
+        if(torneio){
+            res.render('admin/editarTorneio', {torneio: torneio});
+        } else {
+            req.flash('error', 'Torneio não existe.');
+            res.redirect('/admin/torneios');
+        }
+    })
+    .catch(err => {
+        console.log(err);
+        req.flash('error', 'Não foi possível aceder ao torneio.');
+        res.redirect('/admin/torneios');
+    });
+}
+
 exports.createTorneio = (req, res, next) => {
     const designacao = req.body.designacao.trim();
     const localidade = req.body.localidade.trim();
     const ano = req.body.ano.trim();
-    const campos = 0;
+    let campos = 0;
     const errors = validationResult(req);
 
-    if(campos){
+    if(req.body.campos){
         campos = req.body.campos.trim();
     }
 
@@ -131,4 +150,78 @@ exports.ActivaTorneio = (req, res, next) => {
         req.flash('error', 'Não foi possível activar o torneio.')
         res.redirect('/admin/torneios');
     });
+}
+
+exports.updateTorneio = (req, res, next) => {
+    const torneioId = req.params.id;
+    const designacao = req.body.designacao.trim();
+    const localidade = req.body.localidade.trim();
+    const ano = req.body.ano.trim();
+    let campos = 0;
+    const errors = validationResult(req);
+
+    if(req.body.campos){
+        campos = req.body.campos.trim();
+    }
+
+    if(!errors.isEmpty()){
+        const oldData = {
+            torneioId: torneioId,
+            designacao: designacao,
+            localidade: localidade,
+            ano: ano,
+            campos: campos
+        }
+        res.render('admin/editarTorneio', {validationErrors: errors.array({ onlyFirstError: true }), torneio: oldData});
+    } else {
+        Torneio.findByPk(torneioId)
+        .then(torneio => {
+            if(torneio){
+                torneio.designacao = designacao;
+                torneio.localidade = localidade;
+                torneio.ano = ano;
+                torneio.campos = campos;
+                
+                torneio.save()
+                .then(result => {
+                    if(result) {
+                        req.flash('success', 'Torneio actualizado com sucesso.');
+                        res.redirect('/admin/torneios');
+                    } else {
+                        req.flash('error', 'Ocurreu um erro durante a actualização do torneio.');
+                        res.redirect('/admin/torneios');
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                    req.flash('error', 'Não foi possível actualizar o torneio.');
+                    res.redirect('/admin/torneios');
+                });
+            } else {
+                req.flash('error', 'Torneio não existe.');
+                res.redirect('/admin/torneios');
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            req.flash('error', 'Não foi possível actualizar o torneio.');
+            res.redirect('/admin/torneios');
+        });
+    }
+}
+
+exports.deleteTorneio = (req, res, next) => {
+    const torneioId = req.body.id;
+
+    Torneio.destroy({where: {torneioId: torneioId}, limit: 1})
+        .then(result => {
+            if(result){
+                res.status(200).json({success: true});
+            } else {
+                res.status(200).json({success: false});
+            }
+        })
+        .catch(err => { 
+            res.status(200).json({success: false});
+        });
 }

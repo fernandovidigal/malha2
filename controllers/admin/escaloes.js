@@ -10,7 +10,7 @@ exports.getAllEscaloes = (req, res, next) => {
     })
     .catch(err => {
         console.log(err);
-        req.flash('error', 'Não foi possível obter os dados dos escalões!');
+        req.flash('error', 'Não foi possível obter os dados dos escalões.');
         res.redirect('/admin/escaloes');
     });
 }
@@ -23,7 +23,7 @@ exports.getEscalao = (req, res, next) => {
         if(escalao){
             res.render('admin/editarEscalao', {escalao: escalao});
         } else {
-            req.flash('error', 'Escalão não existente');
+            req.flash('error', 'Escalão não existe.');
             res.redirect('/admin/escaloes');
         }
     })
@@ -80,13 +80,15 @@ exports.createEscalao = (req, res, next) => {
                 res.redirect('/admin/escaloes');
             } else {
                 const errors = [{
-                    msg: 'Escalão já existente.'
+                    msg: 'Escalão já existe.'
                 }]
                 res.render('admin/adicionarEscalao', {validationErrors: errors, escalao: oldData});
             }
         })
         .catch(err => {
             console.log(err);
+            req.flash('error', 'Não foi possível adicionar o escalão.');
+            res.redirect('/admin/escaloes');
         });
     }
 }
@@ -115,7 +117,7 @@ exports.updateEscalao = (req, res, next) => {
             // Existe escalão com a mesma designação e sexo
             if(escaloes != null){
                 const errors = [{
-                    msg: 'Escalão já existente.'
+                    msg: 'Escalão já existe.'
                 }]
                 res.render('admin/editarEscalao', {validationErrors: errors, escalao: escalao});
             } else {

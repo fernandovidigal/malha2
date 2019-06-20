@@ -86,10 +86,10 @@ exports.createTorneio = (req, res, next) => {
             // Escolheu adicionar e activar o torneios
             if(req.body.adicionar_activar){
                 if(await setTorneioActivo(torneio.torneioId)){
-                    req.flash('success', 'Torneio adicionado e activado com sucesso!')
+                    req.flash('success', 'Torneio adicionado e activado com sucesso.')
                     res.redirect('/admin/torneios');
                 } else {
-                    req.flash('error', 'Não foi possível activar o torneio!');
+                    req.flash('error', 'Não foi possível activar o torneio.');
                     res.redirect('/admin/torneios');
                 }
             } else {
@@ -100,28 +100,28 @@ exports.createTorneio = (req, res, next) => {
                 .then(async count => {
                     if(count == 1){
                         if(await setTorneioActivo(torneio.torneioId)){
-                            req.flash('success', 'Torneio adicionado e activado com sucesso!')
+                            req.flash('success', 'Torneio adicionado e activado com sucesso.')
                             res.redirect('/admin/torneios');
                         } else {
-                            req.flash('error', 'Não foi possível activar o torneio!');
+                            req.flash('error', 'Não foi possível activar o torneio.');
                             res.redirect('/admin/torneios');
                         }
                     } else {
                         // Existem mais que 1 torneios registados, adicionar apenas
-                        req.flash('success', 'Torneio adicionado e activado com sucesso!')
+                        req.flash('success', 'Torneio adicionado e activado com sucesso.')
                         res.redirect('/admin/torneios');
                     }
                 })
                 .catch(err => {
                     console.log(err);
-                    req.flash('error', 'Não foi possível activar o torneio');
+                    req.flash('error', 'Não foi possível activar o torneio.');
                     res.redirect('/admin/torneios');
                 });
             }
         })
         .catch(err => {
             console.log(err);
-            req.flash('error', 'Não foi possível adicionar o torneio!');
+            req.flash('error', 'Não foi possível adicionar o torneio.');
             res.redirect('/admin/torneios');
         });
     }
@@ -134,14 +134,14 @@ exports.ActivaTorneio = (req, res, next) => {
     .then(async torneio => {
         if(torneio){
             if(await setTorneioActivo(torneio.torneioId)){
-                req.flash('success', 'Torneio activado com sucesso!')
+                req.flash('success', 'Torneio activado com sucesso.')
                 res.redirect('/admin/torneios');
             } else {
-                req.flash('error', 'Não foi possível activar o torneio');
+                req.flash('error', 'Não foi possível activar o torneio.');
                 res.redirect('/admin/torneios');
             }
         } else{
-            req.flash('error', 'Torneio inexistente.')
+            req.flash('error', 'Torneio não existe.')
             res.redirect('/admin/torneios');
         }
     })

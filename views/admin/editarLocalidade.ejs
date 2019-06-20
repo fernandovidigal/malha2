@@ -1,10 +1,16 @@
 <%- include('../includes/header.ejs') %>
 <%- include('../includes/validationErrors.ejs') %>
 
+<% if(typeof localidade !== 'undefined'){ %>
 <form action="/admin/localidades/editarLocalidade/<%= localidade.localidadeId %>?_method=PUT" method="post">
     <label for="localidade">Localidade</label>
     <input type="text" name="localidade" pattern="^[^0-9]+$" value="<%= localidade.nome %>" required><br>
     <input type="submit" name="actualizar" value="Actualizar">
+    <a href="/admin/localidades">Cancelar</a>
 </form>
+<% } else { %>
+    <h1>Oops...Algo correu mal!</h1>
+    <a href="/admin/localidades">Voltar</a>
+<% } %>
 
 <%- include('../includes/footer.ejs') %>

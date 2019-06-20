@@ -12,9 +12,11 @@
         <label for="campos">Número de campos: </label>
         <input type="text" name="campos" value="<%= torneio.campos %>" required><br>
         <input type="submit" value="Actualizar">
+        <a href="/admin/torneios">Cancelar</a>
     </form>
 <% } else { %>
         <h2>Oops...Algo correu mal!</h2>
+        <a href="/admin/torneios">Voltar</a>
 <% } %>
 
 <%- include('../includes/footer.ejs') %>

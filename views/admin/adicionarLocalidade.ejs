@@ -3,7 +3,11 @@
 
 <form action="/admin/localidades/adicionarLocalidade" method="post">
     <label for="localidade">Localidade</label>
-    <input type="text" name="localidade" pattern="^[^0-9]+$" required><br>
+    <input type="text" name="localidade" pattern="^[^0-9]+$" required
+        <% if(typeof localidade !== 'undefined'){ %>
+            value="<%= localidade.nome %>"
+        <% } %>
+    ><br>
     <input type="submit" name="adicionar" value="Adicionar">
     <a href="/admin/localidades">Cancelar</a>
 </form>

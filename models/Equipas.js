@@ -24,7 +24,7 @@ const Equipas = sequelize.define('equipas', {
         type: Sequelize.INTEGER,
         allowNull: false
     },
-    escalaoID: {
+    escalaoId: {
         type: Sequelize.INTEGER,
         allowNull: false
     }

@@ -1,0 +1,54 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/validationErrors.ejs') %>
+
+<form action="/equipas/adicionarEquipa" method="post">
+    <label for="primeiro_elemento">Nome do Primeiro Elemento</label>
+    <input type="text" name="primeiro_elemento" 
+        <% if(typeof equipa !== 'undefined'){ %>
+            value="<%= equipa.primeiroElemento %>"
+        <% } %>
+    ><br>
+    <label for="segundo_elemento">Nome do Segundo Elemento</label>
+    <input type="text" name="segundo_elemento" 
+        <% if(typeof equipa !== 'undefined'){ %>
+            value="<%= equipa.segundoElemento %>"
+        <% } %>
+    ><br>
+    <label for="Localidade">Localidade</label>
+    <select name="localidade" id="localidade" >
+        <option value="0"></option>
+        <% localidades.forEach(function(localidade){ %>
+            <option value="<%= localidade.localidadeId %>" 
+                <% if(typeof equipa !== 'undefined' && equipa.localidade == localidade.localidadeId){ %>
+                    selected
+                <% } %>
+            ><%= localidade.nome %></option>
+        <% }); %>
+    </select>
+    <p>Escalões</p>
+    <p>Masculino</p>
+    <% escaloes.forEach(function(escalao){ %>
+        <% if(escalao.sexo == 1){ %>
+            <input type="radio" name="escalao" value="<%= escalao.escalaoId %>"  
+                <% if(typeof equipa !== 'undefined' && equipa.escalao == escalao.escalaoId){ %>
+                    checked
+                <% } %>
+            ><%= escalao.designacao %>
+        <% } %>
+    <% }); %>
+    <p>Feminino</p>
+    <% escaloes.forEach(function(escalao){ %>
+        <% if(escalao.sexo == 0){ %>
+            <input type="radio" name="escalao" value="<%= escalao.escalaoId %>"  
+                <% if(typeof equipa !== 'undefined' && equipa.escalao == escalao.escalaoId){ %>
+                    checked
+                <% } %>
+            ><%= escalao.designacao %>
+        <% } %>
+    <% }); %>
+    <br>
+    <input type="submit" value="Registar">
+    <a href="/equipas">Cancelar</a>
+</form>
+
+<%- include('../includes/footer.ejs') %>

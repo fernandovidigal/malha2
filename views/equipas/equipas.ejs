@@ -10,17 +10,74 @@
         <div class="messages">
             Não existem escalões registados. Deve adicionar escalões para poder adicionar equipas.<br><a href="/admin/escaloes" class="btn primary_btn msg_link">Adicionar escalões</a>
         </div>
-    <% } %>
-
-    <% if(localidades == null || localidades.length == 0){ %>
+    <% } else if(localidades == null || localidades.length == 0){ %>
         <div class="messages">
             Não existem localidades registadas. Deve adicionar localidades para poder adicionar equipas.<br><a href="/admin/localidades" class="btn primary_btn msg_link">Adicionar localidades</a>
+        </div>
+    <% } else { %>
+
+    <div class="table_sidebar__wrapper">
+        <div class="table__content">
+            <div class="buttons_bar">
+                <div class="search_bar">
+                    <% if(typeof equipaId != 'undefined'){ %>
+                        <div class="search_equipaID">
+                            <%= equipaId %>
+                            <a href="/equipas"><i class="fas fa-times-circle"></i></a>
+                        </div>
+                    <% } %>
+                    <form action="/equipas/pesquisa" method="post" class="searchBox">
+                        <input type="text" name="pesquisaEquipaId" class="searchBox__input" pattern="^[0-9]+$" placeholder="Equipa"/>
+                        <button class="searchBox__btn"><i class="fa fa-search no-margin"></i></button>
+                    </form>
+                </div>
+                <div class="action_btns a-right">
+                        <a href="/equipas/adicionarEquipa" class="btn primary_btn"><i class="fa fa-plus"></i>Adicionar Equipa</a>
+                    <button class="btn print_btn" onclick="window.print()"><i class="fas fa-print"></i>Imprimir</button>
+                </div>
+            </div>
+            <table class="listTable equipasTable">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>Elementos</th>
+                        <th>Localidade</th>
+                        <th>Escalão</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                <% if(typeof equipas != 'undefined' && equipas.length > 0){ %>
+                    <% equipas.forEach(function(equipa){ %>
+                        <tr>
+                            <td class="w5"><%= equipa.equipaId %></td>
+                            <td class="w5"><a href="/equipas/percurso/<%= equipa.equipaId %>" class="classificacoes_icon"><i class="fas fa-clipboard-list"></i></a></td>
+                            <td><%= equipa.primeiroElemento %><br><%= equipa.segundoElemento %></td>
+                            <td class="w20 table_cell_center"><%= equipa.localidade.nome %></td>
+                            <td class="w20 table_cell_center"><%= equipa.escalo.designacao %><br>(<%= equipa.sexo == 0 ? 'Feminino': 'Masculino' %>)</td>
+                            <td class="w5"><a href="/equipas/editarEquipa/<%= equipa.equipaId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
+                            <td class="w5">
+                                <form action="/equipas/<%= equipa.equipaId %>?_method=DELETE" method="POST">
+                                    <button type="submit" class="btn delete_btn"><i class="fa fa-trash"></i>Apagar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="7">Não foram encontradas equipas registadas.</td>
+                    </tr>
+                <% } %>
+                </tbody>
+            </table>
         </div>
     <% } %>
 
 <% } else { %>
     <h2>Oops.. Algo correu mal!</h2>
-    <p>Verifique se existem torneios registados.</p>
+    <p>Verifique se existem torneios registados ou activados.</p>
 <% } %>
 
 <%- include('../includes/footer.ejs') %>

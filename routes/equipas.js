@@ -10,4 +10,15 @@ router.all('/*', userAuthenticated, (req, res, next) => {
 
 router.get('/', EquipasController.getAllEquipas);
 
+router.get('/adicionarEquipa', EquipasController.adicionarEquipa);
+
+router.post('/adicionarEquipa', [
+    check('primeiro_elemento').trim().escape().not().isEmpty().withMessage('Deve indicar o nome do primeiro elemento da equipa.'),
+    check('primeiro_elemento').trim().escape().matches(/^[^0-9]+$/).withMessage('Nome do primeiro elemento inválido.'),
+    check('segundo_elemento').trim().escape().not().isEmpty().withMessage('Deve indicar o nome do segundo elemento da equipa.'),
+    check('segundo_elemento').trim().escape().matches(/^[^0-9]+$/).withMessage('Nome do segundo elemento inválido.'),
+    check('localidade').not().equals('0').withMessage('Deve selecionar a localidade da equipa.'),
+    check('escalao').exists().withMessage('Deve selecionar o escalão ao qual pertence a equipa.')
+], EquipasController.createEquipa);
+
 module.exports = router;

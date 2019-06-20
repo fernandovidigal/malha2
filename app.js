@@ -15,8 +15,8 @@ const fileStruct = require('./helpers/fileStruct');
 fileStruct.dataDirectoryCheck();
 
 // Models
-const User = require('./models/user');
-const Localidade = require('./models/Localidades');
+const Users = require('./models/user');
+const Localidades = require('./models/Localidades');
 const Escaloes = require('./models/Escaloes');
 const Torneios = require('./models/Torneios');
 const Equipas = require('./models/Equipas');
@@ -78,10 +78,18 @@ app.use('/admin/escaloes', adminEscaloes);
 app.use('/admin/torneios', adminTorneios);
 app.use('/equipas', equipas);
 
+// Definir relações entre as bases de dados
+Torneios.hasMany(Equipas, {foreignKey: 'torneioId', onDelete: 'cascade'});
+Equipas.belongsTo(Torneios, {foreignKey: 'torneioId'});
+Localidades.hasMany(Equipas, {foreignKey: 'localidadeId', onDelete: 'cascade'});
+Equipas.belongsTo(Localidades, {foreignKey: 'localidadeId'});
+Escaloes.hasMany(Equipas, {foreignKey: 'escalaoId', onDelete: 'cascade'});
+Equipas.belongsTo(Escaloes, {foreignKey: 'escalaoId'});
+
 sequelize
     .sync()
     .then(async (result) =>{
-        await User.findOrCreate({
+        await Users.findOrCreate({
             where: {username: 'admin'},
             defaults: {
                 password: util.encrypt('12345'),

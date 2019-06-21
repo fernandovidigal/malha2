@@ -1,26 +1,21 @@
 <%- include('../includes/header.ejs') %>
 <%- include('../includes/validationErrors.ejs') %>
 
-<form action="/equipas/adicionarEquipa" method="post">
+<% if(typeof equipa !== 'undefined'){ %>
+
+<form action="/equipas/editarEquipa/<%= equipa.equipaId %>?_method=PUT" method="post">
+    <p>Equipa: <%= equipa.equipaId %></p>
     <label for="primeiro_elemento">Nome do Primeiro Elemento</label>
-    <input type="text" name="primeiro_elemento" pattern="^[^0-9]+$" required 
-        <% if(typeof equipa !== 'undefined'){ %>
-            value="<%= equipa.primeiroElemento %>"
-        <% } %>
-    ><br>
+    <input type="text" name="primeiro_elemento" pattern="^[^0-9]+$" required value="<%= equipa.primeiroElemento %>"><br>
     <label for="segundo_elemento">Nome do Segundo Elemento</label>
-    <input type="text" name="segundo_elemento" pattern="^[^0-9]+$" required 
-        <% if(typeof equipa !== 'undefined'){ %>
-            value="<%= equipa.segundoElemento %>"
-        <% } %>
-    ><br>
+    <input type="text" name="segundo_elemento" pattern="^[^0-9]+$" required value="<%= equipa.segundoElemento %>"><br>
     <label for="Localidade">Localidade</label>
     <% if(typeof localidades != 'undefined' && localidades.length > 0){ %>
-        <select required name="localidade" id="localidade">
+        <select name="localidade" id="localidade" required>
             <option value=""></option>
                 <% localidades.forEach(function(localidade){ %>
                     <option value="<%= localidade.localidadeId %>" 
-                        <% if(typeof equipa != 'undefined' && equipa.localidadeId == localidade.localidadeId){ %>
+                        <% if(equipa.localidadeId == localidade.localidadeId){ %>
                             selected
                         <% } %>
                     ><%= localidade.nome %></option>
@@ -29,14 +24,14 @@
     <% } else { %>
         Não existem localidades registadas.
     <% } %>
-    
+
     <p>Escalões</p>
     <% if(typeof escaloes != 'undefined' && escaloes.length > 0){ %>
         <p>Masculino</p>
         <% escaloes.forEach(function(escalao){ %>
             <% if(escalao.sexo == 1){ %>
                 <input type="radio" name="escalao" required value="<%= escalao.escalaoId %>"  
-                    <% if(typeof equipa != 'undefined' && equipa.escalaoId == escalao.escalaoId){ %>
+                    <% if(equipa.escalaoId == escalao.escalaoId){ %>
                         checked
                     <% } %>
                 ><%= escalao.designacao %>
@@ -46,7 +41,7 @@
         <% escaloes.forEach(function(escalao){ %>
             <% if(escalao.sexo == 0){ %>
                 <input type="radio" name="escalao" required value="<%= escalao.escalaoId %>"  
-                    <% if(typeof equipa != 'undefined' && equipa.escalaoId == escalao.escalaoId){ %>
+                    <% if(equipa.escalaoId == escalao.escalaoId){ %>
                         checked
                     <% } %>
                 ><%= escalao.designacao %>
@@ -56,8 +51,13 @@
         Não existem escalões registadas.
     <% } %>
     <br>
-    <input type="submit" value="Registar">
+    <input type="submit" value="Actualizar">
     <a href="/equipas">Cancelar</a>
 </form>
+
+<% } else { %>
+    <h1>Oops...Algo correu mal!</h1>
+    <a href="/equipas">Voltar</a>
+<% } %>
 
 <%- include('../includes/footer.ejs') %>

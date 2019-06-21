@@ -20,6 +20,11 @@ const Escaloes = sequelize.define('escaloes', {
             max: 1
         }
     }
+}, {
+    name: {
+        singular: "escalao",
+        plural: "escaloes"
+    }
 });
 
 module.exports = Escaloes;

@@ -36,4 +36,16 @@ router.get('/eliminarEquipa/:id', EquipasController.getEquipaToDelete);
 
 router.delete('/eliminarEquipa/:id', EquipasController.deleteEquipa);
 
+// Pesquisa de equipas
+router.post('/pesquisa', [
+    check('pesquisaEquipaId').trim().escape().not().isEmpty().withMessage('Deve indicar o Nº da Equipa a pesquisar.'),
+    check('pesquisaEquipaId').trim().escape().matches(/^[0-9]+$/).withMessage('Nº da Equipa inválido.')
+], EquipasController.searchEquipa);
+
+// FAKER
+// Gera equipa aleatóriamente
+router.get('/faker/:num', EquipasController.createEquipasAleatoriamente);
+
+router.get('/faker/:num/:escalao', EquipasController.createEquipasAleatoriamentePorEscalao);
+
 module.exports = router;

@@ -5,6 +5,9 @@ const Escaloes = require('../models/Escaloes');
 const { validationResult } = require('express-validator/check');
 const util = require('../helpers/util');
 
+const faker = require('faker');
+faker.locale = "pt_BR";
+
 function getTorneioInfo(){
     return Torneios.findOne({where: {activo: 1}, raw: true});
 }
@@ -309,4 +312,142 @@ exports.deleteEquipa = (req, res, next) => {
     } else {
         res.redirect('/equipas');
     }
+}
+
+// Pesquisar Equipas
+exports.searchEquipa = (req, res, next) => {
+    const equipaId = req.body.pesquisaEquipaId;
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()){
+        const error = errors.array({ onlyFirstError: true })[0].msg;
+        req.flash("error", error);
+        res.redirect('/equipas');
+    } else {
+        Equipas.findAll({
+            where: {equipaId: equipaId},
+            include: [
+                {
+                    model: Localidades,
+                    attributes: ['nome']
+                },
+                {
+                    model: Escaloes,
+                    attributes: ['designacao', 'sexo']
+                }
+            ]
+        })
+        .then(async equipa => {
+            if(equipa){
+                const torneioInfo = getTorneioInfo();
+                const localidadesInfo = getLocalidadesInfo();
+                const escaloesInfo = getEscaloesInfo();
+
+                Promise.all([torneioInfo, localidadesInfo, escaloesInfo])
+                .then(([torneio, localidades, escaloes]) => {
+                    res.render("equipas/equipas", {
+                        equipaId: equipaId,
+                        equipas: equipa,
+                        torneio: torneio,
+                        localidades: localidades,
+                        escaloes: escaloes
+                    });
+                })
+                .catch(err => {
+                    console.log(err);
+                    req.flash("error", "Ocorreu um erro. Não foi possível pesquisar a equipa.");
+                    res.redirect('/equipas');
+                });
+            } else {
+                req.flash("error", "Não exitem equipa com o número indicado.");
+                res.redirect('/equipas');
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            req.flash("error", "Não foi possível encontrar a equipa.");
+            res.redirect('/equipas');
+        });
+    }
+}
+
+// Faker
+exports.createEquipasAleatoriamente = (req, res, next) => {
+    const num = req.params.num;
+
+    var listaEscaloes = [];
+    var listaLocalidades = [];
+
+    const torneioInfo = getTorneioInfo();
+    const localidadesInfo = getLocalidadesInfo();
+    const escaloesInfo = getEscaloesInfo();
+
+    Promise.all([torneioInfo, localidadesInfo, escaloesInfo])
+    .then(([torneio, localidades, escaloes]) => {
+        localidades.forEach(localidade => {
+            listaLocalidades.push(localidade.localidadeId);
+        });
+
+        escaloes.forEach(escalao => {
+            listaEscaloes.push(escalao.escalaoId);
+        });
+
+        let count = 0;
+        for(let i = 0; i < num; i++){
+            Equipas.create({
+                torneioId: torneio.torneioId,
+                primeiroElemento: faker.name.firstName() + " " + faker.name.lastName(),
+                segundoElemento: faker.name.firstName() + " " + faker.name.lastName(),
+                localidadeId: listaLocalidades[Math.floor(Math.random() * listaLocalidades.length)],
+                escalaoId: listaEscaloes[Math.floor(Math.random() * listaEscaloes.length)]
+            }).then(() => {
+                count++;
+            });
+        }
+
+        req.flash('success', `${count} adicionadas com sucesso.`);
+        res.redirect('/equipas');
+    })
+    .catch(err => {
+        console.log(err);
+        req.flash('error', 'Não foi possível gerar equipas aleatóriamente.');
+        res.redirect('/equipas');
+    });
+}
+
+exports.createEquipasAleatoriamentePorEscalao = (req, res, next) => {
+    const escalaoId = req.params.escalao;
+    const num = req.params.num;
+    var listaLocalidades = [];
+
+    const torneioInfo = getTorneioInfo();
+    const localidadesInfo = getLocalidadesInfo();
+
+    Promise.all([torneioInfo, localidadesInfo])
+    .then(([torneio, localidades]) => {
+        localidades.forEach(localidade => {
+            listaLocalidades.push(localidade.localidadeId);
+        });
+
+        let count = 0;
+        for(let i = 0; i < num; i++){
+            Equipas.create({
+                torneioId: torneio.torneioId,
+                primeiroElemento: faker.name.firstName() + " " + faker.name.lastName(),
+                segundoElemento: faker.name.firstName() + " " + faker.name.lastName(),
+                localidadeId: listaLocalidades[Math.floor(Math.random() * listaLocalidades.length)],
+                escalaoId: escalaoId
+            }).then(equipa => {
+                count++;
+            });
+        }
+
+        req.flash('success', `${count} adicionadas com sucesso.`);
+        res.redirect('/equipas');
+    })
+    .catch(err => {
+        console.log(err);
+        req.flash('error', 'Não foi possível gerar equipas aleatóriamente.');
+        res.redirect('/equipas');
+    });
 }

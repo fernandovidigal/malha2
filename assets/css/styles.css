@@ -806,3 +806,116 @@ animation-delay: -0.16s;
     font-weight: bold;
     font-size: 120%;
 }
+
+/* //////////////////////////////////// */
+.localidadesSearchWrapper,
+.escaloesSearchWrapper {
+    margin-left: 20px;
+}
+
+.localidadesSearchWrapper ul,
+.escaloesSearchWrapper ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.topDropMenu {
+    position: relative;
+}
+
+.dropMenuTitle {
+    background-color: #f8f9ff;
+    border: solid 1px #eaebf1;
+    border-radius: 8px;
+    padding: 6px 20px 6px 12px;
+    font-size: 15px;
+    outline: none;
+    position: relative;
+}
+
+.dropMenuTitle i {
+    margin-left: 10px;
+    margin-right: 14px;
+    color: #455cc7;
+}
+
+.dropMenuTitle::after {
+    content: "";
+    display: block;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 7px 0 7px;
+    border-color: #a7acc0 transparent transparent transparent;
+}
+
+.dropMenuListItems {
+    display: none;
+    background-color: #f8f9ff;
+    border: solid 1px #eaebf1;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    overflow: hidden;
+}
+
+.topDropMenu:hover > .dropMenuListItems {
+    display: block;
+}
+
+.topDropMenu:hover > .dropMenuTitle {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+}
+
+.dropItem {
+    display: flex;
+    justify-content: stretch;
+    align-items: center;
+}
+
+.dropItem i {
+    font-size: 12px;
+    padding-left: 10px;
+    background-color: transparent;
+}
+
+.dropSubMenuTitle,
+.dropItem a{
+    width: 100%;
+    display: block;
+    line-height: 2.75;
+    padding-left: 22px;
+    color: #333333;
+}
+
+.dropItemselected {
+    padding-left: 5px !important;
+}
+
+.dropMenuTitleSelected {
+    background-color: #ffffff;
+    box-shadow: 0 2px 16px rgba(69, 92, 199, .2);
+    border: solid 1px #dddfe8;
+}
+
+.dropItem:not(:last-child){
+    border-bottom: solid 1px #eaebf1;
+}
+
+.dropItem:hover {
+    background-color: #eaebf1;
+}
+
+.dropSubMenuTitle {
+    width: auto;
+    background-color: #8f9de2;
+    color: #ffffff;
+    padding-left: 10px;
+}
+

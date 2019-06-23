@@ -1,0 +1,21 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/validationErrors.ejs') %>
+
+<% if(torneio != null){ %>
+    <div class="title__bar">
+        <h1><%= torneio.designacao %> - <%= torneio.localidade %></h1>
+        <h3><%= torneio.ano %></h3>
+    </div>
+
+    <p>Definir número de campos!</p>
+    <form action="/torneio/definirNumeroCampos" method="post">
+        <label for="numCampos">Número de Campos:</label>
+        <input type="text" name="numCampos" pattern="^[0-9]+$" {{#if data.numCampos}}value="{{data.numCampos}}"{{/if}} required><br>
+        <input type="submit" value="Definir e avançar">
+    </form>
+<% } else { %>
+    <h2>Oops.. Algo correu mal!</h2>
+    <p>Verifique se existem torneios registados ou activados.</p>
+<% } %>
+
+<%- include('../includes/footer.ejs') %>

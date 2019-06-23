@@ -1,0 +1,25 @@
+<%- include('../includes/header.ejs') %>
+
+<% if(torneio != null){ %>
+    <div class="title__bar">
+        <h1><%= torneio.designacao %> - <%= torneio.localidade %></h1>
+        <h3><%= torneio.ano %></h3>
+    </div>
+
+    <% if(typeof messages != 'undefined'){ %>
+        <div class="messages">
+            <p><%= messages.msg %></p>
+            <a href="/equipas" class="btn primary_btn">Adicionar Equipas</a>
+        </div>
+    <% } %>
+
+    
+
+
+
+<% } else { %>
+    <h2>Oops.. Algo correu mal!</h2>
+    <p>Verifique se existem torneios registados ou activados.</p>
+<% } %>
+
+<%- include('../includes/footer.ejs') %>

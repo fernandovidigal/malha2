@@ -14,15 +14,42 @@ const fileStruct = require('./helpers/fileStruct');
 // Chech File Structure
 fileStruct.dataDirectoryCheck();
 
+// Database
+const sequelize = require('./helpers/database');
+
 // Models
 const Users = require('./models/user');
 const Localidades = require('./models/Localidades');
 const Escaloes = require('./models/Escaloes');
 const Torneios = require('./models/Torneios');
 const Equipas = require('./models/Equipas');
+const Jogos = require('./models/Jogos');
+const Parciais = require('./models/Parciais');
 
-// Database
-const sequelize = require('./helpers/database');
+// Definir relações entre as bases de dados
+Torneios.hasMany(Equipas, {foreignKey: 'torneioId', onDelete: 'cascade'});
+Equipas.belongsTo(Torneios, {foreignKey: 'torneioId'});
+Localidades.hasMany(Equipas, {foreignKey: 'localidadeId', onDelete: 'cascade'});
+Equipas.belongsTo(Localidades, {foreignKey: 'localidadeId'});
+Escaloes.hasMany(Equipas, {foreignKey: 'escalaoId', onDelete: 'cascade'});
+Equipas.belongsTo(Escaloes, {foreignKey: 'escalaoId'});
+
+
+Torneios.hasMany(Jogos, {foreignKey: 'torneioId', onDelete: 'cascade'});
+Jogos.belongsTo(Torneios, {foreignKey: 'torneioId'});
+Escaloes.hasMany(Jogos, {foreignKey: 'escalaoId', onDelete: 'cascade'});
+Jogos.belongsTo(Escaloes, {foreignKey: 'escalaoId'});
+Equipas.hasMany(Jogos, {foreignKey: 'equipa1Id', onDelete: 'set null'});
+Jogos.belongsTo(Equipas, {foreignKey: 'equipa1Id'});
+Equipas.hasMany(Jogos, {foreignKey: 'equipa2Id', onDelete: 'set null'});
+Jogos.belongsTo(Equipas, {foreignKey: 'equipa2Id'});
+
+Jogos.hasMany(Parciais, {foreignKey: 'jogoId', onDelete: 'cascade'});
+Parciais.belongsTo(Jogos, {foreignKey: 'jogoId'});
+Equipas.hasMany(Parciais, {foreignKey: 'equipaId', onDelete: 'cascade'});
+Parciais.belongsTo(Equipas, {foreignKey: 'equipaId'});
+
+
 
 // Template View Engine
 app.set('view engine', 'ejs');
@@ -69,6 +96,7 @@ const adminLocalidades = require('./routes/admin/localidades');
 const adminEscaloes = require('./routes/admin/escaloes');
 const adminTorneios = require('./routes/admin/torneios');
 const equipas = require('./routes/equipas');
+const torneios = require('./routes/torneios');
 
 app.use('/login', login);
 app.use('/', index);
@@ -77,14 +105,7 @@ app.use('/admin/localidades', adminLocalidades);
 app.use('/admin/escaloes', adminEscaloes);
 app.use('/admin/torneios', adminTorneios);
 app.use('/equipas', equipas);
-
-// Definir relações entre as bases de dados
-Torneios.hasMany(Equipas, {foreignKey: 'torneioId', onDelete: 'cascade'});
-Equipas.belongsTo(Torneios, {foreignKey: 'torneioId'});
-Localidades.hasMany(Equipas, {foreignKey: 'localidadeId', onDelete: 'cascade'});
-Equipas.belongsTo(Localidades, {foreignKey: 'localidadeId'});
-Escaloes.hasMany(Equipas, {foreignKey: 'escalaoId', onDelete: 'cascade'});
-Equipas.belongsTo(Escaloes, {foreignKey: 'escalaoId'});
+app.use('/torneio', torneios);
 
 sequelize
     .sync()

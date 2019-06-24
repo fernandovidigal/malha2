@@ -4,6 +4,7 @@ const Localidades = require('../models/Localidades');
 const Escaloes = require('../models/Escaloes');
 const Jogos = require('../models/Jogos');
 const { validationResult } = require('express-validator/check');
+const sequelize = require('../helpers/database');
 const util = require('../helpers/util');
 
 function getTorneioInfo(){
@@ -21,10 +22,11 @@ function getNumCampos(torneioId){
     });
 }
 
-function getNumeroJogosPorFase(torneioId, fase){
+function getNumeroJogosPorFase(torneioId, escalaoId, fase){
     return Jogos.count({
         where: {
             torneioId: torneioId,
+            escalaoId: escalaoId,
             fase: fase
         }
     });
@@ -53,6 +55,57 @@ function getFaseTorneioPorEscalao(torneioId, escalaoId){
     });
 }
 
+function getNumeroCamposPorEscalaoFase(torneioId, escalaoId, fase){
+    return Jogos.max(
+        'campo', {
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId,
+            fase: fase
+        }
+    });
+}
+
+function getAllCampos(torneioId, escalaoId, fase){
+    return Jogos.findAll({
+        attributes: [['campo', 'num']],
+        where: {
+            torneioId,
+            escalaoId: escalaoId,
+            fase: fase
+        },
+        group: ['campo'],
+        raw: true
+    });
+}
+
+function getAllGames(torneioId, escalaoId, fase, campo) {
+    return Jogos.count({
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId,
+            fase: fase,
+            campo: campo
+        }
+    });
+}
+
+function getAllGamesPlayed(torneioId, escalaoId, fase, campo){
+    return sequelize.query(
+        `SELECT COUNT(jogoId) AS count
+        FROM jogos
+        WHERE torneioId = ? AND escalaoId = ? AND fase = ? AND campo = ? AND jogoID
+        IN (
+            SELECT jogoId
+            FROM parciais
+            WHERE equipaId = jogos.equipa1Id OR equipaId = jogos.equipa2Id
+        )`,
+    {
+        replacements: [torneioId, escalaoId, fase, campo],
+        type: sequelize.QueryTypes.SELECT
+    })
+}
+
 exports.getStarting = async (req, res, next) => {
     const torneio = await getTorneioInfo();
     const torneioId = torneio.torneioId;
@@ -74,17 +127,12 @@ exports.getStarting = async (req, res, next) => {
         return res.render('torneio/definirNumeroCampos', {torneio: torneio});
     }
 
-    // 3. verificar se já existem jogos distribuidos
-    /*const numJogos = await getNumeroJogos(torneioId);
-    console.log(numJogos);
-    if(numJogos == 0){
-        return res.render('torneio/selecionaEscalao', {data: data});
-    }*/
     if(numEquipas > 0 && numCampos.campos > 0){
         const listaEscaloes = await getEscaloesComEquipas(torneioId);
 
-        const escaloesMasculino = [];
-        const escaloesFeminino = [];
+        const escaloesMasculinos = [];
+        const escaloesFemininos = [];
+        let numTotalJogos = 0;
 
         for(const escalao of listaEscaloes){
             const _escalao = {
@@ -92,18 +140,56 @@ exports.getStarting = async (req, res, next) => {
                 designacao: escalao.designacao,
                 sexo: escalao.sexo
             }
+
             const fase = await getFaseTorneioPorEscalao(torneioId, escalao.escalaoId);
-            _escalao.fase = fase == null ? 0 : fase;
+            _escalao.fase = (fase == null) ? 0 : fase.fase;
 
-            const numJogos = await getNumeroJogosPorFase(torneioId, _escalao.fase);
+            const numJogos = await getNumeroJogosPorFase(torneioId, _escalao.escalaoId, _escalao.fase);
             _escalao.numJogos = numJogos;
+            numTotalJogos += numJogos;
 
+            // Se já existem jogos distribuídos para determinado escalão, enão o número de jogos é maior que 0
+            if(numJogos > 0){
+                const numCampos = await getNumeroCamposPorEscalaoFase(torneioId, _escalao.escalaoId, _escalao.fase);
+                _escalao.numCampos = numCampos;
+                _escalao.campos = [];
+
+                const listaCampos = await getAllCampos(torneioId, _escalao.escalaoId, _escalao.fase);
+                
+                for(const campo of listaCampos){
+                    const numCampo = campo.num;
+
+                    const numJogosParaJogar = await getAllGames(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
+                    const numJogosJogados = await getAllGamesPlayed(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
+
+                    if(numJogosParaJogar - numJogosJogados.count > 0){
+                        const campoData = {
+                            campo: numCampo,
+                            completo: false
+                        } 
+                        _escalao.campos.push(campoData);
+                    } else {
+                        const campoData = {
+                            campo: numCampo,
+                            completo: true
+                        }
+                        _escalao.campos.push(campoData);
+                    }
+                }
+            }
+          
             if(_escalao.sexo == 0){
-                escaloesFeminino.push(_escalao);
+                escaloesFemininos.push(_escalao);
             } else {
-                escaloesMasculino.push(_escalao);
+                escaloesMasculinos.push(_escalao);
             }
         }
+
+        console.log(escaloesMasculinos);
+        console.log(" ");
+        console.log(escaloesFemininos);
+
+        res.render('torneio/selecionaEscalao', {torneio: torneio, numTotalJogos: numTotalJogos, escaloesMasculinos: escaloesMasculinos, escaloesFemininos: escaloesFemininos});
     }
 
 }

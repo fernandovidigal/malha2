@@ -573,8 +573,9 @@ small {
 }
 
 .escalaoSelect__btn {
-    width: 15%;
     background-color: #6174cf;
+    color: #ffffff;
+    padding: 0 14px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -917,5 +918,13 @@ animation-delay: -0.16s;
     background-color: #8f9de2;
     color: #ffffff;
     padding-left: 10px;
+}
+
+.selecionaEquipasWrapper {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
 }
 

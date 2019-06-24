@@ -96,7 +96,7 @@ const adminLocalidades = require('./routes/admin/localidades');
 const adminEscaloes = require('./routes/admin/escaloes');
 const adminTorneios = require('./routes/admin/torneios');
 const equipas = require('./routes/equipas');
-const torneios = require('./routes/torneios');
+const torneio = require('./routes/torneio');
 
 app.use('/login', login);
 app.use('/', index);
@@ -105,7 +105,7 @@ app.use('/admin/localidades', adminLocalidades);
 app.use('/admin/escaloes', adminEscaloes);
 app.use('/admin/torneios', adminTorneios);
 app.use('/equipas', equipas);
-app.use('/torneio', torneios);
+app.use('/torneio', torneio);
 
 sequelize
     .sync()

@@ -10,7 +10,11 @@
     <p>Definir número de campos!</p>
     <form action="/torneio/definirNumeroCampos" method="post">
         <label for="numCampos">Número de Campos:</label>
-        <input type="text" name="numCampos" pattern="^[0-9]+$" {{#if data.numCampos}}value="{{data.numCampos}}"{{/if}} required><br>
+        <input type="text" name="numCampos" pattern="^[0-9]+$" required
+            <% if(typeof campos !== 'undefined'){ %>
+                value="<%= campos.count %>"
+            <% } %>
+        ><br>
         <input type="submit" value="Definir e avançar">
     </form>
 <% } else { %>

@@ -5,8 +5,7 @@ const Equipas = sequelize.define('equipas', {
     equipaId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        primaryKey: true,
-        autoIncrement: true
+        primaryKey: true
     },
     torneioId: {
         type: Sequelize.INTEGER,

@@ -94,7 +94,7 @@ function getAllGamesPlayed(torneioId, escalaoId, fase, campo){
     return sequelize.query(
         `SELECT COUNT(jogoId) AS count
         FROM jogos
-        WHERE torneioId = ? AND escalaoId = ? AND fase = ? AND campo = ? AND jogoID
+        WHERE torneioId = ? AND escalaoId = ? AND fase = ? AND campo = ? AND jogoId
         IN (
             SELECT jogoId
             FROM parciais
@@ -128,53 +128,82 @@ exports.getStarting = async (req, res, next) => {
     }
 
     if(numEquipas > 0 && numCampos.campos > 0){
+        // Lista dos Escalões com equipas registadas
         const listaEscaloes = await getEscaloesComEquipas(torneioId);
 
         const escaloesMasculinos = [];
         const escaloesFemininos = [];
         let numTotalJogos = 0;
 
+        // Percorre todos os escalões
         for(const escalao of listaEscaloes){
+            // Informações sobre o escalão
             const _escalao = {
                 escalaoId: escalao.escalaoId,
                 designacao: escalao.designacao,
                 sexo: escalao.sexo
             }
 
+            // Verifica em que fase do torneio se encontra o escalão
             const fase = await getFaseTorneioPorEscalao(torneioId, escalao.escalaoId);
             _escalao.fase = (fase == null) ? 0 : fase.fase;
 
+            // Verifica o número de jogos que determinada fase já tem distribuidos
             const numJogos = await getNumeroJogosPorFase(torneioId, _escalao.escalaoId, _escalao.fase);
             _escalao.numJogos = numJogos;
             numTotalJogos += numJogos;
 
-            // Se já existem jogos distribuídos para determinado escalão, enão o número de jogos é maior que 0
+            // Se já existem jogos distribuídos para determinado escalão, então o número de jogos é maior que 0
             if(numJogos > 0){
+                // Verifica o número total de campos que determinado escalão ocupa
                 const numCampos = await getNumeroCamposPorEscalaoFase(torneioId, _escalao.escalaoId, _escalao.fase);
                 _escalao.numCampos = numCampos;
                 _escalao.campos = [];
 
+                // Mantem o registo do número de jogos completos
+                // Se o número de campos completos for igual ao número de campos então a fase está concluída
+                let numCamposCompletos = 0;
+
+                // Obtem a lista de campos para determinado torneio em determinada fase
+                // [1,2,3,4,5,6,7,8,9,...]
                 const listaCampos = await getAllCampos(torneioId, _escalao.escalaoId, _escalao.fase);
                 
+                // Percorre cada campo
                 for(const campo of listaCampos){
+                    // guarda o número do campo
                     const numCampo = campo.num;
 
+                    // Determina para determinado escalão e fase, o número de jogos total para o campo e
+                    // o número de jogos já jogados
                     const numJogosParaJogar = await getAllGames(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
                     const numJogosJogados = await getAllGamesPlayed(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
 
-                    if(numJogosParaJogar - numJogosJogados.count > 0){
+                    // Verifica a diferença entre o total de jogos e o número de jogos já jogados
+                    if((numJogosParaJogar - numJogosJogados[0].count) > 0){
                         const campoData = {
                             campo: numCampo,
                             completo: false
                         } 
                         _escalao.campos.push(campoData);
                     } else {
+                        // Campo com todos os jogos realizados
                         const campoData = {
                             campo: numCampo,
                             completo: true
                         }
                         _escalao.campos.push(campoData);
+
+                        // Actualiza o número de campos completos
+                        numCamposCompletos++;
                     }
+                }
+
+                // Guarda e veriffica se os jogos de todos os campos já foram jogados
+                _escalao.numCamposCompletos = numCamposCompletos;
+                if(_escalao.numCampos == _escalao.numCamposCompletos){
+                    _escalao.todosCamposCompletos = true;
+                } else {
+                    _escalao.todosCamposCompletos = false;
                 }
             }
           
@@ -186,6 +215,7 @@ exports.getStarting = async (req, res, next) => {
         }
 
         console.log(escaloesMasculinos);
+        console.log(escaloesMasculinos[1].campos);
         console.log(" ");
         console.log(escaloesFemininos);
 

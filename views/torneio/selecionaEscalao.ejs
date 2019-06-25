@@ -23,15 +23,22 @@
                         <% escaloesMasculinos.forEach(function(escalao){ %>
                             <div class="escalaoSelect__item">
                                 <div class="escalaoSelect__item-title"><%= escalao.designacao %></div>
-                                <% if(escalao.fase != 0){ %>
+                                <% if(escalao.fase == 0){ %>
+                                    <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>" class="escalaoSelect__btn">Distribuir Equipas</a>
+                                <% } else { %>
                                     <div class="escalaoSelect__fase">
                                         <div class="escalaoSelect__fase-info">
                                             <p>Fase</p>
                                             <p><%= escalao.fase %></p>
                                         </div>
                                     </div>
+
+                                    <% if(escalao.todosCamposCompletos){ %>
+                                        <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>" class="escalaoSelect__btn">Todos Completos</a>
+                                    <% } else { %>
+                                        <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>" class="escalaoSelect__btn"><img src="/imagens/double-arrow.svg" class="arrow"></a>
+                                    <% } %>
                                 <% } %>
-                                <a href="/torneio/resultados/escalao/{{escalao_id}}/fase/{{fase}}" class="escalaoSelect__btn">Distribuir</a>
                             </div>
                         <% }); %>
                     </div>

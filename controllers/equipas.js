@@ -23,6 +23,12 @@ function getEscaloesInfo(){
     return Escaloes.findAll({raw: true});
 }
 
+function getLastEquipaID(torneioId){
+    return Equipas.max('equipaId', {
+        where: { torneioId: torneioId }
+    })
+}
+
 function showValidationErrors(req, res, errors, page, oldData){
     const localidadesInfo = getLocalidadesInfo();
     const escaloesInfo = getEscaloesInfo();
@@ -156,7 +162,7 @@ exports.adicionarEquipa = async (req, res, next) => {
     });
 }
 
-exports.createEquipa = (req, res, next) => {
+exports.createEquipa = async (req, res, next) => {
     const primeiroElemento = req.body.primeiro_elemento.trim();
     const segundoElemento = req.body.segundo_elemento.trim();
     const localidade = req.body.localidade;
@@ -174,7 +180,10 @@ exports.createEquipa = (req, res, next) => {
         showValidationErrors(req, res, errors, 'adicionarEquipa', oldData);
     } else {
         getTorneioInfo()
-        .then(torneio => {
+        .then(async torneio => {
+            let nextEquipaID = await getLastEquipaID(torneio.torneioId);
+            nextEquipaID++;
+            console.log(nextEquipaID);
             Equipas.findOrCreate({
                 where: {
                     torneioId: torneio.torneioId,
@@ -182,6 +191,9 @@ exports.createEquipa = (req, res, next) => {
                     segundoElemento: segundoElemento,
                     localidadeId: localidade,
                     escalaoId: escalao
+                },
+                defaults: {
+                    equipaId: nextEquipaID
                 }
             })
             .then(([equipa, created]) => {
@@ -372,7 +384,7 @@ exports.searchEquipa = (req, res, next) => {
 }
 
 // Faker
-exports.createEquipasAleatoriamente = (req, res, next) => {
+exports.createEquipasAleatoriamente = async (req, res, next) => {
     const num = req.params.num;
 
     var listaEscaloes = [];
@@ -383,7 +395,7 @@ exports.createEquipasAleatoriamente = (req, res, next) => {
     const escaloesInfo = getEscaloesInfo();
 
     Promise.all([torneioInfo, localidadesInfo, escaloesInfo])
-    .then(([torneio, localidades, escaloes]) => {
+    .then(async ([torneio, localidades, escaloes]) => {
         localidades.forEach(localidade => {
             listaLocalidades.push(localidade.localidadeId);
         });
@@ -393,8 +405,11 @@ exports.createEquipasAleatoriamente = (req, res, next) => {
         });
 
         let count = 0;
+        let nextEquipaID = await getLastEquipaID(torneio.torneioId);
         for(let i = 0; i < num; i++){
+            nextEquipaID++;
             Equipas.create({
+                equipaId: nextEquipaID,
                 torneioId: torneio.torneioId,
                 primeiroElemento: faker.name.firstName() + " " + faker.name.lastName(),
                 segundoElemento: faker.name.firstName() + " " + faker.name.lastName(),
@@ -405,7 +420,7 @@ exports.createEquipasAleatoriamente = (req, res, next) => {
             });
         }
 
-        req.flash('success', `${count} adicionadas com sucesso.`);
+        req.flash('success', 'Equipas adicionadas com sucesso.');
         res.redirect('/equipas');
     })
     .catch(err => {
@@ -415,7 +430,7 @@ exports.createEquipasAleatoriamente = (req, res, next) => {
     });
 }
 
-exports.createEquipasAleatoriamentePorEscalao = (req, res, next) => {
+exports.createEquipasAleatoriamentePorEscalao = async (req, res, next) => {
     const escalaoId = req.params.escalao;
     const num = req.params.num;
     var listaLocalidades = [];
@@ -424,14 +439,17 @@ exports.createEquipasAleatoriamentePorEscalao = (req, res, next) => {
     const localidadesInfo = getLocalidadesInfo();
 
     Promise.all([torneioInfo, localidadesInfo])
-    .then(([torneio, localidades]) => {
+    .then(async ([torneio, localidades]) => {
         localidades.forEach(localidade => {
             listaLocalidades.push(localidade.localidadeId);
         });
 
         let count = 0;
+        let nextEquipaID = await getLastEquipaID(torneio.torneioId);
         for(let i = 0; i < num; i++){
+            nextEquipaID++;
             Equipas.create({
+                equipaId: nextEquipaID,
                 torneioId: torneio.torneioId,
                 primeiroElemento: faker.name.firstName() + " " + faker.name.lastName(),
                 segundoElemento: faker.name.firstName() + " " + faker.name.lastName(),
@@ -442,7 +460,7 @@ exports.createEquipasAleatoriamentePorEscalao = (req, res, next) => {
             });
         }
 
-        req.flash('success', `${count} adicionadas com sucesso.`);
+        req.flash('success', 'Equipas adicionadas com sucesso.');
         res.redirect('/equipas');
     })
     .catch(err => {

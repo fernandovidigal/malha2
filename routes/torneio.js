@@ -17,4 +17,7 @@ router.post('/definirNumeroCampos', [
     check('numCampos').trim().escape().matches(/^[0-9]+$/).withMessage('Número de campos inválido.')
 ], TorneiosController.setNumeroCampos);
 
+// Distribuição de todas as equipas de todos os escalões
+router.get('/distribuirTodasEquipas', TorneiosController.distribuirTodasEquipas);
+
 module.exports = router;

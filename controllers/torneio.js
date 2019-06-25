@@ -6,6 +6,7 @@ const Jogos = require('../models/Jogos');
 const { validationResult } = require('express-validator/check');
 const sequelize = require('../helpers/database');
 const util = require('../helpers/util');
+const torneioHelpers = require('../helpers/torneioHelperFunctions');
 
 function getTorneioInfo(){
     return Torneios.findOne({where: {activo: 1}, raw: true});
@@ -214,10 +215,10 @@ exports.getStarting = async (req, res, next) => {
             }
         }
 
-        console.log(escaloesMasculinos);
+        /*console.log(escaloesMasculinos);
         console.log(escaloesMasculinos[1].campos);
         console.log(" ");
-        console.log(escaloesFemininos);
+        console.log(escaloesFemininos);*/
 
         res.render('torneio/selecionaEscalao', {torneio: torneio, numTotalJogos: numTotalJogos, escaloesMasculinos: escaloesMasculinos, escaloesFemininos: escaloesFemininos});
     }
@@ -266,4 +267,13 @@ exports.setNumeroCampos = async (req, res, next) => {
             res.redirect('/torneio/definirNumeroCampos');
         });
     }
+}
+
+exports.distribuirTodasEquipas = async (req, res, next) => {
+    const torneio = await getTorneioInfo();
+    
+    torneioHelpers.distribuiEquipasPorCampos(torneio.torneioId, 4, 6);
+    
+    
+    res.send("Distribuir Equipas");
 }

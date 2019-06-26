@@ -128,7 +128,7 @@ exports.distribuiEquipasPorCampos = async function(torneioId, minEquipas, maxEqu
             //console.log("Número Máximo de campos: " + numMaxCampos);
             // TODO: Throw Error: quando o número de campos retornado é 0
             if(numMaxCampos == 0){
-                throw new Error('Número de campos é 0');
+                throw new Error('Número de campos é 0.');
             }
             
             // 3. Inicia a Array de campos
@@ -174,6 +174,7 @@ exports.distribuiEquipasPorCampos = async function(torneioId, minEquipas, maxEqu
                     let equipa1 = listaCampos[i][par[0]];
                     let equipa2 = listaCampos[i][par[1]];
 
+                    // TODO: experimentar Try {} catch {} block to gerir os erros
                     await dbFunctions.createJogo(torneioId, escalaoId, 1, (i+1), equipa1.equipaId, equipa2.equipaId);
                 }
             }

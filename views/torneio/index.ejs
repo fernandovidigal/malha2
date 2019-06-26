@@ -1,6 +1,6 @@
 <%- include('../includes/header.ejs') %>
 
-<% if(torneio != null){ %>
+<% if(typeof torneio != 'undefined' && torneio != null){ %>
     <div class="title__bar">
         <h1><%= torneio.designacao %> - <%= torneio.localidade %></h1>
         <h3><%= torneio.ano %></h3>
@@ -12,6 +12,8 @@
             <a href="/equipas" class="btn primary_btn">Adicionar Equipas</a>
         </div>
     <% } %>
+
+    
 
     
 

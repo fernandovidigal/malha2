@@ -17,14 +17,14 @@
                 <% if(escaloesMasculinos.length > 0){ %>
                 <div class="escalao__wrapper">
                     <div class="escalao__title">
-                        Masculino
+                        Masculinos
                     </div>
                     <div class="escalaoSelect">
                         <% escaloesMasculinos.forEach(function(escalao){ %>
                             <div class="escalaoSelect__item">
                                 <div class="escalaoSelect__item-title"><%= escalao.designacao %></div>
                                 <% if(escalao.fase == 0){ %>
-                                    <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>" class="escalaoSelect__btn">Distribuir Equipas</a>
+                                    <a href="/torneio/distribuirEquipasPorEscalao/escalao/<%= escalao.escalaoId %>" class="escalaoSelect__btn">Distribuir Equipas</a>
                                 <% } else { %>
                                     <div class="escalaoSelect__fase">
                                         <div class="escalaoSelect__fase-info">
@@ -36,14 +36,50 @@
                                     <% if(escalao.todosCamposCompletos){ %>
                                         <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>" class="escalaoSelect__btn">Todos Completos</a>
                                     <% } else { %>
-                                        <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>" class="escalaoSelect__btn"><img src="/imagens/double-arrow.svg" class="arrow"></a>
+                                        <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/0" class="escalaoSelect__btn"><img src="/imagens/double-arrow.svg" class="arrow"></a>
                                     <% } %>
                                 <% } %>
+                            </div>
+                            <div class="camposSelect__wrapper">
+                                <% escalao.campos.forEach(function(campo){ %>
+                                    <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/<%= campo.campo %>"><%= campo.campo %></a>
+                                <% }); %>
                             </div>
                         <% }); %>
                     </div>
                 </div>
                 <% } %>
+
+                <% if(escaloesFemininos.length > 0){ %>
+                    <div class="escalao__wrapper">
+                        <div class="escalao__title">
+                            Femininos
+                        </div>
+                        <div class="escalaoSelect">
+                            <% escaloesFemininos.forEach(function(escalao){ %>
+                                <div class="escalaoSelect__item">
+                                    <div class="escalaoSelect__item-title"><%= escalao.designacao %></div>
+                                    <% if(escalao.fase == 0){ %>
+                                        <a href="/torneio/distribuirEquipasPorEscalao/escalao/<%= escalao.escalaoId %>" class="escalaoSelect__btn">Distribuir Equipas</a>
+                                    <% } else { %>
+                                        <div class="escalaoSelect__fase">
+                                            <div class="escalaoSelect__fase-info">
+                                                <p>Fase</p>
+                                                <p><%= escalao.fase %></p>
+                                            </div>
+                                        </div>
+    
+                                        <% if(escalao.todosCamposCompletos){ %>
+                                            <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>" class="escalaoSelect__btn">Todos Completos</a>
+                                        <% } else { %>
+                                            <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>" class="escalaoSelect__btn"><img src="/imagens/double-arrow.svg" class="arrow"></a>
+                                        <% } %>
+                                    <% } %>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                    <% } %>
             </div> 
     </div>
 

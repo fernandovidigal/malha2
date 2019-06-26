@@ -20,4 +20,8 @@ router.post('/definirNumeroCampos', [
 // Distribuição de todas as equipas de todos os escalões
 router.get('/distribuirTodasEquipas', TorneiosController.distribuirTodasEquipas);
 
+router.get('/distribuirEquipasPorEscalao/escalao/:escalao', TorneiosController.distribuirEquipasPorEscalao);
+
+router.get('/resultados/escalao/:escalao/fase/:fase/campo/:campo', TorneiosController.mostraResultados);
+
 module.exports = router;

@@ -78,7 +78,7 @@ exports.getStarting = async (req, res, next) => {
                     // Determina para determinado escalão e fase, o número de jogos total para o campo e
                     // o número de jogos já jogados
                     const numJogosParaJogar = await dbFunctions.getAllGames(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
-                    const numJogosJogados = await dbFunctions.getAllGamesPlayed(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
+                    const numJogosJogados = await dbFunctions.getNumGamesPlayed(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
 
                     // Verifica a diferença entre o total de jogos e o número de jogos já jogados
                     if((numJogosParaJogar - numJogosJogados[0].count) > 0){
@@ -189,16 +189,113 @@ exports.distribuirEquipasPorEscalao = async (req, res, next) => {
     res.redirect('/torneio');
 }
 
-exports.mostraResultados = async (req, res, next) => {
-    console.log("aqui");
+async function processaEquipas(listaJogos){ 
+    const jogos = [];
+    for(const jogo of listaJogos){
+        const jogoId = jogo.jogoId;
+        const equipa1Id = jogo.equipa1Id;
+        const equipa2Id = jogo.equipa2Id;
 
+        const equipa1Info = await dbFunctions.getEquipa(equipa1Id);
+        const equipa2Info = await dbFunctions.getEquipa(equipa2Id);
+
+        await Promise.all([equipa1Info, equipa2Info])
+        .then(([_equipa1Info, _equipa2Info]) => {
+            const equipas = {
+                jogoId: jogoId,
+                equipa1Id: _equipa1Info.equipaId,
+                equipa1PrimeiroElemento: _equipa1Info.primeiroElemento,
+                equipa1SegundoElemento: _equipa1Info.segundoElemento,
+                equipa1Localidade: _equipa1Info.localidade.nome,
+                equipa2Id: _equipa2Info.equipaId,
+                equipa2PrimeiroElemento: _equipa2Info.primeiroElemento,
+                equipa2SegundoElemento: _equipa2Info.segundoElemento,
+                equipa2Localidade: _equipa2Info.localidade.nome,
+            }
+            jogos.push(equipas);
+        })
+        .catch(err => {
+            //TODO: implementar em caso de erro!
+        });
+    }
+
+    return jogos;
+}
+
+exports.mostraResultados = async (req, res, next) => {
     const escalaoId = req.params.escalao;
     const fase = req.params.fase;
-    const campo = req.params.campo;
+    const campo = parseInt(req.params.campo);
 
     const torneio = await dbFunctions.getTorneioInfo();
-    const campos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
-    
 
-    res.render('torneio/index', {torneio: torneio});
+    const listaCampos = dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
+    const ultimaFase = dbFunctions.getUltimaFase(torneio.torneioId, escalaoId);
+    const escalaoInfo = dbFunctions.geEscalaoInfo(escalaoId);
+
+    Promise.all([listaCampos, ultimaFase, escalaoInfo])
+    .then(async ([_listaCampos, _ultimaFase, _escalaoInfo]) => {
+
+        // 1. Preencher um array com todas as fases até à actual
+        // Objectivo: poder alternar de fase no ecrã dos resultados
+        const todasFases = [];
+        for(let i = 0; i < _ultimaFase; i++){ todasFases.push(i+1); }
+
+        // 2. Preencher um array com o mesmo número de campos que o escalão tem ocupados
+        const campos = [];
+        if(campo == 0){
+            for(let i = 0; i < _listaCampos.length; i++){
+                campos.push({campo: i+1});
+            }
+        } else {
+            campos.push({campo: campo});
+        }
+
+        // 3. Obter todos os jogos de cada campos
+        for(let i = 0; i < campos.length; i++){
+            // Processa a lista de jogos que ainda falta jogar
+            const listaJogosPorJogar = dbFunctions.getAllGamesNotPlayed(torneio.torneioId, escalaoId, fase, campos[i].campo);
+
+            // Processa a lista de jogos que já foram jogados
+            const listaJogosFinalizados = dbFunctions.getAllGamesPlayed(torneio.torneioId, escalaoId, fase, campos[i].campo);
+
+            await Promise.all([listaJogosPorJogar, listaJogosFinalizados])
+            .then(async ([_jogos, _jogosFinalizados]) => {
+                campos[i].jogos = await processaEquipas(_jogos);
+                campos[i].jogosFinalizados = await processaEquipas(_jogosFinalizados);
+            })
+            .catch(err => {
+                //TODO: implementar em caso de erro!
+            });
+
+            // Obter parciais dos jogos já finalizados
+            for(const jogo of campos[i].jogosFinalizados){
+                const equipa1Parciais = dbFunctions.getParciais(jogo.jogoId, jogo.equipa1Id);
+                const equipa2Parciais = dbFunctions.getParciais(jogo.jogoId, jogo.equipa2Id);
+                const pontuacoes = dbFunctions.getPontuacoes(jogo.jogoId);
+
+                await Promise.all([equipa1Parciais, equipa2Parciais, pontuacoes])
+                .then(([_equipa1Parciais, _equipa2Parciais, _pontuacoes]) => {
+                    jogo.equipa1Pontos = _pontuacoes.equipa1Pontos;
+                    jogo.equipa2Pontos = _pontuacoes.equipa2Pontos;
+                    jogo.equipa1Parciais = {
+                        parcial1: _equipa1Parciais.parcial1,
+                        parcial2: _equipa1Parciais.parcial2,
+                        parcial3: _equipa1Parciais.parcial3
+                    };
+                    jogo.equipa2Parciais = {
+                        parcial1: _equipa2Parciais.parcial1,
+                        parcial2: _equipa2Parciais.parcial2,
+                        parcial3: _equipa2Parciais.parcial3
+                    };
+                })
+                .catch(err => {
+                    //TODO: implementar em caso de erro!
+                });
+            }
+        }
+
+        res.render('torneio/index', {torneio: torneio, campos: campos});
+    })
+    .catch();
 }

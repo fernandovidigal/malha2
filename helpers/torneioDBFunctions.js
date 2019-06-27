@@ -4,6 +4,7 @@ const Torneios = require('../models/Torneios');
 const Escaloes = require('../models/Escaloes');
 const Localidades = require('../models/Localidades');
 const Jogos = require('../models/Jogos');
+const Parciais = require('../models/Parciais');
 
 
 ////////////////////////////////////////////////////////
@@ -26,6 +27,14 @@ exports.getTorneioInfo = () => {
 ////////////////////////////////////////////////////////
 //                        ESCALÕES
 ////////////////////////////////////////////////////////
+
+exports.geEscalaoInfo = (escalaoId) => {
+    return Escaloes.findOne({
+        where: {
+            escalaoId: escalaoId
+        }
+    });
+}
 
 exports.getEscaloesComEquipas = (torneioId) => {
     return Escaloes.findAll({
@@ -51,6 +60,17 @@ exports.getAllLocalidadesID = () => {
 ////////////////////////////////////////////////////////
 //                        EQUIPAS
 ////////////////////////////////////////////////////////
+
+exports.getEquipa = (equipaId) => {
+    return Equipas.findOne({
+        include: {
+            model: Localidades
+        },
+        where: {
+            equipaId: equipaId
+        }
+    });
+}
 
 exports.getNumEquipas = (torneioId) => {
     return Equipas.count({where: {torneioId: torneioId}});
@@ -114,6 +134,18 @@ exports.getNumeroJogosPorFase = (torneioId, escalaoId, fase) => {
     });
 }
 
+exports.getUltimaFase = (torneioId, escalaoId) => {
+    return Jogos.max(
+        'fase',
+        {
+            where: {
+                torneioId: torneioId,
+                escalaoId: escalaoId
+            }
+        }
+    );
+}
+
 exports.getFaseTorneioPorEscalao = (torneioId, escalaoId) => {
     return Jogos.findOne({
         attributes: ['fase'],
@@ -161,7 +193,27 @@ exports.getAllGames = (torneioId, escalaoId, fase, campo) => {
     });
 }
 
-exports.getAllGamesPlayed = (torneioId, escalaoId, fase, campo) => {
+exports.getAllGamesPorCampo = (torneioId, escalaoId, fase, campo) => {
+    return Jogos.findAll({
+        attributes: ['jogoId', 'equipa1Id', 'equipa2Id'],
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId,
+            fase: fase,
+            campo: campo
+        },
+        raw: true
+    });
+}
+
+exports.getPontuacoes = (jogoId) => {
+    return Jogos.findOne({
+        attributes: ['equipa1Pontos', 'equipa2Pontos'],
+        where: { jogoId: jogoId }
+    });
+}
+
+exports.getNumGamesPlayed = (torneioId, escalaoId, fase, campo) => {
     return sequelize.query(
         `SELECT COUNT(jogoId) AS count
         FROM jogos
@@ -187,5 +239,50 @@ exports.getAllCamposPorEscalaoFase = (torneioId, escalaoId, fase) => {
         },
         group: ['campo'],
         raw: true
+    });
+}
+
+exports.getAllGamesPlayed = (torneioId, escalaoId, fase, campo) => {
+    return sequelize.query(
+        `SELECT jogos.jogoId, jogos.equipa1Id, jogos.equipa2Id
+        FROM jogos
+        WHERE jogos.torneioId = ? AND jogos.escalaoId = ? AND jogos.fase = ? AND jogos.campo = ? AND jogos.jogoId
+        IN (
+            SELECT jogoId
+            FROM parciais
+            WHERE equipaId = jogos.equipa1Id OR equipaId = jogos.equipa2Id
+        )`,
+    {
+        replacements: [torneioId, escalaoId, fase, campo],
+        type: sequelize.QueryTypes.SELECT
+    })
+}
+
+exports.getAllGamesNotPlayed = (torneioId, escalaoId, fase, campo) => {
+    return sequelize.query(
+        `SELECT jogos.jogoId, jogos.equipa1Id, jogos.equipa2Id
+        FROM jogos
+        WHERE jogos.torneioId = ? AND jogos.escalaoId = ? AND jogos.fase = ? AND jogos.campo = ? AND jogos.jogoId
+        NOT IN (
+            SELECT jogoId
+            FROM parciais
+            WHERE equipaId = jogos.equipa1Id OR equipaId = jogos.equipa2Id
+        )`,
+    {
+        replacements: [torneioId, escalaoId, fase, campo],
+        type: sequelize.QueryTypes.SELECT
+    })
+}
+
+////////////////////////////////////////////////////////
+//                        PARCIAIS
+////////////////////////////////////////////////////////
+
+exports.getParciais = (jogoId, equipaId) => {
+    return Parciais.findOne({
+        where: {
+            jogoId: jogoId,
+            equipaId: equipaId
+        }
     });
 }

@@ -13,12 +13,86 @@
         </div>
     <% } %>
 
-    
+    <% if(typeof campos != 'undefined' && campos.length > 0) { %>
+        <% campos.forEach(function(campo){ %>
+        <div class="campo__wrapper">
+            <div class="campo__title">Campo <%= campo.campo %></div>
+            <div class="campo__labels">
+                <div class="parcial_label">Parcial 1</div>
+                <div class="parcial_label">Parcial 2</div>
+                <div class="parcial_label">Parcial 3</div>
+                <div class="vencedor_label">Vencedor</div>
+            </div>
 
-    
+            <% campo.jogos.forEach(function(jogo){ %>
+            <form action="" method="post" class="resultados__form">
+                <div class="equipasInfo__wrapper">
+                    <div class="equipas__wrapper">
+                        <div class="equipa">
+                            <div class="equipa_id"><%= jogo.equipa1Id %></div>
+                            <div class="equipa_nome"><%= jogo.equipa1PrimeiroElemento %></div>
+                            <div class="equipa_nome"><%= jogo.equipa1SegundoElemento %></div>
+                            <div class="equipa_localidade"><%= jogo.equipa1Localidade %></div>
+                            <div class="equipa_parcial"><input type="text" name="equipa1_parcial1" size="8" value="30"></div>
+                            <div class="equipa_parcial"><input type="text" name="equipa1_parcial2" size="8" value="6"></div>
+                            <div class="equipa_parcial"><input type="text" name="equipa1_parcial3" size="8" value="30"></div>
+                            <div class="equipa_vencedor equipa1_pontos">&nbsp;</div>
+                        </div>
+                        <div class="equipa">
+                            <div class="equipa_id"><%= jogo.equipa2Id %></div>
+                            <div class="equipa_nome"><%= jogo.equipa2PrimeiroElemento %></div>
+                            <div class="equipa_nome"><%= jogo.equipa2SegundoElemento %></div>
+                            <div class="equipa_localidade"><%= jogo.equipa2Localidade %></div>
+                            <div class="equipa_parcial"><input type="text" name="equipa2_parcial1" size="8" value="18"></div>
+                            <div class="equipa_parcial"><input type="text" name="equipa2_parcial2" size="8" value="30"></div>
+                            <div class="equipa_parcial"><input type="text" name="equipa2_parcial3" size="8" value="6"></div>
+                            <div class="equipa_vencedor equipa2_pontos">&nbsp;</div>
+                        </div>
+                    </div>
+                    <div class="btn_wrapper">
+                        <a href="" class="btn__guardar-resultados" name="guardaResultados" data-jogoid="<%= jogo.jogoId %>">Guardar</a>
+                    </div>
+                </div>
+            </form>
+            <% }); %>
 
-
-
+            <% campo.jogosFinalizados.forEach(function(jogo){ %>
+            <form action="" method="post" class="resultados__form">
+                <div class="equipasInfo__wrapper resultados_finalizados">
+                    <div class="equipas__wrapper">
+                        <div class="equipa">
+                            <div class="equipa_id"><%= jogo.equipa1Id %></div>
+                            <div class="equipa_nome"><%= jogo.equipa1PrimeiroElemento %></div>
+                            <div class="equipa_nome"><%= jogo.equipa1SegundoElemento %></div>
+                            <div class="equipa_localidade"><%= jogo.equipa1Localidade %></div>
+                            <div class="equipa_parcial"><%= jogo.equipa1Parciais.parcial1 %></div>
+                            <div class="equipa_parcial"><%= jogo.equipa1Parciais.parcial2 %></div>
+                            <div class="equipa_parcial"><%= jogo.equipa1Parciais.parcial3 %></div>
+                            <div class="equipa_vencedor equipa1_pontos"><%= jogo.equipa1Pontos %></div>
+                        </div>
+                        <div class="equipa">
+                            <div class="equipa_id"><%= jogo.equipa2Id %></div>
+                            <div class="equipa_nome"><%= jogo.equipa2PrimeiroElemento %></div>
+                            <div class="equipa_nome"><%= jogo.equipa2SegundoElemento %></div>
+                            <div class="equipa_localidade"><%= jogo.equipa2Localidade %></div>
+                            <div class="equipa_parcial"><%= jogo.equipa2Parciais.parcial1 %></div>
+                            <div class="equipa_parcial"><%= jogo.equipa2Parciais.parcial2 %></div>
+                            <div class="equipa_parcial"><%= jogo.equipa2Parciais.parcial3 %></div>
+                            <div class="equipa_vencedor equipa2_pontos"><%= jogo.equipa2Pontos %></div>
+                        </div>
+                    </div>
+                    <div class="btn_wrapper">
+                        <a href="" class="btn__edit-resultados" name="editarResultados" data-jogoid="<%= jogo.jogoId %>"">Editar</a>
+                        <!--<a href="" class="btn__delete-resultados" name="eliminarResultados" data-jogoid="{{jogo_id}}">Eliminar</a>-->
+                    </div>
+                </div>
+            </form>
+            <% }); %>
+        </div>
+        <% }); %>
+    <% } else { %>
+        <h2>Oops.. Algo correu mal!</h2>
+    <% } %>
 <% } else { %>
     <h2>Oops.. Algo correu mal!</h2>
     <p>Verifique se existem torneios registados ou activados.</p>

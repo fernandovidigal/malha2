@@ -24,4 +24,9 @@ router.get('/distribuirEquipasPorEscalao/escalao/:escalao', TorneiosController.d
 
 router.get('/resultados/escalao/:escalao/fase/:fase/campo/:campo', TorneiosController.mostraResultados);
 
+// API
+router.post('/registaParciais', TorneiosController.createParciais);
+
+router.post('/actualizaParciais', TorneiosController.updateParciais);
+
 module.exports = router;

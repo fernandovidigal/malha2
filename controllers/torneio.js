@@ -77,7 +77,7 @@ exports.getStarting = async (req, res, next) => {
 
                     // Determina para determinado escalão e fase, o número de jogos total para o campo e
                     // o número de jogos já jogados
-                    const numJogosParaJogar = await dbFunctions.getAllGames(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
+                    const numJogosParaJogar = await dbFunctions.getNumGamesPorCampo(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
                     const numJogosJogados = await dbFunctions.getNumGamesPlayed(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
 
                     // Verifica a diferença entre o total de jogos e o número de jogos já jogados
@@ -222,6 +222,27 @@ async function processaEquipas(listaJogos){
     return jogos;
 }
 
+async function verificaCamposCompletos(listaCampos, torneioId, escalaoId, fase){
+
+    for(const campo of listaCampos){
+        // Otem o número total dos jogos do campo
+        const numTotalJogos = dbFunctions.getNumGamesPorCampo(torneioId, escalaoId, fase, campo.campo);
+        // Obtem a lista de jogos que já foram jogados
+        const listaJogosFinalizados = dbFunctions.getAllGamesPlayed(torneioId, escalaoId, fase, campo.campo);
+
+        await Promise.all([numTotalJogos, listaJogosFinalizados])
+        .then(([_numTotalJogos, _listaJogosFinalizados]) => {
+            if(_numTotalJogos - _listaJogosFinalizados.length == 0){
+                campo.campoCompleto = true;
+            } else {
+                campo.campoCompleto = false;
+            }
+        });
+    }
+
+    return listaCampos;
+}
+
 exports.mostraResultados = async (req, res, next) => {
     const escalaoId = req.params.escalao;
     const fase = req.params.fase;
@@ -233,6 +254,12 @@ exports.mostraResultados = async (req, res, next) => {
     const ultimaFase = dbFunctions.getUltimaFase(torneio.torneioId, escalaoId);
     const escalaoInfo = dbFunctions.geEscalaoInfo(escalaoId);
 
+    const info = {
+        escalaoId: escalaoId,
+        fase: fase,
+        campo: 0
+    }
+
     Promise.all([listaCampos, ultimaFase, escalaoInfo])
     .then(async ([_listaCampos, _ultimaFase, _escalaoInfo]) => {
 
@@ -241,6 +268,9 @@ exports.mostraResultados = async (req, res, next) => {
         const todasFases = [];
         for(let i = 0; i < _ultimaFase; i++){ todasFases.push(i+1); }
 
+        // Adicionar a lista de fase a info para que se possa alternar de fase nos resultados
+        info.listaFases = todasFases;
+
         // 2. Preencher um array com o mesmo número de campos que o escalão tem ocupados
         const campos = [];
         if(campo == 0){
@@ -248,10 +278,14 @@ exports.mostraResultados = async (req, res, next) => {
                 campos.push({campo: i+1});
             }
         } else {
+            // Número do campo é passado como parametro
             campos.push({campo: campo});
+            info.campo = campo;
         }
 
-        // 3. Obter todos os jogos de cada campos
+        _listaCampos = await verificaCamposCompletos(_listaCampos, torneio.torneioId, escalaoId, fase);
+
+        // 3. Obter todos os jogos de cada campo
         for(let i = 0; i < campos.length; i++){
             // Processa a lista de jogos que ainda falta jogar
             const listaJogosPorJogar = dbFunctions.getAllGamesNotPlayed(torneio.torneioId, escalaoId, fase, campos[i].campo);
@@ -295,7 +329,90 @@ exports.mostraResultados = async (req, res, next) => {
             }
         }
 
-        res.render('torneio/index', {torneio: torneio, campos: campos});
+        //console.log(campos);
+
+        res.render('torneio/index', {torneio: torneio, info: info, campos: campos, listaCampos: _listaCampos});
     })
     .catch();
+}
+
+// API
+function processaPontuacao(data){
+    let equipa1_pontos = 0;
+    let equipa2_pontos = 0;
+
+    if(data.parciaisData.equipa1.parcial1 == 30 && data.parciaisData.equipa2.parcial1 < 30){
+        equipa1_pontos++;
+    } else if(data.parciaisData.equipa1.parcial1 < 30 && data.parciaisData.equipa2.parcial1 == 30){
+        equipa2_pontos++;
+    }
+
+    if(data.parciaisData.equipa1.parcial2 == 30 && data.parciaisData.equipa2.parcial2 < 30){
+        equipa1_pontos++;
+    } else if(data.parciaisData.equipa1.parcial2 < 30 && data.parciaisData.equipa2.parcial2 == 30){
+        equipa2_pontos++;
+    }
+
+    if(data.parciaisData.equipa1.parcial3 == 30 && data.parciaisData.equipa2.parcial3 < 30){
+        equipa1_pontos++;
+    } else if(data.parciaisData.equipa1.parcial3 < 30 && data.parciaisData.equipa2.parcial3 == 30){
+        equipa2_pontos++;
+    }
+
+    data.parciaisData.equipa1.pontos = equipa1_pontos;
+    data.parciaisData.equipa2.pontos = equipa2_pontos;
+
+    return data;
+}
+
+exports.createParciais = async (req, res, next) => {
+    let data = req.body;
+    const jogoId = data.jogoId;
+    const equipas = await dbFunctions.getEquipasPorJogo(jogoId);
+
+    data.parciaisData.equipa1.equipaId = equipas.equipa1Id;
+    data.parciaisData.equipa2.equipaId = equipas.equipa2Id;
+    
+    data = processaPontuacao(data);
+
+    dbFunctions.createParciais(jogoId, data)
+    .then((result)=>{
+        res.status(200).json({
+            success: true,
+            equipa1_pontos: data.parciaisData.equipa1.pontos,
+            equipa2_pontos: data.parciaisData.equipa2.pontos
+        });
+    }).catch((err)=>{
+        res.status(200).json({
+            success: false,
+            equipa1_pontos: data.parciaisData.equipa1.pontos,
+            equipa2_pontos: data.parciaisData.equipa2.pontos
+        });
+    });
+}
+
+exports.updateParciais = async (req, res, next) => {
+    let data = req.body;
+    const jogoId = data.jogoId;
+    const equipas = await dbFunctions.getEquipasPorJogo(jogoId);
+
+    data.parciaisData.equipa1.equipaId = equipas.equipa1Id;
+    data.parciaisData.equipa2.equipaId = equipas.equipa2Id;
+
+    data = processaPontuacao(data);
+
+    dbFunctions.updateParciais(jogoId, data)
+    .then((result)=>{
+        res.status(200).json({
+            success: true,
+            equipa1_pontos: data.parciaisData.equipa1.pontos,
+            equipa2_pontos: data.parciaisData.equipa2.pontos
+        });
+    }).catch((err)=>{
+        res.status(200).json({
+            success: false,
+            equipa1_pontos: data.parciaisData.equipa1.pontos,
+            equipa2_pontos: data.parciaisData.equipa2.pontos
+        });
+    });
 }

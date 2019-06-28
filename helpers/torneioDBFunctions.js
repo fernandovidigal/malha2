@@ -1,3 +1,4 @@
+const Sequelize = require('sequelize');
 const sequelize = require('../helpers/database');
 const Equipas = require('../models/Equipas');
 const Torneios = require('../models/Torneios');
@@ -113,6 +114,15 @@ exports.getEquipasIDByLocalidadeAndEscalao = (torneioId, localidadeId, escalaoId
 //                        JOGOS
 ////////////////////////////////////////////////////////
 
+exports.getEquipasPorJogo = (jogoId) => {
+    return Jogos.findOne({
+        attributes: ['equipa1Id', 'equipa2Id'],
+        where: {
+            jogoId: jogoId
+        }
+    });
+}
+
 exports.createJogo = (torneioId, escalaoId, fase, campo, equipa1Id, equipa2Id) => {
     return Jogos.create({
         torneioId: torneioId,
@@ -182,7 +192,7 @@ exports.getAllCampos = (torneioId, escalaoId, fase) => {
     });
 }
 
-exports.getAllGames = (torneioId, escalaoId, fase, campo) => {
+exports.getNumGamesPorCampo = (torneioId, escalaoId, fase, campo) => {
     return Jogos.count({
         where: {
             torneioId: torneioId,
@@ -285,4 +295,78 @@ exports.getParciais = (jogoId, equipaId) => {
             equipaId: equipaId
         }
     });
+}
+
+exports.createParciais = (jogoId, data) => {
+    const equipa1ParciaisData = data.parciaisData.equipa1;
+    const equipa2ParciaisData = data.parciaisData.equipa2;
+
+    return sequelize.transaction(t => {
+        return Jogos.update({
+            equipa1Pontos: equipa1ParciaisData.pontos,
+            equipa2Pontos: equipa2ParciaisData.pontos
+        }, {
+            where: { jogoId: jogoId }
+        }, {transaction: t})
+        .then(() => {
+            return sequelize.transaction(t2 => {
+                return Parciais.create({
+                    jogoId: jogoId,
+                    equipaId: equipa1ParciaisData.equipaId,
+                    parcial1: equipa1ParciaisData.parcial1,
+                    parcial2: equipa1ParciaisData.parcial2,
+                    parcial3: equipa1ParciaisData.parcial3
+                }, {transaction: t2})
+                .then(() => {
+                    return Parciais.create({
+                        jogoId: jogoId,
+                        equipaId: equipa2ParciaisData.equipaId,
+                        parcial1: equipa2ParciaisData.parcial1,
+                        parcial2: equipa2ParciaisData.parcial2,
+                        parcial3: equipa2ParciaisData.parcial3
+                    }, {transaction: t2})
+                });
+            });
+        });
+    })
+}
+
+exports.updateParciais = (jogoId, data) => {
+    const equipa1ParciaisData = data.parciaisData.equipa1;
+    const equipa2ParciaisData = data.parciaisData.equipa2;
+
+    return sequelize.transaction(t => {
+        return Jogos.update({
+            equipa1Pontos: equipa1ParciaisData.pontos,
+            equipa2Pontos: equipa2ParciaisData.pontos
+        }, {
+            where: { jogoId: jogoId }
+        }, {transaction: t})
+        .then(() => {
+            return sequelize.transaction(t2 => {
+                return Parciais.update({
+                    parcial1: equipa1ParciaisData.parcial1,
+                    parcial2: equipa1ParciaisData.parcial2,
+                    parcial3: equipa1ParciaisData.parcial3
+                }, {
+                    where: {
+                        jogoId: jogoId,
+                        equipaId: equipa1ParciaisData.equipaId
+                    }
+                },{transaction: t2})
+                .then(() => {
+                    return Parciais.update({
+                        parcial1: equipa2ParciaisData.parcial1,
+                        parcial2: equipa2ParciaisData.parcial2,
+                        parcial3: equipa2ParciaisData.parcial3
+                    }, {
+                        where: {
+                            jogoId: jogoId,
+                            equipaId: equipa2ParciaisData.equipaId
+                        }
+                    },{transaction: t2})
+                });
+            });
+        });
+    })
 }

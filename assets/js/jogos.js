@@ -16,13 +16,13 @@ function handleParciais(btn, url, moveToEnd, actualizar){
 
     const jogoID = btn.dataset.jogoid;
 
-    const equipa1_parcial1 = currentForm.elements['equipa1_parcial1'].value;
-    const equipa1_parcial2 = currentForm.elements['equipa1_parcial2'].value;
-    const equipa1_parcial3 = currentForm.elements['equipa1_parcial3'].value;
+    const equipa1_parcial1 = parseInt(currentForm.elements['equipa1_parcial1'].value);
+    const equipa1_parcial2 = parseInt(currentForm.elements['equipa1_parcial2'].value);
+    const equipa1_parcial3 = parseInt(currentForm.elements['equipa1_parcial3'].value);
 
-    const equipa2_parcial1 = currentForm.elements['equipa2_parcial1'].value;
-    const equipa2_parcial2 = currentForm.elements['equipa2_parcial2'].value;
-    const equipa2_parcial3 = currentForm.elements['equipa2_parcial3'].value;
+    const equipa2_parcial1 = parseInt(currentForm.elements['equipa2_parcial1'].value);
+    const equipa2_parcial2 = parseInt(currentForm.elements['equipa2_parcial2'].value);
+    const equipa2_parcial3 = parseInt(currentForm.elements['equipa2_parcial3'].value);
 
 
     let equipa1_pontos_text = currentForm.querySelector('.equipa1_pontos');

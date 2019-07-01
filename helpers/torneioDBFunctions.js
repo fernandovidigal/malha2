@@ -205,7 +205,6 @@ exports.getNumGamesPorCampo = (torneioId, escalaoId, fase, campo) => {
 
 exports.getAllGamesPorCampo = (torneioId, escalaoId, fase, campo) => {
     return Jogos.findAll({
-        attributes: ['jogoId', 'equipa1Id', 'equipa2Id'],
         where: {
             torneioId: torneioId,
             escalaoId: escalaoId,

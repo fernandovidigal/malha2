@@ -243,6 +243,7 @@ async function verificaCamposCompletos(listaCampos, torneioId, escalaoId, fase){
     return listaCampos;
 }
 
+// Resultados
 exports.mostraResultados = async (req, res, next) => {
     const escalaoId = req.params.escalao;
     const fase = req.params.fase;
@@ -336,31 +337,140 @@ exports.mostraResultados = async (req, res, next) => {
     .catch();
 }
 
+// Classificação
+exports.mostraClassificacao = async (req, res, next) => {
+    const escalaoId = req.params.escalao;
+    const fase = req.params.fase;
+    const campo = parseInt(req.params.campo);
+
+    const torneio = await dbFunctions.getTorneioInfo();
+    const _listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
+
+    // 1. Preencher um array com o mesmo número de campos que o escalão tem ocupados
+    const listaCampos = [];
+    if(campo == 0){
+        for(let i = 0; i < _listaCampos.length; i++){
+            listaCampos.push({campo: i+1});
+        }
+    } else {
+        // Número do campo é passado como parametro
+        listaCampos.push({campo: campo});
+    }
+
+    for(const campo of listaCampos){
+        const numCampo = campo.campo;
+        // 1. Obter a lista de Jogos para cada campo
+        const listaJogos = await dbFunctions.getAllGamesPorCampo(torneio.torneioId, escalaoId, fase, numCampo);
+        //console.log(listaJogos);
+
+        campo.classificacao = [];
+        const classificacao = campo.classificacao;
+
+        // 2. Percorre a lista de jogos e coloca as equipas na lista de classificação
+        for(const jogo of listaJogos){
+            // 3. Procura pela posição, se existir, dentro do array da classificação
+            const posicaoEquipa1 = classificacao.findIndex(elemento => {
+                return elemento.equipaId == jogo.equipa1Id;
+            });
+
+            const posicaoEquipa2 = classificacao.findIndex(elemento => {
+                return elemento.equipaId == jogo.equipa2Id;
+            });
+
+            // Coloca a equipa na lista de classificações ou actualiza-a se já existir
+            // -1, não eixte. > -1, existe
+            if(posicaoEquipa1 != -1){
+                classificacao[posicaoEquipa1].vitorias = (jogo.equipa1Pontos > jogo.equipa2Pontos) ? classificacao[posicaoEquipa1].vitorias = classificacao[posicaoEquipa1].vitorias + 1 : classificacao[posicaoEquipa1].vitorias;
+                classificacao[posicaoEquipa1].pontos = classificacao[posicaoEquipa1].pontos + jogo.equipa1Pontos;
+            } else { // não existe
+                const equipa = {
+                    equipaId: jogo.equipa1Id,
+                    vitorias: (jogo.equipa1Pontos > jogo.equipa2Pontos) ? 1 : 0,
+                    pontos: jogo.equipa1Pontos
+                }
+                classificacao.push(equipa);
+            }
+
+            if(posicaoEquipa2 != -1){
+                classificacao[posicaoEquipa2].vitorias = (jogo.equipa2Pontos > jogo.equipa1Pontos) ? classificacao[posicaoEquipa2].vitorias = classificacao[posicaoEquipa2].vitorias + 1 : classificacao[posicaoEquipa2].vitorias;
+                classificacao[posicaoEquipa2].pontos = classificacao[posicaoEquipa2].pontos + jogo.equipa2Pontos;
+            } else { // não existe
+                const equipa = {
+                    equipaId: jogo.equipa2Id,
+                    vitorias: (jogo.equipa2Pontos > jogo.equipa1Pontos) ? 1 : 0,
+                    pontos: jogo.equipa2Pontos
+                }
+                classificacao.push(equipa);
+            }  
+        }
+    }
+
+    // 3. Ordena as equipas por ponto e por vitorias
+    for(const _classif of listaCampos){
+        const classif = _classif.classificacao;
+        
+        // console.log("Antes:");
+        //console.log(classif);
+        classif.sort((a, b) => (a.pontos > b.pontos) ? -1 : (a.pontos === b.pontos) ? ((a.vitorias > b.vitorias) ? -1 : 1) : 1);
+        console.log("Depois:");
+        console.log(classif);
+    }
+
+    //console.log(listaCampos);
+    //console.log(listaCampos[0]);
+
+    res.send("Classificação");
+}
+
 // API
 function processaPontuacao(data){
-    let equipa1_pontos = 0;
-    let equipa2_pontos = 0;
+    let equipa1Pontos = 0;
+    let equipa2Pontos = 0;
+    let vitoriasEquipa1 = 0;
+    let vitoriasEquipa2 = 0;
+
+    console.log(data.parciaisData);
 
     if(data.parciaisData.equipa1.parcial1 == 30 && data.parciaisData.equipa2.parcial1 < 30){
-        equipa1_pontos++;
+        vitoriasEquipa1++;
     } else if(data.parciaisData.equipa1.parcial1 < 30 && data.parciaisData.equipa2.parcial1 == 30){
-        equipa2_pontos++;
+        vitoriasEquipa2++;
     }
 
     if(data.parciaisData.equipa1.parcial2 == 30 && data.parciaisData.equipa2.parcial2 < 30){
-        equipa1_pontos++;
+        vitoriasEquipa1++;
     } else if(data.parciaisData.equipa1.parcial2 < 30 && data.parciaisData.equipa2.parcial2 == 30){
-        equipa2_pontos++;
+        vitoriasEquipa2++;
     }
 
-    if(data.parciaisData.equipa1.parcial3 == 30 && data.parciaisData.equipa2.parcial3 < 30){
-        equipa1_pontos++;
-    } else if(data.parciaisData.equipa1.parcial3 < 30 && data.parciaisData.equipa2.parcial3 == 30){
-        equipa2_pontos++;
+    if(data.parciaisData.equipa1.parcial3 != null && data.parciaisData.equipa2.parcial3 != null){
+        if(data.parciaisData.equipa1.parcial3 == 30 && data.parciaisData.equipa2.parcial3 < 30){
+            vitoriasEquipa1++;
+        } else if(data.parciaisData.equipa1.parcial3 < 30 && data.parciaisData.equipa2.parcial3 == 30){
+            vitoriasEquipa2++;
+        }
     }
 
-    data.parciaisData.equipa1.pontos = equipa1_pontos;
-    data.parciaisData.equipa2.pontos = equipa2_pontos;
+    let resultado = vitoriasEquipa1 - vitoriasEquipa2;
+    switch(resultado){
+        case 3:
+        case 2: equipa1Pontos = 3;
+                equipa2Pontos = 0;
+                break;
+        case 1: equipa1Pontos = 2;
+                equipa2Pontos = 1;
+                break;
+        case -1: equipa1Pontos = 1;
+                 equipa2Pontos = 2;
+                 break;
+        case -2: 
+        case -3: equipa1Pontos = 0;
+                 equipa2Pontos = 3;
+                 break;
+    }
+
+    data.parciaisData.equipa1.pontos = equipa1Pontos;
+    data.parciaisData.equipa2.pontos = equipa2Pontos;
 
     return data;
 }

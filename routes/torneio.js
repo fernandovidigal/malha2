@@ -22,7 +22,11 @@ router.get('/distribuirTodasEquipas', TorneiosController.distribuirTodasEquipas)
 
 router.get('/distribuirEquipasPorEscalao/escalao/:escalao', TorneiosController.distribuirEquipasPorEscalao);
 
+// Resultados
 router.get('/resultados/escalao/:escalao/fase/:fase/campo/:campo', TorneiosController.mostraResultados);
+
+// Classificação
+router.get('/classificacao/escalao/:escalao/fase/:fase/campo/:campo', TorneiosController.mostraClassificacao);
 
 // API
 router.post('/registaParciais', TorneiosController.createParciais);

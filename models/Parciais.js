@@ -30,7 +30,7 @@ const Parciais = sequelize.define('parciais', {
     ,
     parcial3: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         defaultValue: 0
     }
 }, {

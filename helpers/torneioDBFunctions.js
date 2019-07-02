@@ -7,6 +7,8 @@ const Localidades = require('../models/Localidades');
 const Jogos = require('../models/Jogos');
 const Parciais = require('../models/Parciais');
 
+const Op = Sequelize.Op;
+
 
 ////////////////////////////////////////////////////////
 //                        TORNEIOS
@@ -131,6 +133,20 @@ exports.createJogo = (torneioId, escalaoId, fase, campo, equipa1Id, equipa2Id) =
         campo: campo,
         equipa1Id: equipa1Id,
         equipa2Id: equipa2Id
+    });
+}
+
+exports.getJogoPorEquipasID = (torneioId, escalaoId, fase, campo, equipa1Id, equipa2Id) => {
+    return Jogos.findOne({
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId,
+            fase: fase,
+            campo: campo,
+            equipa1Id: equipa1Id,
+            equipa2Id: equipa2Id
+        },
+        raw: true
     });
 }
 
@@ -293,6 +309,17 @@ exports.getParciais = (jogoId, equipaId) => {
             jogoId: jogoId,
             equipaId: equipaId
         }
+    });
+}
+
+exports.getAllParciais = (listaJogos) => {
+    return Parciais.findAll({
+        where: {
+            jogoId: {
+                [Op.in]: listaJogos
+            }
+        },
+        raw: true
     });
 }
 

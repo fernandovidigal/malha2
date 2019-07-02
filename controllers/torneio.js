@@ -361,7 +361,15 @@ exports.mostraClassificacao = async (req, res, next) => {
         const numCampo = campo.campo;
         // 1. Obter a lista de Jogos para cada campo
         const listaJogos = await dbFunctions.getAllGamesPorCampo(torneio.torneioId, escalaoId, fase, numCampo);
-        //console.log(listaJogos);
+
+        // Bloco necessário para desempate por parciais
+        // {
+            //const listaJogosId = listaJogos.map(elemento => elemento.jogoId);
+            //console.log(listaJogosId);
+
+            //const listaParciais = await dbFunctions.getAllParciais(listaJogosId);
+            //console.log(listaParciais);
+        // }
 
         campo.classificacao = [];
         const classificacao = campo.classificacao;
@@ -377,6 +385,9 @@ exports.mostraClassificacao = async (req, res, next) => {
                 return elemento.equipaId == jogo.equipa2Id;
             });
 
+            const equipa1 = await dbFunctions.getEquipa(jogo.equipa1Id);
+            const equipa2 = await dbFunctions.getEquipa(jogo.equipa2Id);
+
             // Coloca a equipa na lista de classificações ou actualiza-a se já existir
             // -1, não eixte. > -1, existe
             if(posicaoEquipa1 != -1){
@@ -385,6 +396,9 @@ exports.mostraClassificacao = async (req, res, next) => {
             } else { // não existe
                 const equipa = {
                     equipaId: jogo.equipa1Id,
+                    primeiroElemento: equipa1.primeiroElemento,
+                    segundoElemento: equipa1.segundoElemento,
+                    localidade: equipa1.localidade.nome,
                     vitorias: (jogo.equipa1Pontos > jogo.equipa2Pontos) ? 1 : 0,
                     pontos: jogo.equipa1Pontos
                 }
@@ -397,29 +411,49 @@ exports.mostraClassificacao = async (req, res, next) => {
             } else { // não existe
                 const equipa = {
                     equipaId: jogo.equipa2Id,
+                    primeiroElemento: equipa2.primeiroElemento,
+                    segundoElemento: equipa2.segundoElemento,
+                    localidade: equipa2.localidade.nome,
                     vitorias: (jogo.equipa2Pontos > jogo.equipa1Pontos) ? 1 : 0,
                     pontos: jogo.equipa2Pontos
                 }
                 classificacao.push(equipa);
             }  
+
+            //console.log(classificacao);
         }
-    }
 
-    // 3. Ordena as equipas por ponto e por vitorias
-    for(const _classif of listaCampos){
-        const classif = _classif.classificacao;
-        
-        // console.log("Antes:");
-        //console.log(classif);
-        classif.sort((a, b) => (a.pontos > b.pontos) ? -1 : (a.pontos === b.pontos) ? ((a.vitorias > b.vitorias) ? -1 : 1) : 1);
-        console.log("Depois:");
-        console.log(classif);
-    }
+        // 3. Ordena a Classificação
+        classificacao.sort((a, b) => {
+            // Diferença de Pontos
+            if(a.pontos > b.pontos){
+                return -1;
+            } else if(a.pontos === b.pontos){
+                // Mesmos pontos, desempata por número de vitórias
+                if(a.vitorias > b.vitorias){
+                    return -1;
+                } else if(a.vitorias === b.vitorias) {
+                    // Mesmo número de vitórias, desempata por resultado do confronto directo
+                    const jogo = listaJogos.find(elemento => {
+                        return (elemento.equipa1Id == a.equipaId && elemento.equipa2Id == b.equipaId) || (elemento.equipa1Id == b.equipaId && elemento.equipa2Id == a.equipaId);
+                    });
+                    if(jogo.equipa1Pontos > jogo.equipa2Pontos){
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                } else {
+                    return 1;
+                }
+            } else {
+                return 1;
+            }
+        });
+    }  
 
-    //console.log(listaCampos);
     //console.log(listaCampos[0]);
 
-    res.send("Classificação");
+    res.render('torneio/classificacao', {torneio: torneio, listaCampos: listaCampos});
 }
 
 // API
@@ -429,7 +463,7 @@ function processaPontuacao(data){
     let vitoriasEquipa1 = 0;
     let vitoriasEquipa2 = 0;
 
-    console.log(data.parciaisData);
+    //console.log(data.parciaisData);
 
     if(data.parciaisData.equipa1.parcial1 == 30 && data.parciaisData.equipa2.parcial1 < 30){
         vitoriasEquipa1++;

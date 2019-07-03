@@ -124,7 +124,7 @@
     </div>
     <div class="fase__wrapper">
         <% info.listaFases.forEach(function(fase){ %>
-            <a href="#" class="fase__item <%= fase == info.fase ? 'fase__item-active' : '' %>">Fase <%= fase %></a>
+            <a href="/torneio/resultados/escalao/<%= info.escalaoId %>/fase/<%= fase %>/campo/<%= info.campo %>" class="fase__item <%= fase == info.fase ? 'fase__item-active' : '' %>">Fase <%= fase %></a>
         <% }); %>
     </div>
     <% } else { %>

@@ -30,22 +30,26 @@
                                         <div class="escalaoSelect__fase">
                                             <div class="escalaoSelect__fase-info">
                                                 <p>Fase</p>
-                                                <p><%= escalao.fase %></p>
+                                                <p><%= (escalao.fase != 100) ? escalao.fase : 'Final & 3º e 4º Lugar' %></p>
                                             </div>
                                         </div>
 
                                         <% if(escalao.todosCamposCompletos){ %>
-                                            <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>" class="escalaoSelect__btn">Processa<br>Próxima Fase</a>
+                                            <a href="/torneio/processaProximaFase/escalao/<%= escalao.escalaoId %>" class="escalaoSelect__btn">Processa<br>Próxima Fase</a>
                                         <% } else { %>
-                                            <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/0" class="escalaoSelect__btn"><img src="/imagens/double-arrow.svg" class="arrow"></a>
+                                            <% if(escalao.fase != 100){ %>
+                                                <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/0" class="escalaoSelect__btn"><img src="/imagens/double-arrow.svg" class="arrow"></a>
+                                            <% } %>
                                         <% } %>
                                     <% } %>
                                 </div>
-                                <div class="escalaoSelect__campos">
-                                    <% escalao.campos.forEach(function(campo){ %>
-                                        <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/<%= campo.campo %>" class="campo <%= campo.completo ? 'campo_completed' : '' %>"><%= campo.campo %></a>
-                                    <% }); %>
-                                </div>
+                                <% if(typeof escalao.campos != 'undefined'){ %>
+                                    <div class="escalaoSelect__campos">
+                                        <% escalao.campos.forEach(function(campo){ %>
+                                            <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/<%= campo.campo %>" class="campo <%= campo.completo ? 'campo_completed' : '' %>"><%= campo.campo %></a>
+                                        <% }); %>
+                                    </div>
+                                <% } %>
                             </div>
                         <% }); %>
                     </div>
@@ -68,22 +72,24 @@
                                             <div class="escalaoSelect__fase">
                                                 <div class="escalaoSelect__fase-info">
                                                     <p>Fase</p>
-                                                    <p><%= escalao.fase %></p>
+                                                    <p><%= (escalao.fase != 100) ? escalao.fase : 'Final & 3º e 4º Lugar' %></p>
                                                 </div>
                                             </div>
     
                                             <% if(escalao.todosCamposCompletos){ %>
-                                                <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>" class="escalaoSelect__btn">Processa<br>Próxima Fase</a>
+                                                <a href="/torneio/processaProximaFase/escalao/<%= escalao.escalaoId %>" class="escalaoSelect__btn">Processa<br>Próxima Fase</a>
                                             <% } else { %>
                                                 <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/0" class="escalaoSelect__btn"><img src="/imagens/double-arrow.svg" class="arrow"></a>
                                             <% } %>
                                         <% } %>
                                     </div>
-                                    <div class="escalaoSelect__campos">
-                                        <% escalao.campos.forEach(function(campo){ %>
-                                            <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/<%= campo.campo %>" class="campo <%= campo.completo ? 'campo_completed' : '' %>"><%= campo.campo %></a>
-                                        <% }); %>
-                                    </div>
+                                    <% if(typeof escalao.campos != 'undefined'){ %>
+                                        <div class="escalaoSelect__campos">
+                                            <% escalao.campos.forEach(function(campo){ %>
+                                                <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/<%= campo.campo %>" class="campo <%= campo.completo ? 'campo_completed' : '' %>"><%= campo.campo %></a>
+                                            <% }); %>
+                                        </div>
+                                    <% } %>
                                 </div>
                             <% }); %>
                         </div>

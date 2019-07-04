@@ -19,6 +19,13 @@ function getLocalidadesInfo(){
     })
 }
 
+function getAllLocalidadesId(){
+    return Localidades.findAll({
+        attributes: ['localidadeId'],
+        raw: true
+    });
+}
+
 function getEscaloesInfo(){
     return Escaloes.findAll({raw: true});
 }
@@ -26,7 +33,7 @@ function getEscaloesInfo(){
 function getLastEquipaID(torneioId){
     return Equipas.max('equipaId', {
         where: { torneioId: torneioId }
-    })
+    });
 }
 
 function showValidationErrors(req, res, errors, page, oldData){
@@ -181,9 +188,9 @@ exports.createEquipa = async (req, res, next) => {
     } else {
         getTorneioInfo()
         .then(async torneio => {
-            let nextEquipaID = await getLastEquipaID(torneio.torneioId);
+            let nextEquipaID = await getLastEquipaID(torneio.torneioId) || 0;
             nextEquipaID++;
-            console.log(nextEquipaID);
+
             Equipas.findOrCreate({
                 where: {
                     torneioId: torneio.torneioId,
@@ -386,41 +393,34 @@ exports.searchEquipa = (req, res, next) => {
 // Faker
 exports.createEquipasAleatoriamente = async (req, res, next) => {
     const num = req.params.num;
-
-    var listaEscaloes = [];
-    var listaLocalidades = [];
+    let count = 0;
 
     const torneioInfo = getTorneioInfo();
-    const localidadesInfo = getLocalidadesInfo();
+    const localidadesInfo = getAllLocalidadesId();
     const escaloesInfo = getEscaloesInfo();
 
     Promise.all([torneioInfo, localidadesInfo, escaloesInfo])
     .then(async ([torneio, localidades, escaloes]) => {
-        localidades.forEach(localidade => {
-            listaLocalidades.push(localidade.localidadeId);
-        });
+        
+        const listaLocalidades = localidades.map(localidade => localidade.localidadeId);
+        const listaEscaloes = escaloes.map(escalao => escalao.escalaoId);
 
-        escaloes.forEach(escalao => {
-            listaEscaloes.push(escalao.escalaoId);
-        });
-
-        let count = 0;
-        let nextEquipaID = await getLastEquipaID(torneio.torneioId);
+        let nextEquipaID = await getLastEquipaID(torneio.torneioId) || 0;
         for(let i = 0; i < num; i++){
             nextEquipaID++;
-            Equipas.create({
+            await Equipas.create({
                 equipaId: nextEquipaID,
                 torneioId: torneio.torneioId,
                 primeiroElemento: faker.name.firstName() + " " + faker.name.lastName(),
                 segundoElemento: faker.name.firstName() + " " + faker.name.lastName(),
                 localidadeId: listaLocalidades[Math.floor(Math.random() * listaLocalidades.length)],
                 escalaoId: listaEscaloes[Math.floor(Math.random() * listaEscaloes.length)]
-            }).then(() => {
+            }).then(equipa => {
                 count++;
             });
-        }
-
-        req.flash('success', 'Equipas adicionadas com sucesso.');
+        }        
+    }).then(() => {
+        req.flash('success', `${count} equipas adicionadas com sucesso.`);
         res.redirect('/equipas');
     })
     .catch(err => {
@@ -433,22 +433,19 @@ exports.createEquipasAleatoriamente = async (req, res, next) => {
 exports.createEquipasAleatoriamentePorEscalao = async (req, res, next) => {
     const escalaoId = req.params.escalao;
     const num = req.params.num;
-    var listaLocalidades = [];
+    let count = 0;
 
     const torneioInfo = getTorneioInfo();
-    const localidadesInfo = getLocalidadesInfo();
+    const localidadesInfo = getAllLocalidadesId();
 
     Promise.all([torneioInfo, localidadesInfo])
     .then(async ([torneio, localidades]) => {
-        localidades.forEach(localidade => {
-            listaLocalidades.push(localidade.localidadeId);
-        });
+        const listaLocalidades = localidades.map(localidade => localidade.localidadeId);
 
-        let count = 0;
-        let nextEquipaID = await getLastEquipaID(torneio.torneioId);
+        let nextEquipaID = await getLastEquipaID(torneio.torneioId) || 0;
         for(let i = 0; i < num; i++){
             nextEquipaID++;
-            Equipas.create({
+            await Equipas.create({
                 equipaId: nextEquipaID,
                 torneioId: torneio.torneioId,
                 primeiroElemento: faker.name.firstName() + " " + faker.name.lastName(),
@@ -459,8 +456,9 @@ exports.createEquipasAleatoriamentePorEscalao = async (req, res, next) => {
                 count++;
             });
         }
-
-        req.flash('success', 'Equipas adicionadas com sucesso.');
+    })
+    .then(() => {
+        req.flash('success', `${count} equipas adicionadas com sucesso.`);
         res.redirect('/equipas');
     })
     .catch(err => {

@@ -134,7 +134,7 @@ exports.ActivaTorneio = (req, res, next) => {
     .then(async torneio => {
         if(torneio){
             if(await setTorneioActivo(torneio.torneioId)){
-                req.flash('success', 'Torneio activado com sucesso.')
+                req.flash('success', `Torneio, ${torneio.designacao}, activado com sucesso.`)
                 res.redirect('/admin/torneios');
             } else {
                 req.flash('error', 'Não foi possível activar o torneio.');

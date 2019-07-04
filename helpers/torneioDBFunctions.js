@@ -238,7 +238,7 @@ exports.getPontuacoes = (jogoId) => {
     });
 }
 
-exports.getNumGamesPlayed = (torneioId, escalaoId, fase, campo) => {
+exports.getNumGamesPlayed_old = (torneioId, escalaoId, fase, campo) => {
     return sequelize.query(
         `SELECT COUNT(jogoId) AS count
         FROM jogos
@@ -251,7 +251,27 @@ exports.getNumGamesPlayed = (torneioId, escalaoId, fase, campo) => {
     {
         replacements: [torneioId, escalaoId, fase, campo],
         type: sequelize.QueryTypes.SELECT
-    })
+    });
+}
+
+exports.getNumGamesPlayed = (torneioId, escalaoId, fase, campo) => {
+    return Jogos.count({
+        col: 'jogoId',
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId,
+            fase: fase
+        },
+        include: {
+            model: Parciais,
+            where: {
+                [Op.or]: [
+                    {equipaId: sequelize.col('jogos.equipa1Id')},
+                    {equipaId: sequelize.col('jogos.equipa2Id')}
+                ]
+            }
+        }
+    });
 }
 
 exports.getAllCamposPorEscalaoFase = (torneioId, escalaoId, fase) => {

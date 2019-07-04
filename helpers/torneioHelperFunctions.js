@@ -57,6 +57,9 @@ function metodoEmparelhamento(equipas){
 
     let emparelhamento = null;
 
+    console.log("Equipas");
+    console.log(equipas);
+
     switch(equipas.length){
         case 2 :
             emparelhamento = equipas2;
@@ -122,6 +125,9 @@ exports.distribuiEquipasPorCampos = async function(torneioId, minEquipas, maxEqu
             // 1. Verificar o número total de equipas de cada escalão
             const numEquipasPorEscalao = await dbFunctions.getNumEquipasPorEscalao(torneioId, escalaoId);
             //console.log("Número de equipas por Escalão: " + numEquipasPorEscalao);
+            if(numEquipasPorEscalao < 2){
+                continue;
+            }
 
             // 2. Determinar o número máximo de campos necessário para cada escalão
             const numMaxCampos = determinaNumeroTotalCampos(numEquipasPorEscalao, numCamposTorneio, minEquipas, maxEquipas);
@@ -170,6 +176,7 @@ exports.distribuiEquipasPorCampos = async function(torneioId, minEquipas, maxEqu
 
             for(i = 0; i < listaCampos.length; i++){
                 let emparelhamento = metodoEmparelhamento(listaCampos[i]);
+                console.log(emparelhamento);
                 for(const par of emparelhamento){
                     let equipa1 = listaCampos[i][par[0]];
                     let equipa2 = listaCampos[i][par[1]];

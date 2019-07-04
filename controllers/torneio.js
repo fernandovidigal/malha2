@@ -9,124 +9,144 @@ const torneioHelpers = require('../helpers/torneioHelperFunctions');
 const dbFunctions = require('../helpers/torneioDBFunctions');
 
 exports.getStarting = async (req, res, next) => {
-    const torneio = await dbFunctions.getTorneioInfo();
-    const torneioId = torneio.torneioId;
 
-    // 1. Verificar se existem equipas (não se pode fazer um torneio sem equipas)
-    // e se exitem pelo menos 2 equipas
-    const numEquipas = await dbFunctions.getNumEquipas(torneioId);
-    if(numEquipas == 0){
-        const error = { msg: "Não existem equipas registadas."};
-        return res.render('torneio/index', {torneio: torneio, messages: error});
-    } else if(numEquipas < 2){
-        const error = { msg: "Existem menos de 2 equipas registadas"};
-        return res.render('torneio/index', {torneio: torneio, messages: error});
-    }
+    try {
+        const torneio = await dbFunctions.getTorneioInfo();
 
-    // 2. Verificar se existem o número de campos definido para o torneio
-    const numCampos = await dbFunctions.getNumCampos(torneioId);
-    if(numCampos.campos == 0){
-        return res.render('torneio/definirNumeroCampos', {torneio: torneio});
-    }
+        // Não existe torneio registado ou activo
+        if(!torneio){
+            req.flash('error', 'Não existem torneios activos.');
+            return res.redirect("../");
+        }
+        const torneioId = torneio.torneioId;
 
-    if(numEquipas > 0 && numCampos.campos > 0){
-        // Lista dos Escalões com equipas registadas
-        const listaEscaloes = await dbFunctions.getEscaloesComEquipas(torneioId);
-
-        const escaloesMasculinos = [];
-        const escaloesFemininos = [];
-        let numTotalJogos = 0;
-
-        // Percorre todos os escalões
-        for(const escalao of listaEscaloes){
-            // Informações sobre o escalão
-            const _escalao = {
-                escalaoId: escalao.escalaoId,
-                designacao: escalao.designacao,
-                sexo: escalao.sexo
-            }
-
-            // Verifica em que fase do torneio se encontra o escalão
-            const fase = await dbFunctions.getFaseTorneioPorEscalao(torneioId, escalao.escalaoId);
-            _escalao.fase = (fase == null) ? 0 : fase.fase;
-
-            // Verifica o número de jogos que determinada fase já tem distribuidos
-            const numJogos = await dbFunctions.getNumeroJogosPorFase(torneioId, _escalao.escalaoId, _escalao.fase);
-            _escalao.numJogos = numJogos;
-            numTotalJogos += numJogos;
-
-            // Se já existem jogos distribuídos para determinado escalão, então o número de jogos é maior que 0
-            if(numJogos > 0){
-                // Verifica o número total de campos que determinado escalão ocupa
-                const numCampos = await dbFunctions.getNumeroCamposPorEscalaoFase(torneioId, _escalao.escalaoId, _escalao.fase);
-                _escalao.numCampos = numCampos;
-                _escalao.campos = [];
-
-                // Mantem o registo do número de jogos completos
-                // Se o número de campos completos for igual ao número de campos então a fase está concluída
-                let numCamposCompletos = 0;
-
-                // Obtem a lista de campos para determinado torneio em determinada fase
-                // [1,2,3,4,5,6,7,8,9,...]
-                const listaCampos = await dbFunctions.getAllCampos(torneioId, _escalao.escalaoId, _escalao.fase);
-                
-                // Percorre cada campo
-                for(const campo of listaCampos){
-                    // guarda o número do campo
-                    const numCampo = campo.num;
-
-                    // Determina para determinado escalão e fase, o número de jogos total para o campo e
-                    // o número de jogos já jogados
-                    const numJogosParaJogar = await dbFunctions.getNumGamesPorCampo(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
-                    const numJogosJogados = await dbFunctions.getNumGamesPlayed(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
-
-                    // Verifica a diferença entre o total de jogos e o número de jogos já jogados
-                    if((numJogosParaJogar - numJogosJogados[0].count) > 0){
-                        const campoData = {
-                            campo: (numCampo == 1000) ? 'Final' : (numCampo == 500 ? '3º e 4º' : numCampo),
-                            completo: false
-                        } 
-                        _escalao.campos.push(campoData);
-                    } else {
-                        // Campo com todos os jogos realizados
-                        const campoData = {
-                            campo: (numCampo == 1000) ? 'Final' : (numCampo == 500 ? '3º e 4º' : numCampo),
-                            completo: true
-                        }
-                        _escalao.campos.push(campoData);
-
-                        // Actualiza o número de campos completos
-                        numCamposCompletos++;
-                    }
-                }
-
-                // Guarda e veriffica se os jogos de todos os campos já foram jogados
-                _escalao.numCamposCompletos = numCamposCompletos;
-                if(_escalao.numCampos == _escalao.numCamposCompletos){
-                    _escalao.todosCamposCompletos = true;
-                } else {
-                    _escalao.todosCamposCompletos = false;
-                }
-            }
-          
-            if(_escalao.sexo == 0){
-                escaloesFemininos.push(_escalao);
-            } else {
-                escaloesMasculinos.push(_escalao);
-            }
+        // 1. Verificar se existem equipas (não se pode fazer um torneio sem equipas)
+        // e se exitem pelo menos 2 equipas
+        const numEquipas = await dbFunctions.getNumEquipas(torneioId);
+        if(numEquipas == 0){
+            const error = { msg: "Não existem equipas registadas no torneio."};
+            return res.render('torneio/index', {torneio: torneio, messages: error});
+        } else if(numEquipas < 2){
+            const error = { msg: "Existem menos de 2 equipas registadas."};
+            return res.render('torneio/index', {torneio: torneio, messages: error});
         }
 
-        console.log("Escalões Masculinos:");
-        console.log(escaloesMasculinos);
-        console.log("Escalões Masculinos 1 Elemento:");
-        console.log(escaloesMasculinos[1].campos);
-        console.log(" ");
-        console.log("Escalões Femininos:");
-        console.log(escaloesFemininos);
+        // 2. Verificar se o número de campos para o torneio está definido
+        const numCampos = await dbFunctions.getNumCampos(torneioId);
+        if(numCampos.campos == 0){
+            return res.render('torneio/definirNumeroCampos', {torneio: torneio});
+        }
 
-        res.render('torneio/selecionaEscalao', {torneio: torneio, numTotalJogos: numTotalJogos, escaloesMasculinos: escaloesMasculinos, escaloesFemininos: escaloesFemininos});
+        if(numEquipas > 0 && numCampos.campos > 0){
+            // Lista dos Escalões com equipas registadas
+            const listaEscaloes = await dbFunctions.getEscaloesComEquipas(torneioId);
+
+            const escaloesMasculinos = [];
+            const escaloesFemininos = [];
+            let numTotalJogos = 0;
+
+            // Percorre todos os escalões
+            for(const escalao of listaEscaloes){
+                // Informações sobre o escalão
+                const _escalao = {
+                    escalaoId: escalao.escalaoId,
+                    designacao: escalao.designacao,
+                    sexo: escalao.sexo
+                }
+
+                // Verificar se o escalão tem mais de 2 equipas
+                // Se não tiver, mostrar alerta
+                // TODO:
+
+                // Verifica em que fase do torneio se encontra o escalão
+                const fase = await dbFunctions.getFaseTorneioPorEscalao(torneioId, escalao.escalaoId);
+                _escalao.fase = (fase == null) ? 0 : fase.fase;
+
+                // Verifica o número de jogos que determinada fase já tem distribuidos
+                const numJogos = await dbFunctions.getNumeroJogosPorFase(torneioId, _escalao.escalaoId, _escalao.fase);
+                _escalao.numJogos = numJogos;
+
+                // Serve para verificar se já existem jogos distribuídos para algum escalão
+                // s´Se for 0, então nenhum escalão tem jogos distribuídos
+                numTotalJogos += numJogos;
+
+                // Se já existem jogos distribuídos para determinado escalão, então o número de jogos é maior que 0
+                // então obtem as informações sobre os jogos
+                if(numJogos > 0){
+                    // Verifica o número total de campos que determinado escalão ocupa
+                    const numCampos = await dbFunctions.getNumeroCamposPorEscalaoFase(torneioId, _escalao.escalaoId, _escalao.fase);
+                    _escalao.numCampos = numCampos;
+                    _escalao.campos = [];
+
+                    // Mantem o registo do número de jogos completos
+                    // Se o número de campos completos for igual ao número de campos total do escalão então a fase está concluída
+                    let numCamposCompletos = 0;
+
+                    // Obtem a lista de campos para determinado torneio em determinada fase
+                    // [1,2,3,4,5,6,7,8,9,...]
+                    const listaCampos = await dbFunctions.getAllCampos(torneioId, _escalao.escalaoId, _escalao.fase);
+                    
+                    // Para cada campo da lista de campos
+                    for(const campo of listaCampos){
+                        // guarda o número do campo
+                        const numCampo = campo.num;
+
+                        // Determina para determinado escalão e fase, o número de jogos total para o campo e
+                        // o número de jogos já jogados
+                        const numJogosParaJogar = await dbFunctions.getNumGamesPorCampo(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
+                        const numJogosJogados = await dbFunctions.getNumGamesPlayed(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
+
+                        // Verifica a diferença entre o total de jogos e o número de jogos já jogados
+                        if((numJogosParaJogar - numJogosJogados[0].count) > 0){
+                            const campoData = {
+                                campo: (numCampo == 1000) ? 'Final' : (numCampo == 500 ? '3º e 4º' : numCampo),
+                                completo: false
+                            } 
+                            _escalao.campos.push(campoData);
+                        } else {
+                            // Campo com todos os jogos realizados
+                            const campoData = {
+                                campo: (numCampo == 1000) ? 'Final' : (numCampo == 500 ? '3º e 4º' : numCampo),
+                                completo: true
+                            }
+                            _escalao.campos.push(campoData);
+
+                            // Actualiza o número de campos completos
+                            numCamposCompletos++;
+                        }
+                    }
+
+                    // Guarda e veriffica se os jogos de todos os campos já foram jogados
+                    _escalao.numCamposCompletos = numCamposCompletos;
+                    if(_escalao.numCampos == _escalao.numCamposCompletos){
+                        _escalao.todosCamposCompletos = true;
+                    } else {
+                        _escalao.todosCamposCompletos = false;
+                    }
+                }
+            
+                if(_escalao.sexo == 0){
+                    escaloesFemininos.push(_escalao);
+                } else {
+                    escaloesMasculinos.push(_escalao);
+                }
+            }
+
+            /*console.log("Escalões Masculinos:");
+            console.log(escaloesMasculinos);
+            console.log("Escalões Masculinos 1 Elemento:");
+            console.log(escaloesMasculinos[1].campos);
+            console.log(" ");
+            console.log("Escalões Femininos:");
+            console.log(escaloesFemininos);*/
+
+            res.render('torneio/selecionaEscalao', {torneio: torneio, numTotalJogos: numTotalJogos, escaloesMasculinos: escaloesMasculinos, escaloesFemininos: escaloesFemininos});
+        }
+    } catch(e) {
+        console.log(e);
+        req.flash('error', 'Ocorreu um erro! Não foi possível aceder à página do torneio.');
+        res.redirect('../');
     }
-
 }
 
 exports.getNumeroCampos = async (req, res, next) => {

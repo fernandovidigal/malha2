@@ -421,13 +421,14 @@ small {
     background-color: #f8f9ff;
     border: solid 1px #eaebf1;
     border-radius: 8px;
-    width: 34px;
+    min-width: 20px;
     height: 34px;
     margin: 0 5px 10px 5px;
     display: flex;
     justify-content: center;
     align-items: center;
     transition: all .25s;
+    padding: 0 8px;
 }
 
 .campo-xl {
@@ -608,6 +609,17 @@ small {
     padding-top: 10px;
     padding-left: 5px;
     flex-wrap: wrap;
+}
+
+.escalao_err_msg {
+    font-size: 80%;
+    margin-right: 14px;
+    padding: 8px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1; 
 }
 
 .listTable th.resultados__campo-header {

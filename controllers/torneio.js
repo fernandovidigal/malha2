@@ -56,18 +56,25 @@ exports.getStarting = async (req, res, next) => {
 
                 // Verificar se o escalão tem mais de 2 equipas
                 // Se não tiver, mostrar alerta
-                // TODO:
-
+                const numEquipas = dbFunctions.getNumEquipasPorEscalao(torneioId, escalao.escalaoId);
+                
                 // Verifica em que fase do torneio se encontra o escalão
-                const fase = await dbFunctions.getFaseTorneioPorEscalao(torneioId, escalao.escalaoId);
-                _escalao.fase = (fase == null) ? 0 : fase.fase;
+                const fase = dbFunctions.getFaseTorneioPorEscalao(torneioId, escalao.escalaoId);
+                
+                await Promise.all([numEquipas, fase])
+                .then(([_numEquipas, _fase]) => {
+                    _escalao.numEquipas = _numEquipas;
+                    _escalao.fase = (_fase == null) ? 0 : _fase.fase;
+                }).catch(err => {
+                    throw new Error(err);
+                });
 
                 // Verifica o número de jogos que determinada fase já tem distribuidos
                 const numJogos = await dbFunctions.getNumeroJogosPorFase(torneioId, _escalao.escalaoId, _escalao.fase);
                 _escalao.numJogos = numJogos;
 
                 // Serve para verificar se já existem jogos distribuídos para algum escalão
-                // s´Se for 0, então nenhum escalão tem jogos distribuídos
+                // Se for 0, então nenhum escalão tem jogos distribuídos
                 numTotalJogos += numJogos;
 
                 // Se já existem jogos distribuídos para determinado escalão, então o número de jogos é maior que 0
@@ -94,35 +101,36 @@ exports.getStarting = async (req, res, next) => {
                         // Determina para determinado escalão e fase, o número de jogos total para o campo e
                         // o número de jogos já jogados
                         const numJogosParaJogar = await dbFunctions.getNumGamesPorCampo(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
+                        //console.log("Num Jogos para Jogar");
+                        //console.log(numJogosParaJogar);
                         const numJogosJogados = await dbFunctions.getNumGamesPlayed(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
+                        //console.log("Num Jogos já jogados");
+                        //console.log(numJogosJogados[0].count);
 
-                        // Verifica a diferença entre o total de jogos e o número de jogos já jogados
-                        if((numJogosParaJogar - numJogosJogados[0].count) > 0){
-                            const campoData = {
-                                campo: (numCampo == 1000) ? 'Final' : (numCampo == 500 ? '3º e 4º' : numCampo),
-                                completo: false
-                            } 
-                            _escalao.campos.push(campoData);
-                        } else {
-                            // Campo com todos os jogos realizados
-                            const campoData = {
-                                campo: (numCampo == 1000) ? 'Final' : (numCampo == 500 ? '3º e 4º' : numCampo),
-                                completo: true
-                            }
-                            _escalao.campos.push(campoData);
+                        /*const numJogosJogadosNew = await dbFunctions.getNumGamesPlayed_old(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
+                        //console.log("Num Jogos já jogados NEW!");
+                        //console.log(numJogosJogadosNew[0]);
+                        const mapping = numJogosJogadosNew.map(x => x.jogoId);
+                        console.log(mapping);*/
 
-                            // Actualiza o número de campos completos
+                        const campoData = {
+                            campo: (numCampo == 1000) ? 'Final' : (numCampo == 500 ? '3º e 4º' : numCampo),
+                            completo: ((numJogosParaJogar - numJogosJogados[0].count) > 0) ? false: true
+                        }
+                        _escalao.campos.push(campoData);
+
+                        // Verifica o número de campos completos
+                        if(numJogosParaJogar == numJogosJogados[0].count){
                             numCamposCompletos++;
                         }
                     }
 
                     // Guarda e veriffica se os jogos de todos os campos já foram jogados
                     _escalao.numCamposCompletos = numCamposCompletos;
-                    if(_escalao.numCampos == _escalao.numCamposCompletos){
-                        _escalao.todosCamposCompletos = true;
-                    } else {
-                        _escalao.todosCamposCompletos = false;
-                    }
+                    _escalao.todosCamposCompletos = (_escalao.numCampos == _escalao.numCamposCompletos) ? true : false;
+                    /*console.log(_escalao.numCampos);
+                    console.log(_escalao.numCamposCompletos);
+                    console.log(_escalao.todosCamposCompletos);*/
                 }
             
                 if(_escalao.sexo == 0){
@@ -197,7 +205,7 @@ exports.setNumeroCampos = async (req, res, next) => {
 exports.distribuirTodasEquipas = async (req, res, next) => {
     const torneio = await dbFunctions.getTorneioInfo();
 
-    await torneioHelpers.distribuiEquipasPorCampos(torneio.torneioId, 4, 6);
+    const escaloesDistribuidos = await torneioHelpers.distribuiEquipasPorCampos(torneio.torneioId, 4, 6);
     
     res.redirect('/torneio');
 }
@@ -250,8 +258,10 @@ async function verificaCamposCompletos(listaCampos, torneioId, escalaoId, fase){
     for(const campo of listaCampos){
         // Otem o número total dos jogos do campo
         const numTotalJogos = dbFunctions.getNumGamesPorCampo(torneioId, escalaoId, fase, campo.campo);
+        console.log(numTotalJogos);
         // Obtem a lista de jogos que já foram jogados
         const listaJogosFinalizados = dbFunctions.getAllGamesPlayed(torneioId, escalaoId, fase, campo.campo);
+        console.log(listaJogosFinalizados);
 
         await Promise.all([numTotalJogos, listaJogosFinalizados])
         .then(([_numTotalJogos, _listaJogosFinalizados]) => {

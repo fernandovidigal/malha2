@@ -66,6 +66,11 @@ exports.getAllEquipas = async (req, res, next) => {
     Promise.all([torneioInfo, localidadesInfo, escaloesInfo])
     .then(([torneio, localidades, escaloes]) => {
 
+        if(!torneio){
+            req.flash('error', 'Não existem torneios activos.');
+            return res.redirect("../");
+        }
+
         // Ordena correctamente as localidades
         util.sort(localidades);
 

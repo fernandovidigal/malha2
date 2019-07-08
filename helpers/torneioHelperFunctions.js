@@ -1,4 +1,5 @@
 const dbFunctions = require('./torneioDBFunctions');
+const sequelize = require('../helpers/database');
 
 function determinaNumeroTotalCampos(numEquipas, numCamposTorneio, minEquipas, maxEquipas){
     
@@ -57,9 +58,6 @@ function metodoEmparelhamento(equipas){
 
     let emparelhamento = null;
 
-    console.log("Equipas");
-    console.log(equipas);
-
     switch(equipas.length){
         case 2 :
             emparelhamento = equipas2;
@@ -115,6 +113,8 @@ exports.distribuiEquipasPorCampos = async function(torneioId, minEquipas, maxEqu
     //console.log("Distribui Equipas: Escaloes ->");
     //console.log(escaloes);
 
+    const escaloesDistribuidos = [];
+
     // Não foi definido nenhum escalão
     // Distribui todas as equipas de todos os escalões
     if(escalao == 0){
@@ -125,46 +125,174 @@ exports.distribuiEquipasPorCampos = async function(torneioId, minEquipas, maxEqu
             // 1. Verificar o número total de equipas de cada escalão
             const numEquipasPorEscalao = await dbFunctions.getNumEquipasPorEscalao(torneioId, escalaoId);
             //console.log("Número de equipas por Escalão: " + numEquipasPorEscalao);
-            if(numEquipasPorEscalao < 2){
+
+            // Se só existem 2 equipas então o jogo é decisão do vencedor
+            if(numEquipasPorEscalao == 2){
+                const equipas = await dbFunctions.getEquipasPorEscalao(torneioId, escalaoId);
+                // Regista jogo para determinar o vencedor
+                dbFunctions.createJogo(torneioId, escalaoId, 100, 1000, equipas[0].equipaId, equipas[1].equipaId)
+                .then(() => {
+                    const distribuido = {
+                        escalao: escalaoId,
+                        sucesso: true
+                    }
+                    escaloesDistribuidos.push(distribuido);
+                })
+                .catch(err => {
+                    console.log("ERRO::Distribuição de Equipas:");
+                    console.log(err);
+                    const distribuido = {
+                        escalao: escalaoId,
+                        sucesso: false
+                    }
+                    escaloesDistribuidos.push(distribuido);
+                });
+
+            } else if(numEquipasPorEscalao > 2) {
+                // Existem mais que duas equipas, distribuir equipas
+
+                // 2. Determinar o número máximo de campos necessário para cada escalão
+                const numMaxCampos = determinaNumeroTotalCampos(numEquipasPorEscalao, numCamposTorneio, minEquipas, maxEquipas);
+                //console.log("Número Máximo de campos: " + numMaxCampos);
+                // TODO: Throw Error: quando o número de campos retornado é 0
+                if(numMaxCampos == 0){
+                    throw new Error('O número de campos deve ser superior a 0.');
+                }
+                
+                // 3. Inicia a Array de campos
+                let listaCampos = [];
+                for(i = 0; i < numMaxCampos; i++){
+                    listaCampos.push(new Array());
+                }
+                //console.log("Lista de Campos:");
+                //console.log(listaCampos);
+
+                // 4. Por cada localidade distribuir as respectivas equipas pelos campos
+                let listaLocalidades = await dbFunctions.getAllLocalidadesID();
+
+                // 5. Baralha as localidades
+                listaLocalidades = shuffleLocalidades(listaLocalidades);
+                //console.log("Lista Localidades:");
+                //console.log(listaLocalidades);
+
+                let k = 0;
+                for(const localidade of listaLocalidades){
+                    const numEquipasPorLocalidade = await dbFunctions.getNumEquipasPorLocalidadeAndEscalao(torneioId, localidade.localidadeId, escalaoId);
+                    //console.log(numEquipasPorLocalidade);
+
+                    if(numEquipasPorLocalidade > 0){
+                        const listaEquipasPorLocalidade = await dbFunctions.getEquipasIDByLocalidadeAndEscalao(torneioId, localidade.localidadeId, escalaoId);
+                        //console.log(listaEquipasPorLocalidade);
+
+                        // Adiciona a equipa à lista de campos
+                        for(const equipa of listaEquipasPorLocalidade){
+                            if(k >= numMaxCampos){
+                                k = 0;
+                            }
+
+                            listaCampos[k].push(equipa);
+                            k++;
+                        }
+                    }
+                }
+
+                const listaJogos = [];
+                for(i = 0; i < listaCampos.length; i++){
+                    let emparelhamento = metodoEmparelhamento(listaCampos[i]);
+                    for(const par of emparelhamento){
+                        let equipa1 = listaCampos[i][par[0]];
+                        let equipa2 = listaCampos[i][par[1]];
+
+                        // TODO: experimentar Try {} catch {} block to gerir os erros
+                        //await dbFunctions.createJogo(torneioId, escalaoId, 1, (i+1), equipa1.equipaId, equipa2.equipaId);
+                        listaJogos.push(dbFunctions.createJogo(torneioId, escalaoId, 1, (i+1), equipa1.equipaId, equipa2.equipaId));
+                    }
+                }
+
+                // Execute em transação o registo dos jogos
+                sequelize.transaction(t => {
+                    return Promise.all(listaJogos, { transaction: t });
+                })
+                .then(()=>{
+                    const distribuido = {
+                        escalao: escalaoId,
+                        sucesso: true
+                    }
+                    escaloesDistribuidos.push(distribuido);
+                })
+                .catch(err => {
+                    console.log("ERRO::Distribuição de Equipas:");
+                    console.log(err);
+                    const distribuido = {
+                        escalao: escalaoId,
+                        sucesso: false
+                    }
+                    escaloesDistribuidos.push(distribuido);
+                });
+
+            } else {
                 continue;
             }
+        }
+
+    } else {
+        const escalaoId = escalao;
+        // Distribui equipas só do escalão passado como parametro
+        // 1. Verificar o número total de equipas de cada escalão
+        const numEquipasPorEscalao = await dbFunctions.getNumEquipasPorEscalao(torneioId, escalaoId);
+        //console.log("Número de equipas por Escalão: " + numEquipasPorEscalao);
+
+        // Se só existem 2 equipas então o jogo é decisão do vencedor
+        if(numEquipasPorEscalao == 2){
+            const equipas = await dbFunctions.getEquipasPorEscalao(torneioId, escalaoId);
+            // Regista jogo para determinar o vencedor
+            dbFunctions.createJogo(torneioId, escalaoId, 100, 1000, equipas[0].equipaId, equipas[1].equipaId)
+            .then(() => {
+                const distribuido = {
+                    escalao: escalaoId,
+                    sucesso: true
+                }
+                escaloesDistribuidos.push(distribuido);
+            })
+            .catch(err => {
+                console.log("ERRO::Distribuição de Equipas:");
+                console.log(err);
+                const distribuido = {
+                    escalao: escalaoId,
+                    sucesso: false
+                }
+                escaloesDistribuidos.push(distribuido);
+            });
+
+        } else if(numEquipasPorEscalao > 2) {
+            // Existem mais que duas equipas, distribuir equipas
 
             // 2. Determinar o número máximo de campos necessário para cada escalão
             const numMaxCampos = determinaNumeroTotalCampos(numEquipasPorEscalao, numCamposTorneio, minEquipas, maxEquipas);
             //console.log("Número Máximo de campos: " + numMaxCampos);
-            // TODO: Throw Error: quando o número de campos retornado é 0
-            if(numMaxCampos == 0){
-                throw new Error('Número de campos é 0.');
-            }
             
             // 3. Inicia a Array de campos
             let listaCampos = [];
             for(i = 0; i < numMaxCampos; i++){
                 listaCampos.push(new Array());
             }
-            //console.log("Lista de Campos:");
-            //console.log(listaCampos);
 
             // 4. Por cada localidade distribuir as respectivas equipas pelos campos
             let listaLocalidades = await dbFunctions.getAllLocalidadesID();
 
             // 5. Baralha as localidades
             listaLocalidades = shuffleLocalidades(listaLocalidades);
-            //console.log("Lista Localidades:");
-            //console.log(listaLocalidades);
 
             let k = 0;
             for(const localidade of listaLocalidades){
                 const numEquipasPorLocalidade = await dbFunctions.getNumEquipasPorLocalidadeAndEscalao(torneioId, localidade.localidadeId, escalaoId);
-                //console.log(numEquipasPorLocalidade);
 
                 if(numEquipasPorLocalidade > 0){
                     const listaEquipasPorLocalidade = await dbFunctions.getEquipasIDByLocalidadeAndEscalao(torneioId, localidade.localidadeId, escalaoId);
-                    //console.log(listaEquipasPorLocalidade);
 
                     // Adiciona a equipa à lista de campos
                     for(const equipa of listaEquipasPorLocalidade){
-                        if(k >= numMaxCampos){
+                        if(k > (numMaxCampos-1)){
                             k = 0;
                         }
 
@@ -174,68 +302,40 @@ exports.distribuiEquipasPorCampos = async function(torneioId, minEquipas, maxEqu
                 }
             }
 
+            const listaJogos = [];
             for(i = 0; i < listaCampos.length; i++){
                 let emparelhamento = metodoEmparelhamento(listaCampos[i]);
-                console.log(emparelhamento);
                 for(const par of emparelhamento){
                     let equipa1 = listaCampos[i][par[0]];
                     let equipa2 = listaCampos[i][par[1]];
 
-                    // TODO: experimentar Try {} catch {} block to gerir os erros
-                    await dbFunctions.createJogo(torneioId, escalaoId, 1, (i+1), equipa1.equipaId, equipa2.equipaId);
+                    listaJogos.push(dbFunctions.createJogo(torneioId, escalaoId, 1, (i+1), equipa1.equipaId, equipa2.equipaId));
                 }
             }
-        }
-    } else {
-        const escalaoId = escalao;
-        // Distribui equipas só do escalão passado como parametro
-        // 1. Verificar o número total de equipas de cada escalão
-        const numEquipasPorEscalao = await dbFunctions.getNumEquipasPorEscalao(torneioId, escalaoId);
-        //console.log("Número de equipas por Escalão: " + numEquipasPorEscalao);
 
-        // 2. Determinar o número máximo de campos necessário para cada escalão
-        const numMaxCampos = determinaNumeroTotalCampos(numEquipasPorEscalao, numCamposTorneio, minEquipas, maxEquipas);
-        //console.log("Número Máximo de campos: " + numMaxCampos);
-        
-        // 3. Inicia a Array de campos
-        let listaCampos = [];
-        for(i = 0; i < numMaxCampos; i++){
-            listaCampos.push(new Array());
-        }
-
-        // 4. Por cada localidade distribuir as respectivas equipas pelos campos
-        let listaLocalidades = await dbFunctions.getAllLocalidadesID();
-
-        // 5. Baralha as localidades
-        listaLocalidades = shuffleLocalidades(listaLocalidades);
-
-        let k = 0;
-        for(const localidade of listaLocalidades){
-            const numEquipasPorLocalidade = await dbFunctions.getNumEquipasPorLocalidadeAndEscalao(torneioId, localidade.localidadeId, escalaoId);
-
-            if(numEquipasPorLocalidade > 0){
-                const listaEquipasPorLocalidade = await dbFunctions.getEquipasIDByLocalidadeAndEscalao(torneioId, localidade.localidadeId, escalaoId);
-
-                // Adiciona a equipa à lista de campos
-                for(const equipa of listaEquipasPorLocalidade){
-                    if(k > (numMaxCampos-1)){
-                        k = 0;
-                    }
-
-                    listaCampos[k].push(equipa);
-                    k++;
+            // Execute em transação o registo dos jogos
+            sequelize.transaction(t => {
+                return Promise.all(listaJogos, { transaction: t });
+            })
+            .then(()=>{
+                const distribuido = {
+                    escalao: escalaoId,
+                    sucesso: true
                 }
-            }
-        }
-
-        for(i = 0; i < listaCampos.length; i++){
-            let emparelhamento = metodoEmparelhamento(listaCampos[i]);
-            for(const par of emparelhamento){
-                let equipa1 = listaCampos[i][par[0]];
-                let equipa2 = listaCampos[i][par[1]];
-
-                await dbFunctions.createJogo(torneioId, escalaoId, 1, (i+1), equipa1.equipaId, equipa2.equipaId);
-            }
+                escaloesDistribuidos.push(distribuido);
+            })
+            .catch(err => {
+                console.log("ERRO::Distribuição de Equipas:");
+                console.log(err);
+                const distribuido = {
+                    escalao: escalaoId,
+                    sucesso: false
+                }
+                escaloesDistribuidos.push(distribuido);
+            });
         }
     }
+
+    // Retorna informação sobre que escalões foram distribuidos com sucesso e os que não foram
+    return escaloesDistribuidos;
 }

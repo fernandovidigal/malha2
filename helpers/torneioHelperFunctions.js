@@ -15,25 +15,34 @@ function determinaNumeroTotalCampos(numEquipas, numCamposTorneio, minEquipas, ma
     let found = false;
     let numCampos = 0;
     while(!found){
+        //console.log("minEquipasIter: " + minEquipasIter);
+
         numCampos = Math.floor(numEquipas / minEquipasIter);
+        //console.log("numCampos: " + numCampos);
         // Calcula com quantas equipas fica o último campo
         let calc = numEquipas - (numCampos * minEquipasIter);
+        //console.log("calc: " + calc);
 
         // Verifica se o último campo tem menos que o mínimo das equipas requeridas no torneio
         // e se o valor iterativo do mínimo das equipas não fica superior ao valor máximo das equipas
         // requiridas no torneio
+        //console.log("minEquipas: " + minEquipas);
         if(calc < minEquipas && minEquipasIter <= maxEquipas){
             // Verifica se o valor iteractivo é maior que o número minimo de equipas, é que se não for, não é possível
             // fazer a distribuição/redução dos ultimos campos para preencher o requisito de equipas minimas por campo.
             // verifica também se existem número de campos suficientes para poder fazer a redução no número das equipas para compensar
             // os campos que fiquem com menos do número minimo das equipas requeridas no torneio. Se existirem campos suficientes para fazer
-            // a redução econtrou-se o número de campos necessários para fazer a distribuição das equipas pelos campos  
+            // a redução econtrou-se o número de campos necessários para fazer a distribuição das equipas pelos campos 
+            //console.log("xpto: " + (numCampos-(minEquipas - calc)));
             if(minEquipasIter > minEquipas && (numCampos-(minEquipas - calc)) < numCampos){
+                //console.log("aqui found 2");
                 found = true;
             } else {
+                //console.log("aqui ++");
                 minEquipasIter++;
             }
         } else {
+            //console.log("aqui found 1");
             found = true;
         }
     }

@@ -258,10 +258,10 @@ async function verificaCamposCompletos(listaCampos, torneioId, escalaoId, fase){
     for(const campo of listaCampos){
         // Otem o número total dos jogos do campo
         const numTotalJogos = dbFunctions.getNumGamesPorCampo(torneioId, escalaoId, fase, campo.campo);
-        console.log(numTotalJogos);
+        //console.log(numTotalJogos);
         // Obtem a lista de jogos que já foram jogados
         const listaJogosFinalizados = dbFunctions.getAllGamesPlayed(torneioId, escalaoId, fase, campo.campo);
-        console.log(listaJogosFinalizados);
+        //console.log(listaJogosFinalizados);
 
         await Promise.all([numTotalJogos, listaJogosFinalizados])
         .then(([_numTotalJogos, _listaJogosFinalizados]) => {

@@ -3,7 +3,7 @@ const path = require('path');
 
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: 'data/malha.db', 
+    storage: path.join(path.dirname(process.execPath), '/data/malha.db'),
     logging: false,
     define: {
         timestamps: false

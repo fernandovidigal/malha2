@@ -1,5 +1,7 @@
 const sequelize = require('../../helpers/database');
 const Torneio = require('../../models/Torneios');
+const Escaloes = require('../../models/Escaloes');
+const Campos = require('../../models/Campos');
 const { validationResult } = require('express-validator/check');
 
 function setTorneioActivo(id){
@@ -19,6 +21,10 @@ function setTorneioActivo(id){
     .catch(err => {
         return false;
     });
+}
+
+function getAllEscaloes(){
+    return Escaloes.findAll({raw: true});
 }
 
 exports.getAllTorneios = (req, res, next) => {
@@ -55,37 +61,93 @@ exports.getTorneio = (req, res, next) => {
     });
 }
 
-exports.createTorneio = (req, res, next) => {
+exports.adicionarTorneio = (req, res, next) => {
+
+    getAllEscaloes()
+    .then( _escaloes => {
+        const escaloes = {};
+        escaloes.masculinos = _escaloes.filter(escalao => escalao.sexo == 1);
+        escaloes.femininos = _escaloes.filter(escalao => escalao.sexo == 0);
+
+        res.render('admin/adicionarTorneio', {escaloes: escaloes});
+    })
+    .catch(err => {
+        console.log(err);
+        req.flash('error', 'Não é possivel adicionar torneio. Sem acesso à lista de escalões.');
+        res.redirect('/admin/torneios');
+    });
+}
+
+exports.createTorneio = async (req, res, next) => {
     const designacao = req.body.designacao.trim();
     const localidade = req.body.localidade.trim();
     const ano = req.body.ano.trim();
-    let campos = 0;
     const errors = validationResult(req);
+    const camposMasculinos =  req.body.camposMasculinos;
+    const escalaoIdMasculinos = req.body.escalaoIdMasculinos;
+    const camposFemininos = req.body.camposFemininos;
+    const escalaoIdFemininos = req.body.escalaoIdFemininos;
 
-    if(req.body.campos){
-        campos = req.body.campos.trim();
-    }
+    console.log(camposMasculinos);
+
+    // Valida número de campos introduzidos
+
+    // Processa todos os escalões
+    const _escaloes = await getAllEscaloes();
+    const escaloes = {};
+    escaloes.masculinos = _escaloes.filter(escalao => escalao.sexo == 1);
+    escaloes.femininos = _escaloes.filter(escalao => escalao.sexo == 0);
 
     if(!errors.isEmpty()){
         const oldData = {
             designacao: designacao,
             localidade: localidade,
             ano: ano,
-            campos: campos
+            camposMasculinos: camposMasculinos,
+            escalaoIdMasculinos: escalaoIdMasculinos,
+            camposFemininos: camposFemininos,
+            escalaoIdFemininos: escalaoIdFemininos
         }
-        res.render('admin/adicionarTorneio', {validationErrors: errors.array({ onlyFirstError: true }), torneio: oldData});
+        res.render('admin/adicionarTorneio', {validationErrors: errors.array({ onlyFirstError: true }), escaloes: escaloes, oldData: oldData});
     } else {
-        Torneio.create({
-            designacao: designacao,
-            localidade: localidade,
-            ano: ano,
-            campos: campos
-        })
-        .then(async torneio => {
+        let torneioId = 0;
 
+        sequelize.transaction(t => {
+            return Torneio.create({
+                designacao: designacao,
+                localidade: localidade,
+                ano: ano
+            }, {transaction: t})
+            .then(async torneio => {
+                torneioId = torneio.torneioId;
+
+                let i = 0;
+                // Processa os campos para os escalões masculinos
+                for(const escalao of camposMasculinos){
+                    await Campos.create({
+                        torneioId: torneio.torneioId,
+                        escalaoId: escalaoIdMasculinos[i],
+                        numCampos: camposMasculinos[i],
+                    }, {transaction: t})
+                    .then(() => i++ );
+                }
+                
+                i = 0;
+                // Processa os campos para os escalões Femininos
+                for(const escalao of camposFemininos){
+                    await Campos.create({
+                        torneioId: torneio.torneioId,
+                        escalaoId: escalaoIdFemininos[i],
+                        numCampos: camposFemininos[i]
+                    }, {transaction: t})
+                    .then(() => i++ );
+                }
+            });
+        })
+        .then(async result => {
             // Escolheu adicionar e activar o torneios
             if(req.body.adicionar_activar){
-                if(await setTorneioActivo(torneio.torneioId)){
+                if(await setTorneioActivo(torneioId)){
                     req.flash('success', 'Torneio adicionado e activado com sucesso.')
                     res.redirect('/admin/torneios');
                 } else {
@@ -99,7 +161,7 @@ exports.createTorneio = (req, res, next) => {
                 Torneio.count()
                 .then(async count => {
                     if(count == 1){
-                        if(await setTorneioActivo(torneio.torneioId)){
+                        if(await setTorneioActivo(torneioId)){
                             req.flash('success', 'Torneio adicionado e activado com sucesso.')
                             res.redirect('/admin/torneios');
                         } else {

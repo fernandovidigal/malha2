@@ -20,11 +20,6 @@ const Torneios = sequelize.define('torneios', {
         type: Sequelize.INTEGER,
         allowNull: false
     },
-    campos: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0
-    },
     activo: {
         type: Sequelize.INTEGER,
         allowNull: false,

@@ -10,17 +10,14 @@ router.all('/*', [userAuthenticated, checkGestorStatus], (req, res, next) => {
 
 router.get('/', TorneiosController.getAllTorneios);
 
-router.get('/adicionarTorneio', (req, res) => {
-    res.render('admin/adicionarTorneio');
-});
+router.get('/adicionarTorneio', TorneiosController.adicionarTorneio);
 
 router.post('/adicionarTorneio', [
     check('designacao').not().isEmpty().withMessage('Deve indicar a designação do torneio.'),
     check('localidade').not().isEmpty().withMessage('Deve indicar a localidade do torneio.'),
     check('localidade').matches(/^[^0-9]+$/).withMessage('Nome da localidade inválido'),
     check('ano').not().isEmpty().withMessage('Deve indicar o ano do torneio.'),
-    check('ano').isNumeric().isLength({ min: 4, max:4 }).withMessage('Ano do torneio inválido'),
-    check('campos').optional({ checkFalsy: true }).isNumeric().withMessage('Número de campos inválido')
+    check('ano').matches(/^[0-9]{4}$/).withMessage('Ano do torneio inválido')
 ], TorneiosController.createTorneio);
 
 router.get('/activaTorneio/:id', TorneiosController.ActivaTorneio);
@@ -32,8 +29,7 @@ router.put('/editarTorneio/:id', [
     check('localidade').not().isEmpty().withMessage('Deve indicar a localidade do torneio.'),
     check('localidade').matches(/^[^0-9]+$/).withMessage('Nome da localidade inválido'),
     check('ano').not().isEmpty().withMessage('Deve indicar o ano do torneio.'),
-    check('ano').isNumeric().isLength({ min: 4, max:4 }).withMessage('Ano do torneio inválido'),
-    check('campos').optional({ checkFalsy: true }).isNumeric().withMessage('Número de campos inválido')
+    check('ano').matches(/^[0-9]{4}$/).withMessage('Ano do torneio inválido')
 ] ,TorneiosController.updateTorneio);
 
 router.delete('/deleteTorneio', TorneiosController.deleteTorneio);

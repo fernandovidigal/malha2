@@ -6,12 +6,27 @@
         <label for="designacao">Designação</label>
         <input type="text" name="designacao" value="<%= torneio.designacao %>" required><br>
         <label for="localidade">Localidade</label>
-        <input type="text" name="localidade" pattern="^[^0-9]+$" value="<%= torneio.localidade %>" required><br>
+        <input type="text" name="localidade" value="<%= torneio.localidade %>" required><br>
         <label for="ano">Ano</label>
-        <input type="text" name="ano" pattern="^[0-9]{4}$" value="<%= torneio.ano %>" required><br>
-        <label for="campos">Número de campos: </label>
-        <input type="text" name="campos" value="<%= torneio.campos %>"><br>
+        <input type="text" name="ano" value="<%= torneio.ano %>" required><br>
+        <p>Número de campos</p>
+    <% if(typeof escaloes != 'undefined'){ %>
+        <p>Masculinos:</p>
+        <% escaloes.masculinos.forEach(function(escalao, index){ %>
+            <%= escalao.designacao %>: <input type="text" name="camposMasculinos[]" size="6" pattern="^[0-9]+$" value="<%= escalao.campos[0].numCampos %>"><br>
+            <input type="hidden" name="escalaoIdMasculinos[]" value="<%= escalao.escalaoId %>">
+        <% }); %>
+
+        <p>Femininos:</p>
+        <% escaloes.femininos.forEach(function(escalao, index){ %>
+            <%= escalao.designacao %>: <input type="text" name="camposFemininos[]" size="6" pattern="^[0-9]+$" value="<%= escalao.campos[0].numCampos %>"><br>
+            <input type="hidden" name="escalaoIdFemininos[]" value="<%= escalao.escalaoId %>">
+        <% }); %>
+        <br>
         <input type="submit" value="Actualizar">
+    <% } else { %>
+        <p>Não foi possível aceder aos escalões.</p>
+    <% } %>
         <a href="/admin/torneios">Cancelar</a>
     </form>
 <% } else { %>

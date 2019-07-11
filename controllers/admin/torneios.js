@@ -23,8 +23,33 @@ function setTorneioActivo(id){
     });
 }
 
+function getTorneio(torneioId){
+    return Torneio.findByPk(torneioId);
+}
+
 function getAllEscaloes(){
     return Escaloes.findAll({raw: true});
+}
+
+function getCamposPorTorneio(torneioId){
+    return Campos.findAll({
+        where: {
+            torneioId: torneioId
+        },
+        raw: true
+    });
+}
+
+function getAllEscaloesECampos(torneioId){
+    return Escaloes.findAll({
+        include: {
+            model: Campos,
+            attributes: ['numCampos'],
+            where: {
+                torneioId: torneioId
+            },
+        }
+    });
 }
 
 exports.getAllTorneios = (req, res, next) => {
@@ -45,20 +70,27 @@ exports.getAllTorneios = (req, res, next) => {
 exports.getTorneio = (req, res, next) => {
     const torneioId = req.params.id;
 
-    Torneio.findByPk(torneioId)
-    .then(torneio => {
-        if(torneio){
-            res.render('admin/editarTorneio', {torneio: torneio});
-        } else {
-            req.flash('error', 'Torneio não existe.');
-            res.redirect('/admin/torneios');
-        }
-    })
-    .catch(err => {
+    try {
+        const escaloes = getAllEscaloesECampos(torneioId);
+        const torneio = getTorneio(torneioId);
+
+        Promise.all([escaloes, torneio])
+        .then(([_escaloes, _torneio]) => {
+            const escaloes = {};
+            escaloes.masculinos = _escaloes.filter(escalao => escalao.sexo == 1);
+            escaloes.femininos = _escaloes.filter(escalao => escalao.sexo == 0);
+
+            res.render('admin/editarTorneio', {torneio: _torneio, escaloes: escaloes});
+        })
+        .catch(err => {
+            throw new Error(err);
+        });
+
+    } catch(err) {
         console.log(err);
-        req.flash('error', 'Não foi possível aceder ao torneio.');
+        req.flash('error', 'Não é possível editar o torneio.');
         res.redirect('/admin/torneios');
-    });
+    }
 }
 
 exports.adicionarTorneio = (req, res, next) => {
@@ -83,14 +115,14 @@ exports.createTorneio = async (req, res, next) => {
     const localidade = req.body.localidade.trim();
     const ano = req.body.ano.trim();
     const errors = validationResult(req);
-    const camposMasculinos =  req.body.camposMasculinos;
+    let camposMasculinos =  req.body.camposMasculinos;
     const escalaoIdMasculinos = req.body.escalaoIdMasculinos;
-    const camposFemininos = req.body.camposFemininos;
+    let camposFemininos = req.body.camposFemininos;
     const escalaoIdFemininos = req.body.escalaoIdFemininos;
 
-    console.log(camposMasculinos);
-
     // Valida número de campos introduzidos
+    camposMasculinos = camposMasculinos.map(campo => (campo != '') ? parseInt(campo) : 0);
+    camposFemininos = camposFemininos.map(campo => (campo != '') ? parseInt(campo) : 0);
 
     // Processa todos os escalões
     const _escaloes = await getAllEscaloes();
@@ -108,7 +140,7 @@ exports.createTorneio = async (req, res, next) => {
             camposFemininos: camposFemininos,
             escalaoIdFemininos: escalaoIdFemininos
         }
-        res.render('admin/adicionarTorneio', {validationErrors: errors.array({ onlyFirstError: true }), escaloes: escaloes, oldData: oldData});
+        res.render('admin/adicionarTorneio', {validationErrors: errors.array({ onlyFirstError: true }), escaloes: escaloes});
     } else {
         let torneioId = 0;
 
@@ -214,61 +246,102 @@ exports.ActivaTorneio = (req, res, next) => {
     });
 }
 
-exports.updateTorneio = (req, res, next) => {
+function processaCamposParaEscalao(escaloes, listaIds, listaCampos){
+    escaloes.forEach(escalao => {
+        escalao.campos = [];
+        listaIds.forEach((id, index) => {
+            if(escalao.escalaoId == id){
+                const numCampos = {
+                    numCampos: listaCampos[index]
+                }
+                escalao.campos.push(numCampos);
+            }
+        });
+    });
+}
+async function processaUpdateCampos(transaction, torneioId, listaCampos, listaIds){
+    let i = 0;
+    for(const escalao of listaCampos){
+        let escalaoCamposToUpdate = await Campos.findOne({
+            where: {
+                torneioId: torneioId,
+                escalaoId: listaIds[i]
+            }
+        }, {transaction});
+
+        await escalaoCamposToUpdate.update({numCampos: listaCampos[i]}, {transaction});
+        i++;
+    }
+}
+
+exports.updateTorneio = async (req, res, next) => {
     const torneioId = req.params.id;
     const designacao = req.body.designacao.trim();
     const localidade = req.body.localidade.trim();
     const ano = req.body.ano.trim();
-    let campos = 0;
     const errors = validationResult(req);
+    let camposMasculinos =  req.body.camposMasculinos;
+    const escalaoIdMasculinos = req.body.escalaoIdMasculinos;
+    let camposFemininos = req.body.camposFemininos;
+    const escalaoIdFemininos = req.body.escalaoIdFemininos;
 
-    if(req.body.campos){
-        campos = req.body.campos.trim();
-    }
+    // Valida número de campos introduzidos
+    camposMasculinos = camposMasculinos.map(campo => (campo != '') ? parseInt(campo) : 0);
+    camposFemininos = camposFemininos.map(campo => (campo != '') ? parseInt(campo) : 0);
 
+    // Processa todos os escalões
+    const _escaloes = await getAllEscaloes();
+    const escaloes = {};
+    escaloes.masculinos = _escaloes.filter(escalao => escalao.sexo == 1);
+    escaloes.femininos = _escaloes.filter(escalao => escalao.sexo == 0);
+
+    processaCamposParaEscalao(escaloes.masculinos, escalaoIdMasculinos, camposMasculinos);
+    processaCamposParaEscalao(escaloes.femininos, escalaoIdFemininos, camposFemininos);
+    
     if(!errors.isEmpty()){
         const oldData = {
             torneioId: torneioId,
             designacao: designacao,
             localidade: localidade,
             ano: ano,
-            campos: campos
+            camposMasculinos: camposMasculinos,
+            escalaoIdMasculinos: escalaoIdMasculinos,
+            camposFemininos: camposFemininos,
+            escalaoIdFemininos: escalaoIdFemininos
         }
-        res.render('admin/editarTorneio', {validationErrors: errors.array({ onlyFirstError: true }), torneio: oldData});
+        res.render('admin/editarTorneio', {validationErrors: errors.array({ onlyFirstError: true }), torneio: oldData, escaloes: escaloes});
     } else {
-        Torneio.findByPk(torneioId)
-        .then(torneio => {
-            if(torneio){
-                torneio.designacao = designacao;
-                torneio.localidade = localidade;
-                torneio.ano = ano;
-                torneio.campos = campos;
-                
-                torneio.save()
-                .then(result => {
-                    if(result) {
-                        req.flash('success', 'Torneio actualizado com sucesso.');
-                        res.redirect('/admin/torneios');
-                    } else {
-                        req.flash('error', 'Ocurreu um erro durante a actualização do torneio.');
-                        res.redirect('/admin/torneios');
-                    }
-                })
-                .catch(err => {
-                    console.log(err);
-                    req.flash('error', 'Não foi possível actualizar o torneio.');
-                    res.redirect('/admin/torneios');
-                });
-            } else {
-                req.flash('error', 'Torneio não existe.');
-                res.redirect('/admin/torneios');
-            }
-        })
-        .catch(err => {
+
+        let transaction;
+        try {
+
+            transaction = await sequelize.transaction();
+
+            let torneioToUpdate = await Torneio.findByPk(torneioId, {transaction});
+
+            await torneioToUpdate.update({
+                designacao: designacao,
+                localidade: localidade,
+                ano: ano
+            }, {transaction});
+            
+            await processaUpdateCampos(transaction, torneioId, camposMasculinos, escalaoIdMasculinos);
+            await processaUpdateCampos(transaction, torneioId, camposFemininos, escalaoIdFemininos);
+
+            await transaction.commit();
+
+        } catch(err) {
             console.log(err);
+            if (err) await transaction.rollback();
+        }
+
+        if(transaction.finished === 'commit'){
+            req.flash('success', 'Torneio actualizado com sucesso.');
+            res.redirect('/admin/torneios');
+        } else {
             req.flash('error', 'Não foi possível actualizar o torneio.');
             res.redirect('/admin/torneios');
-        });
+        }
     }
 }
 

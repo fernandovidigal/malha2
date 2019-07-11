@@ -12,7 +12,6 @@
             <th></th>
             <th>Designação</th>
             <th>Localidade</th>
-            <th>Campos</th>
             <th>Ano</th>
             <th></th>
             <th></th>
@@ -25,7 +24,6 @@
                 <td><a href="/admin/torneios/activaTorneio/<%= torneio.torneioId %>"><i class="fas fa-check-square <%= torneio.activo == 1 ? 'torneio-active' : 'torneio-not-active' %>"></i></a></td>
                 <td class="torneio_designacao"><%= torneio.designacao %></td>
                 <td class="w30 table_cell_center torneio_localidade"><%= torneio.localidade %></td>
-                <td class="w10 table_cell_center"><%= torneio.campos %></td>
                 <td class="w10 table_cell_center"><%= torneio.ano %></td>
                 <td class="w10"><a href="/admin/torneios/editarTorneio/<%= torneio.torneioId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
                 <td class="w10"><a href="" class="btn delete_btn" data-torneio="<%= torneio.torneioId %>"><i class="fa fa-trash"></i>Eliminar</a></td>

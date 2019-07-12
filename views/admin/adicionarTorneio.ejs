@@ -30,9 +30,11 @@
                     value="<%= oldData.camposMasculinos[index] %>"
                 <% } %>
             ><br>
-            <input type="hidden" name="escalaoIdMasculinos[]" value="<%= escalao.escalaoId %>"
+            <input type="hidden" name="escalaoIdMasculinos[]"
                 <% if(typeof oldData !== 'undefined'){ %>
                     value="<%= oldData.escalaoIdMasculinos[index] %>"
+                <% } else { %>
+                    value="<%= escalao.escalaoId %>"
                 <% } %>
             >
         <% }); %>
@@ -44,9 +46,11 @@
                     value="<%= oldData.camposFemininos[index] %>"
                 <% } %>
             ><br>
-            <input type="hidden" name="escalaoIdFemininos[]" value="<%= escalao.escalaoId %>"
+            <input type="hidden" name="escalaoIdFemininos[]" 
                 <% if(typeof oldData !== 'undefined'){ %>
                     value="<%= oldData.escalaoIdFemininos[index] %>"
+                <% } else { %>
+                    value="<%= escalao.escalaoId %>"
                 <% } %>
             >
         <% }); %>

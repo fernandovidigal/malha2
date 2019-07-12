@@ -26,7 +26,6 @@ router.post('/adicionarTorneio', [
                 }
             }
         });
-
         return true;
     }),
     check('camposFemininos').custom((value, {req}) => {

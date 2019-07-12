@@ -1,3 +1,4 @@
+const sequelize = require('../helpers/database');
 const Equipas = require('../models/Equipas');
 const Torneios = require('../models/Torneios');
 const Localidades = require('../models/Localidades');
@@ -31,16 +32,25 @@ exports.getStarting = async (req, res, next) => {
             return res.render('torneio/index', {torneio: torneio, messages: error});
         }
 
-        // 2. Verificar se o número de campos para o torneio está definido
-        const numCampos = await dbFunctions.getNumCampos(torneioId);
-        if(numCampos.campos == 0){
-            return res.render('torneio/definirNumeroCampos', {torneio: torneio});
+        // Lista dos Escalões com equipas registadas
+        const listaEscaloes = await dbFunctions.getEscaloesComEquipas(torneioId);
+        
+        // Adiciona o número de campos definidos a cada escalão e verifica se existem
+        // escalões ainda sem campos definidos
+        let existemCamposNaoDefinidos = false;
+        for(const escalao of listaEscaloes){
+            const campos = await dbFunctions.getNumeroCamposPorEscalao(torneioId, escalao.escalaoId);
+            escalao.campos = campos.numCampos;
+            if(escalao.campos == 0){
+                existemCamposNaoDefinidos = true;
+            }
         }
 
-        if(numEquipas > 0 && numCampos.campos > 0){
-            // Lista dos Escalões com equipas registadas
-            const listaEscaloes = await dbFunctions.getEscaloesComEquipas(torneioId);
+        if(existemCamposNaoDefinidos){
+            return res.render('torneio/definirNumeroCampos', {torneio: torneio, escaloes: listaEscaloes});
+        }
 
+        if(numEquipas > 0 && !existemCamposNaoDefinidos){
             const escaloesMasculinos = [];
             const escaloesFemininos = [];
             let numTotalJogos = 0;
@@ -163,41 +173,46 @@ exports.getNumeroCampos = async (req, res, next) => {
 }
 
 exports.setNumeroCampos = async (req, res, next) => {
-    const numCampos = req.body.numCampos;
+    let listaCampos = req.body.numCampos;
+    let listaCamposId = req.body.escalaoId;
     const errors = validationResult(req);
+
     const torneio = await dbFunctions.getTorneioInfo();
-    
-    const oldData = {
-        count: numCampos
+    const listaEscaloes = await dbFunctions.getEscaloesComEquipas(torneio.torneioId);
+
+    listaCampos = listaCampos.map(campo => parseInt(campo));
+    listaCamposId = listaCamposId.map(id => parseInt(id));
+
+    for(const escalao of listaEscaloes){
+        const i = listaCamposId.indexOf(escalao.escalaoId);
+        escalao.campos = listaCampos[i];
     }
 
     if(!errors.isEmpty()){
-        res.render('torneio/definirNumeroCampos', {validationErrors: errors.array({ onlyFirstError: true }), torneio: torneio, campos: oldData});
+        res.render('torneio/definirNumeroCampos', {validationErrors: errors.array({ onlyFirstError: true }), torneio: torneio, escaloes: listaEscaloes});
     } else {
-        Torneios.findByPk(torneio.torneioId)
-        .then(torneio => {
-            torneio.campos = numCampos;
-            torneio.save()
-            .then(result => {
-                if(result){
-                    req.flash("success", "Número de campos do torneio foi actualizado com sucesso!");
-                    res.redirect('/torneio');
-                } else {
-                    req.flash("error", "Não foi possível definir o número de campos do torneio.");
-                    res.redirect('/torneio/definirNumeroCampos');
-                }
-            })
-            .catch(err => {
-                console.log(err);
-                req.flash("error", "Não foi possível definir o número de campos do torneio.");
-                res.redirect('/torneio/definirNumeroCampos');
-            });
-        })
-        .catch(err => {
+
+        let transaction;
+
+        try {
+            transaction = await sequelize.transaction();
+
+            await dbFunctions.processaUpdateCampos(transaction, torneio.torneioId, listaCampos, listaCamposId);
+
+            await transaction.commit();
+
+        } catch(err) {
             console.log(err);
-            req.flash("error", "Não foi possível obter os dados do torneio.");
-            res.redirect('/torneio/definirNumeroCampos');
-        });
+            if(err) await transaction.rollback();
+        }
+
+        if(transaction.finished === 'commit'){
+            req.flash("success", "Número de campos do torneio foi actualizado com sucesso!");
+            res.redirect('/torneio');
+        } else {
+            req.flash("error", "Não foi possível definir o número de campos para o torneio.");
+            res.redirect('/torneio');
+        }
     }
 }
 

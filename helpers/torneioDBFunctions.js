@@ -5,6 +5,7 @@ const Torneios = require('../models/Torneios');
 const Escaloes = require('../models/Escaloes');
 const Localidades = require('../models/Localidades');
 const Jogos = require('../models/Jogos');
+const Campos = require('../models/Campos');
 const Parciais = require('../models/Parciais');
 
 const Op = Sequelize.Op;
@@ -46,8 +47,38 @@ exports.getEscaloesComEquipas = (torneioId) => {
             where: {torneioId: torneioId},
             attributes: []
         },
-        group: ['equipas.escalaoId'] 
+        group: ['equipas.escalaoId'],
+        raw: true
     });
+}
+
+////////////////////////////////////////////////////////
+//                        CAMPOS
+////////////////////////////////////////////////////////
+
+exports.getNumeroCamposPorEscalao = (torneioId, escalaoId) => {
+    return Campos.findOne({
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId
+        },
+        raw: true
+    });
+}
+
+exports.processaUpdateCampos = async (transaction, torneioId, listaCampos, listaIds) => {
+    let i = 0;
+    for(const escalao of listaCampos){
+        let escalaoCamposToUpdate = await Campos.findOne({
+            where: {
+                torneioId: torneioId,
+                escalaoId: listaIds[i]
+            }
+        }, {transaction});
+
+        await escalaoCamposToUpdate.update({numCampos: listaCampos[i]}, {transaction});
+        i++;
+    }
 }
 
 ////////////////////////////////////////////////////////

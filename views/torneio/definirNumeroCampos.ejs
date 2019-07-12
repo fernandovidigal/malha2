@@ -1,7 +1,7 @@
 <%- include('../includes/header.ejs') %>
 <%- include('../includes/validationErrors.ejs') %>
 
-<% if(torneio != null){ %>
+<% if(torneio != null && escaloes != null){ %>
     <div class="title__bar">
         <h1><%= torneio.designacao %> - <%= torneio.localidade %></h1>
         <h3><%= torneio.ano %></h3>
@@ -9,12 +9,23 @@
 
     <p>Definir número de campos!</p>
     <form action="/torneio/definirNumeroCampos" method="post">
-        <label for="numCampos">Número de Campos:</label>
-        <input type="text" name="numCampos" pattern="^[0-9]+$" required
-            <% if(typeof campos !== 'undefined'){ %>
-                value="<%= campos.count %>"
+        <p>Masculinos:</p>
+        <% escaloes.forEach(escalao => { 
+            if(escalao.sexo == 1) { %>
+                <%= escalao.designacao %> <input type="text" name="numCampos[]" pattern="^[0-9]+$" size="6" required value="<%= escalao.campos %>"><br>
+                <input type="hidden" name="escalaoId[]" value="<%= escalao.escalaoId %>">
             <% } %>
-        ><br>
+        <% }); %>
+
+        <p>Femininos:</p>
+        <% escaloes.forEach(escalao => { 
+            if(escalao.sexo == 0) { %>
+                <%= escalao.designacao %> <input type="text" name="numCampos[]" pattern="^[0-9]+$" size="6" required value="<%= escalao.campos %>"><br>
+                <input type="hidden" name="escalaoId[]" value="<%= escalao.escalaoId %>">
+            <% } %>
+        <% }); %>
+
+        <br>
         <input type="submit" value="Definir e avançar">
     </form>
 <% } else { %>

@@ -8,7 +8,7 @@
         <label for="localidade">Localidade</label>
         <input type="text" name="localidade" value="<%= torneio.localidade %>" required><br>
         <label for="ano">Ano</label>
-        <input type="text" name="ano" value="<%= torneio.ano %>" required><br>
+        <input type="text" name="ano" maxlength="4" value="<%= torneio.ano %>" required><br>
         <p>Número de campos</p>
     <% if(typeof escaloes != 'undefined'){ %>
         <p>Masculinos:</p>

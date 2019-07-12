@@ -110,6 +110,19 @@ exports.adicionarTorneio = (req, res, next) => {
     });
 }
 
+async function processaCriacaoCampos(transaction, torneioId, listaCampos, listaCamposIds){
+    let i = 0;
+
+    for(const escalao of listaCampos){
+        await Campos.create({
+            torneioId: torneioId,
+            escalaoId: listaCamposIds[i],
+            numCampos: listaCampos[i]
+        }, {transaction});
+        i++;
+    }
+}
+
 exports.createTorneio = async (req, res, next) => {
     const designacao = req.body.designacao.trim();
     const localidade = req.body.localidade.trim();
@@ -121,8 +134,8 @@ exports.createTorneio = async (req, res, next) => {
     const escalaoIdFemininos = req.body.escalaoIdFemininos;
 
     // Valida número de campos introduzidos
-    camposMasculinos = camposMasculinos.map(campo => (campo != '') ? parseInt(campo) : 0);
-    camposFemininos = camposFemininos.map(campo => (campo != '') ? parseInt(campo) : 0);
+    camposMasculinos = camposMasculinos.map(campo => (campo != '' && !isNaN(campo)) ? parseInt(campo) : 0);
+    camposFemininos = camposFemininos.map(campo => (campo != '' && !isNaN(campo)) ? parseInt(campo) : 0);
 
     // Processa todos os escalões
     const _escaloes = await getAllEscaloes();
@@ -140,43 +153,33 @@ exports.createTorneio = async (req, res, next) => {
             camposFemininos: camposFemininos,
             escalaoIdFemininos: escalaoIdFemininos
         }
-        res.render('admin/adicionarTorneio', {validationErrors: errors.array({ onlyFirstError: true }), escaloes: escaloes});
+        res.render('admin/adicionarTorneio', {validationErrors: errors.array({ onlyFirstError: true }), escaloes: escaloes, oldData: oldData});
     } else {
-        let torneioId = 0;
+        let torneioCriadoId = 0;
+        let transaction;
 
-        sequelize.transaction(t => {
-            return Torneio.create({
-                designacao: designacao,
-                localidade: localidade,
-                ano: ano
-            }, {transaction: t})
-            .then(async torneio => {
-                torneioId = torneio.torneioId;
+        try {
+            transaction = await sequelize.transaction();
 
-                let i = 0;
-                // Processa os campos para os escalões masculinos
-                for(const escalao of camposMasculinos){
-                    await Campos.create({
-                        torneioId: torneio.torneioId,
-                        escalaoId: escalaoIdMasculinos[i],
-                        numCampos: camposMasculinos[i],
-                    }, {transaction: t})
-                    .then(() => i++ );
-                }
-                
-                i = 0;
-                // Processa os campos para os escalões Femininos
-                for(const escalao of camposFemininos){
-                    await Campos.create({
-                        torneioId: torneio.torneioId,
-                        escalaoId: escalaoIdFemininos[i],
-                        numCampos: camposFemininos[i]
-                    }, {transaction: t})
-                    .then(() => i++ );
-                }
-            });
-        })
-        .then(async result => {
+            let torneioCriado = await Torneio.create({
+                                            designacao: designacao,
+                                            localidade: localidade,
+                                            ano: ano
+                                        }, {transaction});
+            
+            torneioCriadoId = torneioCriado.torneioId;
+
+            await processaCriacaoCampos(transaction, torneioCriadoId, camposMasculinos, escalaoIdMasculinos);
+            await processaCriacaoCampos(transaction, torneioCriadoId, camposFemininos, escalaoIdFemininos);
+
+            await transaction.commit();
+
+        } catch(err) {
+            console.log(err);
+            if(err) await transaction.rollback();
+        }
+
+        if(transaction.finished === 'commit'){
             // Escolheu adicionar e activar o torneios
             if(req.body.adicionar_activar){
                 if(await setTorneioActivo(torneioId)){
@@ -212,12 +215,10 @@ exports.createTorneio = async (req, res, next) => {
                     res.redirect('/admin/torneios');
                 });
             }
-        })
-        .catch(err => {
-            console.log(err);
+        } else {
             req.flash('error', 'Não foi possível adicionar o torneio.');
             res.redirect('/admin/torneios');
-        });
+        }
     }
 }
 
@@ -259,6 +260,7 @@ function processaCamposParaEscalao(escaloes, listaIds, listaCampos){
         });
     });
 }
+
 async function processaUpdateCampos(transaction, torneioId, listaCampos, listaIds){
     let i = 0;
     for(const escalao of listaCampos){
@@ -286,8 +288,8 @@ exports.updateTorneio = async (req, res, next) => {
     const escalaoIdFemininos = req.body.escalaoIdFemininos;
 
     // Valida número de campos introduzidos
-    camposMasculinos = camposMasculinos.map(campo => (campo != '') ? parseInt(campo) : 0);
-    camposFemininos = camposFemininos.map(campo => (campo != '') ? parseInt(campo) : 0);
+    camposMasculinos = camposMasculinos.map(campo => (campo != '' && !isNaN(campo)) ? parseInt(campo) : 0);
+    camposFemininos = camposFemininos.map(campo => (campo != '' && !isNaN(campo)) ? parseInt(campo) : 0);
 
     // Processa todos os escalões
     const _escaloes = await getAllEscaloes();

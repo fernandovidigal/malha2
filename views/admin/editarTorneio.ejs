@@ -12,15 +12,19 @@
         <p>Número de campos</p>
     <% if(typeof escaloes != 'undefined'){ %>
         <p>Masculinos:</p>
-        <% escaloes.masculinos.forEach(function(escalao, index){ %>
-            <%= escalao.designacao %>: <input type="text" name="camposMasculinos[]" size="6" pattern="^[0-9]+$" value="<%= escalao.campos[0].numCampos %>"><br>
-            <input type="hidden" name="escalaoIdMasculinos[]" value="<%= escalao.escalaoId %>">
+        <% escaloes.forEach(escalao => { 
+            if(escalao.sexo == 1) { %>
+                <%= escalao.designacao %> <input type="text" name="numCampos[]" pattern="^[0-9]+$" size="6" value="<%= escalao.campos %>"><br>
+                <input type="hidden" name="escalaoId[]" value="<%= escalao.escalaoId %>">
+            <% } %>
         <% }); %>
 
         <p>Femininos:</p>
-        <% escaloes.femininos.forEach(function(escalao, index){ %>
-            <%= escalao.designacao %>: <input type="text" name="camposFemininos[]" size="6" pattern="^[0-9]+$" value="<%= escalao.campos[0].numCampos %>"><br>
-            <input type="hidden" name="escalaoIdFemininos[]" value="<%= escalao.escalaoId %>">
+        <% escaloes.forEach(escalao => { 
+            if(escalao.sexo == 0) { %>
+                <%= escalao.designacao %> <input type="text" name="numCampos[]" pattern="^[0-9]+$" size="6" value="<%= escalao.campos %>"><br>
+                <input type="hidden" name="escalaoId[]" value="<%= escalao.escalaoId %>">
+            <% } %>
         <% }); %>
         <br>
         <input type="submit" value="Actualizar">

@@ -3,56 +3,28 @@
 
 <form action="/admin/torneios/adicionarTorneio" method="post">
     <label for="designacao">Designação: </label>
-    <input type="text" name="designacao" required 
-        <% if(typeof oldData !== 'undefined'){ %>
-            value="<%= oldData.designacao %>"
-        <% } %>
-    ><br>
+    <input type="text" name="designacao" required value="<%= torneio.designacao %>"><br>
     <label for="localidade">Localidade: </label>
-    <input type="text" name="localidade" pattern="^[^0-9]+$" required
-        <% if(typeof oldData !== 'undefined'){ %>
-            value="<%= oldData.localidade %>"
-        <% } %>
-    ><br>
+    <input type="text" name="localidade" pattern="^[^0-9]+$" required value="<%= torneio.localidade %>"><br>
     <label for="ano">Ano: </label>
-    <input type="text" name="ano" maxlength="4" pattern="^[0-9]{4}$" required
-        <% if(typeof oldData !== 'undefined'){ %>
-            value="<%= oldData.ano %>"
-        <% } %>
-    ><small>(AAAA)</small><br>
+    <input type="text" name="ano" maxlength="4" pattern="^[0-9]{4}$" required value="<%= torneio.ano %>"><small>(AAAA)</small><br>
 
     <p>Número de campos</p>
     <% if(typeof escaloes != 'undefined'){ %>
         <p>Masculinos:</p>
-        <% escaloes.masculinos.forEach(function(escalao, index){ %>
-            <%= escalao.designacao %>: <input type="text" name="camposMasculinos[]" size="6" pattern="^[0-9]+$"
-                <% if(typeof oldData !== 'undefined'){ %>
-                    value="<%= oldData.camposMasculinos[index] %>"
-                <% } %>
-            ><br>
-            <input type="hidden" name="escalaoIdMasculinos[]"
-                <% if(typeof oldData !== 'undefined'){ %>
-                    value="<%= oldData.escalaoIdMasculinos[index] %>"
-                <% } else { %>
-                    value="<%= escalao.escalaoId %>"
-                <% } %>
-            >
+        <% escaloes.forEach(escalao => { 
+            if(escalao.sexo == 1) { %>
+                <%= escalao.designacao %> <input type="text" name="numCampos[]" pattern="^[0-9]+$" size="6" value="<%= escalao.campos %>"><br>
+                <input type="hidden" name="escalaoId[]" value="<%= escalao.escalaoId %>">
+            <% } %>
         <% }); %>
 
         <p>Femininos:</p>
-        <% escaloes.femininos.forEach(function(escalao, index){ %>
-            <%= escalao.designacao %>: <input type="text" name="camposFemininos[]" size="6" pattern="^[0-9]+$"
-                <% if(typeof oldData !== 'undefined'){ %>
-                    value="<%= oldData.camposFemininos[index] %>"
-                <% } %>
-            ><br>
-            <input type="hidden" name="escalaoIdFemininos[]" 
-                <% if(typeof oldData !== 'undefined'){ %>
-                    value="<%= oldData.escalaoIdFemininos[index] %>"
-                <% } else { %>
-                    value="<%= escalao.escalaoId %>"
-                <% } %>
-            >
+        <% escaloes.forEach(escalao => { 
+            if(escalao.sexo == 0) { %>
+                <%= escalao.designacao %> <input type="text" name="numCampos[]" pattern="^[0-9]+$" size="6" value="<%= escalao.campos %>"><br>
+                <input type="hidden" name="escalaoId[]" value="<%= escalao.escalaoId %>">
+            <% } %>
         <% }); %>
         <br>
         <input type="submit" name="adicionar" value="Adicionar">

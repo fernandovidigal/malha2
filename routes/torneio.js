@@ -10,7 +10,7 @@ router.all('/*', userAuthenticated, (req, res, next) => {
 
 router.get('/', TorneiosController.getStarting);
 
-router.post('/definirNumeroCampos');
+//router.post('/definirNumeroCampos');
 
 router.post('/definirNumeroCampos', [
     check('numCampos').trim().escape().not().isEmpty().withMessage('Deve indicar número de campos do torneio.'),

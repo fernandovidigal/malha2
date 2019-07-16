@@ -24,8 +24,12 @@
                             <div class="escalaoSelect__item">
                                 <div class="escalaoSelect__info">
                                     <div class="escalaoSelect__item-title"><%= escalao.designacao %></div>
-                                    <% if(escalao.numEquipas < 2){ %>
+                                    <% if(escalao.numEquipas < 2 || escalao.numCampos * 4 > escalao.numEquipas){ %>
                                         <p class="escalao_err_msg">Não existem equipas suficientes</p>
+                                    <% } else if(escalao.numCampos == 0) { %>
+                                        <p class="escalao_err_msg">Não foi definido o número de campos</p>
+                                    <% } else if(escalao.numCampos * 6 < escalao.numEquipas) { %>
+                                        <p class="escalao_err_msg">Número excessivo de equipas</p>
                                     <% } else { %>
                                         <% if(escalao.fase == 0){ %>
                                             <a href="/torneio/distribuirEquipasPorEscalao/escalao/<%= escalao.escalaoId %>" class="escalaoSelect__btn">Distribuir Equipas</a>
@@ -70,8 +74,12 @@
                                 <div class="escalaoSelect__item">
                                     <div class="escalaoSelect__info">
                                         <div class="escalaoSelect__item-title"><%= escalao.designacao %></div>
-                                        <% if(escalao.numEquipas < 2){ %>
+                                        <% if(escalao.numEquipas < 2 || escalao.numCampos * 4 > escalao.numEquipas){ %>
                                             <p class="escalao_err_msg">Não existem equipas suficientes</p>
+                                        <% } else if(escalao.numCampos == 0) { %>
+                                            <p class="escalao_err_msg">Não foi definido o número de campos</p>
+                                        <% } else if(escalao.numCampos * 6 < escalao.numEquipas) { %>
+                                            <p class="escalao_err_msg">Número excessivo de equipas</p>
                                         <% } else { %>
                                             <% if(escalao.fase == 0){ %>
                                                 <a href="/torneio/distribuirEquipasPorEscalao/escalao/<%= escalao.escalaoId %>" class="escalaoSelect__btn">Distribuir Equipas</a>

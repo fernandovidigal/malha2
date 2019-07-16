@@ -40,7 +40,7 @@ exports.getStarting = async (req, res, next) => {
         let existemCamposNaoDefinidos = false;
         for(const escalao of listaEscaloes){
             const campos = await dbFunctions.getNumeroCamposPorEscalao(torneioId, escalao.escalaoId);
-            escalao.campos = campos.numCampos;
+            escalao.campos = (campos != null) ? campos.numCampos : 0;
             if(escalao.campos == 0){
                 existemCamposNaoDefinidos = true;
             }
@@ -61,7 +61,8 @@ exports.getStarting = async (req, res, next) => {
                 const _escalao = {
                     escalaoId: escalao.escalaoId,
                     designacao: escalao.designacao,
-                    sexo: escalao.sexo
+                    sexo: escalao.sexo,
+                    numCampos: escalao.campos
                 }
 
                 // Verificar se o escalão tem mais de 2 equipas
@@ -90,9 +91,8 @@ exports.getStarting = async (req, res, next) => {
                 // Se já existem jogos distribuídos para determinado escalão, então o número de jogos é maior que 0
                 // então obtem as informações sobre os jogos
                 if(numJogos > 0){
-                    // Verifica o número total de campos que determinado escalão ocupa
-                    const numCampos = await dbFunctions.getNumeroCamposPorEscalaoFase(torneioId, _escalao.escalaoId, _escalao.fase);
-                    _escalao.numCampos = numCampos;
+
+                    // Array de cada campo individual
                     _escalao.campos = [];
 
                     // Mantem o registo do número de jogos completos
@@ -117,12 +117,6 @@ exports.getStarting = async (req, res, next) => {
                         //console.log("Num Jogos já jogados");
                         //console.log(numJogosJogados[0].count);
 
-                        /*const numJogosJogadosNew = await dbFunctions.getNumGamesPlayed_old(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
-                        //console.log("Num Jogos já jogados NEW!");
-                        //console.log(numJogosJogadosNew[0]);
-                        const mapping = numJogosJogadosNew.map(x => x.jogoId);
-                        console.log(mapping);*/
-
                         const campoData = {
                             campo: (numCampo == 1000) ? 'Final' : (numCampo == 500 ? '3º e 4º' : numCampo),
                             completo: ((numJogosParaJogar - numJogosJogados[0].count) > 0) ? false: true
@@ -138,9 +132,6 @@ exports.getStarting = async (req, res, next) => {
                     // Guarda e veriffica se os jogos de todos os campos já foram jogados
                     _escalao.numCamposCompletos = numCamposCompletos;
                     _escalao.todosCamposCompletos = (_escalao.numCampos == _escalao.numCamposCompletos) ? true : false;
-                    /*console.log(_escalao.numCampos);
-                    console.log(_escalao.numCamposCompletos);
-                    console.log(_escalao.todosCamposCompletos);*/
                 }
             
                 if(_escalao.sexo == 0){
@@ -150,14 +141,6 @@ exports.getStarting = async (req, res, next) => {
                 }
             }
 
-            /*console.log("Escalões Masculinos:");
-            console.log(escaloesMasculinos);
-            console.log("Escalões Masculinos 1 Elemento:");
-            console.log(escaloesMasculinos[1].campos);
-            console.log(" ");
-            console.log("Escalões Femininos:");
-            console.log(escaloesFemininos);*/
-
             res.render('torneio/selecionaEscalao', {torneio: torneio, numTotalJogos: numTotalJogos, escaloesMasculinos: escaloesMasculinos, escaloesFemininos: escaloesFemininos});
         }
     } catch(e) {
@@ -165,11 +148,6 @@ exports.getStarting = async (req, res, next) => {
         req.flash('error', 'Ocorreu um erro! Não foi possível aceder à página do torneio.');
         res.redirect('../');
     }
-}
-
-exports.getNumeroCampos = async (req, res, next) => {
-    const torneio = await dbFunctions.getTorneioInfo();
-    res.render('torneio/definirNumeroCampos', {torneio: torneio});
 }
 
 exports.setNumeroCampos = async (req, res, next) => {
@@ -222,6 +200,20 @@ exports.distribuirTodasEquipas = async (req, res, next) => {
 
     const escaloesDistribuidos = await torneioHelpers.distribuiEquipasPorCampos(torneio.torneioId, 4, 6);
     
+    let distribuidos = 0;
+    let naoDistribuidos = 0;
+    escaloesDistribuidos.forEach(escalao => {
+        (escalao.sucesso) ? distribuidos++ : naoDistribuidos ++;
+    });
+
+    if(naoDistribuidos > 0 && naoDistribuidos < escaloesDistribuidos.length){
+        req.flash('error', 'Existem escalões da qual não foi possível distribuir equipas.');
+    } else if(naoDistribuidos == escaloesDistribuidos.length) {
+        req.flash('error', 'Existem escalões da qual não foi possível distribuir equipas.');
+    } else {
+        req.flash('success', 'Todos as equipas foram distribuídas, no respectivo escalão, com sucesso.');
+    }
+    
     res.redirect('/torneio');
 }
 
@@ -230,7 +222,15 @@ exports.distribuirEquipasPorEscalao = async (req, res, next) => {
     const torneio = await dbFunctions.getTorneioInfo();
     const escalaoId = req.params.escalao;
 
-    await torneioHelpers.distribuiEquipasPorCampos(torneio.torneioId, 4, 6, escalaoId);
+    const escaloesDistribuidos = await torneioHelpers.distribuiEquipasPorCampos(torneio.torneioId, 4, 6, escalaoId);
+
+    console.log(escaloesDistribuidos);
+
+    if(escaloesDistribuidos[0].sucesso == false){
+        req.flash('error', 'Não foi possível distribuir as equipas do escalão.');
+    } else {
+        req.flash('success', 'Equipas distribuídas com sucesso.');
+    }
 
     res.redirect('/torneio');
 }

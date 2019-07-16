@@ -75,8 +75,17 @@ exports.processaUpdateCampos = async (transaction, torneioId, listaCampos, lista
                 escalaoId: listaIds[i]
             }
         }, {transaction});
+        
+        if(escalaoCamposToUpdate){
+            await escalaoCamposToUpdate.update({numCampos: listaCampos[i]}, {transaction});
+        } else {
+            await Campos.create({
+                torneioId: torneioId,
+                escalaoId: listaIds[i],
+                numCampos: listaCampos[i]
+            }, {transaction});
+        }
 
-        await escalaoCamposToUpdate.update({numCampos: listaCampos[i]}, {transaction});
         i++;
     }
 }

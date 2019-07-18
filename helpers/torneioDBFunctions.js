@@ -209,6 +209,18 @@ exports.getNumeroJogosPorFase = (torneioId, escalaoId, fase) => {
     });
 }
 
+exports.getAllFasesPorEscalao = (torneioId, escalaoId) => {
+    return Jogos.findAll({
+        attributes: ['fase'],
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId
+        },
+        group: ['fase'],
+        raw: true
+    });
+}
+
 exports.getUltimaFase = (torneioId, escalaoId) => {
     return Jogos.max(
         'fase',

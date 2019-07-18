@@ -8,10 +8,12 @@
 
     <% if(listaCampos.length > 0) { %>
         <% listaCampos.forEach(function(campo){ %>
+            <% let posicao = 1; %>
             <div class="campo__title">Campo <%= campo.campo %></div>
             <table class="listTable">
                 <thead>
                     <tr>
+                        <th>&nbsp;</th>
                         <th>Equipa</th>
                         <th colspan="2">Jogadores</th>
                         <th>Localidade</th>
@@ -23,6 +25,7 @@
                 <% if(campo.classificacao.length > 0) { %>
                     <% campo.classificacao.forEach(function(equipa){ %>
                         <tr>
+                            <td><%= posicao++ %></td>
                             <td><%= equipa.equipaId %></td>
                             <td><%= equipa.primeiroElemento %></td>
                             <td><%= equipa.segundoElemento %></td>

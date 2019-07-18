@@ -38,7 +38,7 @@
         <% if(typeof campos != 'undefined' && campos.length > 0) { %>
             <% campos.forEach(function(campo){ %>
                 <div class="campo__wrapper">
-                    <div class="campo__title">Campo <%= campo.campo %></div>
+                    <div class="campo__title">Campo <%= (info.fase != 100) ? campo.campos : (campo.campo == 1) ? campo.campo + ' - Final' : campo.campo + ' - 3º e 4º lugar' %></div>
                     <div class="campo__labels">
                         <div class="parcial_label">Parcial 1</div>
                         <div class="parcial_label">Parcial 2</div>
@@ -117,14 +117,18 @@
                 <p class="sidebar__title">Campos</p>
                 <div class="campos">
                     <% listaCampos.forEach(function(campo){ %>
-                        <a href="/torneio/resultados/escalao/<%= info.escalaoId %>/fase/<%= info.fase %>/campo/<%= campo.campo %>" class="campo <%= (info.campo != 0 && info.campo == campo.campo) ? 'campo_selected' : '' %> <%= campo.campoCompleto ? 'campo_completed' : '' %>"><%= campo.campo %></a>
+                        <a href="/torneio/resultados/escalao/<%= info.escalaoId %>/fase/<%= info.fase %>/campo/<%= campo.campo %>" class="campo <%= (info.campo != 0 && info.campo == campo.campo) ? 'campo_selected' : '' %> <%= campo.campoCompleto ? 'campo_completed' : '' %>">
+                            <%= (info.fase != 100) ? campo.campos : (campo.campo == 1) ? 'Final' : '3º e 4º' %>
+                        </a>
                     <% }); %>
                 </div>
             </div>
 </div>
         <div class="fase__wrapper">
             <% info.listaFases.forEach(function(fase){ %>
-                <a href="/torneio/resultados/escalao/<%= info.escalaoId %>/fase/<%= fase %>/campo/<%= info.campo %>" class="fase__item <%= fase == info.fase ? 'fase__item-active' : '' %>">Fase <%= fase %></a>
+                <a href="/torneio/resultados/escalao/<%= info.escalaoId %>/fase/<%= fase %>/campo/<%= info.campo %>" class="fase__item <%= fase == info.fase ? 'fase__item-active' : '' %>">
+                    Fase <%= (fase != 100) ? fase : 'Final' %>
+                </a>
             <% }); %>
         </div>
         <% } else { %>

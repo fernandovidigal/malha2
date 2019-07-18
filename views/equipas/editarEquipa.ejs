@@ -25,31 +25,37 @@
         Não existem localidades registadas.
     <% } %>
 
-    <p>Escalões</p>
-    <% if(typeof escaloes != 'undefined' && escaloes.length > 0){ %>
-        <p>Masculino</p>
-        <% escaloes.forEach(function(escalao){ %>
-            <% if(escalao.sexo == 1){ %>
-                <input type="radio" name="escalao" required value="<%= escalao.escalaoId %>"  
-                    <% if(equipa.escalaoId == escalao.escalaoId){ %>
-                        checked
-                    <% } %>
-                ><%= escalao.designacao %>
-            <% } %>
-        <% }); %>
-        <p>Feminino</p>
-        <% escaloes.forEach(function(escalao){ %>
-            <% if(escalao.sexo == 0){ %>
-                <input type="radio" name="escalao" required value="<%= escalao.escalaoId %>"  
-                    <% if(equipa.escalaoId == escalao.escalaoId){ %>
-                        checked
-                    <% } %>
-                ><%= escalao.designacao %>
-            <% } %>
-        <% }); %>
+    <% if(equipa.escaloesEditaveis){ %>
+        <p>Escalões</p>
+        <% if(typeof escaloes != 'undefined' && escaloes.length > 0){ %>
+            <p>Masculino</p>
+            <% escaloes.forEach(function(escalao){ %>
+                <% if(escalao.sexo == 1){ %>
+                    <input type="radio" name="escalao" required value="<%= escalao.escalaoId %>"  
+                        <% if(equipa.escalaoId == escalao.escalaoId){ %>
+                            checked
+                        <% } %>
+                    ><%= escalao.designacao %>
+                <% } %>
+            <% }); %>
+            <p>Feminino</p>
+            <% escaloes.forEach(function(escalao){ %>
+                <% if(escalao.sexo == 0){ %>
+                    <input type="radio" name="escalao" required value="<%= escalao.escalaoId %>"  
+                        <% if(equipa.escalaoId == escalao.escalaoId){ %>
+                            checked
+                        <% } %>
+                    ><%= escalao.designacao %>
+                <% } %>
+            <% }); %>
+        <% } else { %>
+            Não existem escalões registadas.
+        <% } %>
     <% } else { %>
-        Não existem escalões registadas.
+        <% const index = escaloes.map(escalao => escalao.escalaoId).indexOf(equipa.escalaoId); %>
+        <p>Escalão: <%= escaloes[index].designacao %> (<%= (escaloes[index].sexo == 1) ? 'Masculino' : 'Feminino' %>)</p>
     <% } %>
+
     <br>
     <input type="submit" value="Actualizar">
     <a href="/equipas">Cancelar</a>

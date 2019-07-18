@@ -107,10 +107,10 @@
                             <td class="w5"><%= equipa.equipaId %></td>
                             <td class="w5"><a href="/equipas/percurso/<%= equipa.equipaId %>" class="classificacoes_icon"><i class="fas fa-clipboard-list"></i></a></td>
                             <td><%= equipa.primeiroElemento %><br><%= equipa.segundoElemento %></td>
-                            <td class="w20 table_cell_center"><%= equipa.localidade.nome %></td>
-                            <td class="w20 table_cell_center"><%= equipa.escalao.designacao %><br>(<%= equipa.escalao.sexo == 0 ? 'Feminino': 'Masculino' %>)</td>
-                            <td class="w5"><a href="/equipas/editarEquipa/<%= equipa.equipaId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
-                            <td class="w10"><a href="/equipas/eliminarEquipa/<%= equipa.equipaId %>" class="btn delete_btn"><i class="fa fa-trash"></i>Eliminar</a></td>
+                            <td class="w20 table_cell_center"><%= equipa.localidade %></td>
+                            <td class="w20 table_cell_center"><%= equipa.escalao %><br>(<%= equipa.sexo == 0 ? 'Feminino': 'Masculino' %>)</td>
+                            <td class="w5"><a href="/equipas/editarEquipa/<%= equipa.equipaId %>/torneio/<%= torneio.torneioId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
+                            <td class="w10"><a href="/equipas/eliminarEquipa/<%= equipa.equipaId %>/torneio<%= torneio.torneioId %>" class="btn delete_btn"><i class="fa fa-trash"></i>Eliminar</a></td>
                         </tr>
                     <% }); %>
                 <% } else { %>

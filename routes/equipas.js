@@ -21,9 +21,9 @@ router.post('/adicionarEquipa', [
     check('escalao').exists().withMessage('Deve selecionar o escalão ao qual pertence a equipa.')
 ], EquipasController.createEquipa);
 
-router.get('/editarEquipa/:id', EquipasController.getEquipaToEdit);
+router.get('/editarEquipa/:id/torneio/:torneioId', EquipasController.getEquipaToEdit);
 
-router.put('/editarEquipa/:id', [
+router.put('/editarEquipa/:id/torneio/:torneioId', [
     check('primeiro_elemento').trim().escape().not().isEmpty().withMessage('Deve indicar o nome do primeiro elemento da equipa.'),
     check('primeiro_elemento').trim().escape().matches(/^[^0-9]+$/).withMessage('Nome do primeiro elemento inválido.'),
     check('segundo_elemento').trim().escape().not().isEmpty().withMessage('Deve indicar o nome do segundo elemento da equipa.'),

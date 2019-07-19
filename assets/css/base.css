@@ -188,3 +188,7 @@ h3 {
 .validationErrors_msg{
     margin: 8px 0;
 }
+
+.fa-search {
+    cursor: pointer;
+}

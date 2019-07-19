@@ -21,9 +21,9 @@ router.post('/adicionarEquipa', [
     check('escalao').exists().withMessage('Deve selecionar o escalão ao qual pertence a equipa.')
 ], EquipasController.createEquipa);
 
-router.get('/editarEquipa/:id/torneio/:torneioId', EquipasController.getEquipaToEdit);
+router.get('/editarEquipa/:id', EquipasController.getEquipaToEdit);
 
-router.put('/editarEquipa/:id/torneio/:torneioId', [
+router.put('/editarEquipa/:id', [
     check('primeiro_elemento').trim().escape().not().isEmpty().withMessage('Deve indicar o nome do primeiro elemento da equipa.'),
     check('primeiro_elemento').trim().escape().matches(/^[^0-9]+$/).withMessage('Nome do primeiro elemento inválido.'),
     check('segundo_elemento').trim().escape().not().isEmpty().withMessage('Deve indicar o nome do segundo elemento da equipa.'),
@@ -32,9 +32,10 @@ router.put('/editarEquipa/:id/torneio/:torneioId', [
     check('escalao').exists().withMessage('Deve selecionar o escalão ao qual pertence a equipa.')
 ], EquipasController.updateEquipa);
 
-router.get('/eliminarEquipa/:id', EquipasController.getEquipaToDelete);
+//router.get('/eliminarEquipa/:id', EquipasController.getEquipaToDelete);
+router.get('/eliminarEquipa/:equipaId', EquipasController.getEquipaToDelete);
 
-router.delete('/eliminarEquipa/:id', EquipasController.deleteEquipa);
+router.delete('/eliminarEquipa', EquipasController.deleteEquipa);
 
 // Pesquisa de equipas
 router.post('/pesquisa', [

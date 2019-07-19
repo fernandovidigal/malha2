@@ -38,11 +38,14 @@
                                 </div>
                                 <div class="dropMenuListItems">
                                     <ul>
-                                        <li class="dropItem"><a href="">Arraiolos</a></li>
+                                        <% localidades.forEach(function(localidade){ %>
+                                            <li class="dropItem"><a href=""><%= localidade.nome %></a></li>
+                                        <% }); %>
+                                        <!--<li class="dropItem"><a href="">Arraiolos</a></li>
                                         <li class="dropItem"><a href="">Mora</a></li>
                                         <li class="dropItem"><i class="fas fa-check"></i><a href="" class="dropItemselected">Évora</a></li>
                                         <li class="dropItem"><a href="">Portel</a></li>
-                                        <li class="dropItem"><a href="">Estremoz</a></li>
+                                        <li class="dropItem"><a href="">Estremoz</a></li>-->
                                     </ul>
                                 </div>
                             </li>
@@ -61,9 +64,14 @@
                                                 Masculino
                                             </div>
                                             <ul>
-                                                <li class="dropItem"><a href="">Jovem</a></li>
+                                                <% escaloes.forEach(function(escalao){ %>
+                                                    <% if(escalao.sexo == 1){ %>
+                                                        <li class="dropItem"><a href=""><%= escalao.designacao %></a></li>
+                                                    <% } %>
+                                                <% }); %>
+                                                <!--<li class="dropItem"><a href="">Jovem</a></li>
                                                 <li class="dropItem"><i class="fas fa-check"></i><a href="" class="dropItemselected">Sénior</a></li>
-                                                <li class="dropItem"><a href="">65+</a></li>
+                                                <li class="dropItem"><a href="">65+</a></li>-->
                                             </ul>
                                         </li>
                                     </ul>
@@ -73,8 +81,13 @@
                                                 Feminino
                                             </div>
                                             <ul>
-                                                <li class="dropItem"><a href="">Absolutos</a></li>
-                                                <li class="dropItem"><a href="">65+</a></li>
+                                                <% escaloes.forEach(function(escalao){ %>
+                                                    <% if(escalao.sexo == 0){ %>
+                                                        <li class="dropItem"><a href=""><%= escalao.designacao %></a></li>
+                                                    <% } %>
+                                                <% }); %>
+                                                <!--<li class="dropItem"><a href="">Absolutos</a></li>
+                                                <li class="dropItem"><a href="">65+</a></li>-->
                                             </ul>
                                         </li>
                                     </ul>
@@ -104,13 +117,18 @@
                 <% if(typeof equipas != 'undefined' && equipas.length > 0){ %>
                     <% equipas.forEach(function(equipa){ %>
                         <tr>
-                            <td class="w5"><%= equipa.equipaId %></td>
+                            <td class="w5 equipasEquipaId"><%= equipa.equipaId %></td>
                             <td class="w5"><a href="/equipas/percurso/<%= equipa.equipaId %>" class="classificacoes_icon"><i class="fas fa-clipboard-list"></i></a></td>
-                            <td><%= equipa.primeiroElemento %><br><%= equipa.segundoElemento %></td>
-                            <td class="w20 table_cell_center"><%= equipa.localidade %></td>
-                            <td class="w20 table_cell_center"><%= equipa.escalao %><br>(<%= equipa.sexo == 0 ? 'Feminino': 'Masculino' %>)</td>
-                            <td class="w5"><a href="/equipas/editarEquipa/<%= equipa.equipaId %>/torneio/<%= torneio.torneioId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
-                            <td class="w10"><a href="/equipas/eliminarEquipa/<%= equipa.equipaId %>/torneio<%= torneio.torneioId %>" class="btn delete_btn"><i class="fa fa-trash"></i>Eliminar</a></td>
+                            <td class="equipasElementos"><%= equipa.primeiroElemento %><br><%= equipa.segundoElemento %></td>
+                            <td class="w20 table_cell_center equipasLocalidade"><%= equipa.localidade %></td>
+                            <td class="w20 table_cell_center equipasEscalao"><%= equipa.escalao %><br>(<%= equipa.sexo == 0 ? 'Feminino': 'Masculino' %>)</td>
+                            <td class="w5"><a href="/equipas/editarEquipa/<%= equipa.equipaId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
+                            <% if(equipa.eliminavel) {%>
+                                <td class="w10"><a href="" class="btn delete_btn" data-equipa="<%= equipa.equipaId %>"><i class="fa fa-trash"></i>Eliminar</a></td>
+                            <% } else { %>
+                                <td class="w10"></td>
+                            <% } %>
+                            <!--<td class="w10"><a href="/equipas/eliminarEquipa/<%= equipa.equipaId %>" class="btn delete_btn" data-equipa="equipa.equipaId"><i class="fa fa-trash"></i>Eliminar</a></td>-->
                         </tr>
                     <% }); %>
                 <% } else { %>
@@ -127,5 +145,5 @@
     <h2>Oops.. Algo correu mal!</h2>
     <p>Verifique se existem torneios registados ou activados.</p>
 <% } %>
-
+<script src="/js/equipas.js"></script>
 <%- include('../includes/footer.ejs') %>

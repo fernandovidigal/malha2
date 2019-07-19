@@ -6,7 +6,6 @@ const Escaloes = require('../models/Escaloes');
 const Jogos = require('../models/Jogos');
 const { validationResult } = require('express-validator/check');
 const util = require('../helpers/util');
-
 const Op = Sequelize.Op;
 
 const faker = require('faker');
@@ -78,13 +77,32 @@ function getAllEquipas(torneioId){
     });
 }
 
-function getEquipa(torneioId, equipaId){
+function getEquipa(torneioId, equipaId, raw = true){
     return Equipas.findOne({
         where: {
             equipaId: equipaId,
             torneioId: torneioId
         },
-        raw: true
+        raw: raw
+    });
+}
+
+function getEquipaFullDetails(torneioId, equipaId){
+    return Equipas.findOne({
+        where: {
+            equipaId: equipaId,
+            torneioId: torneioId
+        }, 
+        include: [
+            {
+                model: Localidades,
+                attributes: ['nome']
+            },
+            {
+                model: Escaloes,
+                attributes: ['designacao', 'sexo']
+            }
+        ]
     });
 }
 
@@ -124,13 +142,17 @@ exports.getAllEquipas = async (req, res, next) => {
             // Verificar se as equipas já estão atribuídas a jogos
             // Se estiverem então não é possível eliminar a equipa
             for(const equipa of _listaEquipas){
+                // Verifica se a equipa já está associada a jogos
+                const numJogos = await getNumJogosEquipa(torneio.torneioId, equipa.equipaId);
+
                 const _equipa = {
                     equipaId: equipa.equipaId,
                     primeiroElemento: equipa.primeiroElemento,
                     segundoElemento: equipa.segundoElemento,
                     localidade: equipa.localidade.nome,
                     escalao: equipa.escalao.designacao,
-                    sexo: equipa.escalao.sexo
+                    sexo: equipa.escalao.sexo,
+                    eliminavel: (numJogos == 0) ? true : false
                 }
     
                 // Verificar se existem jogos desta equipa
@@ -160,22 +182,19 @@ exports.getEquipaToEdit = async (req, res, next) => {
     const equipaId = req.params.id;
     const torneioId = req.params.torneioId;
 
+    const torneioInfo = getTorneioInfo();
     const localidadesInfo = getLocalidadesInfo();
     const escaloesInfo = getEscaloesInfo();
 
-    Promise.all([localidadesInfo, escaloesInfo])
-    .then(async ([localidades, escaloes]) => {
+    Promise.all([torneioInfo, localidadesInfo, escaloesInfo])
+    .then(async ([torneio, localidades, escaloes]) => {
 
-        console.log(escaloes);
-
-        const equipa = await getEquipa(torneioId, equipaId);
+        const equipa = await getEquipa(torneio.torneioId, equipaId);
         
         if(equipa){
             // Verifica se a equipa já foi atribuida a algum jogo
-            const numJogos = await getNumJogosEquipa(torneioId, equipaId);
+            const numJogos = await getNumJogosEquipa(torneio.torneioId, equipaId);
             equipa.escaloesEditaveis = (numJogos == 0) ? true : false;
-
-            console.log(equipa);
 
             res.render('equipas/editarEquipa', {
                 localidades: localidades,
@@ -186,8 +205,6 @@ exports.getEquipaToEdit = async (req, res, next) => {
             req.flash('error', 'Equipa não existe!')
             res.redirect('/equipas'); 
         }
-
-
     })
     .catch(err => {
         console.log(err);
@@ -277,7 +294,7 @@ exports.createEquipa = async (req, res, next) => {
     }
 }
 
-exports.updateEquipa = (req, res, next) => {
+exports.updateEquipa = async (req, res, next) => {
     const equipaId = req.params.id;
     const primeiroElemento = req.body.primeiro_elemento.trim();
     const segundoElemento = req.body.segundo_elemento.trim();
@@ -296,94 +313,83 @@ exports.updateEquipa = (req, res, next) => {
     if(!errors.isEmpty()){
         showValidationErrors(req, res, errors, 'editarEquipa', oldData);
     } else {
-        Equipas.findByPk(equipaId)
-        .then(equipa => {
-            if(equipa){
-                equipa.primeiroElemento = primeiroElemento;
-                equipa.segundoElemento = segundoElemento;
-                equipa.localidadeId = localidadeId;
-                equipa.escalaoId = escalaoId;
-                equipa.save()
-                .then(result => {
-                    if(result){
-                        req.flash('success', 'Equipa actualizada com sucesso.')
-                        res.redirect('/equipas');
-                    } else {
-                        req.flash('error', 'Não foi possível actualizar a equipa.')
-                        res.redirect('/equipas');
-                    }
-                })
-                .catch(err => {
-                    console.log(err);
+        const torneio = await getTorneioInfo();
+        const equipa = await getEquipa(torneio.torneioId, equipaId, false);
+
+        if(equipa){
+            equipa.primeiroElemento = primeiroElemento;
+            equipa.segundoElemento = segundoElemento;
+            equipa.localidadeId = localidadeId;
+            equipa.escalaoId = escalaoId;
+            equipa.save()
+            .then(result => {
+                if(result){
+                    req.flash('success', 'Equipa actualizada com sucesso.')
+                    res.redirect('/equipas');
+                } else {
                     req.flash('error', 'Não foi possível actualizar a equipa.')
                     res.redirect('/equipas');
-                });
-            } else {
-                req.flash('error', 'Equipa não existe.')
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                req.flash('error', 'Não foi possível actualizar a equipa.')
                 res.redirect('/equipas');
-            }
-        })
-        .catch(err => {
-            console.log(err);
-            req.flash('error', 'Não foi possível obter os dados da equipa.')
+            });
+        } else {
+            req.flash('error', 'Equipa não existe.')
             res.redirect('/equipas');
-        });
+        }
     }
 }
 
 exports.getEquipaToDelete = async (req, res, next) => {
-    const equipaId = req.params.id;
+    const equipaId = req.params.equipaId;
 
-    Equipas.findOne({
-        where: {equipaId: equipaId}, 
-        include: [
-            {
-                model: Localidades,
-                attributes: ['nome']
-            },
-            {
-                model: Escaloes,
-                attributes: ['designacao', 'sexo']
+    const torneio = await getTorneioInfo();
+    const equipa = await getEquipaFullDetails(torneio.torneioId, equipaId);
+    let response;
+
+    if(equipa){
+        response = {
+            success: true,
+            equipa: {
+                equipaId: equipa.equipaId,
+                torneioId: equipa.torneioId,
+                primeiroElemento: equipa.primeiroElemento,
+                segundoElemento: equipa.segundoElemento,
+                localidade: equipa.localidade.nome,
+                sexo: equipa.escalao.sexo,
+                escalao: equipa.escalao.designacao
             }
-        ]
-    })
-    .then(equipa => {
-        res.render('equipas/eliminarEquipa', { equipa: equipa });
-    })
-    .catch(err => {
-        console.log(err);
-        req.flash('error', 'Não foi possível obter dados das equipas.');
-        res.redirect('/equipas');
-    });
+        }
+    } else {
+        response = { success: false }
+    }
+
+    res.status(200).json(response);
 }
 
-exports.deleteEquipa = (req, res, next) => {
-    const equipaId = req.params.id;
-    const confirmacao = req.body.confirmacao;
+exports.deleteEquipa = async (req, res, next) => {
+    const equipaId = req.body.equipaId;
+    const torneioId = req.body.torneioId;
+    let response;
 
-    if(confirmacao == '1'){
-        Equipas.destroy({where: {equipaId: equipaId}, limit: 1})
-        .then(result => {
-            if(result){
-                req.flash('success', 'Equipa eliminada com sucesso.');
-                res.redirect('/equipas');
-            } else {
-                req.flash('error', 'Não foi possível eliminar a equipa.');
-                res.redirect('/equipas');
-            }
-        })
-        .catch(err => { 
-            console.log(err);
-            req.flash('error', 'Não foi possível eliminar a equipa.');
-            res.redirect('/equipas');
-        });
+    const equipa = await getEquipa(torneioId, equipaId, false);
+    if(equipa){
+        const result = await equipa.destroy();
+        response = {
+            success: (result) ? true: false,
+        }
     } else {
-        res.redirect('/equipas');
+        response = { success: false }
     }
+
+    res.status(200).json(response);
 }
 
 // Pesquisar Equipas
-exports.searchEquipa = (req, res, next) => {
+exports.searchEquipa = async (req, res, next) => {
     const equipaId = req.body.pesquisaEquipaId;
     const errors = validationResult(req);
 
@@ -392,50 +398,47 @@ exports.searchEquipa = (req, res, next) => {
         req.flash("error", error);
         res.redirect('/equipas');
     } else {
-        Equipas.findAll({
-            where: {equipaId: equipaId},
-            include: [
-                {
-                    model: Localidades,
-                    attributes: ['nome']
-                },
-                {
-                    model: Escaloes,
-                    attributes: ['designacao', 'sexo']
-                }
-            ]
-        })
-        .then(async equipa => {
-            if(equipa){
-                const torneioInfo = getTorneioInfo();
-                const localidadesInfo = getLocalidadesInfo();
-                const escaloesInfo = getEscaloesInfo();
 
-                Promise.all([torneioInfo, localidadesInfo, escaloesInfo])
-                .then(([torneio, localidades, escaloes]) => {
-                    res.render("equipas/equipas", {
-                        equipaId: equipaId,
-                        equipas: equipa,
-                        torneio: torneio,
-                        localidades: localidades,
-                        escaloes: escaloes
-                    });
-                })
-                .catch(err => {
-                    console.log(err);
-                    req.flash("error", "Ocorreu um erro. Não foi possível pesquisar a equipa.");
-                    res.redirect('/equipas');
+        const torneio = await getTorneioInfo();
+        const equipa = await getEquipaFullDetails(torneio.torneioId, equipaId);
+        console.log(equipa);
+
+        if(equipa){
+            // Verifica se a equipa já está associada a jogos
+            const numJogos = await getNumJogosEquipa(torneio.torneioId, equipaId);
+
+            const _equipa = [{
+                equipaId: equipa.equipaId,
+                primeiroElemento: equipa.primeiroElemento,
+                segundoElemento: equipa.segundoElemento,
+                localidade: equipa.localidade.nome,
+                escalao: equipa.escalao.designacao,
+                sexo: equipa.escalao.sexo,
+                eliminavel: (numJogos == 0) ? true : false,
+            }];
+
+            const localidadesInfo = getLocalidadesInfo();
+            const escaloesInfo = getEscaloesInfo();
+
+            Promise.all([localidadesInfo, escaloesInfo])
+            .then(([localidades, escaloes]) => {
+                res.render("equipas/equipas", {
+                    equipaId: equipaId,
+                    equipas: _equipa,
+                    torneio: torneio,
+                    localidades: localidades,
+                    escaloes: escaloes
                 });
-            } else {
-                req.flash("error", "Não exitem equipa com o número indicado.");
+            })
+            .catch(err => {
+                console.log(err);
+                req.flash("error", "Oops...! Não foi possível pesquisar a equipa.");
                 res.redirect('/equipas');
-            }
-        })
-        .catch(err => {
-            console.log(err);
-            req.flash("error", "Não foi possível encontrar a equipa.");
+            });
+        } else {
+            req.flash("error", "Não exitem equipa com o número indicado.");
             res.redirect('/equipas');
-        });
+        }
     }
 }
 

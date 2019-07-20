@@ -405,7 +405,7 @@ small {
     max-width: 200px;
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: space-around;
     align-items: flex-start;
 }
 
@@ -858,6 +858,7 @@ animation-delay: -0.16s;
 }
 
 .dropMenuTitle {
+    min-width: 140px;
     background-color: #f8f9ff;
     border: solid 1px #eaebf1;
     border-radius: 8px;
@@ -915,6 +916,7 @@ animation-delay: -0.16s;
 .dropItem i {
     font-size: 12px;
     padding-left: 10px;
+    margin-right: 0;
     background-color: transparent;
 }
 

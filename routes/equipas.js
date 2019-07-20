@@ -43,6 +43,11 @@ router.post('/pesquisa', [
     check('pesquisaEquipaId').trim().escape().matches(/^[0-9]+$/).withMessage('Nº da Equipa inválido.')
 ], EquipasController.searchEquipa);
 
+// Filtro de Equipas
+router.get('/filtro/localidade/:localidadeId', EquipasController.filtrarEquipas);
+router.get('/filtro/escalao/:escalaoId', EquipasController.filtrarEquipas);
+router.get('/filtro/localidade/:localidadeId/escalao/:escalaoId', EquipasController.filtrarEquipas);
+
 // FAKER
 // Gera equipa aleatóriamente
 router.get('/faker/:num', EquipasController.createEquipasAleatoriamente);

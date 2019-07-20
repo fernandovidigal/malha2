@@ -33,6 +33,15 @@ function getEscaloesInfo(){
     return Escaloes.findAll({raw: true});
 }
 
+function getNumJogosPorEscalao(torneioId, escalaoId){
+    return Jogos.count({
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId
+        }
+    });
+}
+
 function getLastEquipaID(torneioId){
     return Equipas.max('equipaId', {
         where: { torneioId: torneioId }
@@ -104,6 +113,22 @@ function getEquipaFullDetails(torneioId, equipaId){
             }
         ]
     });
+}
+
+function getAllEquipasPorFiltro(whereClause){
+    return Equipas.findAll({
+        where: whereClause, 
+        include: [
+            {
+                model: Localidades,
+                attributes: ['nome']
+            },
+            {
+                model: Escaloes,
+                attributes: ['designacao', 'sexo']
+            }
+        ]
+    }); 
 }
 
 function getNumJogosEquipa(torneioId, equipaId){
@@ -213,15 +238,27 @@ exports.getEquipaToEdit = async (req, res, next) => {
     });
 }
 
-exports.adicionarEquipa = async (req, res, next) => {
+exports.adicionarEquipa = (req, res, next) => {
+    const torneioInfo = getTorneioInfo();
     const localidadesInfo = getLocalidadesInfo();
     const escaloesInfo = getEscaloesInfo();
 
-    Promise.all([localidadesInfo, escaloesInfo])
-    .then(([localidades, escaloes]) => {
+    Promise.all([torneioInfo, localidadesInfo, escaloesInfo])
+    .then(async ([torneio, localidades, escaloes]) => {
         if(localidades.length > 0 && escaloes.length > 0){
+
+            // Exclui da lista de esclões os escalões que já tenham jogos distribuídos
+            // Se já existe jogos distribuídos não é possível adicionar mais equipas
+            const listaEscaloes = [];
+            for(escalao of escaloes){
+                const numJogosDistribuidos = await getNumJogosPorEscalao(torneio.torneioId, escalao.escalaoId);
+                if(numJogosDistribuidos == 0){
+                    listaEscaloes.push(escalao);
+                }
+            }
+
             util.sort(localidades);
-            res.render('equipas/adicionarEquipa', {localidades: localidades, escaloes: escaloes});
+            res.render('equipas/adicionarEquipa', {localidades: localidades, escaloes: listaEscaloes});
         } else {
             console.log(err);
             req.flash('error', 'Não foi possível obter dados dos escalões e/ou localidades.')
@@ -422,6 +459,7 @@ exports.searchEquipa = async (req, res, next) => {
 
             Promise.all([localidadesInfo, escaloesInfo])
             .then(([localidades, escaloes]) => {
+                util.sort(localidades);
                 res.render("equipas/equipas", {
                     equipaId: equipaId,
                     equipas: _equipa,
@@ -443,7 +481,85 @@ exports.searchEquipa = async (req, res, next) => {
 }
 
 // Filtrar Equipas
+exports.filtrarEquipas = async (req, res, next) => {
+    const localidadeId = req.params.localidadeId;
+    const escalaoId = req.params.escalaoId;
+    const torneio = await getTorneioInfo();
 
+    const filtro = {
+        torneioId: torneio.torneioId
+    };
+
+    if(!localidadeId && !escalaoId){
+        req.flash("error", "Oops...Algo correu mal!");
+        res.redirect('/equipas');
+    }
+
+    if(localidadeId){ filtro.localidadeId = parseInt(localidadeId); }
+
+    if(escalaoId){ filtro.escalaoId = parseInt(escalaoId); }
+
+    //console.log(filtro);
+
+    const equipasInfo = getAllEquipasPorFiltro(filtro);
+    const localidadesInfo = getLocalidadesInfo();
+    const escaloesInfo = getEscaloesInfo();
+
+    Promise.all([equipasInfo, localidadesInfo, escaloesInfo])
+    .then(async ([_listaEquipas, localidades, escaloes]) => {
+        const listaEquipas = [];
+        //console.log(_listaEquipas);
+
+        util.sort(localidades);
+
+        // Verificar se as equipas já estão atribuídas a jogos
+        // Se estiverem então não é possível eliminar a equipa
+        for(const equipa of _listaEquipas){
+            // Verifica se a equipa já está associada a jogos
+            const numJogos = await getNumJogosEquipa(torneio.torneioId, equipa.equipaId);
+
+            const _equipa = {
+                equipaId: equipa.equipaId,
+                primeiroElemento: equipa.primeiroElemento,
+                segundoElemento: equipa.segundoElemento,
+                localidade: equipa.localidade.nome,
+                escalao: equipa.escalao.designacao,
+                sexo: equipa.escalao.sexo,
+                eliminavel: (numJogos == 0) ? true : false
+            }
+    
+            // Verificar se existem jogos desta equipa
+            listaEquipas.push(_equipa);
+        }
+
+        if(localidadeId){ 
+            let i = localidades.map(localidade => localidade.localidadeId).indexOf(parseInt(localidadeId));
+            filtro.localidade = (i != -1) ? localidades[i].nome : '';
+        }
+
+        if(escalaoId){ 
+            let i = escaloes.map(escalao => escalao.escalaoId).indexOf(parseInt(escalaoId));
+            filtro.escalao = (i != -1) ? escaloes[i].designacao : '';
+            filtro.sexo = (i != -1) ? (escaloes[i].sexo == 1) ? 'Masculino' : 'Feminino' : '';
+        } 
+
+        res.render('equipas/equipas', {
+            torneio: torneio,
+            localidades: localidades,
+            escaloes: escaloes,
+            equipas: listaEquipas,
+            filtro: filtro
+        });
+    })
+    .catch(err => {
+        console.log(err);
+        req.flash("error", "Oops...Algo correu mal!");
+        res.redirect('/equipas');
+    });
+    
+    
+
+}
 
 // Faker
 exports.createEquipasAleatoriamente = async (req, res, next) => {

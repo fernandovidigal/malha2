@@ -115,10 +115,13 @@
             </div>
             <div class="sidebar__content">
                 <p class="sidebar__title">Campos</p>
+                <a href="/torneio/resultados/escalao/<%= info.escalaoId %>/fase/<%= info.fase %>/campo/0" class="campo <%= (info.campo == 0) ? 'campo_selected' : '' %>">
+                    Todos os Campos
+                </a>
                 <div class="campos">
                     <% listaCampos.forEach(function(campo){ %>
                         <a href="/torneio/resultados/escalao/<%= info.escalaoId %>/fase/<%= info.fase %>/campo/<%= campo.campo %>" class="campo <%= (info.campo != 0 && info.campo == campo.campo) ? 'campo_selected' : '' %> <%= campo.campoCompleto ? 'campo_completed' : '' %>">
-                            <%= (info.fase != 100) ? campo.campos : (campo.campo == 1) ? 'Final' : '3º e 4º' %>
+                            <%= (info.fase != 100) ? campo.campo : (campo.campo == 1) ? 'Final' : '3º e 4º' %>
                         </a>
                     <% }); %>
                 </div>

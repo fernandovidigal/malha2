@@ -51,24 +51,32 @@
                                         <% } else { %>
                                             <% if(escalao.numEquipas < 2 || escalao.numTotalCampos * 4 > escalao.numEquipas){ %>
                                                 <p class="escalao_err_msg">Não existem equipas suficientes</p>
+                                                <a href="/equipas"><i class="fas fa-user-friends"></i></a>
+                                                    <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
                                             <% } else if(escalao.numTotalCampos == 0) { %>
                                                 <p class="escalao_err_msg">Não foi definido o número de campos</p>
+                                                <a href="/equipas"><i class="fas fa-user-friends"></i></a>
+                                                    <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
                                             <% } else if(escalao.numTotalCampos * 6 < escalao.numEquipas) { %>
                                                 <p class="escalao_err_msg">Número excessivo de equipas</p>
+                                                <a href="/equipas"><i class="fas fa-user-friends"></i></a>
+                                                    <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
                                             <% } else { %>
                                                 <a href="/torneio/distribuirEquipasPorEscalao/escalao/<%= escalao.escalaoId %>" class="escalaoSelect__btn">Distribuir Equipas</a>
                                             <% } %>
                                         <% } %>
                                     <% } %>
                                 </div>
-                                <% if(typeof escalao.campos != 'undefined'){ %>
-                                    <div class="escalaoSelect__campos">
-                                        <% escalao.campos.forEach(function(campo){ %>
-                                            <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/<%= campo.campo %>" class="campo <%= campo.completo ? 'campo_completed' : '' %>">
-                                                <%= (escalao.fase != 100) ? campo.campo : (campo.campo == 1) ? 'Final' : '3º e 4º' %>
-                                            </a>
-                                        <% }); %>
-                                    </div>
+                                <% if(!escalao.existeVencedor){ %>
+                                    <% if(typeof escalao.campos != 'undefined'){ %>
+                                        <div class="escalaoSelect__campos">
+                                            <% escalao.campos.forEach(function(campo){ %>
+                                                <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/<%= campo.campo %>" class="campo <%= campo.completo ? 'campo_completed' : '' %>">
+                                                    <%= (escalao.fase != 100) ? campo.campo : (campo.campo == 1) ? 'Final' : '3º e 4º' %>
+                                                </a>
+                                            <% }); %>
+                                        </div>
+                                    <% } %>
                                 <% } %>
                             </div>
                         <% }); %>
@@ -117,22 +125,28 @@
                                                     <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
                                                 <% } else if(escalao.numTotalCampos == 0) { %>
                                                     <p class="escalao_err_msg">Não foi definido o número de campos</p>
+                                                    <a href="/equipas"><i class="fas fa-user-friends"></i></a>
+                                                    <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
                                                 <% } else if(escalao.numTotalCampos * 6 < escalao.numEquipas) { %>
                                                     <p class="escalao_err_msg">Número excessivo de equipas</p>
+                                                    <a href="/equipas"><i class="fas fa-user-friends"></i></a>
+                                                    <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
                                                 <% } else { %>
                                                     <a href="/torneio/distribuirEquipasPorEscalao/escalao/<%= escalao.escalaoId %>" class="escalaoSelect__btn">Distribuir Equipas</a>
                                                 <% } %>
                                             <% } %>
                                         <% } %>
                                     </div>
-                                    <% if(typeof escalao.campos != 'undefined'){ %>
-                                        <div class="escalaoSelect__campos">
-                                            <% escalao.campos.forEach(function(campo){ %>
-                                                <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/<%= campo.campo %>" class="campo <%= campo.completo ? 'campo_completed' : '' %>">
-                                                    <%= (escalao.fase != 100) ? campo.campo : (campo.campo == 1) ? 'Final' : '3º e 4º' %>
-                                                </a>
-                                            <% }); %>
-                                        </div>
+                                    <% if(!escalao.existeVencedor){ %>
+                                        <% if(typeof escalao.campos != 'undefined'){ %>
+                                            <div class="escalaoSelect__campos">
+                                                <% escalao.campos.forEach(function(campo){ %>
+                                                    <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/<%= campo.campo %>" class="campo <%= campo.completo ? 'campo_completed' : '' %>">
+                                                        <%= (escalao.fase != 100) ? campo.campo : (campo.campo == 1) ? 'Final' : '3º e 4º' %>
+                                                    </a>
+                                                <% }); %>
+                                            </div>
+                                        <% } %>
                                     <% } %>
                                 </div>
                             <% }); %>

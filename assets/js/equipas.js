@@ -20,6 +20,7 @@ function showDeleteMessage(equipa){
         confirmButtonColor: '#d9534f',
         cancelButtonText: 'Não!',
         reverseButtons: true,
+        showLoaderOnConfirm: true,
         animation: true
     }).then(result => {
         if(result.value){

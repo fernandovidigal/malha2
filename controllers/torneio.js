@@ -690,3 +690,52 @@ exports.updateParciais = async (req, res, next) => {
         });
     });
 }
+
+exports.getEscalaoInfo = async (req, res, next) => {
+    const escalaoId = req.params.escalaoId;
+    const torneio = await dbFunctions.getTorneioInfo();
+
+    const escalaoInfo = dbFunctions.geEscalaoInfo(escalaoId);
+    const numCampos = dbFunctions.getNumeroCamposPorEscalao(torneio.torneioId, escalaoId);
+
+    Promise.all([escalaoInfo, numCampos])
+    .then(([_escalao, _campos]) => {
+        if(_escalao && _campos){
+            const response = { 
+                success: true,
+                escalao: {
+                    torneioId: torneio.torneioId,
+                    escalaoId: _escalao.escalaoId,
+                    designacao: _escalao.designacao,
+                    sexo: (_escalao.sexo == 1) ? 'Masculino' : 'Feminino',
+                    numCampos: _campos.numCampos
+                }
+             }
+            res.status(200).json(response);
+        } else {
+            return Promise.reject("Não foi possível obter dados do escalão ou do número de campos.");
+        }
+    })
+    .catch(err => {
+        console.log(err);
+        const response = { success: false }
+        res.status(200).json(response);
+    });
+}
+
+exports.setNumeroCamposAPI = (req, res, next) => {
+    const torneioId = req.body.torneioId;
+    const escalaoId = req.body.escalaoId;
+    const numCampos = req.body.numCampos;
+
+    dbFunctions.updateNumCampos(torneioId, escalaoId, numCampos)
+    .then(() => {
+        const response = { success: true }
+        res.status(200).json(response);
+    })
+    .catch(err => {
+        console.log(err);
+        const response = { success: false }
+        res.status(200).json(response); 
+    });
+}

@@ -35,11 +35,10 @@ function showDeleteMessage(equipa){
                 if(response.ok){
                     return response.json();
                 } else {
-                    return Promise.reject('Não foi possível connectar ao servidor.');
+                    return Promise.reject('Não foi possível connectar à base de dados.');
                 }
             })
             .then(data => {
-                console.log(data);
                 if(data.success){
                     Swal.fire({
                         type: 'success',

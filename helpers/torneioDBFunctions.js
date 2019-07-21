@@ -90,6 +90,20 @@ exports.processaUpdateCampos = async (transaction, torneioId, listaCampos, lista
     }
 }
 
+exports.updateNumCampos = (torneioId, escalaoId, numCampos) => {
+    console.log(torneioId);
+    console.log(escalaoId);
+    console.log(numCampos);
+    return Campos.update({numCampos: numCampos},
+        {
+            where: {
+                torneioId: torneioId,
+                escalaoId: escalaoId
+            }
+        }
+    );
+}
+
 ////////////////////////////////////////////////////////
 //                        LOCALIDADES
 ////////////////////////////////////////////////////////

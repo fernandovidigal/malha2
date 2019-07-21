@@ -113,6 +113,8 @@
                                             <% } else { %>
                                                 <% if(escalao.numEquipas < 2 || escalao.numTotalCampos * 4 > escalao.numEquipas){ %>
                                                     <p class="escalao_err_msg">Não existem equipas suficientes</p>
+                                                    <a href="/equipas"><i class="fas fa-user-friends"></i></a>
+                                                    <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
                                                 <% } else if(escalao.numTotalCampos == 0) { %>
                                                     <p class="escalao_err_msg">Não foi definido o número de campos</p>
                                                 <% } else if(escalao.numTotalCampos * 6 < escalao.numEquipas) { %>
@@ -145,4 +147,5 @@
     <p>Verifique se existem torneios registados ou activados.</p>
 <% } %>
 
+<script src="/js/torneioEscalao.js"></script>
 <%- include('../includes/footer.ejs') %>

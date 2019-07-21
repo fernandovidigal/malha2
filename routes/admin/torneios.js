@@ -22,7 +22,7 @@ router.post('/adicionarTorneio', [
         req.body.numCampos.forEach(campo => {
             if(campo != '' && campo != 0){
                 if(Math.log2(parseInt(campo)) % 1 !== 0){
-                    throw new Error("Número de campos inválido. O número de campos deve ser uma potência de 2.");
+                    throw new Error("Número de campos inválido. O número de campos deve ser uma potência de 2. (Ex: 2, 4, 8, 16, ...)");
                 }
             }
         });
@@ -44,7 +44,7 @@ router.put('/editarTorneio/:id', [
         req.body.numCampos.forEach(campo => {
             if(campo != '' && campo != 0){
                 if(Math.log2(parseInt(campo)) % 1 !== 0){
-                    throw new Error("Número de campos inválido. O número de campos deve ser uma potência de 2.");
+                    throw new Error("Número de campos inválido. O número de campos deve ser uma potência de 2. (Ex: 2, 4, 8, 16, ...)");
                 }
             }
         });

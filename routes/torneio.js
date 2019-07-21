@@ -19,7 +19,7 @@ router.post('/definirNumeroCampos', [
         req.body.numCampos.forEach(campo => {
             if(campo != '' && campo != 0){
                 if(Math.log2(parseInt(campo)) % 1 !== 0){
-                    throw new Error("Número de campos inválido. O número de campos deve ser uma potência de 2.");
+                    throw new Error("Número de campos inválido. O número de campos deve ser uma potência de 2. (Ex: 2, 4, 8, 16, ...).");
                 }
             } else if(campo == 0){
                 throw new Error("O número de campos não pode ser 0.");
@@ -46,5 +46,9 @@ router.get('/classificacao/escalao/:escalao/fase/:fase/campo/:campo', TorneiosCo
 router.post('/registaParciais', TorneiosController.createParciais);
 
 router.post('/actualizaParciais', TorneiosController.updateParciais);
+
+router.get('/getEscalaoInfo/:escalaoId', TorneiosController.getEscalaoInfo);
+
+router.put('/setEscalaoNumCampos', TorneiosController.setNumeroCamposAPI);
 
 module.exports = router;

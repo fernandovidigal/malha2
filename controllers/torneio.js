@@ -1,17 +1,12 @@
 const sequelize = require('../helpers/database');
-const Equipas = require('../models/Equipas');
-const Torneios = require('../models/Torneios');
-const Localidades = require('../models/Localidades');
-const Escaloes = require('../models/Escaloes');
-const Jogos = require('../models/Jogos');
 const { validationResult } = require('express-validator/check');
-const util = require('../helpers/util');
 const torneioHelpers = require('../helpers/torneioHelperFunctions');
 const dbFunctions = require('../helpers/torneioDBFunctions');
 
 exports.getStarting = async (req, res, next) => {
 
     try {
+        console.time("Start");
         const torneio = await dbFunctions.getTorneioInfo();
 
         // Não existe torneio registado ou activo
@@ -19,6 +14,7 @@ exports.getStarting = async (req, res, next) => {
             req.flash('error', 'Não existem torneios activos.');
             return res.redirect("../");
         }
+
         const torneioId = torneio.torneioId;
 
         // 1. Verificar se existem equipas (não se pode fazer um torneio sem equipas)
@@ -34,23 +30,30 @@ exports.getStarting = async (req, res, next) => {
 
         // Lista dos Escalões com equipas registadas
         const listaEscaloes = await dbFunctions.getEscaloesComEquipas(torneioId);
-        
+        const listaCamposPorEscalao = await dbFunctions.getNumCamposEscaloes(torneioId);
+
         // Adiciona o número de campos definidos a cada escalão e verifica se existem
         // escalões ainda sem campos definidos
-        let existemCamposNaoDefinidos = false;
+        let existemNumCamposNaoDefinidos = false;
         for(const escalao of listaEscaloes){
-            const campos = await dbFunctions.getNumeroCamposPorEscalao(torneioId, escalao.escalaoId);
-            escalao.campos = (campos != null) ? campos.numCampos : 0;
+            //const campos = await dbFunctions.getNumeroCamposPorEscalao(torneioId, escalao.escalaoId);
+            const campos = listaCamposPorEscalao.find(_escalao => {
+                if(_escalao.escalaoId == escalao.escalaoId){
+                    return _escalao.numCampos;
+                }
+            });
+
+            escalao.campos = (campos != undefined) ? campos.numCampos : 0;
             if(escalao.campos == 0){
-                existemCamposNaoDefinidos = true;
+                existemNumCamposNaoDefinidos = true;
             }
         }
 
-        if(existemCamposNaoDefinidos){
+        if(existemNumCamposNaoDefinidos){
             return res.render('torneio/definirNumeroCampos', {torneio: torneio, escaloes: listaEscaloes});
         }
 
-        if(numEquipas > 0 && !existemCamposNaoDefinidos){
+        if(numEquipas > 0 && !existemNumCamposNaoDefinidos){
             const escaloesMasculinos = [];
             const escaloesFemininos = [];
             let numTotalJogos = 0;
@@ -100,7 +103,7 @@ exports.getStarting = async (req, res, next) => {
                     // Se o número de campos completos for igual ao número de campos total do escalão então a fase está concluída
                     let numCamposCompletos = 0;
 
-                    // Obtem a lista de campos para determinado torneio em determinada fase
+                    // Obtem a lista de campos para determinado escalão em determinada fase
                     // [1,2,3,4,5,6,7,8,9,...]
                     const listaCampos = await dbFunctions.getAllCampos(torneioId, _escalao.escalaoId, _escalao.fase);
                     _escalao.numCamposFase = listaCampos.length;
@@ -151,6 +154,7 @@ exports.getStarting = async (req, res, next) => {
             }
 
             res.render('torneio/selecionaEscalao', {torneio: torneio, numTotalJogos: numTotalJogos, escaloesMasculinos: escaloesMasculinos, escaloesFemininos: escaloesFemininos});
+            console.timeEnd("Start");
         }
     } catch(e) {
         console.log(e);

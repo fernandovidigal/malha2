@@ -101,6 +101,7 @@ const adminEscaloes = require('./routes/admin/escaloes');
 const adminTorneios = require('./routes/admin/torneios');
 const equipas = require('./routes/equipas');
 const torneio = require('./routes/torneio');
+const listagens = require('./routes/listagens');
 
 app.use('/login', login);
 app.use('/', index);
@@ -110,6 +111,7 @@ app.use('/admin/escaloes', adminEscaloes);
 app.use('/admin/torneios', adminTorneios);
 app.use('/equipas', equipas);
 app.use('/torneio', torneio);
+app.use('/listagens', listagens);
 
 sequelize
     .sync()

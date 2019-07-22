@@ -66,6 +66,15 @@ exports.getNumeroCamposPorEscalao = (torneioId, escalaoId) => {
     });
 }
 
+exports.getNumCamposEscaloes = (torneioId) => {
+    return Campos.findAll({
+        where: {
+            torneioId: torneioId
+        },
+        raw: true
+    });
+}
+
 exports.processaUpdateCampos = async (transaction, torneioId, listaCampos, listaIds) => {
     let i = 0;
     for(const escalao of listaCampos){

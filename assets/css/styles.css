@@ -985,3 +985,55 @@ animation-delay: -0.16s;
 .deleteTeam p small {
     color: #545454;
 }
+
+/* LISTAGENS */
+.listagemWrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.listagemCard {
+    width: 90%;
+    background-color: #ffffff;
+    border: solid 1px #eaebf1;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.07)
+}
+
+.listagemCard_wrapper {
+    display: flex;
+}
+
+.listagemCard__content {
+    margin-right: auto;
+    margin-left: 20px;
+    padding: 16px 0;
+}
+
+.listagemCard__title {
+    font-size: 120%;
+    margin: 0;
+    padding: 0;
+    padding-bottom: 20px;
+}
+
+.listagemCard__controllers > * {
+    margin-right: 20px;
+}
+
+.listagem_btn {
+    width: 7.5%;
+    background-color: #455cc7;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.listagem_btn i {
+    margin: 0;
+    font-size: 200%;
+}

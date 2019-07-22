@@ -144,6 +144,36 @@ function getNumJogosEquipa(torneioId, equipaId){
     });
 }
 
+function getAllEquipasComJogos(torneioId){
+    return Jogos.findAll({
+        attributes: ['equipa1Id', 'equipa2Id'],
+        where: {
+            torneioId: torneioId
+        },
+        raw: true
+    });
+}
+
+function uniao(setA, setB) {
+    var _uniao = new Set(setA);
+    for (var elem of setB) {
+        _uniao.add(elem);
+    }
+    return _uniao;
+}
+
+// Gera um array com a lista de equipas unicas com jogos
+function geraListaEquipasUnicasComJogos(listaCompletaEquipas){
+    //console.log(listaCompletaEquipas);
+    let listaEquipas1 = listaCompletaEquipas.map(equipa => equipa.equipa1Id);
+    //console.log(listaEquipas1);
+    let listaEquipas2 = listaCompletaEquipas.map(equipa => equipa.equipa2Id);
+    //console.log(listaEquipas2);
+    listaEquipas1 = [...new Set(listaEquipas1)];
+    listaEquipas2 = [...new Set(listaEquipas2)];
+    return listaFinal = uniao(listaEquipas1, listaEquipas2);
+}
+
 exports.getAllEquipas = async (req, res, next) => {
     const torneioInfo = getTorneioInfo();
     const localidadesInfo = getLocalidadesInfo();
@@ -160,6 +190,10 @@ exports.getAllEquipas = async (req, res, next) => {
     
             // Ordena correctamente as localidades
             util.sort(localidades);
+
+            // Lista de Equipas Únicas Com Jogos
+            const listaCompletaEquipas = await getAllEquipasComJogos(torneio.torneioId);
+            listaEquipasComJogos = geraListaEquipasUnicasComJogos(listaCompletaEquipas);
     
             const _listaEquipas = await getAllEquipas(torneio.torneioId);
             const listaEquipas = [];
@@ -167,8 +201,6 @@ exports.getAllEquipas = async (req, res, next) => {
             // Verificar se as equipas já estão atribuídas a jogos
             // Se estiverem então não é possível eliminar a equipa
             for(const equipa of _listaEquipas){
-                // Verifica se a equipa já está associada a jogos
-                const numJogos = await getNumJogosEquipa(torneio.torneioId, equipa.equipaId);
 
                 const _equipa = {
                     equipaId: equipa.equipaId,
@@ -177,9 +209,9 @@ exports.getAllEquipas = async (req, res, next) => {
                     localidade: equipa.localidade.nome,
                     escalao: equipa.escalao.designacao,
                     sexo: equipa.escalao.sexo,
-                    eliminavel: (numJogos == 0) ? true : false
+                    eliminavel: (listaEquipasComJogos.has(equipa.equipaId)) ? false : true
                 }
-    
+
                 // Verificar se existem jogos desta equipa
                 listaEquipas.push(_equipa);
             }
@@ -192,7 +224,7 @@ exports.getAllEquipas = async (req, res, next) => {
             });
         } catch(err) {
             console.log(err);
-            req.flash('error', 'Não foi possível obter dados das equipas.')
+            req.flash('error', 'Não foi possível obter os dados das equipas.')
             res.redirect('/equipas');
         }
     })
@@ -205,7 +237,6 @@ exports.getAllEquipas = async (req, res, next) => {
 
 exports.getEquipaToEdit = async (req, res, next) => {
     const equipaId = req.params.id;
-    const torneioId = req.params.torneioId;
 
     const torneioInfo = getTorneioInfo();
     const localidadesInfo = getLocalidadesInfo();
@@ -227,13 +258,13 @@ exports.getEquipaToEdit = async (req, res, next) => {
                 equipa: equipa
             });
         } else {
-            req.flash('error', 'Equipa não existe!')
+            req.flash('error', 'Equipa não existe!');
             res.redirect('/equipas'); 
         }
     })
     .catch(err => {
         console.log(err);
-        req.flash('error', 'Oops...Algo correu mal!')
+        req.flash('error', 'Oops...Algo correu mal!');
         res.redirect('/equipas');
     });
 }
@@ -250,7 +281,7 @@ exports.adicionarEquipa = (req, res, next) => {
             // Exclui da lista de esclões os escalões que já tenham jogos distribuídos
             // Se já existe jogos distribuídos não é possível adicionar mais equipas
             const listaEscaloes = [];
-            for(escalao of escaloes){
+            for(const escalao of escaloes){
                 const numJogosDistribuidos = await getNumJogosPorEscalao(torneio.torneioId, escalao.escalaoId);
                 if(numJogosDistribuidos == 0){
                     listaEscaloes.push(escalao);
@@ -258,6 +289,7 @@ exports.adicionarEquipa = (req, res, next) => {
             }
 
             util.sort(localidades);
+
             res.render('equipas/adicionarEquipa', {localidades: localidades, escaloes: listaEscaloes});
         } else {
             console.log(err);
@@ -267,7 +299,7 @@ exports.adicionarEquipa = (req, res, next) => {
     })
     .catch(err => {
         console.log(err);
-        req.flash('error', 'Não foi possível obter dados dos escalões e/ou localidades.')
+        req.flash('error', 'Oops...Algo correu mal!');
         res.redirect('/equipas');
     });
 }
@@ -275,15 +307,15 @@ exports.adicionarEquipa = (req, res, next) => {
 exports.createEquipa = async (req, res, next) => {
     const primeiroElemento = req.body.primeiro_elemento.trim();
     const segundoElemento = req.body.segundo_elemento.trim();
-    const localidade = req.body.localidade;
-    const escalao = req.body.escalao;
+    const localidadeId = req.body.localidade;
+    const escalaoId = req.body.escalao;
     const errors = validationResult(req);
     
     const oldData = {
         primeiroElemento: primeiroElemento,
         segundoElemento: segundoElemento,
-        localidadeId: localidade,
-        escalaoId: escalao
+        localidadeId: localidadeId,
+        escalaoId: escalaoId
     }
 
     if(!errors.isEmpty()){
@@ -299,8 +331,8 @@ exports.createEquipa = async (req, res, next) => {
                     torneioId: torneio.torneioId,
                     primeiroElemento: primeiroElemento,
                     segundoElemento: segundoElemento,
-                    localidadeId: localidade,
-                    escalaoId: escalao
+                    localidadeId: localidadeId,
+                    escalaoId: escalaoId
                 },
                 defaults: {
                     equipaId: nextEquipaID
@@ -325,7 +357,7 @@ exports.createEquipa = async (req, res, next) => {
         })
         .catch(err => {
             console.log(err);
-            req.flash('error', 'Não foi possível adicionar a equipa.');
+            req.flash('error', 'Oops...Algo correu mal!');
             res.redirect('/equipas');
         });
     }
@@ -350,31 +382,38 @@ exports.updateEquipa = async (req, res, next) => {
     if(!errors.isEmpty()){
         showValidationErrors(req, res, errors, 'editarEquipa', oldData);
     } else {
-        const torneio = await getTorneioInfo();
-        const equipa = await getEquipa(torneio.torneioId, equipaId, false);
 
-        if(equipa){
-            equipa.primeiroElemento = primeiroElemento;
-            equipa.segundoElemento = segundoElemento;
-            equipa.localidadeId = localidadeId;
-            equipa.escalaoId = escalaoId;
-            equipa.save()
-            .then(result => {
-                if(result){
-                    req.flash('success', 'Equipa actualizada com sucesso.')
-                    res.redirect('/equipas');
-                } else {
+        try {
+            const torneio = await getTorneioInfo();
+            const equipa = await getEquipa(torneio.torneioId, equipaId, false);
+
+            if(equipa){
+                equipa.primeiroElemento = primeiroElemento;
+                equipa.segundoElemento = segundoElemento;
+                equipa.localidadeId = localidadeId;
+                equipa.escalaoId = escalaoId;
+                equipa.save()
+                .then(result => {
+                    if(result){
+                        req.flash('success', 'Equipa actualizada com sucesso.')
+                        res.redirect('/equipas');
+                    } else {
+                        req.flash('error', 'Não foi possível actualizar a equipa.')
+                        res.redirect('/equipas');
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
                     req.flash('error', 'Não foi possível actualizar a equipa.')
                     res.redirect('/equipas');
-                }
-            })
-            .catch(err => {
-                console.log(err);
-                req.flash('error', 'Não foi possível actualizar a equipa.')
+                });
+            } else {
+                req.flash('error', 'Equipa não existe.')
                 res.redirect('/equipas');
-            });
-        } else {
-            req.flash('error', 'Equipa não existe.')
+            }
+        } catch(err) {
+            console.log(err);
+            req.flash('error', 'Oops...Algo correu mal!');
             res.redirect('/equipas');
         }
     }
@@ -436,45 +475,51 @@ exports.searchEquipa = async (req, res, next) => {
         res.redirect('/equipas');
     } else {
 
-        const torneio = await getTorneioInfo();
-        const equipa = await getEquipaFullDetails(torneio.torneioId, equipaId);
-        console.log(equipa);
+        try {
+            const torneio = await getTorneioInfo();
+            const equipa = await getEquipaFullDetails(torneio.torneioId, equipaId);
 
-        if(equipa){
-            // Verifica se a equipa já está associada a jogos
-            const numJogos = await getNumJogosEquipa(torneio.torneioId, equipaId);
+            if(equipa){
+                // Verifica se a equipa já está associada a jogos
+                const numJogos = await getNumJogosEquipa(torneio.torneioId, equipaId);
 
-            const _equipa = [{
-                equipaId: equipa.equipaId,
-                primeiroElemento: equipa.primeiroElemento,
-                segundoElemento: equipa.segundoElemento,
-                localidade: equipa.localidade.nome,
-                escalao: equipa.escalao.designacao,
-                sexo: equipa.escalao.sexo,
-                eliminavel: (numJogos == 0) ? true : false,
-            }];
+                const _equipa = [{
+                    equipaId: equipa.equipaId,
+                    primeiroElemento: equipa.primeiroElemento,
+                    segundoElemento: equipa.segundoElemento,
+                    localidade: equipa.localidade.nome,
+                    escalao: equipa.escalao.designacao,
+                    sexo: equipa.escalao.sexo,
+                    eliminavel: (numJogos == 0) ? true : false,
+                }];
 
-            const localidadesInfo = getLocalidadesInfo();
-            const escaloesInfo = getEscaloesInfo();
+                const localidadesInfo = getLocalidadesInfo();
+                const escaloesInfo = getEscaloesInfo();
 
-            Promise.all([localidadesInfo, escaloesInfo])
-            .then(([localidades, escaloes]) => {
-                util.sort(localidades);
-                res.render("equipas/equipas", {
-                    equipaId: equipaId,
-                    equipas: _equipa,
-                    torneio: torneio,
-                    localidades: localidades,
-                    escaloes: escaloes
+                Promise.all([localidadesInfo, escaloesInfo])
+                .then(([localidades, escaloes]) => {
+                    util.sort(localidades);
+
+                    res.render("equipas/equipas", {
+                        equipaId: equipaId,
+                        equipas: _equipa,
+                        torneio: torneio,
+                        localidades: localidades,
+                        escaloes: escaloes
+                    });
+                })
+                .catch(err => {
+                    console.log(err);
+                    req.flash("error", "Não foi possível pesquisar a equipa.");
+                    res.redirect('/equipas');
                 });
-            })
-            .catch(err => {
-                console.log(err);
-                req.flash("error", "Oops...! Não foi possível pesquisar a equipa.");
+            } else {
+                req.flash("error", "Não exite equipa com o número indicado.");
                 res.redirect('/equipas');
-            });
-        } else {
-            req.flash("error", "Não exitem equipa com o número indicado.");
+            }
+        } catch(err) {
+            console.log(err);
+            req.flash('error', 'Oops...Algo correu mal!');
             res.redirect('/equipas');
         }
     }
@@ -484,81 +529,83 @@ exports.searchEquipa = async (req, res, next) => {
 exports.filtrarEquipas = async (req, res, next) => {
     const localidadeId = req.params.localidadeId;
     const escalaoId = req.params.escalaoId;
-    const torneio = await getTorneioInfo();
 
-    const filtro = {
-        torneioId: torneio.torneioId
-    };
-
-    if(!localidadeId && !escalaoId){
-        req.flash("error", "Oops...Algo correu mal!");
-        res.redirect('/equipas');
-    }
-
-    if(localidadeId){ filtro.localidadeId = parseInt(localidadeId); }
-
-    if(escalaoId){ filtro.escalaoId = parseInt(escalaoId); }
-
-    //console.log(filtro);
-
-    const equipasInfo = getAllEquipasPorFiltro(filtro);
-    const localidadesInfo = getLocalidadesInfo();
-    const escaloesInfo = getEscaloesInfo();
-
-    Promise.all([equipasInfo, localidadesInfo, escaloesInfo])
-    .then(async ([_listaEquipas, localidades, escaloes]) => {
-        const listaEquipas = [];
-        //console.log(_listaEquipas);
-
-        util.sort(localidades);
-
-        // Verificar se as equipas já estão atribuídas a jogos
-        // Se estiverem então não é possível eliminar a equipa
-        for(const equipa of _listaEquipas){
-            // Verifica se a equipa já está associada a jogos
-            const numJogos = await getNumJogosEquipa(torneio.torneioId, equipa.equipaId);
-
-            const _equipa = {
-                equipaId: equipa.equipaId,
-                primeiroElemento: equipa.primeiroElemento,
-                segundoElemento: equipa.segundoElemento,
-                localidade: equipa.localidade.nome,
-                escalao: equipa.escalao.designacao,
-                sexo: equipa.escalao.sexo,
-                eliminavel: (numJogos == 0) ? true : false
+    try {
+        const torneio = await getTorneioInfo();
+        
+        const filtro = {
+            torneioId: torneio.torneioId
+        };
+    
+        if(!localidadeId && !escalaoId){ 
+            throw new Error();
+        }
+    
+        if(localidadeId){ filtro.localidadeId = parseInt(localidadeId); }
+    
+        if(escalaoId){ filtro.escalaoId = parseInt(escalaoId); }
+    
+        const equipasInfo = getAllEquipasPorFiltro(filtro);
+        const localidadesInfo = getLocalidadesInfo();
+        const escaloesInfo = getEscaloesInfo();
+    
+        Promise.all([equipasInfo, localidadesInfo, escaloesInfo])
+        .then(async ([_listaEquipas, localidades, escaloes]) => {
+    
+            util.sort(localidades);
+    
+            // Lista de Equipas Únicas Com Jogos
+            const listaCompletaEquipas = await getAllEquipasComJogos(torneio.torneioId);
+            listaEquipasComJogos = geraListaEquipasUnicasComJogos(listaCompletaEquipas);
+    
+            // Verificar se as equipas já estão atribuídas a jogos
+            // Se estiverem então não é possível eliminar a equipa
+            const listaEquipas = [];
+            for(const equipa of _listaEquipas){
+    
+                const _equipa = {
+                    equipaId: equipa.equipaId,
+                    primeiroElemento: equipa.primeiroElemento,
+                    segundoElemento: equipa.segundoElemento,
+                    localidade: equipa.localidade.nome,
+                    escalao: equipa.escalao.designacao,
+                    sexo: equipa.escalao.sexo,
+                    eliminavel: (listaEquipasComJogos.has(equipa.equipaId)) ? false : true
+                }
+        
+                // Verificar se existem jogos desta equipa
+                listaEquipas.push(_equipa);
             }
     
-            // Verificar se existem jogos desta equipa
-            listaEquipas.push(_equipa);
-        }
-
-        if(localidadeId){ 
-            let i = localidades.map(localidade => localidade.localidadeId).indexOf(parseInt(localidadeId));
-            filtro.localidade = (i != -1) ? localidades[i].nome : '';
-        }
-
-        if(escalaoId){ 
-            let i = escaloes.map(escalao => escalao.escalaoId).indexOf(parseInt(escalaoId));
-            filtro.escalao = (i != -1) ? escaloes[i].designacao : '';
-            filtro.sexo = (i != -1) ? (escaloes[i].sexo == 1) ? 'Masculino' : 'Feminino' : '';
-        } 
-
-        res.render('equipas/equipas', {
-            torneio: torneio,
-            localidades: localidades,
-            escaloes: escaloes,
-            equipas: listaEquipas,
-            filtro: filtro
+            if(localidadeId){ 
+                let i = localidades.map(localidade => localidade.localidadeId).indexOf(parseInt(localidadeId));
+                filtro.localidade = (i != -1) ? localidades[i].nome : '';
+            }
+    
+            if(escalaoId){ 
+                let i = escaloes.map(escalao => escalao.escalaoId).indexOf(parseInt(escalaoId));
+                filtro.escalao = (i != -1) ? escaloes[i].designacao : '';
+                filtro.sexo = (i != -1) ? (escaloes[i].sexo == 1) ? 'Masculino' : 'Feminino' : '';
+            } 
+    
+            res.render('equipas/equipas', {
+                torneio: torneio,
+                localidades: localidades,
+                escaloes: escaloes,
+                equipas: listaEquipas,
+                filtro: filtro
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            req.flash("error", "Oops...Algo correu mal!");
+            res.redirect('/equipas');
         });
-    })
-    .catch(err => {
+    } catch(err) {
         console.log(err);
         req.flash("error", "Oops...Algo correu mal!");
         res.redirect('/equipas');
-    });
-    
-    
-
+    }
 }
 
 // Faker

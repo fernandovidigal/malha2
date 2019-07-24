@@ -10,4 +10,9 @@ router.all('/*', userAuthenticated, (req, res, next) => {
 
 router.get('/', ListagensController.mostraListagens);
 
+router.post('/numEquipasPorConcelho', ListagensController.numEquipasPorConcelho);
+
+// API
+router.get('/getNumEquipasPorConcelho/:escalao', ListagensController.getNumEquipasPorConcelho);
+
 module.exports = router;

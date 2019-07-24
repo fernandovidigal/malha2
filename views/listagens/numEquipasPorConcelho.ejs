@@ -1,0 +1,54 @@
+<%- include('../includes/header.ejs') %>
+
+<% if(typeof torneio != 'undefined'){ %>
+    <div class="title__bar">
+        <h1><%= torneio.designacao %> - <%= torneio.localidade %></h1>
+        <h3><%= torneio.ano %></h3>
+    </div>
+    <div class="listagemWrapper" id="listagemWrapper">
+        <p class="listagemWrapper_title">Número de equipas por concelho</p>
+        <table>
+            <tr>
+                <th>Concelho</th>
+                <th>Número de Equipas</th>
+            </tr>
+            <tr>
+                <td>Arraiolos</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td>Borba</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td>Montemor-o-Novo</td>
+                <td>12</td>
+            </tr>
+            <tr>
+                <td>Portel</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td>Vendas Novas</td>
+                <td>10</td>
+            </tr>
+            <tr>
+                <td>Évora</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>Total</td>
+                <td>38</td>
+            </tr>
+        </table>
+    </div>
+
+
+<% } else { %>
+    <h2>Oops.. Algo correu mal!</h2>
+    <p>Verifique se existem torneios registados ou activados.</p>
+<% } %>
+<script src="/js/pdfmake.min.js"></script>
+<script src="/js/vfs_fonts.js"></script>
+<script src="/js/print.js"></script>
+<%- include('../includes/footer.ejs') %>

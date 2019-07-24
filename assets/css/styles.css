@@ -989,8 +989,6 @@ animation-delay: -0.16s;
 /* LISTAGENS */
 .listagemWrapper {
     width: 100%;
-    display: flex;
-    flex-direction: column;
 }
 
 .listagemCard {
@@ -1031,9 +1029,17 @@ animation-delay: -0.16s;
     display: flex;
     justify-content: center;
     align-items: center;
+    border: none;
+    outline: none;
+    cursor: pointer;
 }
 
 .listagem_btn i {
     margin: 0;
     font-size: 200%;
+}
+
+.listagemWrapper_title {
+    width: 100%;
+    text-align: center;
 }

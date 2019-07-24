@@ -9,52 +9,27 @@
     <div class="listagemWrapper">
 
         <div class="listagemCard">
-            <form action="" method="POST">
+            <form action="/listagens/numEquipasPorConcelho" method="POST">
                 <div class="listagemCard_wrapper">
                     <div class="listagemCard__content">
                         <p class="listagemCard__title">Número de Equipas por Concelho</p>
                         <div class="listagemCard__controllers">
-                            <select name="campos" id="campos">
-                                <option value="" disabled selected>Escalão</option>
-                                <option value="1">Jovem</option>
-                                <option value="1">Sénior</option>
-                                <option value="1">65+</option>
-                                <option value="1">Absolutos</option>
-                                <option value="1">65+</option>
-                            </select>
-                            <select name="campos" id="campos">
-                                <option value="" disabled selected>Campo</option>
-                                <option value="1">Campo 1</option>
-                                <option value="1">Campo 2</option>
-                                <option value="1">Campo 3</option>
-                                <option value="1">Campo 4</option>
-                                <option value="1">Campo 5</option>
-                                <option value="1">Campo 6</option>
-                            </select>
-                            <select name="campos" id="campos">
-                                <option value="" disabled selected>Fase</option>
-                                <option value="1">Fase 1</option>
-                                <option value="1">Fase 2</option>
-                                <option value="1">Fase 3</option>
-                                <option value="1">Fase 4</option>
-                                <option value="1">3º e 4º</option>
-                                <option value="1">Final</option>
-                            </select>
-
+                            <%- include('componentes/escaloes.ejs') %> 
                         </div>
                     </div>
-                    <div class="listagem_btn"><i class="fas fa-file-alt"></i></div>
+                    <button type="submit" class="listagem_btn"><i class="fas fa-file-alt"></i></button>
                 </div>
             </form>
         </div>
 
+        <!-- TEMPLATE -->
         <div class="listagemCard">
             <form action="" method="POST">
                 <div class="listagemCard_wrapper">
                     <div class="listagemCard__content">
-                        <p class="listagemCard__title">Número de Equipas por Concelho</p>
+                        <p class="listagemCard__title">Template</p>
                         <div class="listagemCard__controllers">
-                            <select name="campos" id="campos">
+                            <select name="escalao" id="escalao">
                                 <option value="" disabled selected>Escalão</option>
                                 <option value="1">Jovem</option>
                                 <option value="1">Sénior</option>
@@ -62,7 +37,7 @@
                                 <option value="1">Absolutos</option>
                                 <option value="1">65+</option>
                             </select>
-                            <select name="campos" id="campos">
+                            <select name="campo" id="campo">
                                 <option value="" disabled selected>Campo</option>
                                 <option value="1">Campo 1</option>
                                 <option value="1">Campo 2</option>
@@ -71,7 +46,7 @@
                                 <option value="1">Campo 5</option>
                                 <option value="1">Campo 6</option>
                             </select>
-                            <select name="campos" id="campos">
+                            <select name="fase" id="fase">
                                 <option value="" disabled selected>Fase</option>
                                 <option value="1">Fase 1</option>
                                 <option value="1">Fase 2</option>
@@ -83,47 +58,7 @@
 
                         </div>
                     </div>
-                    <div class="listagem_btn"><i class="fas fa-file-alt"></i></div>
-                </div>
-            </form>
-        </div>
-
-        <div class="listagemCard">
-            <form action="" method="POST">
-                <div class="listagemCard_wrapper">
-                    <div class="listagemCard__content">
-                        <p class="listagemCard__title">Número de Equipas por Concelho</p>
-                        <div class="listagemCard__controllers">
-                            <select name="campos" id="campos">
-                                <option value="" disabled selected>Escalão</option>
-                                <option value="1">Jovem</option>
-                                <option value="1">Sénior</option>
-                                <option value="1">65+</option>
-                                <option value="1">Absolutos</option>
-                                <option value="1">65+</option>
-                            </select>
-                            <select name="campos" id="campos">
-                                <option value="" disabled selected>Campo</option>
-                                <option value="1">Campo 1</option>
-                                <option value="1">Campo 2</option>
-                                <option value="1">Campo 3</option>
-                                <option value="1">Campo 4</option>
-                                <option value="1">Campo 5</option>
-                                <option value="1">Campo 6</option>
-                            </select>
-                            <select name="campos" id="campos">
-                                <option value="" disabled selected>Fase</option>
-                                <option value="1">Fase 1</option>
-                                <option value="1">Fase 2</option>
-                                <option value="1">Fase 3</option>
-                                <option value="1">Fase 4</option>
-                                <option value="1">3º e 4º</option>
-                                <option value="1">Final</option>
-                            </select>
-
-                        </div>
-                    </div>
-                    <div class="listagem_btn"><i class="fas fa-file-alt"></i></div>
+                    <button type="submit" class="listagem_btn"><i class="fas fa-file-alt"></i></button>
                 </div>
             </form>
         </div>
@@ -135,4 +70,7 @@
     <p>Verifique se existem torneios registados ou activados.</p>
 <% } %>
 
+<!--<script src="/js/pdfmake.min.js"></script>
+<script src="/js/vfs_fonts.js"></script>-->
+<script src="/js/print.js"></script>
 <%- include('../includes/footer.ejs') %>

@@ -12,7 +12,11 @@ router.get('/', ListagensController.mostraListagens);
 
 router.post('/numEquipasPorConcelho', ListagensController.numEquipasPorConcelho);
 
+router.post('/equipasAgrupadasPorCampos', ListagensController.equipasAgrupadasPorCampos);
+
 // API
 router.get('/getNumEquipasPorConcelho/:escalao', ListagensController.getNumEquipasPorConcelho);
+
+router.get('/equipasAgrupadasPorCampos/:escalao/:fase', ListagensController.getEquipasAgrupadasPorCampos);
 
 module.exports = router;

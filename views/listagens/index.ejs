@@ -22,6 +22,30 @@
             </form>
         </div>
 
+        <div class="listagemCard">
+            <form action="/listagens/equipasAgrupadasPorCampos" method="POST">
+                <div class="listagemCard_wrapper">
+                    <div class="listagemCard__content">
+                        <p class="listagemCard__title">Equipas Agrupadas por Campos</p>
+                        <div class="listagemCard__controllers">
+                            <%- include('componentes/escaloes.ejs') %>
+                            <select name="fase" id="fase">
+                                <option value="" disabled selected>Fase</option>
+                                <option value="1">Fase 1</option>
+                                <option value="1">Fase 2</option>
+                                <option value="1">Fase 3</option>
+                                <option value="1">Fase 4</option>
+                                <option value="1">3º e 4º</option>
+                                <option value="1">Final</option>
+                            </select>
+
+                        </div>
+                    </div>
+                    <button type="submit" class="listagem_btn"><i class="fas fa-file-alt"></i></button>
+                </div>
+            </form>
+        </div>
+
         <!-- TEMPLATE -->
         <div class="listagemCard">
             <form action="" method="POST">
@@ -71,6 +95,6 @@
 <% } %>
 
 <!--<script src="/js/pdfmake.min.js"></script>
-<script src="/js/vfs_fonts.js"></script>-->
-<script src="/js/print.js"></script>
+<script src="/js/vfs_fonts.js"></script>
+<script src="/js/print.js"></script>-->
 <%- include('../includes/footer.ejs') %>

@@ -14,7 +14,7 @@
                     <div class="listagemCard__content">
                         <p class="listagemCard__title">Número de Equipas por Concelho</p>
                         <div class="listagemCard__controllers">
-                            <%- include('componentes/escaloes.ejs') %> 
+                            <%- include('componentes/escaloes.ejs', {escaloes: escaloes}) %> 
                         </div>
                     </div>
                     <button type="submit" class="listagem_btn"><i class="fas fa-file-alt"></i></button>
@@ -28,17 +28,7 @@
                     <div class="listagemCard__content">
                         <p class="listagemCard__title">Equipas Agrupadas por Campos</p>
                         <div class="listagemCard__controllers">
-                            <%- include('componentes/escaloes.ejs') %>
-                            <select name="fase" id="fase">
-                                <option value="" disabled selected>Fase</option>
-                                <option value="1">Fase 1</option>
-                                <option value="1">Fase 2</option>
-                                <option value="1">Fase 3</option>
-                                <option value="1">Fase 4</option>
-                                <option value="1">3º e 4º</option>
-                                <option value="1">Final</option>
-                            </select>
-
+                            <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos}) %>
                         </div>
                     </div>
                     <button type="submit" class="listagem_btn"><i class="fas fa-file-alt"></i></button>
@@ -95,6 +85,6 @@
 <% } %>
 
 <!--<script src="/js/pdfmake.min.js"></script>
-<script src="/js/vfs_fonts.js"></script>
-<script src="/js/print.js"></script>-->
+<script src="/js/vfs_fonts.js"></script>-->
+<script src="/js/print.js"></script>
 <%- include('../includes/footer.ejs') %>

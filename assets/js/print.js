@@ -27,6 +27,34 @@ async function getData(url) {
     return data;
 }
 
+async function mostraFaseSelect(escalaoId, parent){
+    const data = await getData(`/listagens/getFases/${escalaoId}`);
+    const selectBox = document.createElement('select');
+    selectBox.name = 'fase';
+    selectBox.id = 'fase';
+    data.listaFases.forEach(function(fase){
+        const option = document.createElement('option');
+        option.value = fase;
+        option.text = `Fase ${fase}`;
+        selectBox.appendChild(option);
+    });
+    parent.appendChild(selectBox);
+}
+
+const escalaoSelect = document.getElementsByName('escalao');
+
+escalaoSelect.forEach(function(escalao, index){
+    escalao.addEventListener('change', function(e){
+        switch(index){
+            case 1 : 
+                const escalaoId = this[this.selectedIndex].value;
+                mostraFaseSelect(escalaoId, this.parentNode);
+                break;
+            default: break;
+        }
+    });
+});
+
 
 // Abre o pdf noutra janela
 //pdfMake.createPdf(docDefinition).print();

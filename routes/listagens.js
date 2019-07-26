@@ -15,6 +15,8 @@ router.post('/numEquipasPorConcelho', ListagensController.numEquipasPorConcelho)
 router.post('/equipasAgrupadasPorCampos', ListagensController.equipasAgrupadasPorCampos);
 
 // API
+router.get('/getFases/:escalao', ListagensController.getFases);
+
 router.get('/getNumEquipasPorConcelho/:escalao', ListagensController.getNumEquipasPorConcelho);
 
 router.get('/equipasAgrupadasPorCampos/:escalao/:fase', ListagensController.getEquipasAgrupadasPorCampos);

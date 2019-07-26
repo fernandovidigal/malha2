@@ -94,6 +94,30 @@ function getAllJogosEscalaoFase(torneioId, escalaoId, fase){
     });
 }
 
+function getAllEscaloesComJogos(torneioId){
+    return Escaloes.findAll({
+        include: {
+            model: Jogos,
+            attributes: [],
+            where: {
+                torneioId: torneioId
+            }
+        }
+    });
+}
+
+function getAllFasesEscalao(torneioId, escalaoId){
+    return Jogos.findAll({
+        attributes: ['fase'],
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId
+        },
+        group: ['fase'],
+        raw: true
+    });
+}
+
 async function processaListaEquipasAgrupadasPorCampos(torneioId, escalaoId, fase, listaCampos){
     try{
         const listaEquipasEscalao = await getAllEquipasEscalao(torneioId, escalaoId);
@@ -142,8 +166,9 @@ async function processaListaEquipasAgrupadasPorCampos(torneioId, escalaoId, fase
 exports.mostraListagens = async (req, res, next) => {
     const torneio = await getTorneioInfo();
     const listaEscaloes = await getEscaloesComEquipas(torneio.torneioId);
+    const listaEscaloesComJogos = await getAllEscaloesComJogos(torneio.torneioId);
 
-    res.render('listagens/index', {torneio: torneio, escaloes: listaEscaloes});
+    res.render('listagens/index', {torneio: torneio, escaloes: listaEscaloes, escaloesComJogos: listaEscaloesComJogos});
 }
 
 exports.numEquipasPorConcelho = async (req, res, next) => {
@@ -165,10 +190,6 @@ exports.equipasAgrupadasPorCampos = async (req, res, next) => {
     let escalaoId = req.body.escalao || 0;
     let fase = req.body.fase || 0;
     let numCampos = 0;
-
-    // PARA APAGAR QUANDO COMPLETAMENTE IMPLEMENTADO
-    escalaoId = 3;
-    fase = 1;
 
     if(escalaoId == 0 || fase == 0){
         req.flash('error', 'Deve selecionar o escalão e a fase.');
@@ -209,6 +230,34 @@ exports.equipasAgrupadasPorCampos = async (req, res, next) => {
 }
 
 // API
+exports.getFases = async (req, res, next) => {
+    const torneio = await getTorneioInfo();
+    const escalaoId = parseInt(req.params.escalao);
+
+    const response = {
+        success: false
+    };
+
+    if(!torneio){
+        return res.status(200).json(response);
+    }
+
+    let listaFases = await getAllFasesEscalao(torneio.torneioId, escalaoId);
+    listaFases = listaFases.map(_fase => _fase.fase);
+    console.log(listaFases);
+
+    if(listaFases.length > 0){
+        response.success = true;
+        response.listaFases = listaFases
+    } else {
+        response.error = {
+            msg: 'Não existem fases para este escalão.'
+        }
+    }
+
+    res.status(200).json(response);
+}
+
 exports.getNumEquipasPorConcelho = async (req, res, next) => {
     const torneio = await getTorneioInfo();
     const escalaoId = parseInt(req.params.escalao);

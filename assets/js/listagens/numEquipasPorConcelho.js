@@ -57,7 +57,7 @@ printBtn.addEventListener('click', function(e){
                     alignment: 'center',
                     bold: true,
                     margin: [40, 10]
-                 }]
+                }]
             };
             makeHeader(docDefinition, data.torneio);
             makeContent(docDefinition.content, data.numEquipas, data.total);

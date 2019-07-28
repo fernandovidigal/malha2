@@ -36,6 +36,20 @@
             </form>
         </div>
 
+        <div class="listagemCard">
+            <form action="#" method="POST">
+                <div class="listagemCard_wrapper">
+                    <div class="listagemCard__content">
+                        <p class="listagemCard__title">Fichas de Jogo</p>
+                        <div class="listagemCard__controllers">
+                            <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos}) %>
+                        </div>
+                    </div>
+                    <button type="submit" name="fichasJogo_btn" class="listagem_btn"><i class="fas fa-print"></i></button>
+                </div>
+            </form>
+        </div>
+
         <!-- TEMPLATE -->
         <div class="listagemCard">
             <form action="" method="POST">
@@ -84,7 +98,7 @@
     <p>Verifique se existem torneios registados ou activados.</p>
 <% } %>
 
-<!--<script src="/js/pdfmake.min.js"></script>
-<script src="/js/vfs_fonts.js"></script>-->
+<script src="/js/pdfmake.min.js"></script>
+<script src="/js/vfs_fonts.js"></script>
 <script src="/js/print.js"></script>
 <%- include('../includes/footer.ejs') %>

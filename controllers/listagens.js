@@ -94,6 +94,18 @@ function getAllJogosEscalaoFase(torneioId, escalaoId, fase){
     });
 }
 
+function getAllJogosEscalaoFaseCampo(torneioId, escalaoId, fase, campo){
+    return Jogos.findAll({
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId,
+            fase: fase,
+            campo: campo
+        },
+        raw: true
+    });
+}
+
 function getAllEscaloesComJogos(torneioId){
     return Escaloes.findAll({
         include: {
@@ -117,6 +129,20 @@ function getAllFasesEscalao(torneioId, escalaoId){
         raw: true
     });
 }
+
+function getAllCamposPorFase(torneioId, escalaoId, fase){
+    return Jogos.findAll({
+        attributes: ['campo'],
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId,
+            fase: fase
+        },
+        group: ['campo'],
+        raw: true
+    });
+}
+
 
 async function processaListaEquipasAgrupadasPorCampos(torneioId, escalaoId, fase, listaCampos){
     try{
@@ -244,7 +270,6 @@ exports.getFases = async (req, res, next) => {
 
     let listaFases = await getAllFasesEscalao(torneio.torneioId, escalaoId);
     listaFases = listaFases.map(_fase => _fase.fase);
-    console.log(listaFases);
 
     if(listaFases.length > 0){
         response.success = true;
@@ -252,6 +277,34 @@ exports.getFases = async (req, res, next) => {
     } else {
         response.error = {
             msg: 'Não existem fases para este escalão.'
+        }
+    }
+
+    res.status(200).json(response);
+}
+
+exports.getCampos = async (req, res, next) => {
+    const torneio = await getTorneioInfo();
+    const escalaoId = parseInt(req.params.escalao);
+    const fase = parseInt(req.params.fase);
+
+    const response = {
+        success: false
+    };
+
+    if(!torneio){
+        return res.status(200).json(response);
+    }
+
+    let listaCampos = await getAllCamposPorFase(torneio.torneioId, escalaoId, fase);
+    listaCampos = listaCampos.map(_campo => _campo.campo);
+
+    if(listaCampos.length > 0){
+        response.success = true;
+        response.listaCampos = listaCampos;
+    } else {
+        response.error = {
+            msg: 'Não existem campos para esta fase.'
         }
     }
 
@@ -346,6 +399,62 @@ exports.getEquipasAgrupadasPorCampos = async (req, res, next) => {
         response.error = {
             msg: 'Número de campos ainda não foi definido.'
         }
+    }
+
+    res.status(200).json(response);
+}
+
+exports.getJogosPrimeiraFase = async (req, res, next) => {
+    const torneio = await getTorneioInfo();
+    const escalaoId = parseInt(req.params.escalao);
+    const campo = parseInt(req.params.campo);
+    const escalaoInfo = await getEscalaoInfo(escalaoId);
+    let listaJogos = [];
+    let listaCampos = [];
+
+    const response = {
+        success: false
+    };
+
+    if(!torneio){
+        return res.status(200).json(response);
+    }
+
+    // Todos os campos
+    if(campo == 0){
+        listaCampos = await getNumCamposPorEscalaoFase(torneio.torneioId, escalaoId, 1);
+        listaCampos = listaCampos.map(_campo => _campo.campo);
+        if(listaCampos.length > 0){
+            listaJogos = await getAllJogosEscalaoFase(torneio.torneioId, escalaoId, 1);
+        } else {
+            //TODO: Handle quando os campso não estão distribuídos
+        }
+    } else {
+        // Foi indicado o número do campo
+        listaCampos.push(campo);
+        listaJogos = await getAllJogosEscalaoFaseCampo(torneio.torneioId, escalaoId, 1, campo);   
+    }
+
+    if(listaJogos.length > 0){
+        response.torneio = {
+            designacao: torneio.designacao,
+            localidade: torneio.localidade,
+            escalao: escalaoInfo.designacao,
+            sexo: (escalaoInfo.sexo == 1) ? 'Masculino' : 'Feminino'
+        };
+        
+        response.campos = [];
+        listaCampos.forEach(campo => {
+            const _listaJogosCampo = listaJogos.filter(jogo => jogo.campo == campo);
+            const _campo = {
+                campo: campo,
+                listaJogos: _listaJogosCampo
+            }
+            response.campos.push(_campo);
+        });
+        response.success = true;
+    } else {
+        // TODO: não existem jogos para determinado campo
     }
 
     res.status(200).json(response);

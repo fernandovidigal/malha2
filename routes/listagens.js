@@ -17,8 +17,13 @@ router.post('/equipasAgrupadasPorCampos', ListagensController.equipasAgrupadasPo
 // API
 router.get('/getFases/:escalao', ListagensController.getFases);
 
+router.get('/getCampos/:escalao/:fase', ListagensController.getCampos);
+
 router.get('/getNumEquipasPorConcelho/:escalao', ListagensController.getNumEquipasPorConcelho);
 
 router.get('/equipasAgrupadasPorCampos/:escalao/:fase', ListagensController.getEquipasAgrupadasPorCampos);
+
+router.get('/fichaJogoPrimeiraFase/:escalao/:campo', ListagensController.getJogosPrimeiraFase);
+
 
 module.exports = router;

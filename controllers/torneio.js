@@ -6,7 +6,7 @@ const dbFunctions = require('../helpers/torneioDBFunctions');
 exports.getStarting = async (req, res, next) => {
 
     try {
-        console.time("Start");
+        //console.time("Start");
         const torneio = await dbFunctions.getTorneioInfo();
 
         // Não existe torneio registado ou activo
@@ -154,7 +154,7 @@ exports.getStarting = async (req, res, next) => {
             }
 
             res.render('torneio/selecionaEscalao', {torneio: torneio, numTotalJogos: numTotalJogos, escaloesMasculinos: escaloesMasculinos, escaloesFemininos: escaloesFemininos});
-            console.timeEnd("Start");
+            //console.timeEnd("Start");
         }
     } catch(e) {
         console.log(e);
@@ -562,13 +562,31 @@ function ordenaClassificacao(classificacao, listaJogos){
                 return -1;
             } else if(a.vitorias === b.vitorias) {
                 // Mesmo número de vitórias, desempata por resultado do confronto directo
+                console.log(a);
+                console.log(b);
                 const jogo = listaJogos.find(elemento => {
                     return (elemento.equipa1Id == a.equipaId && elemento.equipa2Id == b.equipaId) || (elemento.equipa1Id == b.equipaId && elemento.equipa2Id == a.equipaId);
                 });
+                console.log(jogo)
+                console.log(jogo.equipa1Pontos);
+                console.log(jogo.equipa2Pontos);
+
                 if(jogo.equipa1Pontos > jogo.equipa2Pontos){
-                    return -1;
+                    if(jogo.equipa1Id === a.equipaId){
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                    //console.log("Aqui");
+                    //return -1;
                 } else {
-                    return 1;
+                    if(jogo.equipa2Id === a.equipaId){
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                    //console.log("Aqui2");
+                    //return 1;
                 }
             } else {
                 return 1;

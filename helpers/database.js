@@ -2,10 +2,11 @@ const Sequelize = require('sequelize');
 const path = require('path');
 
 //path.join(path.dirname(process.execPath), '/data/malha.db'),
-console.log(path.join(path.dirname(process.execPath), '/data/malha.db'));
+const dbPath = "data/malha.db";
+//const dbPath = path.join(path.dirname(process.execPath), '/data/malha.db');
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: path.join(path.dirname(process.execPath), '/data/malha.db'),
+    storage: dbPath,
     logging: false,
     define: {
         timestamps: false

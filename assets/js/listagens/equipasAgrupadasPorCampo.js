@@ -10,7 +10,7 @@ function makeContent(ddContent, listaCampos){
             },
             layout: 'lightHorizontalLines',
             id: 'tabela',
-            margin: [0,10,0,10]
+            margin: [0,0,0,10]
         }
 
         campo.listaEquipas.forEach(equipa => {
@@ -49,7 +49,7 @@ printBtn.addEventListener('click', function(e){
                     text: `Equipas Agrupadas por Campos - ${data.fase}ª Fase`,
                     alignment: 'center',
                     bold: true,
-                    margin: [40, 10]
+                    margin: [0, 5]
                 }],
                 pageBreakBefore: function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
                     if (currentNode.id === 'tabela' && currentNode.pageNumbers.length != 1) {

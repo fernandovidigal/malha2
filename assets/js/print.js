@@ -16,7 +16,7 @@ function makeHeader(dd, torneioInfo){
 function makeFooter(dd){
     dd.footer = function(currentPage, pageCount, pageSize) {
 	    if(pageCount > 1){
-            return { text: 'Pág. ' + currentPage.toString(), fontSize: 8, alignment: 'right', margin: [0,0,40,0],};
+            return { text: 'Pág. ' + currentPage.toString() + '/' + pageCount, fontSize: 8, alignment: 'right', margin: [0,0,40,0],};
 	    }
     }
 }
@@ -39,11 +39,22 @@ function splitIntoThree(listaJogos){
     return three;
 }
 
-function makeContentFichaJogoPrimeiraFase(dd, listaJogos, campo){
-    listaJogos = splitIntoThree(listaJogos);
+function makeContentFichaJogoPrimeiraFase(dd, data){
+    
+    const listaJogos = splitIntoThree(data.listaJogos);
+    const totalPaginas = Math.ceil(listaJogos.length / 2);
     let page = 1;
 
     listaJogos.forEach((jogos, index) => {
+        if(Math.abs(index % 2) == 0 ){
+            dd.content.push({
+                text: `Campo Nº ${data.campo}`,
+                alignment: 'center',
+                bold: true,
+                fontSize: 14
+            });
+        }
+
         const _table = {
             table: {
                 headerRows: 1,
@@ -119,14 +130,14 @@ function makeContentFichaJogoPrimeiraFase(dd, listaJogos, campo){
 
         if(Math.abs(index % 2) == 1 ){
             dd.content.push({text: 'Nota: O terceiro jogo de cada Partida só se joga em caso de empate.', alignment: 'center', fontSize: 10, margin:[0,0,0,10]});
-            dd.content.push({text: ` - Campo Nº ${campo} - Pág. ${page}`, fontSize: 8, alignment: 'right', margin: [0,0,0,20]});
+            dd.content.push({text: `Pág. ${page}/${totalPaginas}`, fontSize: 8, alignment: 'right', margin: [0,0,0,20]});
             page++;
         }
-    });  
+    });
 
     if(listaJogos.length % 2 != 0){
         dd.content.push({text: 'Nota: O terceiro jogo de cada Partida só se joga em caso de empate.', alignment: 'center', fontSize: 10, margin:[0,0,0,10]});
-        dd.content.push({text: ` - Campo Nº ${campo} - Pág. ${page}`, fontSize: 8, alignment: 'right', margin: [0,0,0,20]});
+        dd.content.push({text: `Pág. ${page}/${totalPaginas}`, fontSize: 8, alignment: 'right', margin: [0,0,0,20]});
     }
 }
 
@@ -185,8 +196,6 @@ async function mostraFaseSelect(escalaoId, parent, todasOption = true){
 async function mostraCamposSelect(escalaoId, fase, parent){
     const data = await getData(`/listagens/getCampos/${escalaoId}/${fase}`);
     const campoSelectExists = parent.querySelector('.camposSelect');
-    console.log(escalaoId);
-    console.log(fase);
 
     if(campoSelectExists){
         parent.removeChild(campoSelectExists);
@@ -211,6 +220,20 @@ async function mostraCamposSelect(escalaoId, fase, parent){
     parent.appendChild(selectBox);
 }
 
+function mostraCheckBox(parent){
+    const checkBox = document.createElement('input');
+    checkBox.type = 'checkbox';
+    checkBox.name = 'soFolhaRosto';
+    checkBox.id = 'soFolhaRosto';
+
+    const checkLabel = document.createElement('label');
+    checkLabel.setAttribute('for', 'soFolhaRosto');
+    checkLabel.textContent = 'Só Folha de Rosto';
+
+    parent.appendChild(checkBox);
+    parent.appendChild(checkLabel);
+}
+
 const escalaoSelect = document.getElementsByName('escalao');
 escalaoSelect.forEach(function(escalao, index){
     escalao.addEventListener('change', async function(e){
@@ -222,6 +245,7 @@ escalaoSelect.forEach(function(escalao, index){
                 await mostraFaseSelect(escalaoId, this.parentNode, false);
                 const data = getControllersValues(this.parentNode);
                 await mostraCamposSelect(escalaoId, data.fase, this.parentNode);
+                mostraCheckBox(this.parentNode);
                 break;
             default: break;
         }
@@ -265,7 +289,7 @@ async function imprimeFichasJogo(escalaoId, fase, campo){
             if (currentNode.table && currentNode.pageNumbers.length != 1) {
                 return true;
               }
-            if(currentNode.text && currentNode.text.startsWith("Campo") && currentNode.startPosition.pageNumber != 1){
+            if(currentNode.text && currentNode.text.startsWith("PageBreak") && currentNode.startPosition.pageNumber != 1){
                 return true;
             }
             return false;
@@ -283,14 +307,14 @@ async function imprimeFichasJogo(escalaoId, fase, campo){
         makeHeader(docDefinition, data.torneio);
 
         data.campos.forEach(campo => {
-            const title = {
-                text: `Campo Nº ${campo.campo}`,
-                alignment: 'center',
-                bold: true,
-                fontSize: 14
+            const pageBreak = {
+                text: 'PageBreak',
+                fontSize: 0,
+                color: '#ffffff',
+                margin: [0,0,0,0],
             }
-            docDefinition.content.push(title);
-            makeContentFichaJogoPrimeiraFase(docDefinition, campo.listaJogos, campo.campo);
+            docDefinition.content.push(pageBreak);
+            makeContentFichaJogoPrimeiraFase(docDefinition, campo);
         });
 
         pdfMake.createPdf(docDefinition).print();

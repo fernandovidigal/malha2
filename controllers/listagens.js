@@ -33,6 +33,16 @@ function getEscalaoInfo(escalaoId){
     });
 }
 
+function getEquipas(torneioId, escalaoId){
+    return Equipas.findAll({
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId
+        },
+        raw: true
+    });
+}
+
 function getNumEquipasPorConcelhoInfo(torneioId, escalaoId){
     return sequelize.query(
         `SELECT count(equipas.equipaId) AS numEquipas, localidades.nome FROM equipas
@@ -305,6 +315,32 @@ exports.getCampos = async (req, res, next) => {
     } else {
         response.error = {
             msg: 'Não existem campos para esta fase.'
+        }
+    }
+
+    res.status(200).json(response);
+}
+
+exports.getEquipas = async (req, res, next) => {
+    const torneio = await getTorneioInfo();
+    const escalaoId = parseInt(req.params.escalao);
+
+    const response = {
+        success: false
+    };
+
+    if(!torneio){
+        return res.status(200).json(response);
+    }
+
+    let listaEquipas = await getEquipas(torneio.torneioId, escalaoId);
+
+    if(listaEquipas.length > 0){
+        response.success = true;
+        response.listaEquipas = listaEquipas;
+    } else {
+        response.error = {
+            msg: 'Não existem equipas para este escalão.'
         }
     }
 

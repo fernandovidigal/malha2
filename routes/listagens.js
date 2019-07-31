@@ -19,6 +19,8 @@ router.get('/getFases/:escalao', ListagensController.getFases);
 
 router.get('/getCampos/:escalao/:fase', ListagensController.getCampos);
 
+router.get('/getEquipas/:escalao', ListagensController.getEquipas);
+
 router.get('/getNumEquipasPorConcelho/:escalao', ListagensController.getNumEquipasPorConcelho);
 
 router.get('/equipasAgrupadasPorCampos/:escalao/:fase', ListagensController.getEquipasAgrupadasPorCampos);

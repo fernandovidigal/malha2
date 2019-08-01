@@ -562,14 +562,9 @@ function ordenaClassificacao(classificacao, listaJogos){
                 return -1;
             } else if(a.vitorias === b.vitorias) {
                 // Mesmo número de vitórias, desempata por resultado do confronto directo
-                console.log(a);
-                console.log(b);
                 const jogo = listaJogos.find(elemento => {
                     return (elemento.equipa1Id == a.equipaId && elemento.equipa2Id == b.equipaId) || (elemento.equipa1Id == b.equipaId && elemento.equipa2Id == a.equipaId);
                 });
-                console.log(jogo)
-                console.log(jogo.equipa1Pontos);
-                console.log(jogo.equipa2Pontos);
 
                 if(jogo.equipa1Pontos > jogo.equipa2Pontos){
                     if(jogo.equipa1Id === a.equipaId){

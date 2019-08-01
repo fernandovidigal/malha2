@@ -50,6 +50,20 @@
             </form>
         </div>
 
+        <div class="listagemCard">
+            <form action="" method="POST">
+                <div class="listagemCard_wrapper">
+                    <div class="listagemCard__content">
+                        <p class="listagemCard__title">Resultados</p>
+                        <div class="listagemCard__controllers">
+                            <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos}) %>
+                        </div>
+                    </div>
+                    <button type="submit" name="resultados_btn" class="listagem_btn"><i class="fas fa-file-alt"></i></button>
+                </div>
+            </form>
+        </div>
+
         <!-- TEMPLATE -->
         <!--<div class="listagemCard">
             <form action="" method="POST">

@@ -19,11 +19,14 @@ router.get('/getFases/:escalao', ListagensController.getFases);
 
 router.get('/getCampos/:escalao/:fase', ListagensController.getCampos);
 
+router.get('/getEquipas/:escalao', ListagensController.getEquipas);
+
 router.get('/getNumEquipasPorConcelho/:escalao', ListagensController.getNumEquipasPorConcelho);
 
 router.get('/equipasAgrupadasPorCampos/:escalao/:fase', ListagensController.getEquipasAgrupadasPorCampos);
 
-router.get('/fichaJogoPrimeiraFase/:escalao/:campo', ListagensController.getJogosPrimeiraFase);
+router.get('/getFichasJogo/:escalao/:campo/:fase?', ListagensController.getFichasJogo);
 
+router.get('/getClassificacao/:escalao/:campo/:fase?', ListagensController.getClassificacao);
 
 module.exports = router;

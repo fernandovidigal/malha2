@@ -2,7 +2,7 @@
 
 var dd = {
 	pageSize: 'A4',
-    pageMargins: [10, 100, 10, 60],
+    pageMargins: [10, 100, 10, 40],
     header: {
         table: {
             widths: ['*'],
@@ -30,7 +30,8 @@ var dd = {
     {
         table: {
             headerRows: 1,
-            widths: ['auto', 'auto', 'auto', 'auto', 40, 40, 40, 40],
+            dontBreakRows: true,
+            widths: ['auto', '*', '*', 'auto', 40, 40, 40, 40],
             body: [
                 [
                     {text: 'Equipas', fontSize: 10, bold: true, border: [false, false, false, true]},
@@ -44,233 +45,382 @@ var dd = {
                     
                 ],
                 [
-                    {text: '3', alignment: 'center', fontSize: 12, margin: [0, 5]},
-                    {text: 'Óscar Joaquim Ferreira', fontSize: 10, margin: [0, 7]},
-                    {text: 'Manuel Joaquim Massas', fontSize: 10, margin: [0, 7]},
-                    {text: 'Borba', fontSize: 10, margin: [5, 7]},
                     {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    border: [false, false, false, true],
-								    text:' '
-								}],
-							]
-						},
-						margin: [4,4]
-                    },
-                    {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    border: [false, false, false, true],
-								    text:' '
-								}],
-							]
-						},
-						margin: [4,4]
-                    },
-                    {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    border: [false, false, false, true],
-								    text:' '
-								}],
-							]
-						}
-						,
-						margin: [4,4]
-                    },
-                    {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    text:' '
-								}],
-							]
-						},
-						margin: [4,4]
-                    },
+						stack: [
+							{text:'3', alignment: 'center', fontSize: 12, margin: [0, 5]},
+							{text:'15', alignment: 'center', fontSize: 12, margin: [0, 5]}
+						]
+					},
+					{
+						stack: [
+							{text:'Óscar Joaquim Ferreira', fontSize: 10, margin: [0, 7]},
+							{text:'Edmundo Coelho', fontSize: 10, margin: [0, 7]}
+						]
+					},
+					{
+						stack: [
+							{text:'Manuel Joaquim Massas', fontSize: 10, margin: [0, 7]},
+							{text:'Eduardo Coelho', fontSize: 10, margin: [0, 7]}
+						]
+					},
+					{
+						stack: [
+							{text:'Vendas Novas', fontSize: 10, margin: [0, 7]},
+							{text:'Montemor-o-Novo', fontSize: 10, margin: [0, 7]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,4,5,0]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,4,5,0]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,4,5,0]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[' ']]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[' ']]
+							    },
+							    margin: [5,4,5,0],
+							}
+						]
+					},
                 ],
                 [
-                    {text: '15', alignment: 'center', fontSize: 12, margin: [0, 5]},
-                    {text: 'Edmundo Coelho', fontSize: 10, margin: [0, 7]},
-                    {text: 'Eduardo Coelho', fontSize: 10, margin: [0, 7]},
-                    {text: 'Montemor-o-Novo', fontSize: 10, margin: [5, 7]},
                     {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    border: [false, false, false, true],
-								    text:' '
-								}],
-							]
-						},
-						margin: [4,4]
-                    },
-                    {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    border: [false, false, false, true],
-								    text:' '
-								}],
-							]
-						},
-						margin: [4,4]
-                    },
-                    {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    border: [false, false, false, true],
-								    text:' '
-								}],
-							]
-						},
-						margin: [4,4]
-                    },
-                    {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    text:' '
-								}],
-							]
-						},
-						margin: [4,4]
-                    },
+						stack: [
+							{text:'3', alignment: 'center', fontSize: 12, margin: [0, 5]},
+							{text:'15', alignment: 'center', fontSize: 12, margin: [0, 5]}
+						]
+					},
+					{
+						stack: [
+							{text:'Óscar Joaquim Ferreira', fontSize: 10, margin: [0, 7]},
+							{text:'Edmundo Coelho', fontSize: 10, margin: [0, 7]}
+						]
+					},
+					{
+						stack: [
+							{text:'Manuel Joaquim Massas', fontSize: 10, margin: [0, 7]},
+							{text:'Eduardo Coelho', fontSize: 10, margin: [0, 7]}
+						]
+					},
+					{
+						stack: [
+							{text:'Vendas Novas', fontSize: 10, margin: [0, 7]},
+							{text:'Montemor-o-Novo', fontSize: 10, margin: [0, 7]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,4,5,0]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,4,5,0]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,4,5,0]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[' ']]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[' ']]
+							    },
+							    margin: [5,4,5,0]}
+						]
+					},
                 ],
                 [
-                    {text: '3', alignment: 'center', fontSize: 12, margin: [0, 5]},
-                    {text: 'Óscar Joaquim Ferreira', fontSize: 10, margin: [0, 7]},
-                    {text: 'Manuel Joaquim Massas', fontSize: 10, margin: [0, 7]},
-                    {text: 'Borba', fontSize: 10, margin: [5, 7]},
                     {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    border: [false, false, false, true],
-								    text:' '
-								}],
-							]
-						},
-						margin: [4,4]
-                    },
-                    {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    border: [false, false, false, true],
-								    text:' '
-								}],
-							]
-						},
-						margin: [4,4]
-                    },
-                    {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    border: [false, false, false, true],
-								    text:' '
-								}],
-							]
-						},
-						margin: [4,4]
-                    },
-                    {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    text:' '
-								}],
-							]
-						},
-						margin: [4,4]
-                    },
+						stack: [
+							{text:'3', alignment: 'center', fontSize: 12, margin: [0, 5]},
+							{text:'15', alignment: 'center', fontSize: 12, margin: [0, 5]}
+						]
+					},
+					{
+						stack: [
+							{text:'Óscar Joaquim Ferreira', fontSize: 10, margin: [0, 7]},
+							{text:'Edmundo Coelho', fontSize: 10, margin: [0, 7]}
+						]
+					},
+					{
+						stack: [
+							{text:'Manuel Joaquim Massas', fontSize: 10, margin: [0, 7]},
+							{text:'Eduardo Coelho', fontSize: 10, margin: [0, 7]}
+						]
+					},
+					{
+						stack: [
+							{text:'Vendas Novas', fontSize: 10, margin: [0, 7]},
+							{text:'Montemor-o-Novo', fontSize: 10, margin: [0, 7]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,4,5,0]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,4,5,0]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,4,5,0]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[' ']]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[' ']]
+							    },
+							    margin: [5,4,5,0],
+							}
+						]
+					},
                 ],
                 [
-                    {text: '15', alignment: 'center', fontSize: 12, margin: [0, 5]},
-                    {text: 'Edmundo Coelho', fontSize: 10, margin: [0, 7]},
-                    {text: 'Eduardo Coelho', fontSize: 10, margin: [0, 7]},
-                    {text: 'Montemor-o-Novo', fontSize: 10, margin: [5, 7]},
                     {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    border: [false, false, false, true],
-								    text:' '
-								}],
-							]
-						},
-						margin: [4,4]
-                    },
-                    {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    border: [false, false, false, true],
-								    text:' '
-								}],
-							]
-						},
-						margin: [4,4]
-                    },
-                    {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    border: [false, false, false, true],
-								    text:' '
-								}],
-							]
-						},
-						margin: [4,4]
-                    },
-                    {
-                        table: {
-                            widths: ['*'],
-                            heights: [10],
-							body: [
-								[{
-								    text:' '
-								}],
-							]
-						},
-						margin: [4,4]
-                    },
+						stack: [
+							{text:'3', alignment: 'center', fontSize: 12, margin: [0, 5]},
+							{text:'15', alignment: 'center', fontSize: 12, margin: [0, 5]}
+						]
+					},
+					{
+						stack: [
+							{text:'Óscar Joaquim Ferreira', fontSize: 10, margin: [0, 7]},
+							{text:'Edmundo Coelho', fontSize: 10, margin: [0, 7]}
+						]
+					},
+					{
+						stack: [
+							{text:'Manuel Joaquim Massas', fontSize: 10, margin: [0, 7]},
+							{text:'Eduardo Coelho', fontSize: 10, margin: [0, 7]}
+						]
+					},
+					{
+						stack: [
+							{text:'Vendas Novas', fontSize: 10, margin: [0, 7]},
+							{text:'Montemor-o-Novo', fontSize: 10, margin: [0, 7]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,4,5,0]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,4,5,0]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[{text:' ', border: [false, false, false, true],}]]
+							    },
+							    margin: [5,4,5,0]}
+						]
+					},
+					{
+						stack: [
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[' ']]
+							    },
+							    margin: [5,2]
+							},
+							{
+							    table: {
+							        widths:['*'],
+							        body: [[' ']]
+							    },
+							    margin: [5,4,5,0]}
+						]
+					},
                 ]
             ]
         },
@@ -279,7 +429,7 @@ var dd = {
                 if(i === 1) {
                     return 2;
                 }
-                if(Math.abs(i % 2) === 1){
+                if(i > 1){
                     return 1;
                 }
             },

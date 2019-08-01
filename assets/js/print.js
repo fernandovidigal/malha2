@@ -144,7 +144,7 @@ function makeContentFichaJogoPrimeiraFase(dd, data){
 function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase){
     
     dd.content.push({
-        text: `Jogos a efectuar - ${fase}`,
+        text: `Jogos a efectuar - ${fase}ª Fase`,
         alignment: 'center',
         bold: true
     });
@@ -160,6 +160,7 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase){
     const _table = {
         table: {
             headerRows: 1,
+            dontBreakRows: true,
             widths: ['auto', '*', '*', 'auto', 40, 40, 40, 40],
             body: [[
                 {text: 'Equipas', fontSize: 10, bold: true, border: [false, false, false, true]},
@@ -178,7 +179,7 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase){
                 if(i === 1) {
                     return 2;
                 }
-                if(Math.abs(i % 2) === 1){
+                if(i > 1){
                     return 1;
                 }
             },
@@ -191,135 +192,238 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase){
                 } else {
                     return 'black';
                 }
-    		}
+            }
         }
     }
 
     data.listaJogos.forEach((jogo, index) => {
         const equipa1 = equipas.find(equipa => equipa.equipaId == jogo.equipa1Id);
         const equipa2 = equipas.find(equipa => equipa.equipaId == jogo.equipa2Id);
-        const equipa1Row = [
-            {text: `${equipa1.equipaId}`, alignment: 'center', fontSize: 10, margin: [0, 5]},
-            {text: `${equipa1.primeiroElemento}`, fontSize: 9, margin: [0, 5]},
-            {text: `${equipa1.segundoElemento}`, fontSize: 9, margin: [0, 5]},
-            {text: 'Borba', fontSize: 10, margin: [5, 5]},
+
+        const row = [
             {
-                table: {
-                    widths: ['*'],
-                    heights: ['auto'],
-                    body: [
-                        [{
-                            border: [false, false, false, true],
-                            text:' '
-                        }],
-                    ]
-                },
-                margin: [4,2]
+                stack: [
+                    {text:`${equipa1.equipaId}`, alignment: 'center', fontSize: 12, margin: [0, 5]},
+                    {text:`${equipa2.equipaId}`, alignment: 'center', fontSize: 12, margin: [0, 5]}
+                ]
             },
             {
-                table: {
-                    widths: ['*'],
-                    heights: ['auto'],
-                    body: [
-                        [{
-                            border: [false, false, false, true],
-                            text:' '
-                        }],
-                    ]
-                },
-                margin: [4,2]
+                stack: [
+                    {text:`${equipa1.primeiroElemento}`, fontSize: 10, margin: [0, 7]},
+                    {text:`${equipa2.primeiroElemento}`, fontSize: 10, margin: [0, 7]}
+                ]
             },
             {
-                table: {
-                    widths: ['*'],
-                    heights: ['auto'],
-                    body: [
-                        [{
-                            border: [false, false, false, true],
-                            text:' '
-                        }],
-                    ]
-                },
-                margin: [4,2]
+                stack: [
+                    {text:`${equipa1.segundoElemento}`, fontSize: 10, margin: [0, 7]},
+                    {text:`${equipa2.segundoElemento}`, fontSize: 10, margin: [0, 7]}
+                ]
             },
             {
-                table: {
-                    widths: ['*'],
-                    heights: [10],
-                    body: [
-                        [{
-                            text:' '
-                        }],
-                    ]
-                },
-                margin: [4,2]
-            }
+                stack: [
+                    {text:`${equipa1.localidade.nome}`, fontSize: 10, margin: [0, 7]},
+                    {text:`${equipa2.localidade.nome}`, fontSize: 10, margin: [0, 7]}
+                ]
+            },
+            {
+                stack: [
+                    {
+                        table: {
+                            widths:['*'],
+                            body: [[{text:' ', border: [false, false, false, true],}]]
+                        },
+                        margin: [5,2]
+                    },
+                    {
+                        table: {
+                            widths:['*'],
+                            body: [[{text:' ', border: [false, false, false, true],}]]
+                        },
+                        margin: [5,4,5,0]}
+                ]
+            },
+            {
+                stack: [
+                    {
+                        table: {
+                            widths:['*'],
+                            body: [[{text:' ', border: [false, false, false, true],}]]
+                        },
+                        margin: [5,2]
+                    },
+                    {
+                        table: {
+                            widths:['*'],
+                            body: [[{text:' ', border: [false, false, false, true],}]]
+                        },
+                        margin: [5,4,5,0]}
+                ]
+            },
+            {
+                stack: [
+                    {
+                        table: {
+                            widths:['*'],
+                            body: [[{text:' ', border: [false, false, false, true],}]]
+                        },
+                        margin: [5,2]
+                    },
+                    {
+                        table: {
+                            widths:['*'],
+                            body: [[{text:' ', border: [false, false, false, true],}]]
+                        },
+                        margin: [5,4,5,0]}
+                ]
+            },
+            {
+                stack: [
+                    {
+                        table: {
+                            widths:['*'],
+                            body: [[' ']]
+                        },
+                        margin: [5,2]
+                    },
+                    {
+                        table: {
+                            widths:['*'],
+                            body: [[' ']]
+                        },
+                        margin: [5,4,5,0],
+                    }
+                ]
+            },
         ];
 
-        const equipa2Row = [
-            {text: `${equipa2.equipaId}`, alignment: 'center', fontSize: 10, margin: [0, 5]},
-            {text: `${equipa2.primeiroElemento}`, fontSize: 9, margin: [0, 5]},
-            {text: `${equipa2.segundoElemento}`, fontSize: 9, margin: [0, 5]},
-            {text: 'Borba', fontSize: 10, margin: [5, 5]},
-            {
-                table: {
-                    widths: ['*'],
-                    heights: ['auto'],
-                    body: [
-                        [{
-                            border: [false, false, false, true],
-                            text:' '
-                        }],
-                    ]
-                },
-                margin: [4,2]
-            },
-            {
-                table: {
-                    widths: ['*'],
-                    heights: ['auto'],
-                    body: [
-                        [{
-                            border: [false, false, false, true],
-                            text:' '
-                        }],
-                    ]
-                },
-                margin: [4,2]
-            },
-            {
-                table: {
-                    widths: ['*'],
-                    heights: ['auto'],
-                    body: [
-                        [{
-                            border: [false, false, false, true],
-                            text:' '
-                        }],
-                    ]
-                },
-                margin: [4,2]
-            },
-            {
-                table: {
-                    widths: ['*'],
-                    heights: [10],
-                    body: [
-                        [{
-                            text:' '
-                        }],
-                    ]
-                },
-                margin: [4,2],
-            }
-        ];
 
-        _table.table.body.push(equipa1Row);
-        _table.table.body.push(equipa2Row);
+        _table.table.body.push(row);
     });
 
     dd.content.push(_table);
     //dd.content.push({text: `Pág. 1/2`, fontSize: 8, alignment: 'right', margin: [0,0,0,20]});
+    // Exemplo absolute postion {text: 'text 2', absolutePosition: {x:400, y:250}},
+}
+
+function makeFichasJogoFasesSeguintes(dd, data, equipas, fase){
+    dd.content.push({
+        text: `Fase da Competição: ${fase}ª Fase`,
+        alignment: 'center',
+        bold: true,
+        margin: [0, 60, 0, 20]
+    });
+
+    dd.content.push({
+        text: 'Ficha de Jogo',
+        alignment: 'center',
+        bold: true,
+        margin: [0, 10]
+    });
+
+    
+    data.listaJogos.forEach((jogo, index) => {
+        const equipa1 = equipas.find(equipa => equipa.equipaId == jogo.equipa1Id);
+        const equipa2 = equipas.find(equipa => equipa.equipaId == jogo.equipa2Id);
+
+        const _tableEquipas = {
+            table: {
+                widths: ['auto', '*', 120],
+                body: [
+                    [{text: `${equipa1.equipaId}`, margin: [20, 13], rowSpan: 2}, {text: `${equipa1.primeiroElemento}`, margin: [10, 2]}, {text: `${equipa1.localidade.nome}`, rowSpan: 2, margin: [10, 13]}],
+                    ['', {text: `${equipa1.segundoElemento}`, margin: [10, 2]}, ''],
+                    [{text: `${equipa2.equipaId}`, margin: [20, 13], rowSpan: 2}, {text: `${equipa2.primeiroElemento}`, margin: [10, 2]}, {text: `${equipa2.localidade.nome}`, rowSpan: 2, margin: [10, 13]}],
+                    ['', {text: `${equipa2.segundoElemento}`, margin: [10, 2]}, '']
+                ]
+            },
+            layout: {
+                hLineWidth: function(i, node) {
+                    if(i === 0 || i === 2 || i === 4) {
+                        return 1.5;
+                    } else {
+                        return 0.5;
+                    }
+                },
+                vLineWidth: function(i, node) {
+                    if(i === 0 || i === 3) {
+                        return 1.5;
+                    } else {
+                        return 1;
+                    }
+                }
+            },
+            margin: [40, 0]
+        }
+    
+        dd.content.push(_tableEquipas);
+
+        const _tablePontos = {
+            table: {
+                headerRows: 1,
+                widths: ['*', '*', '*', '*', '*', '*'],
+                body: []
+            },
+            pageBreak: 'after',
+            margin: [80, 40],
+            layout: {
+                hLineWidth: function(i, node) {
+                    if(i === 0 || i === 12 || i === 13) {
+                        return 1.5;
+                    } else {
+                        return 1;
+                    }
+                },
+                vLineWidth: function(i, node) {
+                    if(i === 0 || i === 2 || i === 4 || i === 6) {
+                        return 1.5;
+                    } else {
+                        return 1;
+                    }
+                },
+                hLineColor: function(i, node) {
+                    if(i > 2 && i < 12) {
+                        return 'gray';
+                    } else {
+                        return 'black';
+                    }
+                },
+                vLineColor: function(i, node) {
+                    if(i === 1 || i === 3 || i === 5) {
+                        return 'gray';
+                    } else {
+                        return 'black';
+                    }
+                }
+            }
+        }
+
+        const jogosRow = [];
+        jogosRow.push({text: `1º Jogo`, colSpan: 2, alignment: 'center', bold: true, fillColor: '#dddddd'});
+        jogosRow.push('');
+        jogosRow.push({text: `2º Jogo`, colSpan: 2, alignment: 'center', bold: true, fillColor: '#dddddd'});
+        jogosRow.push('');
+        jogosRow.push({text: `3º Jogo`, colSpan: 2, alignment: 'center', bold: true, fillColor: '#dddddd'});
+        jogosRow.push('');
+        _tablePontos.table.body.push(jogosRow);
+
+        const equipasRow = [];
+        for(let i = 0; i < 3; i++){
+            equipasRow.push({text: `Equipa ${jogo.equipa1Id}`, alignment: 'center', bold: true, fillColor: '#eeeeee'});
+            equipasRow.push({text: `Equipa ${jogo.equipa2Id}`, alignment: 'center', bold: true, fillColor: '#eeeeee'});
+        }
+        
+        _tablePontos.table.body.push(equipasRow);
+
+        for(let i = 1; i <= 11; i++){
+            const pontuacaoRow = [];
+            for(let k = 0; k < 6; k++){
+                const value = i * 3;
+                pontuacaoRow.push({text: `${(i != 11)? value : ' '}`, alignment: 'center', margin: [0,3], fontSize: 10});
+            }
+            _tablePontos.table.body.push(pontuacaoRow);
+        }
+
+        dd.content.push(_tablePontos);
+    });
 }
 
 async function getData(url) {
@@ -424,6 +528,7 @@ escalaoSelect.forEach(function(escalao, index){
         switch(index){
             case 1 :
             case 2 :
+            case 3 :
                 await mostraFaseSelect(escalaoId, this.parentNode, false);
                 const data = getControllersValues(this.parentNode);
                 await mostraCamposSelect(escalaoId, data.fase, this.parentNode);
@@ -457,36 +562,37 @@ cardsWrapper.forEach(card => {
             const ctrlData = getControllersValues(card);
             imprimeFichasJogo(ctrlData.escalaoId, ctrlData.fase, ctrlData.campo, e.target.parentNode);
         }
+
+        if(e.target.name == 'resultados_btn'){
+            e.preventDefault();
+            const ctrlData = getControllersValues(card);
+            imprimeResultados(ctrlData.escalaoId, ctrlData.fase, ctrlData.campo, e.target.parentNode)
+        }
         
     });
 });
 
 async function imprimeFichasJogo(escalaoId, fase, campo, parent){
-    let data;
-    const soFolhaRosto = parent.querySelector('.soFolhaRosto');
     const equipas = await getData(`/listagens/getEquipas/${escalaoId}`);
+    const data = await getData(`/listagens/getFichasJogo/${escalaoId}/${campo}/${fase}`);
 
     let docDefinition = {
         pageSize: 'A4',
         pageMargins: [15, 100, 15, 40],
         content: [],
         pageBreakBefore: function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
-            if (currentNode.table && currentNode.pageNumbers.length != 1) {
-                return true;
-              }
-            /*if(currentNode.text && currentNode.text.startsWith("PageBreak") && currentNode.startPosition.pageNumber != 1){
+            /*if (currentNode.table && currentNode.pageNumbers.length != 1) {
                 return true;
             }*/
+            if(currentNode.text && currentNode.text.startsWith("Jogos a efectuar") && currentNode.startPosition.pageNumber != 1){
+                return true;
+            }
+            if(currentNode.text && currentNode.text.startsWith("PageBreak") && currentNode.startPosition.pageNumber != 1){
+                return true;
+            }
             return false;
         },
     };
-
-    if(fase == 1){
-        // Imprime todos os jogos
-        data = await getData(`/listagens/fichaJogoPrimeiraFase/${escalaoId}/${campo}`);
-    } else {
-        
-    }
 
     if(data.success){
         makeHeader(docDefinition, data.torneio);
@@ -500,14 +606,20 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
                 pageBreak: 'before'
             }
 
-            makeFolhaRostoJogosPrimeiraFase(docDefinition, campo, equipas.listaEquipas, fase);
+            if(fase == 1){
+                const soFolhaRosto = parent.querySelector('.soFolhaRosto');
+
+                makeFolhaRostoJogosPrimeiraFase(docDefinition, campo, equipas.listaEquipas, fase);
             
-            // Verifica se só se pretende imprimir a folha de rosto
-            if(!soFolhaRosto.checked){
-                console.log("aqui");
-                docDefinition.content.push(pageBreak);
-                makeContentFichaJogoPrimeiraFase(docDefinition, campo);
-            } 
+                // Verifica se só se pretende imprimir a folha de rosto
+                if(!soFolhaRosto.checked){
+                    docDefinition.content.push(pageBreak);
+                    makeContentFichaJogoPrimeiraFase(docDefinition, campo);
+                } 
+            } else {
+                makeFichasJogoFasesSeguintes(docDefinition, campo, equipas.listaEquipas, fase)
+            }
+            
         });
 
         pdfMake.createPdf(docDefinition).print();
@@ -518,8 +630,16 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
     // Handle erro Quando fase == 0
 }
 
+async function imprimeResultados(escalaoId, fase, campo, parent){
+    const data = await getData(`/listagens/getClassificacao/${escalaoId}/${campo}/${fase}`);
+    console.log(data);
+}
+
+
+
+
+
 // Abre o pdf noutra janela
 //pdfMake.createPdf(docDefinition).print();
 // Quando se pretende abrir o pdf na mesma janela
 //pdfMake.createPdf(docDefinition).print({}, window);
-

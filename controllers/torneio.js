@@ -679,6 +679,7 @@ exports.createParciais = async (req, res, next) => {
             equipa2_pontos: data.parciaisData.equipa2.pontos
         });
     }).catch((err)=>{
+        console.log(err);
         res.status(200).json({
             success: false,
             equipa1_pontos: data.parciaisData.equipa1.pontos,
@@ -705,6 +706,7 @@ exports.updateParciais = async (req, res, next) => {
             equipa2_pontos: data.parciaisData.equipa2.pontos
         });
     }).catch((err)=>{
+        console.log(err);
         res.status(200).json({
             success: false,
             equipa1_pontos: data.parciaisData.equipa1.pontos,

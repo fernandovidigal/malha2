@@ -25,7 +25,8 @@ router.get('/getNumEquipasPorConcelho/:escalao', ListagensController.getNumEquip
 
 router.get('/equipasAgrupadasPorCampos/:escalao/:fase', ListagensController.getEquipasAgrupadasPorCampos);
 
-router.get('/fichaJogoPrimeiraFase/:escalao/:campo', ListagensController.getJogosPrimeiraFase);
+router.get('/getFichasJogo/:escalao/:campo/:fase?', ListagensController.getFichasJogo);
 
+router.get('/getClassificacao/:escalao/:campo/:fase?', ListagensController.getClassificacao);
 
 module.exports = router;

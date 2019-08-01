@@ -7,6 +7,7 @@ const Campos = require('../models/Campos');
 const Localidades = require('../models/Localidades');
 const Equipas = require('../models/Equipas');
 const util = require('../helpers/util');
+const dbFunctions = require('../helpers/torneioDBFunctions');
 
 function getTorneioInfo(){
     return Torneios.findOne({where: {activo: 1}, raw: true});
@@ -35,11 +36,13 @@ function getEscalaoInfo(escalaoId){
 
 function getEquipas(torneioId, escalaoId){
     return Equipas.findAll({
+        include: {
+            model: Localidades
+        },
         where: {
             torneioId: torneioId,
             escalaoId: escalaoId
-        },
-        raw: true
+        }
     });
 }
 
@@ -153,7 +156,6 @@ function getAllCamposPorFase(torneioId, escalaoId, fase){
     });
 }
 
-
 async function processaListaEquipasAgrupadasPorCampos(torneioId, escalaoId, fase, listaCampos){
     try{
         const listaEquipasEscalao = await getAllEquipasEscalao(torneioId, escalaoId);
@@ -197,6 +199,131 @@ async function processaListaEquipasAgrupadasPorCampos(torneioId, escalaoId, fase
     } catch(err) {
         return Promise.reject(err);
     }
+}
+
+async function processaClassificacao(torneioId, escalaoId, fase, campo = 0){
+
+    const _listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneioId, escalaoId, fase);
+
+    // 1. Preencher um array com o mesmo número de campos que o escalão tem ocupados
+    const listaCampos = [];
+    if(campo == 0){
+        for(let i = 0; i < _listaCampos.length; i++){
+            listaCampos.push({campo: i+1});
+        }
+    } else {
+        // Número do campo é passado como parametro
+        listaCampos.push({campo: campo});
+    }
+
+    for(const campo of listaCampos){
+        const numCampo = campo.campo;
+        // 1. Obter a lista de Jogos para cada campo
+        const listaJogos = await dbFunctions.getAllGamesPorCampo(torneioId, escalaoId, fase, numCampo);
+
+        // Bloco necessário para desempate por parciais
+        // {
+            //const listaJogosId = listaJogos.map(elemento => elemento.jogoId);
+            //console.log(listaJogosId);
+
+            //const listaParciais = await dbFunctions.getAllParciais(listaJogosId);
+            //console.log(listaParciais);
+        // }
+
+        campo.classificacao = [];
+        const classificacao = campo.classificacao;
+
+        // 2. Percorre a lista de jogos e coloca as equipas na lista de classificação
+        for(const jogo of listaJogos){
+            // 3. Procura pela posição, se existir, dentro do array da classificação
+            const posicaoEquipa1 = classificacao.findIndex(elemento => {
+                return elemento.equipaId == jogo.equipa1Id;
+            });
+
+            const posicaoEquipa2 = classificacao.findIndex(elemento => {
+                return elemento.equipaId == jogo.equipa2Id;
+            });
+
+            const equipa1 = await dbFunctions.getEquipa(jogo.equipa1Id);
+            const equipa2 = await dbFunctions.getEquipa(jogo.equipa2Id);
+
+            // Coloca a equipa na lista de classificações ou actualiza-a se já existir
+            // -1, não eixte. > -1, existe
+            if(posicaoEquipa1 != -1){
+                classificacao[posicaoEquipa1].vitorias = (jogo.equipa1Pontos > jogo.equipa2Pontos) ? classificacao[posicaoEquipa1].vitorias = classificacao[posicaoEquipa1].vitorias + 1 : classificacao[posicaoEquipa1].vitorias;
+                classificacao[posicaoEquipa1].pontos = classificacao[posicaoEquipa1].pontos + jogo.equipa1Pontos;
+            } else { // não existe
+                const equipa = {
+                    equipaId: jogo.equipa1Id,
+                    primeiroElemento: equipa1.primeiroElemento,
+                    segundoElemento: equipa1.segundoElemento,
+                    localidadeId: equipa1.localidade.localidadeId,
+                    localidade: equipa1.localidade.nome,
+                    vitorias: (jogo.equipa1Pontos > jogo.equipa2Pontos) ? 1 : 0,
+                    pontos: jogo.equipa1Pontos
+                }
+                classificacao.push(equipa);
+            }
+
+            if(posicaoEquipa2 != -1){
+                classificacao[posicaoEquipa2].vitorias = (jogo.equipa2Pontos > jogo.equipa1Pontos) ? classificacao[posicaoEquipa2].vitorias = classificacao[posicaoEquipa2].vitorias + 1 : classificacao[posicaoEquipa2].vitorias;
+                classificacao[posicaoEquipa2].pontos = classificacao[posicaoEquipa2].pontos + jogo.equipa2Pontos;
+            } else { // não existe
+                const equipa = {
+                    equipaId: jogo.equipa2Id,
+                    primeiroElemento: equipa2.primeiroElemento,
+                    segundoElemento: equipa2.segundoElemento,
+                    localidadeId: equipa2.localidade.localidadeId,
+                    localidade: equipa2.localidade.nome,
+                    vitorias: (jogo.equipa2Pontos > jogo.equipa1Pontos) ? 1 : 0,
+                    pontos: jogo.equipa2Pontos
+                }
+                classificacao.push(equipa);
+            }  
+        }
+
+        // 3. Ordena a Classificação
+        ordenaClassificacao(classificacao, listaJogos);
+    }
+
+    return listaCampos;
+}
+
+function ordenaClassificacao(classificacao, listaJogos){
+    classificacao.sort((a, b) => {
+        // Diferença de Pontos
+        if(a.pontos > b.pontos){
+            return -1;
+        } else if(a.pontos === b.pontos){
+            // Mesmos pontos, desempata por número de vitórias
+            if(a.vitorias > b.vitorias){
+                return -1;
+            } else if(a.vitorias === b.vitorias) {
+                // Mesmo número de vitórias, desempata por resultado do confronto directo
+                const jogo = listaJogos.find(elemento => {
+                    return (elemento.equipa1Id == a.equipaId && elemento.equipa2Id == b.equipaId) || (elemento.equipa1Id == b.equipaId && elemento.equipa2Id == a.equipaId);
+                });
+
+                if(jogo.equipa1Pontos > jogo.equipa2Pontos){
+                    if(jogo.equipa1Id === a.equipaId){
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                } else {
+                    if(jogo.equipa2Id === a.equipaId){
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                }
+            } else {
+                return 1;
+            }
+        } else {
+            return 1;
+        }
+    });
 }
 
 exports.mostraListagens = async (req, res, next) => {
@@ -440,10 +567,11 @@ exports.getEquipasAgrupadasPorCampos = async (req, res, next) => {
     res.status(200).json(response);
 }
 
-exports.getJogosPrimeiraFase = async (req, res, next) => {
+exports.getFichasJogo = async (req, res, next) => {
     const torneio = await getTorneioInfo();
     const escalaoId = parseInt(req.params.escalao);
     const campo = parseInt(req.params.campo);
+    const fase = parseInt(req.params.fase) || 1;
     const escalaoInfo = await getEscalaoInfo(escalaoId);
     let listaJogos = [];
     let listaCampos = [];
@@ -458,17 +586,17 @@ exports.getJogosPrimeiraFase = async (req, res, next) => {
 
     // Todos os campos
     if(campo == 0){
-        listaCampos = await getNumCamposPorEscalaoFase(torneio.torneioId, escalaoId, 1);
+        listaCampos = await getNumCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
         listaCampos = listaCampos.map(_campo => _campo.campo);
         if(listaCampos.length > 0){
-            listaJogos = await getAllJogosEscalaoFase(torneio.torneioId, escalaoId, 1);
+            listaJogos = await getAllJogosEscalaoFase(torneio.torneioId, escalaoId, fase);
         } else {
             //TODO: Handle quando os campso não estão distribuídos
         }
     } else {
         // Foi indicado o número do campo
         listaCampos.push(campo);
-        listaJogos = await getAllJogosEscalaoFaseCampo(torneio.torneioId, escalaoId, 1, campo);   
+        listaJogos = await getAllJogosEscalaoFaseCampo(torneio.torneioId, escalaoId, fase, campo);   
     }
 
     if(listaJogos.length > 0){
@@ -488,6 +616,40 @@ exports.getJogosPrimeiraFase = async (req, res, next) => {
             }
             response.campos.push(_campo);
         });
+        response.success = true;
+    } else {
+        // TODO: não existem jogos para determinado campo
+    }
+
+    res.status(200).json(response);
+}
+
+exports.getClassificacao = async (req, res, next) => {
+    const torneio = await getTorneioInfo();
+    const escalaoId = parseInt(req.params.escalao);
+    const campo = parseInt(req.params.campo);
+    const fase = parseInt(req.params.fase) || 1;
+    const escalaoInfo = await getEscalaoInfo(escalaoId);
+
+    const response = {
+        success: false
+    };
+
+    if(!torneio){
+        return res.status(200).json(response);
+    }
+    
+    const listaCampos = await processaClassificacao(torneio.torneioId, escalaoId, fase, campo);
+
+    if(listaCampos.length > 0){
+        response.torneio = {
+            designacao: torneio.designacao,
+            localidade: torneio.localidade,
+            escalao: escalaoInfo.designacao,
+            sexo: (escalaoInfo.sexo == 1) ? 'Masculino' : 'Feminino'
+        };
+        
+        response.listaCampos = listaCampos;
         response.success = true;
     } else {
         // TODO: não existem jogos para determinado campo

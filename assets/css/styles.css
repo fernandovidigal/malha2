@@ -39,7 +39,7 @@ small {
     width: 65%;
     margin: 0 auto;
     display: block;
-    margin-top: 40px;
+    margin-top: 20px;
 }
 
 .content__wrapper {
@@ -1042,4 +1042,8 @@ animation-delay: -0.16s;
 .listagemWrapper_title {
     width: 100%;
     text-align: center;
+}
+
+.soFolhaRostoWrapper {
+    display: inline-block;
 }

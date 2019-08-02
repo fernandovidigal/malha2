@@ -1,44 +1,4 @@
-function makeContent(ddContent, numEquipas, total){
-    const content = {
-        table: {
-            headerRows: 1,
-            widths: ['*', '*'],
-            body: [
-                [{text: 'Concelho', margin: [10, 5]}, {text: 'Equipas', margin: [10, 5]}]
-            ]
-        },
-        layout: 'lightHorizontalLines'
-    }
 
-    numEquipas.forEach(equipa => {
-        const row = [{
-            text: equipa.nome,
-            margin: [20, 5]
-        }, 
-        {
-            text: equipa.numEquipas,
-            margin: [20, 5]
-        }];
-        content.table.body.push(row);
-    });
-
-    const totalRow = [{
-        margin: [10, 5],
-        text: 'Total',
-        fillColor: '#eeeeee',
-        bold: true
-    }, 
-    {
-        margin: [20, 5],
-        text: `${total}`,
-        fillColor: '#eeeeee',
-        bold: true
-    }];
-
-    content.table.body.push(totalRow);
-
-    ddContent.push(content);
-}
 
 const printBtn = document.querySelector('.print_btn');
 
@@ -51,12 +11,12 @@ printBtn.addEventListener('click', function(e){
         if(data.success){
             var docDefinition = {
                 pageSize: 'A4',
-                pageMargins: [40, 100, 40, 60],
+                pageMargins: [10, 120, 10, 20],
                 content: [{
                     text: 'Número de Equipas por Concelho',
                     alignment: 'center',
                     bold: true,
-                    margin: [40, 10]
+                    margin: [0, 10]
                 }]
             };
             makeHeader(docDefinition, data.torneio);

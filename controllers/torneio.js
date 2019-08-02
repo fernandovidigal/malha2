@@ -572,16 +572,12 @@ function ordenaClassificacao(classificacao, listaJogos){
                     } else {
                         return 1;
                     }
-                    //console.log("Aqui");
-                    //return -1;
                 } else {
                     if(jogo.equipa2Id === a.equipaId){
                         return -1;
                     } else {
                         return 1;
                     }
-                    //console.log("Aqui2");
-                    //return 1;
                 }
             } else {
                 return 1;

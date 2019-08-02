@@ -1,36 +1,4 @@
-function makeContent(ddContent, listaCampos){
-    listaCampos.forEach(campo => {
-        const content = {
-            table: {
-                widths:['auto',200,'*'],
-                headerRows: 1,
-                body: [
-                    [{text: `Campo ${campo.campo}`, style: 'tableHeader', colSpan: 3, alignment: 'left', bold: true, fontSize: 14}, {}, {}],
-                ]
-            },
-            layout: 'lightHorizontalLines',
-            id: 'tabela',
-            margin: [0,0,0,10]
-        }
 
-        campo.listaEquipas.forEach(equipa => {
-            const row = [{text: `${equipa.equipaId}`, fontSize: 11, margin: [15, 10, 20, 0]}, {
-                table: {
-                    body: [
-                        [{text: `${equipa.primeiroElemento}`, fontSize: 10}],
-                        [{text: `${equipa.segundoElemento}`, fontSize: 10}]
-                    ]
-                },
-                layout: 'noBorders',
-                margin: [0, 0, 50, 0]
-            }, {text: `${equipa.localidade}`, fontSize: 11, margin: [0, 10, 0, 0]}];
-
-            content.table.body.push(row);
-        });
-
-        ddContent.push(content);
-    });
-}
 
 const printBtn = document.querySelector('.print_btn');
 

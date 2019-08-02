@@ -45,7 +45,7 @@ deleteBtns.forEach(function(item, index){
                         type: 'error',
                         title: 'Oops...',
                         text: err.message,
-                      })
+                    });
                 });
             }
         });

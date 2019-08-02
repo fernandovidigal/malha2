@@ -17,7 +17,7 @@
                             <%- include('componentes/escaloes.ejs', {escaloes: escaloes}) %> 
                         </div>
                     </div>
-                    <button type="submit" class="listagem_btn"><i class="fas fa-file-alt"></i></button>
+                    <button type="submit" class="listagem_btn numEquipasPorConcelho_btn"><i class="fas fa-print"></i></button>
                 </div>
             </form>
         </div>
@@ -31,7 +31,7 @@
                             <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos}) %>
                         </div>
                     </div>
-                    <button type="submit" class="listagem_btn"><i class="fas fa-file-alt"></i></button>
+                    <button type="submit" class="listagem_btn equipasAgrupadasPorCampos_btn"><i class="fas fa-print"></i></button>
                 </div>
             </form>
         </div>
@@ -41,11 +41,11 @@
                 <div class="listagemCard_wrapper">
                     <div class="listagemCard__content">
                         <p class="listagemCard__title">Fichas de Jogo</p>
-                        <div class="listagemCard__controllers">
+                        <div class="listagemCard__controllers fichasJogo">
                             <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos}) %>
                         </div>
                     </div>
-                    <button type="submit" name="fichasJogo_btn" class="listagem_btn"><i class="fas fa-print"></i></button>
+                    <button type="submit" class="listagem_btn fichasJogo_btn"><i class="fas fa-print"></i></button>
                 </div>
             </form>
         </div>
@@ -59,7 +59,7 @@
                             <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos}) %>
                         </div>
                     </div>
-                    <button type="submit" name="resultados_btn" class="listagem_btn"><i class="fas fa-file-alt"></i></button>
+                    <button type="submit" class="listagem_btn resultados_btn"><i class="fas fa-print"></i></button>
                 </div>
             </form>
         </div>
@@ -114,5 +114,6 @@
 
 <script src="/js/pdfmake.min.js"></script>
 <script src="/js/vfs_fonts.js"></script>
+<script src="/js/printFunctions.js"></script>
 <script src="/js/print.js"></script>
 <%- include('../includes/footer.ejs') %>

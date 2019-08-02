@@ -1,6 +1,6 @@
 <% if(typeof escaloes != 'undefined'){ %>
 <select name="escalao" id="escalao" class="escalaoSelect">
-    <option value="" selected>Escalão</option>
+    <option value="0" selected>Escalão</option>
     <optgroup label="Masculinos">
         <% escaloes.forEach(function(escalao){ %>
             <% if(escalao.sexo == 1){ %>

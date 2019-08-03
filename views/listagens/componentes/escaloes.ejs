@@ -1,19 +1,23 @@
 <% if(typeof escaloes != 'undefined'){ %>
-<select name="escalao" id="escalao" class="escalaoSelect">
-    <option value="0" selected>Escalão</option>
-    <optgroup label="Masculinos">
-        <% escaloes.forEach(function(escalao){ %>
-            <% if(escalao.sexo == 1){ %>
-                <option value="<%= escalao.escalaoId %>"><%= escalao.designacao %></option>
-            <% } %>
-        <% }); %>
-    </optgroup>
-    <optgroup label="Femininos">
-        <% escaloes.forEach(function(escalao){ %>
-            <% if(escalao.sexo == 0){ %>
-                <option value="<%= escalao.escalaoId %>"><%= escalao.designacao %></option>
-            <% } %>
-        <% }); %>
-    </optgroup>
-</select>
+    <% if(escaloes.length > 0){ %>
+        <select name="escalao" id="escalao" class="escalaoSelect">
+            <option value="0" selected>Escalão</option>
+            <optgroup label="Masculinos">
+                <% escaloes.forEach(function(escalao){ %>
+                    <% if(escalao.sexo == 1){ %>
+                        <option value="<%= escalao.escalaoId %>"><%= escalao.designacao %></option>
+                    <% } %>
+                <% }); %>
+            </optgroup>
+            <optgroup label="Femininos">
+                <% escaloes.forEach(function(escalao){ %>
+                    <% if(escalao.sexo == 0){ %>
+                        <option value="<%= escalao.escalaoId %>"><%= escalao.designacao %></option>
+                    <% } %>
+                <% }); %>
+            </optgroup>
+        </select>
+    <% } else { %>
+        Não existem equipas registadas!
+    <% } %>
 <% } %>

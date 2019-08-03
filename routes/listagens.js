@@ -23,7 +23,7 @@ router.get('/getEquipas/:escalao', ListagensController.getEquipas);
 
 router.get('/getNumEquipasPorConcelho/:escalao', ListagensController.getNumEquipasPorConcelho);
 
-router.get('/equipasAgrupadasPorCampos/:escalao/:fase', ListagensController.getEquipasAgrupadasPorCampos);
+router.get('/equipasAgrupadasPorCampos/:escalao/:fase/:campo?', ListagensController.getEquipasAgrupadasPorCampos);
 
 router.get('/getFichasJogo/:escalao/:campo/:fase?', ListagensController.getFichasJogo);
 

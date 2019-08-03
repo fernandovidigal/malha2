@@ -98,8 +98,20 @@ function makeNumEquipaPorConcelho(dd, numEquipas, total){
     dd.content.push(content);
 }
 
-function makeEquipasAgrupadasPorCampos(ddContent, listaCampos){
+function makeEquipasAgrupadasPorCampos(ddContent, listaCampos, fase){
     listaCampos.forEach(campo => {
+
+        if(fase == 100){
+            ddContent.push({
+                text: `${campo.campo == 1 ? 'Final' : '3º e 4º Lugar'}`,
+                fontSize: 20,
+                bold: true,
+                margin: [0, 20, 0, 10],
+                color: '#455cc7',
+                alignment: 'center',
+            })
+        }
+
         const content = {
             table: {
                 widths:['auto',200,'*'],
@@ -396,7 +408,7 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase){
 
 function makeFichasJogoFasesSeguintes(dd, data, equipas, fase){
     dd.content.push({
-        text: `Fase da Competição: ${fase}ª Fase`,
+        text: `Fase da Competição: ${fase != 100 ? fase + 'ª Fase' : (data.campo == 1) ? 'Final' : '3º e 4º Lugar'}`,
         alignment: 'center',
         bold: true,
         fontSize: 16,
@@ -522,7 +534,22 @@ function makeFichasJogoFasesSeguintes(dd, data, equipas, fase){
     });
 }
 
-function makeContentResultados(dd, data){
+function makeContentResultados(dd, data, fase){
+
+    // na primeira fase é 3 porque são duas equipas apuradas que ocupam a linha 2 e 3
+    // nas fases seguintes é 2 porque só é apurada uma equipa na linha 2
+    let k = (fase == 1) ? 3 : 2;
+
+    if(fase == 100){
+        dd.content.push({
+            text: `${data.campo == 1 ? 'Final' : '3º e 4º Lugar'}`,
+            fontSize: 20,
+            bold: true,
+            margin: [0, 20, 0, 10],
+            color: '#455cc7',
+            alignment: 'center'
+        })
+    }
     
     const _table = {
         table: {
@@ -569,7 +596,7 @@ function makeContentResultados(dd, data){
                 }
     		},
     		fillColor: function(i, node){
-    		    if(i === 2 || i === 3){
+    		    if(i > 1 && i <= k){
     		        return '#eeeeee';
     		    }
     		}

@@ -202,6 +202,25 @@ async function processaListaEquipasAgrupadasPorCampos(torneioId, escalaoId, fase
     }
 }
 
+function procuraEquipa(listaEquipas, equipaId){
+    for(let i = 0; i < listaEquipas.length; i++){
+        if(listaEquipas[i].equipaId == equipaId){
+            return listaEquipas[i];
+        }
+    }
+    return null;
+}
+
+function procuraEquipaIndex(listaEquipas, equipaId){
+    let k = -1;
+    for(let i = 0; i < listaEquipas.length; i++){
+        if(listaEquipas[i].equipaId == equipaId){
+            return i;
+        }
+    }
+    return k;
+}
+
 async function processaClassificacao(torneioId, escalaoId, fase, campo = 0){
     try {
         const _listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneioId, escalaoId, fase);
@@ -217,23 +236,24 @@ async function processaClassificacao(torneioId, escalaoId, fase, campo = 0){
             listaCampos.push({campo: campo});
         }
 
+        const listaCompletaEquipas = await getAllEquipasEscalao(torneioId, escalaoId);
+
         for(const campo of listaCampos){
             const numCampo = campo.campo;
+
             // 1. Obter a lista de Jogos para cada campo
             const listaJogos = await dbFunctions.getAllGamesPorCampo(torneioId, escalaoId, fase, numCampo);
             campo.classificacao = [];
             const classificacao = campo.classificacao;
-            const listaEquipas = new Set();
+            //const listaEquipas = new Set();
 
             // 2. Percorre a lista de jogos e coloca as equipas na lista de classificação
             for(const jogo of listaJogos){
-    
-                const equipa1Info = dbFunctions.getEquipa(jogo.equipa1Id);
-                const equipa2Info = dbFunctions.getEquipa(jogo.equipa2Id);
-                const [equipa1, equipa2] = await Promise.all([equipa1Info, equipa2Info]);
-                
-                if(listaEquipas.has(jogo.equipa1Id)){
-                    const posicaoEquipa1 = [...listaEquipas].indexOf(jogo.equipa1Id);
+                const equipa1 = procuraEquipa(listaCompletaEquipas, jogo.equipa1Id);
+                const equipa2 = procuraEquipa(listaCompletaEquipas, jogo.equipa2Id);
+
+                const posicaoEquipa1 = procuraEquipaIndex(classificacao, jogo.equipa1Id);
+                if(posicaoEquipa1 != -1){
                     classificacao[posicaoEquipa1].vitorias = (jogo.equipa1Pontos > jogo.equipa2Pontos) ? classificacao[posicaoEquipa1].vitorias = classificacao[posicaoEquipa1].vitorias + 1 : classificacao[posicaoEquipa1].vitorias;
                     classificacao[posicaoEquipa1].pontos = classificacao[posicaoEquipa1].pontos + jogo.equipa1Pontos;
                 } else {
@@ -247,11 +267,10 @@ async function processaClassificacao(torneioId, escalaoId, fase, campo = 0){
                         pontos: jogo.equipa1Pontos
                     }
                     classificacao.push(equipa);
-                    listaEquipas.add(jogo.equipa1Id);
                 }
 
-                if(listaEquipas.has(jogo.equipa2Id)){
-                    const posicaoEquipa2 = [...listaEquipas].indexOf(jogo.equipa2Id);
+                const posicaoEquipa2 = procuraEquipaIndex(classificacao, jogo.equipa2Id);
+                if(posicaoEquipa2 != -1){
                     classificacao[posicaoEquipa2].vitorias = (jogo.equipa2Pontos > jogo.equipa1Pontos) ? classificacao[posicaoEquipa2].vitorias = classificacao[posicaoEquipa2].vitorias + 1 : classificacao[posicaoEquipa2].vitorias;
                     classificacao[posicaoEquipa2].pontos = classificacao[posicaoEquipa2].pontos + jogo.equipa2Pontos;
                 } else {
@@ -265,7 +284,6 @@ async function processaClassificacao(torneioId, escalaoId, fase, campo = 0){
                         pontos: jogo.equipa2Pontos
                     }
                     classificacao.push(equipa);
-                    listaEquipas.add(jogo.equipa2Id);
                 }
             }
             
@@ -383,84 +401,105 @@ exports.equipasAgrupadasPorCampos = async (req, res, next) => {
 
 // API
 exports.getFases = async (req, res, next) => {
-    const torneio = await getTorneioInfo();
-    const escalaoId = parseInt(req.params.escalao);
+    try {
+        const torneio = await getTorneioInfo();
+        const escalaoId = parseInt(req.params.escalao);
 
-    const response = {
-        success: false
-    };
+        const response = {
+            success: false
+        };
 
-    if(!torneio){
-        return res.status(200).json(response);
-    }
-
-    let listaFases = await getAllFasesEscalao(torneio.torneioId, escalaoId);
-    listaFases = listaFases.map(_fase => _fase.fase);
-
-    if(listaFases.length > 0){
-        response.success = true;
-        response.listaFases = listaFases
-    } else {
-        response.error = {
-            msg: 'Não existem fases para este escalão.'
+        if(!torneio){
+            response.errMsg = 'Não foi possível obter dados.';
+            return res.status(200).json(response);
         }
-    }
 
-    res.status(200).json(response);
+        let listaFases = await getAllFasesEscalao(torneio.torneioId, escalaoId);
+        listaFases = listaFases.map(_fase => _fase.fase);
+
+        if(listaFases.length > 0){
+            response.success = true;
+            response.listaFases = listaFases
+        } else {
+            response.errMsg = 'Não existem fases para o escalão selecionado.';
+        }
+
+        res.status(200).json(response);
+    } catch(err) {
+        console.log(err);
+        res.status(200).json({
+            success: false,
+            errMsg: 'Ocorreu um erro. Por favor tente novamente.'
+        });
+    }
 }
 
 exports.getCampos = async (req, res, next) => {
-    const torneio = await getTorneioInfo();
-    const escalaoId = parseInt(req.params.escalao);
-    const fase = parseInt(req.params.fase);
-
-    const response = {
-        success: false
-    };
-
-    if(!torneio){
-        return res.status(200).json(response);
-    }
-
-    let listaCampos = await getAllCamposPorFase(torneio.torneioId, escalaoId, fase);
-    listaCampos = listaCampos.map(_campo => _campo.campo);
-
-    if(listaCampos.length > 0){
-        response.success = true;
-        response.listaCampos = listaCampos;
-    } else {
-        response.error = {
-            msg: 'Não existem campos para esta fase.'
+    try {
+        const torneio = await getTorneioInfo();
+        const escalaoId = parseInt(req.params.escalao);
+        const fase = parseInt(req.params.fase);
+    
+        const response = {
+            success: false
+        };
+    
+        if(!torneio){
+            response.errMsg = 'Não foi possível obter dados.';
+            return res.status(200).json(response);
         }
-    }
-
-    res.status(200).json(response);
+    
+        let listaCampos = await getAllCamposPorFase(torneio.torneioId, escalaoId, fase);
+        listaCampos = listaCampos.map(_campo => _campo.campo);
+    
+        if(listaCampos.length > 0){
+            response.success = true;
+            response.listaCampos = listaCampos;
+        } else {
+            response.errMsg = 'Não existem campos para esta fase.';
+        }
+    
+        res.status(200).json(response);
+    } catch(err) {
+        console.log(err);
+        res.status(200).json({
+            success: false,
+            errMsg: 'Ocorreu um erro. Por favor tente novamente.'
+        });
+    } 
 }
 
 exports.getEquipas = async (req, res, next) => {
-    const torneio = await getTorneioInfo();
-    const escalaoId = parseInt(req.params.escalao);
-
-    const response = {
-        success: false
-    };
-
-    if(!torneio){
-        return res.status(200).json(response);
-    }
-
-    let listaEquipas = await getEquipas(torneio.torneioId, escalaoId);
-
-    if(listaEquipas.length > 0){
-        response.success = true;
-        response.listaEquipas = listaEquipas;
-    } else {
-        response.error = {
-            msg: 'Não existem equipas para este escalão.'
+    try {
+        const torneio = await getTorneioInfo();
+        const escalaoId = parseInt(req.params.escalao);
+    
+        const response = {
+            success: false
+        };
+    
+        if(!torneio){
+            response.errMsg = 'Não foi possível obter dados.';
+            return res.status(200).json(response);
         }
-    }
-
-    res.status(200).json(response);
+    
+        let listaEquipas = await getEquipas(torneio.torneioId, escalaoId);
+    
+        if(listaEquipas.length > 0){
+            response.success = true;
+            response.listaEquipas = listaEquipas;
+        } else {
+            response.errMsg = 'Não existem equipas para este escalão.';
+        }
+    
+        res.status(200).json(response);
+    } catch(err) {
+        console.log(err);
+        res.status(200).json({
+            success: false,
+            errMsg: 'Ocorreu um erro. Por favor tente novamente.'
+        });
+    } 
 }
 
 exports.getNumEquipasPorConcelho = async (req, res, next) => {

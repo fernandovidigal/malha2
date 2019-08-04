@@ -402,8 +402,6 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase){
     });
 
     dd.content.push(_table);
-    //dd.content.push({text: `Pág. 1/2`, fontSize: 8, alignment: 'right', margin: [0,0,0,20]});
-    // Exemplo absolute postion {text: 'text 2', absolutePosition: {x:400, y:250}},
 }
 
 function makeFichasJogoFasesSeguintes(dd, data, equipas, fase){

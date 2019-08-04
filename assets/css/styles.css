@@ -611,6 +611,7 @@ small {
     flex-wrap: wrap;
 }
 
+.errMsg,
 .escalao_err_msg {
     font-size: 80%;
     margin-right: 14px;
@@ -620,6 +621,10 @@ small {
     color: #a94442;
     background-color: #f2dede;
     border-color: #ebccd1; 
+}
+
+.errMsg {
+    margin: 0;
 }
 
 .listTable th.resultados__campo-header {

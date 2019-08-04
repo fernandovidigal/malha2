@@ -123,10 +123,31 @@ function mostraSoFolhaRostoCheckBox(parent){
     parent.appendChild(soFolhaRostoWrapper);
 }
 
+function removeSelectBoxes(parent){
+    // Fase selectbox
+    const faseSelectExists = parent.querySelector('.faseSelect');
+    if(faseSelectExists){
+        parent.removeChild(faseSelectExists);
+    }
+
+    // Campos selectbox
+    const campoSelectExists = parent.querySelector('.camposSelect');
+    if(campoSelectExists){
+        parent.removeChild(campoSelectExists);
+    }
+
+    // So Folha Rosto checkbox
+    const soFolhaRostoExists = parent.querySelector('.soFolhaRostoWrapper');
+    if(soFolhaRostoExists){
+        parent.removeChild(soFolhaRostoExists);
+    }
+}
+
 async function imprimeNumEquipasPorConcelho(escalaoId){
     try {
         const data = await getData(`/listagens/getNumEquipasPorConcelho/${escalaoId}`);
         docDefinition.content = [];
+        delete docDefinition.pageBreakBefore;
 
         if(data.success){
             makeHeader(docDefinition, data.torneio);
@@ -149,6 +170,7 @@ async function imprimeNumEquipasPorConcelho(escalaoId){
             });
         }
     } catch(err){
+        console.log(err);
         Swal.fire({
             type: 'error',
             title: 'Oops...',
@@ -230,9 +252,8 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
 
                 if(fase == 1){
                     const soFolhaRosto = parent.querySelector('.soFolhaRosto');
-
                     makeFolhaRostoJogosPrimeiraFase(docDefinition, campo, equipas.listaEquipas, fase);
-                
+
                     // Verifica se só se pretende imprimir a folha de rosto
                     if(!soFolhaRosto.checked){
                         docDefinition.content.push(pageBreak);
@@ -241,7 +262,6 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
                 } else {
                     makeFichasJogoFasesSeguintes(docDefinition, campo, equipas.listaEquipas, fase);
                 }
-                
             });
 
             pdfMake.createPdf(docDefinition).print();
@@ -320,14 +340,20 @@ escalaoSelect.forEach(function(escalao, index){
         try{
             const escalaoId = this[this.selectedIndex].value;
 
-            if(index == 1 || index == 2 || index == 3){
-                await mostraFaseSelect(escalaoId, this.parentNode, false);
-                const data = getControllersValues(this.parentNode);
-                await mostraCamposSelect(escalaoId, data.fase, this.parentNode);
-            } 
-            if(index == 2){
-                mostraSoFolhaRostoCheckBox(this.parentNode);
+            if(escalaoId != 0) {
+                if(index == 1 || index == 2 || index == 3){
+                    await mostraFaseSelect(escalaoId, this.parentNode, false);
+                    const data = getControllersValues(this.parentNode);
+                    await mostraCamposSelect(escalaoId, data.fase, this.parentNode);
+                } 
+                if(index == 2){
+                    mostraSoFolhaRostoCheckBox(this.parentNode);
+                }
+            } else {
+                removeSelectBoxes(this.parentNode);
             }
+
+            
         } catch(err) {
             Swal.fire({
                 type: 'error',

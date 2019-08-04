@@ -14,7 +14,7 @@
                     <div class="listagemCard__content">
                         <p class="listagemCard__title">Número de Equipas por Concelho</p>
                         <div class="listagemCard__controllers">
-                            <%- include('componentes/escaloes.ejs', {escaloes: escaloes}) %> 
+                            <%- include('componentes/escaloes.ejs', {escaloes: escaloes, errMsg: 'Não existem equipas registadas!'}) %> 
                         </div>
                     </div>
                     <button type="submit" class="listagem_btn numEquipasPorConcelho_btn"><i class="fas fa-print"></i></button>
@@ -28,7 +28,7 @@
                     <div class="listagemCard__content">
                         <p class="listagemCard__title">Equipas Agrupadas por Campos</p>
                         <div class="listagemCard__controllers">
-                            <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos}) %>
+                            <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos, errMsg: 'Não existem jogos registados!'}) %>
                         </div>
                     </div>
                     <button type="submit" class="listagem_btn equipasAgrupadasPorCampos_btn"><i class="fas fa-print"></i></button>
@@ -42,7 +42,7 @@
                     <div class="listagemCard__content">
                         <p class="listagemCard__title">Fichas de Jogo</p>
                         <div class="listagemCard__controllers fichasJogo">
-                            <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos}) %>
+                            <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos, errMsg: 'Não existem jogos registados!'}) %>
                         </div>
                     </div>
                     <button type="submit" class="listagem_btn fichasJogo_btn"><i class="fas fa-print"></i></button>
@@ -56,55 +56,13 @@
                     <div class="listagemCard__content">
                         <p class="listagemCard__title">Resultados</p>
                         <div class="listagemCard__controllers">
-                            <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos}) %>
+                            <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos, errMsg: 'Não existem jogos registados!'}) %>
                         </div>
                     </div>
                     <button type="submit" class="listagem_btn resultados_btn"><i class="fas fa-print"></i></button>
                 </div>
             </form>
         </div>
-
-        <!-- TEMPLATE -->
-        <!--<div class="listagemCard">
-            <form action="" method="POST">
-                <div class="listagemCard_wrapper">
-                    <div class="listagemCard__content">
-                        <p class="listagemCard__title">Template</p>
-                        <div class="listagemCard__controllers">
-                            <select name="escalao" id="escalao">
-                                <option value="" disabled selected>Escalão</option>
-                                <option value="1">Jovem</option>
-                                <option value="1">Sénior</option>
-                                <option value="1">65+</option>
-                                <option value="1">Absolutos</option>
-                                <option value="1">65+</option>
-                            </select>
-                            <select name="campo" id="campo">
-                                <option value="" disabled selected>Campo</option>
-                                <option value="1">Campo 1</option>
-                                <option value="1">Campo 2</option>
-                                <option value="1">Campo 3</option>
-                                <option value="1">Campo 4</option>
-                                <option value="1">Campo 5</option>
-                                <option value="1">Campo 6</option>
-                            </select>
-                            <select name="fase" id="fase">
-                                <option value="" disabled selected>Fase</option>
-                                <option value="1">Fase 1</option>
-                                <option value="1">Fase 2</option>
-                                <option value="1">Fase 3</option>
-                                <option value="1">Fase 4</option>
-                                <option value="1">3º e 4º</option>
-                                <option value="1">Final</option>
-                            </select>
-
-                        </div>
-                    </div>
-                    <button type="submit" class="listagem_btn"><i class="fas fa-file-alt"></i></button>
-                </div>
-            </form>
-        </div>-->
-
     </div>
 
 <% } else { %>

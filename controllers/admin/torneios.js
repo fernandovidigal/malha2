@@ -125,15 +125,15 @@ exports.adicionarTorneio = (req, res, next) => {
     });
 }
 
-async function processaCriacaoCampos(transaction, torneioId, listaCampos, listaCamposIds){
-    let i = 0;
-    for(const escalao of listaCampos){
-        await Campos.create({
-            torneioId: torneioId,
-            escalaoId: listaCamposIds[i],
-            numCampos: listaCampos[i]
-        }, {transaction});
-        i++;
+async function processaCriacaoCampos(transaction, torneioId, listaEscaloes){
+    for(const escalao of listaEscaloes){
+        if(escalao.campos > 0){
+            await Campos.create({
+                torneioId: torneioId,
+                escalaoId: escalao.escalaoId,
+                numCampos: escalao.campos
+            }, {transaction});
+        }
     }
 }
 
@@ -145,15 +145,16 @@ exports.createTorneio = async (req, res, next) => {
     let listaCampos =  req.body.numCampos;
     let listaCamposId = req.body.escalaoId;
 
-    // Valida número de campos introduzidos
-    listaCampos = listaCampos.map(campo => (campo != '' && !isNaN(campo)) ? parseInt(campo) : 0);
-    listaCamposId = listaCamposId.map(id => parseInt(id));
-    
+
     // Processa todos os escalões
     const listaEscaloes = await getAllEscaloes();
     for(const escalao of listaEscaloes){
-        const i = listaCamposId.indexOf(escalao.escalaoId);
-        escalao.campos = listaCampos[i];
+        const numCampos = req.body[escalao.escalaoId];
+        if(Math.log2(parseInt(numCampos)) % 1 === 0){
+            escalao.campos = parseInt(numCampos);
+        } else {
+            escalao.campos = 0;
+        }
     }
 
     if(!errors.isEmpty()){
@@ -178,7 +179,8 @@ exports.createTorneio = async (req, res, next) => {
             
             torneioCriadoId = torneioCriado.torneioId;
 
-            await processaCriacaoCampos(transaction, torneioCriadoId, listaCampos, listaCamposId);
+            await processaCriacaoCampos(transaction, torneioCriadoId, listaEscaloes);
+            //await processaCriacaoCampos(transaction, torneioCriadoId, listaCampos, listaCamposId);
             //await processaCriacaoCampos(transaction, torneioCriadoId, camposFemininos, escalaoIdFemininos);
 
             await transaction.commit();

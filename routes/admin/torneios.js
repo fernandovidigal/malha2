@@ -18,7 +18,7 @@ router.post('/adicionarTorneio', [
     check('localidade').matches(/^[^0-9]+$/).withMessage('Nome da localidade inválido'),
     check('ano').not().isEmpty().withMessage('Deve indicar o ano do torneio.'),
     check('ano').matches(/^[0-9]{4}$/).withMessage('Ano do torneio inválido'),
-    check('numCampos').custom((value, {req}) => {
+    /*check('numCampos').custom((value, {req}) => {
         req.body.numCampos.forEach(campo => {
             if(campo != '' && campo != 0){
                 if(Math.log2(parseInt(campo)) % 1 !== 0){
@@ -27,7 +27,7 @@ router.post('/adicionarTorneio', [
             }
         });
         return true;
-    }),
+    }),*/
 ], TorneiosController.createTorneio);
 
 router.get('/activaTorneio/:id', TorneiosController.ActivaTorneio);

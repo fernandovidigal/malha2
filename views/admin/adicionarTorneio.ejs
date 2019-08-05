@@ -14,16 +14,36 @@
         <p>Masculinos:</p>
         <% escaloes.forEach(escalao => { 
             if(escalao.sexo == 1) { %>
-                <%= escalao.designacao %> <input type="text" name="numCampos[]" pattern="^[0-9]+$" size="6" value="<%= escalao.campos %>"><br>
-                <input type="hidden" name="escalaoId[]" value="<%= escalao.escalaoId %>">
+                <%= escalao.designacao %> <!--<input type="text" name="numCampos[]" pattern="^[0-9]+$" size="6" value="<%= escalao.campos %>"><br>
+                <input type="hidden" name="escalaoId[]" value="<%= escalao.escalaoId %>">-->
+                <select name="<%= escalao.escalaoId %>">
+                    <option value="0" <%= (escalao.campos == 0) ? 'selected': ''%>>0</option>
+                    <option value="2" <%= (escalao.campos == 2) ? 'selected': ''%>>2</option>
+                    <option value="4" <%= (escalao.campos == 4) ? 'selected': ''%>>4</option>
+                    <option value="8" <%= (escalao.campos == 8) ? 'selected': ''%>>8</option>
+                    <option value="16" <%= (escalao.campos == 16) ? 'selected': ''%>>16</option>
+                    <option value="32" <%= (escalao.campos == 32) ? 'selected': ''%>>32</option>
+                    <option value="64" <%= (escalao.campos == 64) ? 'selected': ''%>>64</option>
+                    <option value="128" <%= (escalao.campos == 128) ? 'selected': ''%>>128</option>
+                </select><br>
             <% } %>
         <% }); %>
 
         <p>Femininos:</p>
         <% escaloes.forEach(escalao => { 
             if(escalao.sexo == 0) { %>
-                <%= escalao.designacao %> <input type="text" name="numCampos[]" pattern="^[0-9]+$" size="6" value="<%= escalao.campos %>"><br>
-                <input type="hidden" name="escalaoId[]" value="<%= escalao.escalaoId %>">
+                <%= escalao.designacao %> <!--<input type="text" name="numCampos[]" pattern="^[0-9]+$" size="6" value="<%= escalao.campos %>"><br>
+                <input type="hidden" name="escalaoId[]" value="<%= escalao.escalaoId %>">-->
+                <select name="<%= escalao.escalaoId %>">
+                    <option value="0" <%= (escalao.campos == 0) ? 'selected': ''%>>0</option>
+                    <option value="2" <%= (escalao.campos == 2) ? 'selected': ''%>>2</option>
+                    <option value="4" <%= (escalao.campos == 4) ? 'selected': ''%>>4</option>
+                    <option value="8" <%= (escalao.campos == 8) ? 'selected': ''%>>8</option>
+                    <option value="16" <%= (escalao.campos == 16) ? 'selected': ''%>>16</option>
+                    <option value="32" <%= (escalao.campos == 32) ? 'selected': ''%>>32</option>
+                    <option value="64" <%= (escalao.campos == 64) ? 'selected': ''%>>64</option>
+                    <option value="128" <%= (escalao.campos == 128) ? 'selected': ''%>>128</option>
+                </select><br>
             <% } %>
         <% }); %>
         <br>

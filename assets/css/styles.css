@@ -1061,3 +1061,42 @@ animation-delay: -0.16s;
 .escalao__designacao {
     color: #455cc7;
 }
+
+.escalaoNumCampos + label{
+    display: inline-block;
+    position: relative;
+    margin-left: 10px;
+    cursor: pointer;
+    background-color: #f4f5f9;
+    color: #858ca8;
+    padding: 8px;
+    text-align: center;
+    min-width: 20px;
+    border: solid 1px #eaebf1;
+    border-radius: 8px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    transition: all .2s;
+}
+
+.escalaoNumCampos{
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.escalaoNumCampos + label:hover {
+    color: #2c3641;
+    background-color: #ffffff;
+    border: solid 1px #dddfe8;
+    box-shadow: 0 2px 16px rgba(69, 92, 199, .2);
+}
+
+.escalaoNumCampos:checked + label {
+    color: #2c3641;
+    background-color: #ffffff;
+    border: solid 1px #dddfe8;
+    box-shadow: 0 2px 16px rgba(69, 92, 199, .2);
+}

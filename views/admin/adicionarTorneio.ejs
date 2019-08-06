@@ -18,19 +18,17 @@
                     <p class="escalao__designacao">
                     <%= escalao.designacao %>
                     </p>
-                    <div class="escalao__numCampos">
+                    <div class="escalao__numCampos-wrapper">
                         Campos: 
                         <% for(let i = 0; i < 8; i++){ %>
-                            <label for="<%= (escalao.escalaoId * 10) + i %>"  class="escalaoNumCampos">
-                                <input type="radio" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
+                                <input type="radio" class="escalaoNumCampos" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
                                 <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
                                     <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %>
                                 <% } else { %>
                                     <%= (i == 0) ? 'checked' : '' %>
                                 <% } %>
                                 >
-                                <%= (i != 0) ? Math.pow(2,i): 0 %>
-                            </label>
+                                <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
                         <% } %>
                     </div>
 
@@ -51,19 +49,17 @@
                     <p class="escalao__designacao">
                     <%= escalao.designacao %>
                     </p>
-                    <div class="escalao__numCampos">
+                    <div class="escalao__numCampos-wrapper">
                         Campos: 
                         <% for(let i = 0; i < 8; i++){ %>
-                            <label for="<%= (escalao.escalaoId * 10) + i %>" class="escalaoNumCampos">
-                                <input type="radio" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
+                                <input type="radio" class="escalaoNumCampos" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
                                 <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
                                     <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %>
                                 <% } else { %>
                                     <%= (i == 0) ? 'checked' : '' %>
                                 <% } %>
                                 >
-                                <%= (i != 0) ? Math.pow(2,i): 0 %>
-                            </label>
+                                <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
                         <% } %>
                     </div>
 

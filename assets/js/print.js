@@ -161,7 +161,7 @@ async function imprimeNumEquipasPorConcelho(escalaoId){
 
             makeNumEquipaPorConcelho(docDefinition, data.numEquipas, data.total);
 
-            pdfMake.createPdf(docDefinition).print();
+            pdfMake.createPdf(docDefinition).print({}, window);
         } else {
             Swal.fire({
                 type: 'error',

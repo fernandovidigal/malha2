@@ -1052,3 +1052,12 @@ animation-delay: -0.16s;
 .soFolhaRostoWrapper {
     display: inline-block;
 }
+
+.escalao__genero {
+    padding-bottom: 10px;
+    border-bottom: solid 1px #dddddd;
+}
+
+.escalao__designacao {
+    color: #455cc7;
+}

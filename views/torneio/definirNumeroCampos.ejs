@@ -9,19 +9,65 @@
 
     <p>Definir número de campos!</p>
     <form action="/torneio/definirNumeroCampos" method="post">
-        <p>Masculinos:</p>
+        <p class="escalao__genero">Masculinos:</p>
         <% escaloes.forEach(escalao => { 
             if(escalao.sexo == 1) { %>
-                <%= escalao.designacao %> <input type="text" name="numCampos[]" pattern="^[0-9]+$" size="6" required value="<%= escalao.campos %>"><br>
-                <input type="hidden" name="escalaoId[]" value="<%= escalao.escalaoId %>">
+                <div class="escalao">
+                    <p class="escalao__designacao">
+                    <%= escalao.designacao %> (<%= escalao.numEquipas %> equipas registadas)
+                    </p>
+                    <div class="escalao__numCampos-wrapper">
+                        Campos: 
+                        <% for(let i = 0; i < 8; i++){ %>
+                                <input type="radio" class="escalaoNumCampos" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
+                                <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
+                                    <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %>
+                                <% } else { %>
+                                    <%= (i == 0) ? 'checked' : '' %>
+                                <% } %>
+                                >
+                                <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
+                        <% } %>
+                    </div>
+
+                    <div class="escalao__minMaxEquipas">
+                        Equipas por Campo:
+                        <input type="text" name="<%= (escalao.escalaoId * 100) + 1 %>" class="escalaoMinEquipas" placeholder="Mínimo" value="<%= (typeof escalao.minEquipas != undefined) ? escalao.minEquipas : '' %>">
+                        <input type="text" name="<%= (escalao.escalaoId * 100) + 2 %>" class="escalaoMaxEquipas" placeholder="Máximo" value="<%= (typeof escalao.maxEquipas != undefined) ? escalao.maxEquipas : '' %>">
+                        <button class="preFillMinMaxEquipas"><i class="fas fa-edit"></i></button>
+                    </div>
+                </div>
             <% } %>
         <% }); %>
 
-        <p>Femininos:</p>
+        <p class="escalao__genero">Femininos:</p>
         <% escaloes.forEach(escalao => { 
             if(escalao.sexo == 0) { %>
-                <%= escalao.designacao %> <input type="text" name="numCampos[]" pattern="^[0-9]+$" size="6" required value="<%= escalao.campos %>"><br>
-                <input type="hidden" name="escalaoId[]" value="<%= escalao.escalaoId %>">
+                <div class="escalao">
+                    <p class="escalao__designacao">
+                    <%= escalao.designacao %> (<%= escalao.numEquipas %> equipas registadas)
+                    </p>
+                    <div class="escalao__numCampos-wrapper">
+                        Campos: 
+                        <% for(let i = 0; i < 8; i++){ %>
+                                <input type="radio" class="escalaoNumCampos" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
+                                <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
+                                    <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %>
+                                <% } else { %>
+                                    <%= (i == 0) ? 'checked' : '' %>
+                                <% } %>
+                                >
+                                <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
+                        <% } %>
+                    </div>
+
+                    <div class="escalao__minMaxEquipas">
+                        Equipas por Campo:
+                        <input type="text" name="<%= (escalao.escalaoId * 100) + 1 %>" class="escalaoMinEquipas" placeholder="Mínimo" value="<%= (typeof escalao.minEquipas != undefined) ? escalao.minEquipas : '' %>">
+                        <input type="text" name="<%= (escalao.escalaoId * 100) + 2 %>" class="escalaoMaxEquipas" placeholder="Máximo" value="<%= (typeof escalao.maxEquipas != undefined) ? escalao.maxEquipas : '' %>">
+                        <button class="preFillMinMaxEquipas"><i class="fas fa-edit"></i></button>
+                    </div>
+                </div>
             <% } %>
         <% }); %>
 
@@ -33,4 +79,32 @@
     <p>Verifique se existem torneios registados ou activados.</p>
 <% } %>
 
+<script>
+    const escalaoNumCampos = document.querySelectorAll('.escalaoNumCampos');
+    escalaoNumCampos.forEach(element => {
+        element.addEventListener('change', function(e){
+            const value = this.value;
+            if(value == 0){
+                const topNode = this.closest('.escalao');
+                const minEquipas = topNode.querySelector('.escalaoMinEquipas');
+                const maxEquipas = topNode.querySelector('.escalaoMaxEquipas');
+                minEquipas.value = '';
+                maxEquipas.value = '';
+            }
+        });
+    });
+    
+    const preFillButtons = document.querySelectorAll('.preFillMinMaxEquipas');
+    preFillButtons.forEach(element => {
+        element.addEventListener('click', function(e){
+            e.preventDefault();
+    
+            const parent = this.parentNode;
+            const minEquipas = parent.querySelector('.escalaoMinEquipas');
+            const maxEquipas = parent.querySelector('.escalaoMaxEquipas');
+            minEquipas.value = 4;
+            maxEquipas.value = 6;
+        });
+    });
+    </script>
 <%- include('../includes/footer.ejs') %>

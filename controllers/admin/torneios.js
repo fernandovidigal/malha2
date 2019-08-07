@@ -82,7 +82,6 @@ exports.getTorneio = async (req, res, next) => {
 
         Promise.all([listaEscaloes, torneio])
         .then(async ([_escaloes, _torneio]) => { 
-            console.log(_escaloes[0].campos);
             for(const escalao of _escaloes){
                 const _escalao = {
                     escalaoId: escalao.escalaoId,
@@ -96,10 +95,12 @@ exports.getTorneio = async (req, res, next) => {
                 listaEscaloesComCampo.push(escalao.escalaoId);
             }
             const escaloesSemCampos = await getAllEscaloesSemCampos(torneioId, listaEscaloesComCampo);
+
             // Junta as duas Arrays (com e sem campos definidos)
             escaloes = escaloes.concat(escaloesSemCampos);
 
-            console.log(escaloes);
+            // Ordena a lista de Escalões pelo escalão Id
+            escaloes.sort((a,b) => (a.escalaoId > b.escalaoId) ? 1 : -1);
 
             res.render('admin/editarTorneio', {torneio: _torneio, escaloes: escaloes});
         })
@@ -129,7 +130,7 @@ exports.adicionarTorneio = (req, res, next) => {
 
 async function processaCriacaoCampos(transaction, torneioId, listaEscaloes){
     for(const escalao of listaEscaloes){
-        if(escalao.campos > 0){
+        if(escalao.campos > 0 && escalao.minEquipas > 0 && escalao.maxEquipas > 0){
             await Campos.create({
                 torneioId: torneioId,
                 escalaoId: escalao.escalaoId,
@@ -173,13 +174,17 @@ exports.createTorneio = async (req, res, next) => {
                 errors.push({
                     msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Deve indicar o número mínimo de equipas por campo'
                 });
-            } else if(minEquipas <= 0){
+            } else if(maxEquipas <= 0){
                 errors.push({
                     msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Deve indicar o número máximo de equipas por campo'
                 });
             } else if(maxEquipas < minEquipas){
                 errors.push({
                     msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - O número máximo de equipas não pode ser inferior ao número mínimo de equipas'
+                });
+            } else if(minEquipas < 2){
+                errors.push({
+                    msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - O número mínimo de equipas por campo deve ser 2 ou mais'
                 });
             }
         } else {
@@ -290,27 +295,34 @@ exports.ActivaTorneio = (req, res, next) => {
     });
 }
 
-async function processaUpdateCampos(transaction, torneioId, listaCampos, listaIds){
-    let i = 0;
-    for(const escalao of listaCampos){
+async function processaUpdateCampos(transaction, torneioId, listaEscaloes){
+    for(const escalao of listaEscaloes){
         let escalaoCamposToUpdate = await Campos.findOne({
             where: {
                 torneioId: torneioId,
-                escalaoId: listaIds[i]
+                escalaoId: escalao.escalaoId
             }
         }, {transaction});
         
         if(escalaoCamposToUpdate){
-            await escalaoCamposToUpdate.update({numCampos: listaCampos[i]}, {transaction});
+            if(escalao.campos == 0){
+                await escalaoCamposToUpdate.destroy({transaction});
+            } else {
+                await escalaoCamposToUpdate.update({
+                    numCampos: escalao.campos,
+                    minEquipas: escalao.minEquipas,
+                    maxEquipas: escalao.maxEquipas
+                }, {transaction});
+            }
         } else {
             await Campos.create({
                 torneioId: torneioId,
-                escalaoId: listaIds[i],
-                numCampos: listaCampos[i]
+                escalaoId: escalao.escalaoId,
+                numCampos: escalao.campos,
+                minEquipas: escalao.minEquipas,
+                maxEquipas: escalao.maxEquipas
             }, {transaction});
         }
-
-        i++;
     }
 }
 
@@ -319,29 +331,64 @@ exports.updateTorneio = async (req, res, next) => {
     const designacao = req.body.designacao.trim();
     const localidade = req.body.localidade.trim();
     const ano = req.body.ano.trim();
-    const errors = validationResult(req);
-    let listaCampos =  req.body.numCampos;
-    let listaCamposId = req.body.escalaoId;
-
-    // Valida número de campos introduzidos
-    listaCampos = listaCampos.map(campo => (campo != '' && !isNaN(campo)) ? parseInt(campo) : 0);
-    listaCamposId = listaCamposId.map(id => parseInt(id));
+    const errors = validationResult(req).array({ onlyFirstError: true });
     
     // Processa todos os escalões
     const listaEscaloes = await getAllEscaloes();
     for(const escalao of listaEscaloes){
-        const i = listaCamposId.indexOf(escalao.escalaoId);
-        escalao.campos = listaCampos[i];
+        const numCampos = req.body[escalao.escalaoId];
+        // Campos
+        if(Math.log2(parseInt(numCampos)) % 1 === 0){
+            escalao.campos = parseInt(numCampos);
+        } else {
+            escalao.campos = 0;
+        }
+
+        //Min Max Equipas
+        const minEquipas = parseInt(req.body[(escalao.escalaoId * 100) + 1]) || 0;
+        const maxEquipas = parseInt(req.body[(escalao.escalaoId * 100) + 2]) || 0;
+        escalao.minEquipas = minEquipas;
+        escalao.maxEquipas = maxEquipas;
+
+        if(escalao.campos > 0){
+            if(minEquipas <= 0 && maxEquipas <= 0){
+                errors.push({
+                    msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Deve indicar o número mínimo e máximo de equipas por campo'
+                });
+            } else if(minEquipas <= 0){
+                errors.push({
+                    msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Deve indicar o número mínimo de equipas por campo'
+                });
+            } else if(maxEquipas <= 0){
+                errors.push({
+                    msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Deve indicar o número máximo de equipas por campo'
+                });
+            } else if(maxEquipas < minEquipas){
+                errors.push({
+                    msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - O número máximo de equipas não pode ser inferior ao número mínimo de equipas'
+                });
+            } else if(minEquipas < 2){
+                errors.push({
+                    msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - O número mínimo de equipas por campo deve ser 2 ou mais'
+                });
+            }
+        } else {
+            if(minEquipas > 0 || maxEquipas > 0){
+                errors.push({
+                    msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Deve selecionar o número de campos'
+                }); 
+            }
+        }
     }
     
-    if(!errors.isEmpty()){
+    if(errors.length > 0){
         const oldData = {
             torneioId: torneioId,
             designacao: designacao,
             localidade: localidade,
             ano: ano
         }
-        res.render('admin/editarTorneio', {validationErrors: errors.array({ onlyFirstError: true }), torneio: oldData, escaloes: listaEscaloes});
+        res.render('admin/editarTorneio', {validationErrors: errors, torneio: oldData, escaloes: listaEscaloes});
     } else {
 
         let transaction;
@@ -357,7 +404,7 @@ exports.updateTorneio = async (req, res, next) => {
                 ano: ano
             }, {transaction});
             
-            await processaUpdateCampos(transaction, torneioId, listaCampos, listaCamposId);
+            await processaUpdateCampos(transaction, torneioId, listaEscaloes);
 
             await transaction.commit();
 

@@ -1060,6 +1060,11 @@ animation-delay: -0.16s;
 
 .escalao__designacao {
     color: #455cc7;
+    font-size: 110%;
+}
+
+.escalao__numCampos-wrapper {
+    margin-bottom: 10px;
 }
 
 .escalaoNumCampos + label{

@@ -75,27 +75,34 @@ exports.getNumCamposEscaloes = (torneioId) => {
     });
 }
 
-exports.processaUpdateCampos = async (transaction, torneioId, listaCampos, listaIds) => {
-    let i = 0;
-    for(const escalao of listaCampos){
+exports.processaUpdateCampos = async (transaction, torneioId, listaEscaloes) => {
+    for(const escalao of listaEscaloes){
         let escalaoCamposToUpdate = await Campos.findOne({
             where: {
                 torneioId: torneioId,
-                escalaoId: listaIds[i]
+                escalaoId: escalao.escalaoId
             }
         }, {transaction});
         
         if(escalaoCamposToUpdate){
-            await escalaoCamposToUpdate.update({numCampos: listaCampos[i]}, {transaction});
+            if(escalao.campos == 0){
+                await escalaoCamposToUpdate.destroy({transaction});
+            } else {
+                await escalaoCamposToUpdate.update({
+                    numCampos: escalao.campos,
+                    minEquipas: escalao.minEquipas,
+                    maxEquipas: escalao.maxEquipas
+                }, {transaction});
+            }
         } else {
             await Campos.create({
                 torneioId: torneioId,
-                escalaoId: listaIds[i],
-                numCampos: listaCampos[i]
+                escalaoId: escalao.escalaoId,
+                numCampos: escalao.campos,
+                minEquipas: escalao.minEquipas,
+                maxEquipas: escalao.maxEquipas
             }, {transaction});
         }
-
-        i++;
     }
 }
 
@@ -159,6 +166,17 @@ exports.getNumEquipasPorEscalao = (torneio_id, escalaoId) => {
             escalaoId: escalaoId
         }
     });
+}
+
+exports.getNumEquipasPorCadaEscalao = (torneioId) => {
+    return Equipas.findAll({
+        attributes: ['escalaoId', [sequelize.fn('count', sequelize.col('equipaId')), 'numEquipas']],
+        where: {
+            torneioId: torneioId,
+        },
+        group: ['escalaoId'],
+        raw: true
+      });
 }
 
 exports.getNumEquipasPorLocalidadeAndEscalao = (torneioId, localidadeId, escalaoId) => {

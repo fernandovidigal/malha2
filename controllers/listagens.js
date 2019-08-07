@@ -335,6 +335,12 @@ function ordenaClassificacao(classificacao, listaJogos){
 
 exports.mostraListagens = async (req, res, next) => {
     const torneio = await getTorneioInfo();
+
+    if(!torneio){
+        req.flash('error', 'Não existem torneios activos.');
+        return res.redirect("../");
+    }
+
     const listaEscaloes = await getEscaloesComEquipas(torneio.torneioId);
     const listaEscaloesComJogos = await getAllEscaloesComJogos(torneio.torneioId);
 

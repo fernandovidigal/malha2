@@ -12,22 +12,7 @@ router.get('/', TorneiosController.getStarting);
 
 //router.post('/definirNumeroCampos');
 
-router.post('/definirNumeroCampos', [
-    check('numCampos').trim().escape().not().isEmpty().withMessage('Deve indicar número de campos do torneio.'),
-    check('numCampos').trim().escape().matches(/^[0-9]+$/).withMessage('Número de campos inválido.'),
-    check('numCampos').custom((value, {req}) => {
-        req.body.numCampos.forEach(campo => {
-            if(campo != '' && campo != 0){
-                if(Math.log2(parseInt(campo)) % 1 !== 0){
-                    throw new Error("Número de campos inválido. O número de campos deve ser uma potência de 2. (Ex: 2, 4, 8, 16, ...).");
-                }
-            } else if(campo == 0){
-                throw new Error("O número de campos não pode ser 0.");
-            }
-        });
-        return true;
-    })
-], TorneiosController.setNumeroCampos);
+router.post('/definirNumeroCampos', TorneiosController.setNumeroCampos);
 
 // Distribuição de todas as equipas de todos os escalões
 router.get('/distribuirTodasEquipas', TorneiosController.distribuirTodasEquipas);

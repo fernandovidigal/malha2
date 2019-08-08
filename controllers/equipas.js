@@ -70,7 +70,7 @@ function showValidationErrors(req, res, errors, page, oldData){
     });
 }
 
-function getAllEquipas(torneioId){
+function getAllEquipas(torneioId, offset, limit){
     return Equipas.findAll({
         where: {torneioId: torneioId}, 
         include: [
@@ -82,7 +82,17 @@ function getAllEquipas(torneioId){
                 model: Escaloes,
                 attributes: ['designacao', 'sexo']
             }
-        ]
+        ],
+        offest: ((offset-1) * limit),
+        limit: limit
+    });
+}
+
+function getNumTotalEquipas(torneioId){
+    return Equipas.count({
+        where: {
+            torneioId: torneioId
+        }
     });
 }
 
@@ -178,6 +188,8 @@ exports.getAllEquipas = async (req, res, next) => {
     const torneioInfo = getTorneioInfo();
     const localidadesInfo = getLocalidadesInfo();
     const escaloesInfo = getEscaloesInfo();
+    const page = parseInt(req.params.page) || 1;
+    const perPage = parseInt(req.params.perPage) || 15;
 
     Promise.all([torneioInfo, localidadesInfo, escaloesInfo])
     .then(async ([torneio, localidades, escaloes]) => {
@@ -195,8 +207,10 @@ exports.getAllEquipas = async (req, res, next) => {
             const listaCompletaEquipas = await getAllEquipasComJogos(torneio.torneioId);
             listaEquipasComJogos = geraListaEquipasUnicasComJogos(listaCompletaEquipas);
     
-            const _listaEquipas = await getAllEquipas(torneio.torneioId);
+            const _listaEquipas = await getAllEquipas(torneio.torneioId, page, perPage);
             const listaEquipas = [];
+
+            const numEquipas = await getNumTotalEquipas(torneio.torneioId);
     
             // Verificar se as equipas já estão atribuídas a jogos
             // Se estiverem então não é possível eliminar a equipa
@@ -220,7 +234,9 @@ exports.getAllEquipas = async (req, res, next) => {
                 torneio: torneio,
                 localidades: localidades,
                 escaloes: escaloes,
-                equipas: listaEquipas
+                equipas: listaEquipas,
+                page: page,
+                perPage: perPage
             });
         } catch(err) {
             console.log(err);

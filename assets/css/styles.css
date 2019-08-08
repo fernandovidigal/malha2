@@ -1105,3 +1105,30 @@ animation-delay: -0.16s;
     border: solid 1px #dddfe8;
     box-shadow: 0 2px 16px rgba(69, 92, 199, .2);
 }
+
+.pagination__wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination__item i {
+    margin: 0;
+}
+
+.pagination__item {
+    padding: 6px;
+    min-width: 20px;
+    background-color: #f8f9ff;
+    border: solid 1px #eaebf1;
+    border-radius: 8px;
+    text-align: center;
+    color: #333333;
+}
+
+.pagination__item:hover,
+.pagination__selected {
+    background-color: #ffffff;
+}

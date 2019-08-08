@@ -8,6 +8,7 @@ const Localidades = require('../models/Localidades');
 const Equipas = require('../models/Equipas');
 const util = require('../helpers/util');
 const dbFunctions = require('../helpers/torneioDBFunctions');
+const torneioHelpers = require('../helpers/torneioHelperFunctions');
 
 function getTorneioInfo(){
     return Torneios.findOne({where: {activo: 1}, raw: true});
@@ -200,137 +201,6 @@ async function processaListaEquipasAgrupadasPorCampos(torneioId, escalaoId, fase
     } catch(err) {
         return Promise.reject(err);
     }
-}
-
-function procuraEquipa(listaEquipas, equipaId){
-    for(let i = 0; i < listaEquipas.length; i++){
-        if(listaEquipas[i].equipaId == equipaId){
-            return listaEquipas[i];
-        }
-    }
-    return null;
-}
-
-function procuraEquipaIndex(listaEquipas, equipaId){
-    let k = -1;
-    for(let i = 0; i < listaEquipas.length; i++){
-        if(listaEquipas[i].equipaId == equipaId){
-            return i;
-        }
-    }
-    return k;
-}
-
-async function processaClassificacao(torneioId, escalaoId, fase, campo = 0){
-    try {
-        const _listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneioId, escalaoId, fase);
-
-        // 1. Preencher um array com o mesmo número de campos que o escalão tem ocupados
-        const listaCampos = [];
-        if(campo == 0){
-            for(let i = 0; i < _listaCampos.length; i++){
-                listaCampos.push({campo: i+1});
-            }
-        } else {
-            // Número do campo é passado como parametro
-            listaCampos.push({campo: campo});
-        }
-
-        const listaCompletaEquipas = await getAllEquipasEscalao(torneioId, escalaoId);
-
-        for(const campo of listaCampos){
-            const numCampo = campo.campo;
-
-            // 1. Obter a lista de Jogos para cada campo
-            const listaJogos = await dbFunctions.getAllGamesPorCampo(torneioId, escalaoId, fase, numCampo);
-            campo.classificacao = [];
-            const classificacao = campo.classificacao;
-            //const listaEquipas = new Set();
-
-            // 2. Percorre a lista de jogos e coloca as equipas na lista de classificação
-            for(const jogo of listaJogos){
-                const equipa1 = procuraEquipa(listaCompletaEquipas, jogo.equipa1Id);
-                const equipa2 = procuraEquipa(listaCompletaEquipas, jogo.equipa2Id);
-
-                const posicaoEquipa1 = procuraEquipaIndex(classificacao, jogo.equipa1Id);
-                if(posicaoEquipa1 != -1){
-                    classificacao[posicaoEquipa1].vitorias = (jogo.equipa1Pontos > jogo.equipa2Pontos) ? classificacao[posicaoEquipa1].vitorias = classificacao[posicaoEquipa1].vitorias + 1 : classificacao[posicaoEquipa1].vitorias;
-                    classificacao[posicaoEquipa1].pontos = classificacao[posicaoEquipa1].pontos + jogo.equipa1Pontos;
-                } else {
-                    const equipa = {
-                        equipaId: jogo.equipa1Id,
-                        primeiroElemento: equipa1.primeiroElemento,
-                        segundoElemento: equipa1.segundoElemento,
-                        localidadeId: equipa1.localidade.localidadeId,
-                        localidade: equipa1.localidade.nome,
-                        vitorias: (jogo.equipa1Pontos > jogo.equipa2Pontos) ? 1 : 0,
-                        pontos: jogo.equipa1Pontos
-                    }
-                    classificacao.push(equipa);
-                }
-
-                const posicaoEquipa2 = procuraEquipaIndex(classificacao, jogo.equipa2Id);
-                if(posicaoEquipa2 != -1){
-                    classificacao[posicaoEquipa2].vitorias = (jogo.equipa2Pontos > jogo.equipa1Pontos) ? classificacao[posicaoEquipa2].vitorias = classificacao[posicaoEquipa2].vitorias + 1 : classificacao[posicaoEquipa2].vitorias;
-                    classificacao[posicaoEquipa2].pontos = classificacao[posicaoEquipa2].pontos + jogo.equipa2Pontos;
-                } else {
-                    const equipa = {
-                        equipaId: jogo.equipa2Id,
-                        primeiroElemento: equipa2.primeiroElemento,
-                        segundoElemento: equipa2.segundoElemento,
-                        localidadeId: equipa2.localidade.localidadeId,
-                        localidade: equipa2.localidade.nome,
-                        vitorias: (jogo.equipa2Pontos > jogo.equipa1Pontos) ? 1 : 0,
-                        pontos: jogo.equipa2Pontos
-                    }
-                    classificacao.push(equipa);
-                }
-            }
-            
-            // 3. Ordena a Classificação
-            ordenaClassificacao(classificacao, listaJogos);
-        }
-        return listaCampos;
-    } catch(err) {
-        console.log(err);
-    }
-}
-
-function ordenaClassificacao(classificacao, listaJogos){
-    classificacao.sort((a, b) => {
-        // Diferença de Pontos
-        if(a.pontos > b.pontos){
-            return -1;
-        } else if(a.pontos === b.pontos){
-            // Mesmos pontos, desempata por número de vitórias
-            if(a.vitorias > b.vitorias){
-                return -1;
-            } else if(a.vitorias === b.vitorias) {
-                // Mesmo número de vitórias, desempata por resultado do confronto directo
-                const jogo = listaJogos.find(elemento => {
-                    return (elemento.equipa1Id == a.equipaId && elemento.equipa2Id == b.equipaId) || (elemento.equipa1Id == b.equipaId && elemento.equipa2Id == a.equipaId);
-                });
-
-                if(jogo.equipa1Pontos > jogo.equipa2Pontos){
-                    if(jogo.equipa1Id === a.equipaId){
-                        return -1;
-                    } else {
-                        return 1;
-                    }
-                } else {
-                    if(jogo.equipa2Id === a.equipaId){
-                        return -1;
-                    } else {
-                        return 1;
-                    }
-                }
-            } else {
-                return 1;
-            }
-        } else {
-            return 1;
-        }
-    });
 }
 
 exports.mostraListagens = async (req, res, next) => {
@@ -711,7 +581,7 @@ exports.getClassificacao = async (req, res, next) => {
             return res.status(200).json(response);
         }
         
-        const listaCampos = await processaClassificacao(torneio.torneioId, escalaoId, fase, campo);
+        const listaCampos = await torneioHelpers.processaClassificacao(torneio.torneioId, escalaoId, fase, campo);
 
         if(listaCampos.length > 0){
             response.torneio = {

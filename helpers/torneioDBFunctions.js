@@ -126,7 +126,8 @@ exports.updateNumCampos = (torneioId, escalaoId, numCampos) => {
 
 exports.getAllLocalidadesID = () => {
     return Localidades.findAll({
-        attributes: ['localidadeId']
+        attributes: ['localidadeId'],
+        raw: true
     });
 }
 

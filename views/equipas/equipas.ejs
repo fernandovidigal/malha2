@@ -184,6 +184,26 @@
                 <% } %>
                 </tbody>
             </table>
+            <div class="pagination__wrapper">
+                <select name="perPage" class="perPage">
+                    <option value="/equipas" <%= (perPage == 15) ? 'selected' : '' %>>15</option>
+                    <option value="/equipas/25" <%= (perPage == 25) ? 'selected' : '' %>>25</option>
+                    <option value="/equipas/50" <%= (perPage == 50) ? 'selected' : '' %>>50</option>
+                    <option value="/equipas/75" <%= (perPage == 75) ? 'selected' : '' %>>75</option>
+                    <option value="/equipas/100" <%= (perPage == 100) ? 'selected' : '' %>>100</option>
+                </select>
+                <div class="pagination">
+                    <a href="#" class="pagination__item"><i class="fas fa-caret-left"></i></a>
+                    <a href="#" class="pagination__item pagination__selected">1</a>
+                    <a href="#" class="pagination__item">2</a>
+                    <a href="#" class="pagination__item">3</a>
+                    <a href="#" class="pagination__item">4</a>
+                    <a href="#" class="pagination__item">5</a>
+                    <a href="#" class="pagination__item">6</a>
+                    <a href="#" class="pagination__item">7</a>
+                    <a href="#" class="pagination__item"><i class="fas fa-caret-right"></i></a>
+                </div>
+            </div>
         </div>
     <% } %>
 
@@ -191,5 +211,12 @@
     <h2>Oops.. Algo correu mal!</h2>
     <p>Verifique se existem torneios registados ou activados.</p>
 <% } %>
+<script>
+const perPage = document.querySelector('.perPage');
+perPage.addEventListener('change', function(e){
+    window.location = this.options[this.selectedIndex].value;
+    return false;
+});
+</script>
 <script src="/js/equipas.js"></script>
 <%- include('../includes/footer.ejs') %>

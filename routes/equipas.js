@@ -8,7 +8,7 @@ router.all('/*', userAuthenticated, (req, res, next) => {
     next();
 });
 
-router.get('/', EquipasController.getAllEquipas);
+router.get('/:perPage?/:page?', EquipasController.getAllEquipas);
 
 router.get('/adicionarEquipa', EquipasController.adicionarEquipa);
 

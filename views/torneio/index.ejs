@@ -38,7 +38,7 @@
         <% if(typeof campos != 'undefined' && campos.length > 0) { %>
             <% campos.forEach(function(campo){ %>
                 <div class="campo__wrapper">
-                    <div class="campo__title">Campo <%= (info.fase != 100) ? campo.campos : (campo.campo == 1) ? campo.campo + ' - Final' : campo.campo + ' - 3º e 4º lugar' %></div>
+                    <div class="campo__title">Campo <%= (info.fase != 100) ? campo.campo : (campo.campo == 1) ? campo.campo + ' - Final' : campo.campo + ' - 3º e 4º lugar' %></div>
                     <div class="campo__labels">
                         <div class="parcial_label">Parcial 1</div>
                         <div class="parcial_label">Parcial 2</div>
@@ -142,6 +142,5 @@
     <h2>Oops.. Algo correu mal!</h2>
     <p>Verifique se existem torneios registados ou activados.</p>
 <% } %>
-
 <script src="/js/jogos.js"></script>
 <%- include('../includes/footer.ejs') %>

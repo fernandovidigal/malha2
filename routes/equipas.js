@@ -8,8 +8,6 @@ router.all('/*', userAuthenticated, (req, res, next) => {
     next();
 });
 
-router.get('/:perPage?/:page?', EquipasController.getAllEquipas);
-
 router.get('/adicionarEquipa', EquipasController.adicionarEquipa);
 
 router.post('/adicionarEquipa', [
@@ -47,11 +45,16 @@ router.post('/pesquisa', [
 router.get('/filtro/localidade/:localidadeId', EquipasController.filtrarEquipas);
 router.get('/filtro/escalao/:escalaoId', EquipasController.filtrarEquipas);
 router.get('/filtro/localidade/:localidadeId/escalao/:escalaoId', EquipasController.filtrarEquipas);
+router.get('/filtro/localidade/:localidadeId/:perPage?/:page?', EquipasController.filtrarEquipas);
+router.get('/filtro/escalao/:escalaoId/:perPage?/:page?', EquipasController.filtrarEquipas);
+router.get('/filtro/localidade/:localidadeId/escalao/:escalaoId/:perPage?/:page?', EquipasController.filtrarEquipas);
 
 // FAKER
 // Gera equipa aleatóriamente
 router.get('/faker/:num', EquipasController.createEquipasAleatoriamente);
 
 router.get('/faker/:num/:escalao', EquipasController.createEquipasAleatoriamentePorEscalao);
+
+router.get('/:perPage?/:page?', EquipasController.getAllEquipas);
 
 module.exports = router;

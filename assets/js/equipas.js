@@ -96,3 +96,23 @@ deleteBtns.forEach(function(item, index){
         });
     });
 });
+
+// Print Button
+const printBtn = document.querySelector('.print_btn');
+printBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    const path = window.location.pathname;
+    const pathComponents = path.split('/');
+
+    let localidadeIndex = pathComponents.indexOf('localidade');
+    let escalaoIndex = pathComponents.indexOf('escalao');
+    localidadeIndex = pathComponents[localidadeIndex + 1];
+    escalaoIndex = pathComponents[escalaoIndex + 1];
+});
+
+//Mudança da selecção de resultados por página
+const perPage = document.querySelector('.perPage');
+perPage.addEventListener('change', function(e){
+    window.location = this.options[this.selectedIndex].value;
+    return false;
+});

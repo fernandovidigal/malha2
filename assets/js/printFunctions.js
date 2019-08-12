@@ -158,7 +158,6 @@ function makeEquipasAgrupadasPorCampos(ddContent, listaCampos, fase){
                 ]
             },
             layout: 'lightHorizontalLines',
-            id: 'tabela',
             margin: [0,0,0,10]
         }
 
@@ -199,7 +198,6 @@ function makeContentFichaJogoPrimeiraFase(dd, data){
                 widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'],
                 body: []
             },
-            id: 'tabela',
             layout: {
                 hLineWidth: function(i, node) {
                     if(i === 0 || i === 12 || i === 13) {
@@ -655,5 +653,93 @@ function makeContentResultados(dd, data, fase){
 }
 
 function makeEquipasContent(dd, data){
+    const widths = ['auto', '*'];
+    const tableHeader = [
+        {text: 'Equipa', bold: true},
+        {text: 'Jogadores', bold: true},
+    ];
 
+
+    if(!data.hasOwnProperty('localidade')){
+        widths.push('*');
+        tableHeader.push({text: 'Localidade', bold: true, alignment: 'center'});
+    } else {
+        dd.content.push({
+            text: `${data.localidade.nome}`,
+            alignment: 'center',
+            bold: true,
+            fontSize: 18
+        });
+    }
+
+    if(!data.hasOwnProperty('escalao')){
+        if(!data.hasOwnProperty('localidade')){
+            widths.push('auto');
+        } else {
+            widths.push('*');
+        }
+        tableHeader.push({text: 'Escalão', bold: true, alignment: 'center'});
+    } else {
+        dd.content.push({
+            text: `${data.escalao.designacao} (${data.escalao.sexo == 1 ? 'Masculino' : 'Feminino'})`,
+            alignment: 'center',
+            fontSize: 14,
+            margin: [0, 5, 0, 0]
+        });
+    }
+
+    const content = {
+        table: {
+            headerRows: 2,
+            dontBreakRows: true,
+            widths: widths,
+            body: []
+        },
+        layout: {
+            hLineWidth: function(i, node) {
+                if(i === 0){
+                    return 0;
+                } else if(i === 1){
+                    return 2;
+                } else {
+                    return 0.3;
+                }
+            },
+            vLineWidth: function(i, node) {
+                return 0;
+            },
+            hLineColor: function(i, node) {
+                if(i > 1) {
+                    return '#dddddd';
+                } else {
+                    return 'black';
+                }
+    		}
+        }
+    }
+
+    content.table.body.push(tableHeader);
+
+    data.listaEquipas.forEach(equipa => {
+        const row = [
+            {text: `${equipa.equipaId}`, alignment: 'center', margin: [5, 10]},
+            {stack: [
+                {text: `${equipa.primeiroElemento}`, fontSize: 10, margin: [0, 4, 0, 2]},
+                {text: `${equipa.segundoElemento}`, fontSize: 10, margin: [0, 2, 0, 4]},
+            ]}
+        ];
+        if(!data.hasOwnProperty('localidade')){
+            row.push({text: `${equipa.localidade}`, alignment: 'center', margin: [5, 10]});
+        }
+    
+        if(!data.hasOwnProperty('escalao')){
+            row.push({text: `${equipa.escalao} (${equipa.sexo})`, alignment: 'center', margin: [5, 10]});
+        }
+
+        content.table.body.push(row);
+    });
+
+    
+
+    dd.content.push(content);
 }

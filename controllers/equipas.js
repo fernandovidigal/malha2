@@ -731,7 +731,7 @@ exports.listagemEquipas = async (req, res, next) => {
 
         if(escalaoId != 0){
             query.escalaoId = escalaoId;
-            response.escalao = await getLocalidade(escalaoId);
+            response.escalao = await getEscalao(escalaoId);
         }
 
         const _listaEquipas = await getAllEquipasFullDetails(query);

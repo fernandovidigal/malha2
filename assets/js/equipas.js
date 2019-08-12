@@ -80,11 +80,14 @@ async function imprimeListaEquipas(localidade, escalao){
         const data = await getData(`/equipas/listagem/${localidade}/${escalao}`);
         docDefinition.content = [];
         delete docDefinition.pageBreakBefore;
+        docDefinition.pageMargins = [15, 105, 15, 25]
 
         if(data.success){
+            console.log(data);
             makeHeaderOnlyTorneioInfo(docDefinition, data.torneio);
-
-            pdfMake.createPdf(docDefinition).print({}, window);
+            makeEquipasContent(docDefinition, data);
+            makeFooter(docDefinition);
+            pdfMake.createPdf(docDefinition).print();
         } else {
             Swal.fire({
                 type: 'error',

@@ -170,7 +170,6 @@ async function imprimeNumEquipasPorConcelho(escalaoId){
             });
         }
     } catch(err){
-        console.log(err);
         Swal.fire({
             type: 'error',
             title: 'Oops...',

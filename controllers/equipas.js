@@ -22,6 +22,15 @@ function getLocalidadesInfo(){
     })
 }
 
+function getLocalidade(localidadeId){
+    return Localidades.findOne({
+        where: {
+            localidadeId: localidadeId
+        },
+        raw: true
+    })
+}
+
 function getAllLocalidadesId(){
     return Localidades.findAll({
         attributes: ['localidadeId'],
@@ -31,6 +40,15 @@ function getAllLocalidadesId(){
 
 function getEscaloesInfo(){
     return Escaloes.findAll({raw: true});
+}
+
+function getEscalao(escalaoId){
+    return Escaloes.findOne({
+        where: {
+            escalaoId: escalaoId
+        },
+        raw: true
+    })
 }
 
 function getNumJogosPorEscalao(torneioId, escalaoId){
@@ -113,6 +131,22 @@ function getEquipaFullDetails(torneioId, equipaId){
             equipaId: equipaId,
             torneioId: torneioId
         }, 
+        include: [
+            {
+                model: Localidades,
+                attributes: ['nome']
+            },
+            {
+                model: Escaloes,
+                attributes: ['designacao', 'sexo']
+            }
+        ]
+    });
+}
+
+function getAllEquipasFullDetails(whereClause){
+    return Equipas.findAll({
+        where: whereClause, 
         include: [
             {
                 model: Localidades,
@@ -662,6 +696,71 @@ exports.filtrarEquipas = async (req, res, next) => {
         console.log(err);
         req.flash("error", "Não foi possível filtrar equipas.");
         res.redirect('/equipas');
+    }
+}
+
+// API
+exports.listagemEquipas = async (req, res, next) => {
+    try {
+        const localidadeId = parseInt(req.params.localidade);
+        const escalaoId = parseInt(req.params.escalao);
+        const torneio = await getTorneioInfo();
+        const listaEquipas = [];
+        const query = {
+            torneioId: torneio.torneioId
+        }
+
+        const response = {
+            success: false
+        };
+
+        if(!torneio){
+            response.errMsg = 'Não foi possível obter os dados!';
+            return res.status(200).json(response);
+        } else {
+            response.torneio = {
+                designacao: torneio.designacao,
+                localidade: torneio.localidade
+            };
+        }
+
+        if(localidadeId != 0){
+            query.localidadeId = localidadeId;
+            response.localidade = await getLocalidade(localidadeId);
+        }
+
+        if(escalaoId != 0){
+            query.escalaoId = escalaoId;
+            response.escalao = await getLocalidade(escalaoId);
+        }
+
+        const _listaEquipas = await getAllEquipasFullDetails(query);
+        if(_listaEquipas.length > 0){
+            for(const equipa of _listaEquipas){
+                const _equipa = {
+                    equipaId: equipa.equipaId,
+                    primeiroElemento: equipa.primeiroElemento,
+                    segundoElemento: equipa.segundoElemento,
+                    localidade: equipa.localidade.nome,
+                    escalao: equipa.escalao.designacao,
+                    sexo: (equipa.escalao.sexo == 1) ? 'Masculino' : 'Feminino'
+                }
+                listaEquipas.push(_equipa);
+            }
+    
+            response.success = true;
+            response.listaEquipas = listaEquipas;
+        } else {
+            response.errMsg = 'Não existem equipas!';
+        }
+
+        res.status(200).json(response);
+    } catch(err) {
+        console.log(err);
+        res.status(200).json({
+            success: false,
+            errMsg: 'Ocorreu um erro. Por favor tente novamente.'
+        });
     }
 }
 

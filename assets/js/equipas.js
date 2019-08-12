@@ -1,5 +1,15 @@
-// Delete Buttons
-const deleteBtns = document.querySelectorAll('.delete_btn');
+async function getData(url) {
+    try {
+        let response = await fetch(url);
+        let data = await response.json();
+        return data;
+    } catch(err){
+        return {
+            success: false,
+            msg: 'Não foi possível obter os dados!'
+        }
+    }    
+}
 
 function showDeleteMessage(equipa){
     swal.fire({
@@ -65,6 +75,34 @@ function showDeleteMessage(equipa){
     });
 }
 
+async function imprimeListaEquipas(localidade, escalao){
+    try {
+        const data = await getData(`/equipas/listagem/${localidade}/${escalao}`);
+        docDefinition.content = [];
+        delete docDefinition.pageBreakBefore;
+
+        if(data.success){
+            makeHeaderOnlyTorneioInfo(docDefinition, data.torneio);
+
+            pdfMake.createPdf(docDefinition).print({}, window);
+        } else {
+            Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: data.errMsg,
+            });
+        }
+    } catch(err){
+        Swal.fire({
+            type: 'error',
+            title: 'Oops...',
+            text: 'Não foi possível obter os dados!',
+        });
+    }
+}
+
+// Delete Buttons
+const deleteBtns = document.querySelectorAll('.delete_btn');
 deleteBtns.forEach(function(item, index){
     item.addEventListener('click', function(e){
         e.preventDefault();
@@ -106,8 +144,10 @@ printBtn.addEventListener('click', function(e){
 
     let localidadeIndex = pathComponents.indexOf('localidade');
     let escalaoIndex = pathComponents.indexOf('escalao');
-    localidadeIndex = pathComponents[localidadeIndex + 1];
-    escalaoIndex = pathComponents[escalaoIndex + 1];
+    localidadeIndex = (localidadeIndex != -1) ? pathComponents[localidadeIndex + 1] : 0;
+    escalaoIndex = (escalaoIndex != -1) ? pathComponents[escalaoIndex + 1] : 0;
+
+    imprimeListaEquipas(localidadeIndex, escalaoIndex);
 });
 
 //Mudança da selecção de resultados por página

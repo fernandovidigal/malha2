@@ -49,6 +49,9 @@ router.get('/filtro/localidade/:localidadeId/:perPage?/:page?', EquipasControlle
 router.get('/filtro/escalao/:escalaoId/:perPage?/:page?', EquipasController.filtrarEquipas);
 router.get('/filtro/localidade/:localidadeId/escalao/:escalaoId/:perPage?/:page?', EquipasController.filtrarEquipas);
 
+// API
+router.get('/listagem/:localidade/:escalao', EquipasController.listagemEquipas);
+
 // FAKER
 // Gera equipa aleatóriamente
 router.get('/faker/:num', EquipasController.createEquipasAleatoriamente);

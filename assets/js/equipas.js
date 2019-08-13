@@ -83,7 +83,6 @@ async function imprimeListaEquipas(localidade, escalao){
         docDefinition.pageMargins = [15, 105, 15, 25]
 
         if(data.success){
-            console.log(data);
             makeHeaderOnlyTorneioInfo(docDefinition, data.torneio);
             makeEquipasContent(docDefinition, data);
             makeFooter(docDefinition);

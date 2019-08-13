@@ -9,6 +9,19 @@ guardaResultados.forEach((btn, index) => {
     });
 });
 
+async function getData(url) {
+    try {
+        let response = await fetch(url);
+        let data = await response.json();
+        return data;
+    } catch(err){
+        return {
+            success: false,
+            msg: 'Não foi possível obter os dados!'
+        }
+    }    
+}
+
 function handleParciais(btn, url, moveToEnd, actualizar){
     const campoWrapper = btn.closest('.campo__wrapper');
     const currentForm = btn.closest('.resultados__form');
@@ -163,7 +176,6 @@ function inputsParaTexto(item, index){
     parentNode.innerHTML = inputValue;
 }
 
-
 const editResultadosBtns = document.querySelectorAll('.btn_wrapper');
 editResultadosBtns.forEach((item, index)=>{
     item.addEventListener('click', function(event){
@@ -221,3 +233,49 @@ function removeAllChilds(element){
         element.removeChild(element.firstChild);
     }
 }
+
+async function imprimeFichaParciais(escalao, fase, campo){
+    try {
+        const data = await getData(`/torneio/fichaParciais/${escalao}/${fase}/${campo}`);
+        docDefinition.content = [];
+        delete docDefinition.pageBreakBefore;
+        console.log(data);
+
+        if(data.success){
+            //makeHeaderOnlyTorneioInfo(docDefinition, data.torneio);
+            //makeEquipasContent(docDefinition, data);
+            //makeFooter(docDefinition);
+            //pdfMake.createPdf(docDefinition).print();
+            console.log("Sucesso");
+        } else {
+            Swal.fire({
+                type: 'error',
+                title: 'Oops...',
+                text: data.errMsg,
+            });
+        }
+    } catch(err){
+        Swal.fire({
+            type: 'error',
+            title: 'Oops...',
+            text: 'Não foi possível obter os dados!',
+        });
+    }
+}
+
+const printBtn = document.querySelector('.print_btn');
+printBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    const path = window.location.pathname;
+    const pathComponents = path.split('/');
+
+    let escalaoIndex = pathComponents.indexOf('escalao');
+    let faseIndex = pathComponents.indexOf('fase');
+    let campoIndex = pathComponents.indexOf('campo');
+    
+    escalaoIndex = (escalaoIndex != -1) ? pathComponents[escalaoIndex + 1] : 0;
+    faseIndex = (faseIndex != -1) ? pathComponents[faseIndex + 1] : 0;
+    campoIndex = (campoIndex != -1) ? pathComponents[campoIndex + 1] : 0;
+
+    imprimeFichaParciais(escalaoIndex, faseIndex, campoIndex);
+});

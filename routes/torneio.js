@@ -36,4 +36,6 @@ router.get('/getEscalaoInfo/:escalaoId', TorneiosController.getEscalaoInfo);
 
 router.put('/setEscalaoNumCampos', TorneiosController.setNumeroCamposAPI);
 
+router.get('/fichaParciais/:escalao/:fase/:campo', TorneiosController.fichasParciais);
+
 module.exports = router;

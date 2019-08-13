@@ -32,7 +32,7 @@ exports.getTorneioInfo = () => {
 //                        ESCALÕES
 ////////////////////////////////////////////////////////
 
-exports.geEscalaoInfo = (escalaoId) => {
+exports.getEscalaoInfo = (escalaoId) => {
     return Escaloes.findOne({
         where: {
             escalaoId: escalaoId
@@ -322,6 +322,13 @@ exports.getNumGamesPorCampo = (torneioId, escalaoId, fase, campo) => {
     });
 }
 
+exports.getAllGames = (whereClause) => {
+    return Jogos.findAll({
+        where: whereClause,
+        raw: true
+    });
+}
+
 exports.getAllGamesPorCampo = (torneioId, escalaoId, fase, campo) => {
     return Jogos.findAll({
         where: {
@@ -357,7 +364,7 @@ exports.getNumGamesPlayed = (torneioId, escalaoId, fase, campo) => {
     });
 }
 
-exports.getNumGamesPlayed_old = (torneioId, escalaoId, fase, campo) => {
+/*exports.getNumGamesPlayed_old = (torneioId, escalaoId, fase, campo) => {
     return Jogos.findAll({
         col: 'jogoId',
         where: {
@@ -376,7 +383,7 @@ exports.getNumGamesPlayed_old = (torneioId, escalaoId, fase, campo) => {
             }
         }
     });
-}
+}*/
 
 exports.getAllCamposPorEscalaoFase = (torneioId, escalaoId, fase) => {
     return Jogos.findAll({

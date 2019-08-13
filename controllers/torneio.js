@@ -355,7 +355,7 @@ exports.mostraResultados = async (req, res, next) => {
         const torneio = await dbFunctions.getTorneioInfo();
 
         const _listaCampos = dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
-        const _escalaoInfo = dbFunctions.geEscalaoInfo(escalaoId);
+        const _escalaoInfo = dbFunctions.getEscalaoInfo(escalaoId);
         const _listaFases = dbFunctions.getAllFasesPorEscalao(torneio.torneioId, escalaoId);
 
         const info = {
@@ -579,7 +579,7 @@ exports.getEscalaoInfo = async (req, res, next) => {
     const escalaoId = req.params.escalaoId;
     const torneio = await dbFunctions.getTorneioInfo();
 
-    const escalaoInfo = dbFunctions.geEscalaoInfo(escalaoId);
+    const escalaoInfo = dbFunctions.getEscalaoInfo(escalaoId);
     const numCampos = dbFunctions.getNumeroCamposPorEscalao(torneio.torneioId, escalaoId);
 
     Promise.all([escalaoInfo, numCampos])
@@ -622,4 +622,48 @@ exports.setNumeroCamposAPI = (req, res, next) => {
         const response = { success: false }
         res.status(200).json(response); 
     });
+}
+
+exports.fichasParciais = async (req, res, next) => {
+    try {
+        console.log("aqui");
+        const escalaoId = parseInt(req.params.escalao);
+        const campo = parseInt(req.params.campo);
+        const fase = parseInt(req.params.fase) || 1;
+        const torneioInfo = dbFunctions.getTorneioInfo();
+        const escalaoInfo = dbFunctions.getEscalaoInfo(escalaoId);
+        const [torneio, escalao] = await Promise.all([torneioInfo, escalaoInfo]);
+        let listaCampos = [];
+        const query = {};
+
+        const response = {
+            success: false
+        };
+
+        if(!torneio || !escalao){
+            response.errMsg = 'Não foi possível obter os dados.';
+            return res.status(200).json(response);
+        } else {
+            query.torneioId = torneio.torneioId;
+            query.escalaoId = escalao.escalaoId;
+        }
+
+        if(campo == 0){
+            listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
+        } else {
+            listaCampos.push({campo: campo});
+            query.campo = campo;
+        }
+
+        const listaJogos = await dbFunctions.getAllGames(query);
+        const listaJogosId = listaJogos.map(jogo => jogo.jogoId);
+        const listaParciais = await dbFunctions.getAllParciais(listaJogosId);
+
+    } catch(err) {
+        console.log(err);
+        res.status(200).json({
+            success: false,
+            errMsg: 'Ocorreu um erro. Por favor tente novamente.'
+        });
+    }
 }

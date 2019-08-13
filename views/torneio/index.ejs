@@ -31,7 +31,7 @@
             </div>
             <div class="action_btns a-right">
                 <a href="/torneio/classificacao/escalao/<%= info.escalaoId %>/fase/<%= info.fase %>/campo/<%= info.campo %>" clasS="btn classificacao_btn"><i class="fas fa-list"></i>Classificação</a>
-                <button class="btn print_btn" onclick="window.print()"><i class="fas fa-print"></i>Imprimir</button>
+                <button class="btn print_btn"><i class="fas fa-print"></i>Imprimir</button>
             </div>
         </div>
 
@@ -142,5 +142,8 @@
     <h2>Oops.. Algo correu mal!</h2>
     <p>Verifique se existem torneios registados ou activados.</p>
 <% } %>
+<script src="/js/pdfmake.min.js"></script>
+<script src="/js/vfs_fonts.js"></script>
+<script src="/js/printFunctions.js"></script>
 <script src="/js/jogos.js"></script>
 <%- include('../includes/footer.ejs') %>

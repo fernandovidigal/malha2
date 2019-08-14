@@ -529,7 +529,7 @@ exports.createParciais = async (req, res, next) => {
     data.parciaisData.equipa1.equipaId = equipas.equipa1Id;
     data.parciaisData.equipa2.equipaId = equipas.equipa2Id;
     
-    data = torneio.processaPontuacao(data);
+    data = torneioHelpers.processaPontuacao(data);
 
     dbFunctions.createParciais(jogoId, data)
     .then((result)=>{
@@ -626,7 +626,6 @@ exports.setNumeroCamposAPI = (req, res, next) => {
 
 exports.fichasParciais = async (req, res, next) => {
     try {
-        console.log("aqui");
         const escalaoId = parseInt(req.params.escalao);
         const campo = parseInt(req.params.campo);
         const fase = parseInt(req.params.fase) || 1;
@@ -644,6 +643,13 @@ exports.fichasParciais = async (req, res, next) => {
             response.errMsg = 'Não foi possível obter os dados.';
             return res.status(200).json(response);
         } else {
+            response.torneio = {
+                designacao: torneio.designacao,
+                localidade: torneio.localidade,
+                escalao: escalao.designacao,
+                sexo: (escalao.sexo == 1) ? 'Masculino' : 'Feminino'
+            };
+
             query.torneioId = torneio.torneioId;
             query.escalaoId = escalao.escalaoId;
         }
@@ -657,7 +663,20 @@ exports.fichasParciais = async (req, res, next) => {
 
         const listaJogos = await dbFunctions.getAllGames(query);
         const listaJogosId = listaJogos.map(jogo => jogo.jogoId);
-        const listaParciais = await dbFunctions.getAllParciais(listaJogosId);
+        const _listaParciais = dbFunctions.getAllParciais(listaJogosId);
+        const _listaEquipas = dbFunctions.getAllEquipas(torneio.torneioId, escalao.escalaoId);
+        const [listaParciais, listaEquipas] = await Promise.all([_listaParciais, _listaEquipas]);
+
+        for(const campo of listaCampos){
+            campo.listaJogos = listaJogos.filter(jogo => jogo.campo == campo.campo);
+        }
+
+        response.listaCampos = listaCampos;
+        response.listaEquipas = listaEquipas;
+        response.listaParciais = listaParciais;
+
+        response.success = true;
+        res.status(200).json(response);
 
     } catch(err) {
         console.log(err);

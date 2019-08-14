@@ -227,7 +227,10 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
         docDefinition.content = [];
 
         docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
-            if(currentNode.text && currentNode.text.startsWith("Jogos a efectuar") && currentNode.startPosition.pageNumber != 1){
+            if(currentNode.text && currentNode.text.startsWith("Jogos a efectuar")){
+                console.log(currentNode);
+            }
+            if(currentNode.text && currentNode.text.startsWith("Jogos a efectuar") && currentNode.startPosition.top > 120){
                 return true;
             } else if(currentNode.text && currentNode.text.startsWith("PageBreak") && currentNode.startPosition.pageNumber != 1){
                 return true;

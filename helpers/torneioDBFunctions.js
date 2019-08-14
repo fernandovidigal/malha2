@@ -146,6 +146,18 @@ exports.getEquipa = (equipaId) => {
     });
 }
 
+exports.getAllEquipas = (torneioId, escalaoId) => {
+    return Equipas.findAll({
+        include: {
+            model: Localidades
+        },
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId
+        }
+    });
+}
+
 exports.getEquipasPorEscalao = (torneioId, escalaoId) => {
     return Equipas.findAll({
         where: {

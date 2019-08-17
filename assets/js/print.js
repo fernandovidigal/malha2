@@ -227,12 +227,9 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
         docDefinition.content = [];
 
         docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
-            if(currentNode.text && currentNode.text.startsWith("Jogos a efectuar")){
-                console.log(currentNode);
-            }
             if(currentNode.text && currentNode.text.startsWith("Jogos a efectuar") && currentNode.startPosition.top > 120){
                 return true;
-            } else if(currentNode.text && currentNode.text.startsWith("PageBreak") && currentNode.startPosition.pageNumber != 1){
+            } else if(currentNode.text && currentNode.text.startsWith("PageBreak") && currentNode.startPosition.top > 120){
                 return true;
             } else if(currentNode.text && currentNode.text.startsWith("Fase") && currentNode.startPosition.top > 750){
                 return true;
@@ -243,7 +240,7 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
 
         if(data.success){
             makeHeader(docDefinition, data.torneio);
-
+            
             data.campos.forEach(async campo => {
                 const pageBreak = {
                     text: 'PageBreak',

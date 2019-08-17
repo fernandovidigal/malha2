@@ -10,9 +10,28 @@ const methodOverride = require('method-override');
 
 const util = require('./helpers/util');
 const fileStruct = require('./helpers/fileStruct');
+const configFile = require('./helpers/configFunctions');
+
+let serverConfig = {
+    server: {
+        port: 3000
+    }
+}
 
 // Chech File Structure
 fileStruct.dataDirectoryCheck();
+
+configFile.readConfigFile()
+.then(data => {
+    serverConfig = data;
+    console.log("Configuração do servidor carregada!");
+})
+.catch(err => {
+    configFile.writeConfigFile(serverConfig)
+    .then(() => {
+        console.log("Carregada configuração por defeito do servidor!");
+    });
+});
 
 // Database
 const sequelize = require('./helpers/database');
@@ -52,8 +71,6 @@ Jogos.hasMany(Parciais, {foreignKey: 'jogoId', onDelete: 'cascade'});
 Parciais.belongsTo(Jogos, {foreignKey: 'jogoId'});
 Equipas.hasMany(Parciais, {foreignKey: 'equipaId', onDelete: 'cascade'});
 Parciais.belongsTo(Equipas, {foreignKey: 'equipaId'});
-
-
 
 // Template View Engine
 app.set('view engine', 'ejs');
@@ -99,6 +116,7 @@ const adminUtilizadores = require('./routes/admin/utilizadores');
 const adminLocalidades = require('./routes/admin/localidades');
 const adminEscaloes = require('./routes/admin/escaloes');
 const adminTorneios = require('./routes/admin/torneios');
+const adminConfiguracoes = require('./routes/admin/configuracoes');
 const equipas = require('./routes/equipas');
 const torneio = require('./routes/torneio');
 const listagens = require('./routes/listagens');
@@ -109,6 +127,7 @@ app.use('/admin/utilizadores', adminUtilizadores);
 app.use('/admin/localidades', adminLocalidades);
 app.use('/admin/escaloes', adminEscaloes);
 app.use('/admin/torneios', adminTorneios);
+app.use('/admin/configuracoes', adminConfiguracoes);
 app.use('/equipas', equipas);
 app.use('/torneio', torneio);
 app.use('/listagens', listagens);
@@ -126,6 +145,7 @@ sequelize
         .then(([user, created]) => {
             // Utilizador por defeito criado.
             // Server Start
+            const port = serverConfig.server.port;
             app.listen(port, () => console.log(`Malha App em localhost:${port} ou <IP da máquina>:${port}`));
         })
         .catch((err) => {

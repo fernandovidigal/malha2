@@ -1,0 +1,17 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/validationErrors.ejs') %>
+
+<div class="configWrapper">
+    <div class="configGroup">
+        <div class="configGroup__title">
+            <h2>Servidor</h2>
+        </div>
+        <form action="/admin/configuracoes/definirPorta" class="configItem" method="post">
+            <p class="configItem__title">Porta</p>
+            <input type="text" name="porta" value="<%= server.port %>" size="6">
+            <button type="submit" class="btn primary_btn"><i class="fas fa-save"></i>Guardar</button>
+        </form>
+    </div>
+</div>
+
+<%- include('../includes/footer.ejs') %>

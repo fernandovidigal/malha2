@@ -715,6 +715,7 @@ exports.listagemEquipas = async (req, res, next) => {
         };
 
         if(!torneio){
+            response.errType = 'error';
             response.errMsg = 'Não foi possível obter os dados!';
             return res.status(200).json(response);
         } else {
@@ -735,6 +736,7 @@ exports.listagemEquipas = async (req, res, next) => {
         }
 
         const _listaEquipas = await getAllEquipasFullDetails(query);
+        console.log(_listaEquipas);
         if(_listaEquipas.length > 0){
             for(const equipa of _listaEquipas){
                 const _equipa = {
@@ -751,6 +753,7 @@ exports.listagemEquipas = async (req, res, next) => {
             response.success = true;
             response.listaEquipas = listaEquipas;
         } else {
+            response.errType = 'warning';
             response.errMsg = 'Não existem equipas!';
         }
 

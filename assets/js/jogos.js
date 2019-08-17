@@ -239,27 +239,16 @@ async function imprimeFichaParciais(escalao, fase, campo){
         const data = await getData(`/torneio/fichaParciais/${escalao}/${fase}/${campo}`);
         docDefinition.content = [];
         docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
-            /*if(currentNode.text && currentNode.text.startsWith("Jogos a efectuar") && currentNode.startPosition.pageNumber != 1){
+            if(currentNode.text && currentNode.text.startsWith("Campo") && currentNode.startPosition.top > 130){
                 return true;
-            } else if(currentNode.text && currentNode.text.startsWith("PageBreak") && currentNode.startPosition.pageNumber != 1){
-                return true;
-            } else if(currentNode.text && currentNode.text.startsWith("Fase") && currentNode.startPosition.top > 750){
-                return true;
-            }else {
-                return false;
-            }*/
+            }
         };
 
-        if(data.success){
-            console.log(data);
-            makeHeader(docDefinition, data.torneio);
+        if(data.success){           makeHeader(docDefinition, data.torneio);
             data.listaCampos.forEach(campo => {
                 makeFolhaParciais(docDefinition, campo, data.listaEquipas, data.listaParciais);
             });
-            //makeFolhaParciais(docDefinition, data);
-            //makeFooter(docDefinition);
             pdfMake.createPdf(docDefinition).print();
-            console.log("Sucesso");
         } else {
             Swal.fire({
                 type: 'error',
@@ -268,7 +257,6 @@ async function imprimeFichaParciais(escalao, fase, campo){
             });
         }
     } catch(err){
-        console.log(err);
         Swal.fire({
             type: 'error',
             title: 'Oops...',

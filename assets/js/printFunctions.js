@@ -719,7 +719,7 @@ function makeEquipasContent(dd, data){
     }
 
     content.table.body.push(tableHeader);
-
+    
     data.listaEquipas.forEach(equipa => {
         const row = [
             {text: `${equipa.equipaId}`, alignment: 'center', margin: [5, 10]},
@@ -790,8 +790,7 @@ function makeFolhaParciais(dd, data, equipas, parciais){
                     return 'black';
                 }
             }
-        },
-        pageBreak: 'after'
+        }
     }
 
     data.listaJogos.forEach((jogo, index) => {
@@ -830,67 +829,78 @@ function makeFolhaParciais(dd, data, equipas, parciais){
                     {
                         table: {
                             widths:['*'],
-                            body: [[(equipa1parcial == null) ? {text:' ', border: [false, false, false, true],} : {text: `${equipa1parcial.parcial1}`, alignment: 'center', fontSize: 13, border: [false, false, false, false]}]]
+                            body: [[(equipa1parcial == null) ? {text:' '} : {text: `${equipa1parcial.parcial1}`, alignment: 'center', fontSize: 13}]]
                         },
-                        margin: [5,2]
+                        margin: [5,2],
+                        layout: 'noBorders'
                     },
                     {
                         table: {
                             widths:['*'],
-                            body: [[(equipa2parcial == null) ? {text:' ', border: [false, false, false, true],} : {text: `${equipa2parcial.parcial1}`, alignment: 'center', fontSize: 13, border: [false, false, false, false]}]]
-                        },
-                        margin: [5,4,5,0]}
-                ]
-            },
-            {
-                stack: [
-                    {
-                        table: {
-                            widths:['*'],
-                            body: [[(equipa1parcial == null) ? {text:' ', border: [false, false, false, true],} : {text: `${equipa1parcial.parcial2}`, alignment: 'center', fontSize: 13, border: [false, false, false, false]}]]
-                        },
-                        margin: [5,2]
-                    },
-                    {
-                        table: {
-                            widths:['*'],
-                            body: [[(equipa2parcial == null) ? {text:' ', border: [false, false, false, true],} : {text: `${equipa2parcial.parcial2}`, alignment: 'center', fontSize: 13, border: [false, false, false, false]}]]
-                        },
-                        margin: [5,4,5,0]}
-                ]
-            },
-            {
-                stack: [
-                    {
-                        table: {
-                            widths:['*'],
-                            body: [[(equipa1parcial == null) ? {text:' ', border: [false, false, false, true],} : {text: `${equipa1parcial.parcial3}`, alignment: 'center', fontSize: 13, border: [false, false, false, false]}]]
-                        },
-                        margin: [5,2]
-                    },
-                    {
-                        table: {
-                            widths:['*'],
-                            body: [[(equipa2parcial == null) ? {text:' ', border: [false, false, false, true],} : {text: `${equipa2parcial.parcial3}`, alignment: 'center', fontSize: 13, border: [false, false, false, false]}]]
-                        },
-                        margin: [5,4,5,0]}
-                ]
-            },
-            {
-                stack: [
-                    {
-                        table: {
-                            widths:['*'],
-                            body: [[(equipa1parcial == null) ? {text:' '} : {text: `${jogo.equipa1Pontos}`, alignment: 'center', fontSize: 14, bold: true, border: [false, false, false, false]}]]
-                        },
-                        margin: [5,2]
-                    },
-                    {
-                        table: {
-                            widths:['*'],
-                            body: [[(equipa2parcial == null) ? {text:' '} : {text: `${jogo.equipa2Pontos}`, alignment: 'center', fontSize: 14, bold: true, border: [false, false, false, false]}]]
+                            body: [[(equipa2parcial == null) ? {text:' '} : {text: `${equipa2parcial.parcial1}`, alignment: 'center', fontSize: 13}]]
                         },
                         margin: [5,4,5,0],
+                        layout: 'noBorders'
+                    }
+                ]
+            },
+            {
+                stack: [
+                    {
+                        table: {
+                            widths:['*'],
+                            body: [[(equipa1parcial == null) ? {text:' '} : {text: `${equipa1parcial.parcial2}`, alignment: 'center', fontSize: 13}]]
+                        },
+                        margin: [5,2],
+                        layout: 'noBorders'
+                    },
+                    {
+                        table: {
+                            widths:['*'],
+                            body: [[(equipa2parcial == null) ? {text:' '} : {text: `${equipa2parcial.parcial2}`, alignment: 'center', fontSize: 13}]]
+                        },
+                        margin: [5,4,5,0],
+                        layout: 'noBorders'
+                    }
+                ]
+            },
+            {
+                stack: [
+                    {
+                        table: {
+                            widths:['*'],
+                            body: [[(equipa1parcial == null) ? {text:' '} : {text: `${equipa1parcial.parcial3}`, alignment: 'center', fontSize: 13}]]
+                        },
+                        margin: [5,2],
+                        layout: 'noBorders'
+                    },
+                    {
+                        table: {
+                            widths:['*'],
+                            body: [[(equipa2parcial == null) ? {text:' '} : {text: `${equipa2parcial.parcial3}`, alignment: 'center', fontSize: 13}]]
+                        },
+                        margin: [5,4,5,0],
+                        layout: 'noBorders'
+                    }
+                ]
+            },
+            {
+                stack: [
+                    {
+                        table: {
+                            widths:['*'],
+                            body: [[(equipa1parcial == null) ? {text:' '} : {text: `${jogo.equipa1Pontos}`, alignment: 'center', fontSize: 14, bold: true}]]
+                        },
+                        margin: [5,2],
+                        layout: 'noBorders'
+                    },
+                    {
+                        table: {
+                            widths:['*'],
+                            body: [[(equipa2parcial == null) ? {text:' '} : {text: `${jogo.equipa2Pontos}`, alignment: 'center', fontSize: 14, bold: true}]]
+                        },
+                        margin: [5,4,5,0],
+                        layout: 'noBorders'
                     }
                 ]
             },

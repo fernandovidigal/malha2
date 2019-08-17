@@ -14,6 +14,9 @@
                         <li><a href="/admin/escaloes">Escalões</a></li>
                         <li><a href="/admin/torneios">Torneios</a></li>
                         <li><a href="/admin/localidades">Localidades</a></li>
+                        <% if(loggedUser.level === 10){ %>
+                            <li><a href="/admin/configuracoes">Configurações</a></li>
+                        <% } %>
                     </ul>
                 </li>
             <% } %>

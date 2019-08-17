@@ -89,16 +89,14 @@ async function imprimeListaEquipas(localidade, escalao){
             pdfMake.createPdf(docDefinition).print();
         } else {
             Swal.fire({
-                type: 'error',
-                title: 'Oops...',
-                text: data.errMsg,
+                type: data.errType,
+                title: data.errMsg,
             });
         }
     } catch(err){
         Swal.fire({
             type: 'error',
-            title: 'Oops...',
-            text: 'Não foi possível obter os dados!',
+            title: 'Não foi possível obter os dados!',
         });
     }
 }

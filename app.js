@@ -18,6 +18,19 @@ let serverConfig = {
     }
 }
 
+// Para Produção
+/*const sqlite3File = 'node_sqlite3.node';
+//const configFileName = path.join(path.dirname(process.execPath), '/config.json');
+
+try {
+    // TODO: anter de ver se é possível ler ou escrever deve-se verificar se existe o ficheiro
+    //R_OK e W_OK verifica se é possível ler escrever
+    fs.accessSync('sqlite3File', fs.constants.R_OK | fs.constants.W_OK);
+    console.log('can read/write');
+} catch (err) {
+    console.error('no access!');
+}*/
+
 // Chech File Structure
 fileStruct.dataDirectoryCheck();
 

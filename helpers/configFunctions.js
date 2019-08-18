@@ -1,11 +1,10 @@
 const fs = require('fs');
 const path = require('path');
-const configFileName = 'config.json';
-//const configFileName = path.join(path.dirname(process.execPath), '/config.json');
+const appPaths = require('./appPaths');
 
 exports.readConfigFile = async function(){
     return new Promise((resolve, reject) => {
-        fs.readFile(configFileName, 'utf8', (err, data) => {
+        fs.readFile(appPaths.configFileName, 'utf8', (err, data) => {
             if(err) return reject(err);
             resolve(JSON.parse(data));
         });
@@ -15,7 +14,7 @@ exports.readConfigFile = async function(){
 exports.writeConfigFile = async function(data){
     return new Promise((resolve, reject) => {
         const configData = JSON.stringify(data);
-        fs.writeFile(configFileName, configData, (err) => {
+        fs.writeFile(appPaths.configFileName, configData, (err) => {
             if(err) return reject(err);
             resolve();
         });

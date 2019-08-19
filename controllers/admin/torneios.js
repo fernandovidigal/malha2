@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 const sequelize = require('../../helpers/database');
 const Torneio = require('../../models/Torneios');
 const Escaloes = require('../../models/Escaloes');
+const Jogos = require('../../models/Jogos');
 const Campos = require('../../models/Campos');
 const { validationResult } = require('express-validator/check');
 
@@ -56,6 +57,17 @@ function getAllEscaloesSemCampos(torneioId, listaEscaloesComCampo){
     });
 }
 
+function getNumJogosAllEscaloes(torneioId){
+    return Jogos.findAll({
+        attributes: ['escalaoId'],
+        where: {
+            torneioId: torneioId
+        },
+        group: ['escalaoId'],
+        raw: true
+    });
+}
+
 exports.getAllTorneios = (req, res, next) => {
     Torneio.findAll({
         order: [['ano', 'DESC']],
@@ -76,20 +88,23 @@ exports.getTorneio = async (req, res, next) => {
 
     try {
         const listaEscaloes = getAllEscaloesComCampos(torneioId);
+        const listaNumJogos = getNumJogosAllEscaloes(torneioId);
         const torneio = getTorneio(torneioId);
         let escaloes = [];
         const listaEscaloesComCampo = [];
 
-        Promise.all([listaEscaloes, torneio])
-        .then(async ([_escaloes, _torneio]) => { 
+        Promise.all([listaEscaloes, torneio, listaNumJogos])
+        .then(async ([_escaloes, _torneio, _listaNumJogos]) => {
             for(const escalao of _escaloes){
+                const jogos = _listaNumJogos.find(_escalao => _escalao.escalaoId == escalao.escalaoId);
                 const _escalao = {
                     escalaoId: escalao.escalaoId,
                     designacao: escalao.designacao,
                     sexo: escalao.sexo,
                     campos: escalao.campos[0].numCampos,
                     minEquipas: escalao.campos[0].minEquipas,
-                    maxEquipas: escalao.campos[0].maxEquipas
+                    maxEquipas: escalao.campos[0].maxEquipas,
+                    editavel: (jogos == -1) ? true: false
                 }
                 escaloes.push(_escalao);
                 listaEscaloesComCampo.push(escalao.escalaoId);

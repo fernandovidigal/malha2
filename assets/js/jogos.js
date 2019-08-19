@@ -1,14 +1,3 @@
-
-let guardaResultados = document.getElementsByName('guardaResultados');
-let campoWrapper = document.querySelectorAll('.campo__wrapper');
-
-guardaResultados.forEach((btn, index) => {
-    btn.addEventListener('click', function(e){
-        e.preventDefault();
-        handleParciais(btn, "/torneio/registaParciais", true, 0);
-    });
-});
-
 async function getData(url) {
     try {
         let response = await fetch(url);
@@ -22,101 +11,132 @@ async function getData(url) {
     }    
 }
 
-function handleParciais(btn, url, moveToEnd, actualizar){
+let guardaResultados = document.getElementsByName('guardaResultados');
+let campoWrapper = document.querySelectorAll('.campo__wrapper');
+
+guardaResultados.forEach((btn, index) => {
+    btn.addEventListener('click', function(e){
+        e.preventDefault();
+        handleParciais(btn, "/torneio/registaParciais", true);
+    });
+});
+
+function getEquipasInputValues(form){
+    return {
+        equipa1: {
+            parcial1: parseInt(form.elements['equipa1_parcial1'].value),
+            parcial2: parseInt(form.elements['equipa1_parcial2'].value),
+            parcial3: (isNaN(parseInt(form.elements['equipa1_parcial3'].value))) ? 0 : parseInt(form.elements['equipa1_parcial3'].value)
+        },
+        equipa2: {
+            parcial1: parseInt(form.elements['equipa2_parcial1'].value),
+            parcial2: parseInt(form.elements['equipa2_parcial2'].value),
+            parcial3: (isNaN(parseInt(form.elements['equipa2_parcial3'].value))) ? 0 : parseInt(form.elements['equipa2_parcial3'].value)
+        }
+    }
+}
+
+function validaPontosEquipas(equipa1, equipa2){
+    let valido = true;
+
+    if(equipa1.parcial1 < 0 || equipa1.parcial1 > 30 || equipa2.parcial1 < 0 || equipa2.parcial1 > 30 || equipa1.parcial1 == equipa2.parcial1){
+        valido = false;
+        Swal.fire({
+            type: 'error',
+            title: 'Parciais do primeiro jogo inválidos'
+        });
+    } else if(equipa1.parcial2 < 0 || equipa1.parcial2 > 30 || equipa2.parcial2 < 0 || equipa2.parcial2 > 30 || equipa1.parcial2 == equipa2.parcial2){
+        valido = false;
+        Swal.fire({
+            type: 'error',
+            title: 'Parciais do segundo jogo inválidos'
+        });
+    } else if(equipa1.parcial3 < 0 || equipa1.parcial2 > 30 || equipa2.parcial3 < 0 || equipa2.parcial3 > 30){
+        valido = false;
+        Swal.fire({
+            type: 'error',
+            title: 'Parciais do terceiro jogo inválidos'
+        });
+    } else if(equipa1.parcial3 != 0 && equipa2.parcial3 != 0 && equipa1.parcial3 == equipa2.parcial3){
+        valido = false;
+        Swal.fire({
+            type: 'error',
+            title: 'Parciais do terceiro jogo inválidos'
+        });
+    }
+
+    return valido;
+}
+
+async function handleParciais(btn, url, moveToEnd, actualizar = 0){
     const campoWrapper = btn.closest('.campo__wrapper');
     const currentForm = btn.closest('.resultados__form');
     const currentEquipasInfowrapper = currentForm.querySelector(".equipasInfo__wrapper");
-
     const jogoID = btn.dataset.jogoid;
-
-    const equipa1_parcial1 = parseInt(currentForm.elements['equipa1_parcial1'].value);
-    const equipa1_parcial2 = parseInt(currentForm.elements['equipa1_parcial2'].value);
-    const equipa1_parcial3 = parseInt(currentForm.elements['equipa1_parcial3'].value);
-
-    const equipa2_parcial1 = parseInt(currentForm.elements['equipa2_parcial1'].value);
-    const equipa2_parcial2 = parseInt(currentForm.elements['equipa2_parcial2'].value);
-    const equipa2_parcial3 = parseInt(currentForm.elements['equipa2_parcial3'].value);
-
-
     let equipa1_pontos_text = currentForm.querySelector('.equipa1_pontos');
     let equipa2_pontos_text = currentForm.querySelector('.equipa2_pontos');
 
-    // Cria o componente de carregamento loading
-    const loadingDiv = createLoading();
-    const currentBtnWrapper = btn.closest('.btn_wrapper');
-    // Substitui o botão pelo componente de carregamento
-    currentBtnWrapper.replaceChild(loadingDiv, btn);
+    const equipasInputValues = getEquipasInputValues(currentForm);
+    const valido = validaPontosEquipas(equipasInputValues.equipa1, equipasInputValues.equipa2);
 
-    fetch(url, {
-        headers: { "Content-Type": "application/json; charset=utf-8" },
-        method: 'POST',
-        body: JSON.stringify({
-            jogoId: jogoID,
-            parciaisData: {
-                equipa1: {
-                    parcial1: equipa1_parcial1,
-                    parcial2: equipa1_parcial2,
-                    parcial3: equipa1_parcial3
-                },
-                equipa2: {
-                    parcial1: equipa2_parcial1,
-                    parcial2: equipa2_parcial2,
-                    parcial3: equipa2_parcial3
-                }
+    if(valido){
+        // Cria o componente de carregamento loading
+        const loadingDiv = createLoading();
+        const currentBtnWrapper = btn.closest('.btn_wrapper');
+        // Substitui o botão pelo componente de carregamento
+        currentBtnWrapper.replaceChild(loadingDiv, btn);
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                  },
+                method: 'POST',
+                body: JSON.stringify({
+                    jogoId: jogoID,
+                    parciaisData: equipasInputValues
+                })
+            });
+
+            const data = await response.json();
+
+            if(!data.success){
+                throw new Error((actualizar == 0) ? 'Não foi possível adicionar os parciais' : 'Não foi possível actualizar os parciais');
             }
-        })
-    })
-    .then(function(response){
-        if(response.status != 200){
-            throw new Error((actualizar == 0) ? 'Não foi possível adicionar os parciais' : 'Não foi possível actualizar os parciais');
-        }
-        
-        return response.json();
-    }).then(data => {
-        if(!data.success){
-            throw new Error((actualizar == 0) ? 'Não foi possível adicionar os parciais' : 'Não foi possível actualizar os parciais');
-        }
 
-        if(actualizar == 0) {
             Swal.fire({
                 type: 'success',
-                title: 'Parciais adicionados com sucesso!',
+                title: `Parciais ${(actualizar == 0) ? 'adicionados': 'actualizados'} com sucesso!`,
+                showConfirmButton: false,
+                timer: 1000
             });
-        } else {
+
+            equipa1_pontos_text.appendChild(document.createTextNode(data.equipa1_pontos));
+            equipa2_pontos_text.appendChild(document.createTextNode(data.equipa2_pontos));
+
+            if(moveToEnd){
+                campoWrapper.removeChild(currentForm);
+                campoWrapper.appendChild(currentForm);
+            }
+            
+            const parciaisInput = currentForm.querySelectorAll("input[type=text]");
+            parciaisInput.forEach(inputsParaTexto);
+
+            
+            const editBtn = createEditButton(jogoID);
+
+            removeAllChilds(currentBtnWrapper);
+            currentBtnWrapper.appendChild(editBtn);
+
+            currentEquipasInfowrapper.classList.add('resultados_finalizados');
+        } catch(err) {
             Swal.fire({
-                type: 'success',
-                title: 'Parciais actualizados com sucesso!',
+                type: 'error',
+                title: err.message,
             });
         }
-
-        equipa1_pontos_text.appendChild(document.createTextNode(data.equipa1_pontos));
-        equipa2_pontos_text.appendChild(document.createTextNode(data.equipa2_pontos));
-
-        if(moveToEnd){
-            campoWrapper.removeChild(currentForm);
-            campoWrapper.appendChild(currentForm);
-        }
-        
-        const parciaisInput = currentForm.querySelectorAll("input[type=text]");
-        parciaisInput.forEach(inputsParaTexto);
-
-        
-        const editBtn = createEditButton(jogoID);
-        //const deleteBtn = createDeleteButton(jogoID);
-
-        removeAllChilds(currentBtnWrapper);
-        currentBtnWrapper.appendChild(editBtn);
-        //currentBtnWrapper.appendChild(deleteBtn);
-
-        currentEquipasInfowrapper.classList.add('resultados_finalizados');
-    })
-    .catch(function(err){
-        Swal.fire({
-            type: 'error',
-            title: 'Ocorreu um erro!',
-            text: err.message
-        });
-    });
+    }
 }
 
 function createLoading(){
@@ -203,7 +223,7 @@ function activaEdicaoResultados(element){
     let equipaCount = 1;
     let parcialCount = 1;
 
-    equipaParcial.forEach((parcial, index)=>{
+    equipaParcial.forEach((parcial, index) => {
         if(parcialCount > 3){
             equipaCount++;
             parcialCount = 1;

@@ -13,7 +13,8 @@
     <% if(typeof escaloes != 'undefined'){ %>
         <p class="escalao__genero">Masculinos:</p>
         <% escaloes.forEach(escalao => { 
-            if(escalao.sexo == 1) { %>
+            if(escalao.sexo == 1) { 
+                if(escalao.editavel) { %>
                 <div class="escalao">
                     <p class="escalao__designacao">
                     <%= escalao.designacao %>
@@ -36,15 +37,24 @@
                         Equipas por Campo:
                         <input type="text" name="<%= (escalao.escalaoId * 100) + 1 %>" class="escalaoMinEquipas" placeholder="Mínimo" value="<%= (typeof escalao.minEquipas != undefined) ? escalao.minEquipas : '' %>">
                         <input type="text" name="<%= (escalao.escalaoId * 100) + 2 %>" class="escalaoMaxEquipas" placeholder="Máximo" value="<%= (typeof escalao.maxEquipas != undefined) ? escalao.maxEquipas : '' %>">
-                        <button class="preFillMinMaxEquipas"><i class="fas fa-edit"></i></button>
+                        <button class="preFillMinMaxEquipas"><i class="fas fa-edit"></i>Min/Max por defeito</button>
                     </div>
                 </div>
+                <% } else { %>
+                    <p class="escalao__designacao">
+                        <%= escalao.designacao %>
+                    </p>
+                    <p>Campos: <%= escalao.campos %></p>
+                    <p>Mínimo de Equipas: <%= escalao.minEquipas %></p>
+                    <p>Máximo de Equipas: <%= escalao.maxEquipas %></p>
+                <% } %>
             <% } %>
         <% }); %>
 
         <p class="escalao__genero">Femininos:</p>
         <% escaloes.forEach(escalao => { 
-            if(escalao.sexo == 0) { %>
+            if(escalao.sexo == 0) { 
+                if(escalao.editavel) { %>
                 <div class="escalao">
                     <p class="escalao__designacao">
                     <%= escalao.designacao %>
@@ -67,9 +77,17 @@
                         Equipas por Campo:
                         <input type="text" name="<%= (escalao.escalaoId * 100) + 1 %>" class="escalaoMinEquipas" placeholder="Mínimo" value="<%= (typeof escalao.minEquipas != undefined) ? escalao.minEquipas : '' %>">
                         <input type="text" name="<%= (escalao.escalaoId * 100) + 2 %>" class="escalaoMaxEquipas" placeholder="Máximo" value="<%= (typeof escalao.maxEquipas != undefined) ? escalao.maxEquipas : '' %>">
-                        <button class="preFillMinMaxEquipas"><i class="fas fa-edit"></i></button>
+                        <button class="preFillMinMaxEquipas"><i class="fas fa-edit"></i>Min/Max por defeito</button>
                     </div>
                 </div>
+                <% } else { %>
+                    <p class="escalao__designacao">
+                        <%= escalao.designacao %>
+                    </p>
+                    <p>Campos: <%= escalao.campos %></p>
+                    <p>Mínimo de Equipas: <%= escalao.minEquipas %></p>
+                    <p>Máximo de Equipas: <%= escalao.maxEquipas %></p>
+                <% } %>
             <% } %>
         <% }); %>
         <br>

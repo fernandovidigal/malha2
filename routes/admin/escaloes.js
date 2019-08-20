@@ -5,6 +5,7 @@ const { check } = require('express-validator/check');
 const EscaloesController = require('../../controllers/admin/escaloes');
 
 router.all('/*', [userAuthenticated, checkGestorStatus], (req, res, next) => {
+    res.locals.menuAdminEscaloes = true;
     next();
 });
 

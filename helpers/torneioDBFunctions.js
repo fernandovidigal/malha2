@@ -466,54 +466,56 @@ exports.getAllParciais = (listaJogos) => {
     });
 }
 
-exports.createParciais = (jogoId, data) => {
+exports.createParciais = async (jogoId, data) => {
     const equipa1ParciaisData = data.parciaisData.equipa1;
     const equipa2ParciaisData = data.parciaisData.equipa2;
+    let transaction;
 
-    return sequelize.transaction(t => {
-        return Jogos.update({
-            equipa1Pontos: equipa1ParciaisData.pontos,
-            equipa2Pontos: equipa2ParciaisData.pontos
-        }, {
-            where: { jogoId: jogoId }
-        }, {transaction: t})
-        .then(() => {
-            return sequelize.transaction(t2 => {
-                return Parciais.create({
+    try { 
+        transaction = await sequelize.transaction();
+        await Jogos.update({
+                    equipa1Pontos: equipa1ParciaisData.pontos,
+                    equipa2Pontos: equipa2ParciaisData.pontos
+                }, { where: { jogoId: jogoId } }, {transaction});
+        
+        await Parciais.create({
                     jogoId: jogoId,
                     equipaId: equipa1ParciaisData.equipaId,
                     parcial1: equipa1ParciaisData.parcial1,
                     parcial2: equipa1ParciaisData.parcial2,
                     parcial3: equipa1ParciaisData.parcial3
-                }, {transaction: t2})
-                .then(() => {
-                    return Parciais.create({
-                        jogoId: jogoId,
-                        equipaId: equipa2ParciaisData.equipaId,
-                        parcial1: equipa2ParciaisData.parcial1,
-                        parcial2: equipa2ParciaisData.parcial2,
-                        parcial3: equipa2ParciaisData.parcial3
-                    }, {transaction: t2})
-                });
-            });
-        });
-    })
+                }, {transaction});
+
+        await Parciais.create({
+                    jogoId: jogoId,
+                    equipaId: equipa2ParciaisData.equipaId,
+                    parcial1: equipa2ParciaisData.parcial1,
+                    parcial2: equipa2ParciaisData.parcial2,
+                    parcial3: equipa2ParciaisData.parcial3
+                }, {transaction});
+
+        await transaction.commit();
+        return Promise.resolve();
+
+    } catch(err){
+        await transaction.rollback();
+        return Promise.reject(err);
+    }
 }
 
-exports.updateParciais = (jogoId, data) => {
+exports.updateParciais = async (jogoId, data) => {
     const equipa1ParciaisData = data.parciaisData.equipa1;
     const equipa2ParciaisData = data.parciaisData.equipa2;
+    let transaction;
 
-    return sequelize.transaction(t => {
-        return Jogos.update({
-            equipa1Pontos: equipa1ParciaisData.pontos,
-            equipa2Pontos: equipa2ParciaisData.pontos
-        }, {
-            where: { jogoId: jogoId }
-        }, {transaction: t})
-        .then(() => {
-            return sequelize.transaction(t2 => {
-                return Parciais.update({
+    try { 
+        transaction = await sequelize.transaction();
+        await Jogos.update({
+                    equipa1Pontos: equipa1ParciaisData.pontos,
+                    equipa2Pontos: equipa2ParciaisData.pontos
+                }, { where: { jogoId: jogoId } }, {transaction});
+        
+        await Parciais.update({
                     parcial1: equipa1ParciaisData.parcial1,
                     parcial2: equipa1ParciaisData.parcial2,
                     parcial3: equipa1ParciaisData.parcial3
@@ -522,20 +524,24 @@ exports.updateParciais = (jogoId, data) => {
                         jogoId: jogoId,
                         equipaId: equipa1ParciaisData.equipaId
                     }
-                },{transaction: t2})
-                .then(() => {
-                    return Parciais.update({
-                        parcial1: equipa2ParciaisData.parcial1,
-                        parcial2: equipa2ParciaisData.parcial2,
-                        parcial3: equipa2ParciaisData.parcial3
-                    }, {
-                        where: {
-                            jogoId: jogoId,
-                            equipaId: equipa2ParciaisData.equipaId
-                        }
-                    },{transaction: t2})
-                });
-            });
-        });
-    })
+                },{transaction});
+
+        await Parciais.update({
+                    parcial1: equipa2ParciaisData.parcial1,
+                    parcial2: equipa2ParciaisData.parcial2,
+                    parcial3: equipa2ParciaisData.parcial3
+                }, {
+                    where: {
+                        jogoId: jogoId,
+                        equipaId: equipa2ParciaisData.equipaId
+                    }
+                },{transaction});
+
+        await transaction.commit();
+        return Promise.resolve();
+
+    } catch(err){
+        await transaction.rollback();
+        return Promise.reject(err);
+    }
 }

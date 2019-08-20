@@ -2,18 +2,21 @@
     <img src="/imagens/logoMalha.png" alt="Logotipo Malha" class="logo">
     <div class="navigation">
         <ul>
-            <li><a href="/torneio"><i class="fas fa-trophy"></i>Competição</a></li>
-            <li><a href="/equipas"><i class="fas fa-user-friends"></i>Equipas</a></li>
-            <li><a href="/listagens"><i class="fas fa-list"></i>Listagens</a></li>
+            <li <%= (typeof menuTorneio != 'undefined')? "class=menuSelected" : '' %>>
+                <a href="/torneio"><i class="fas fa-trophy"></i>Competição</a>
+                
+            </li>
+            <li <%= (typeof menuEquipas != 'undefined')? "class=menuSelected" : '' %>><a href="/equipas"><i class="fas fa-user-friends"></i>Equipas</a></li>
+            <li <%= (typeof menuListagens != 'undefined')? "class=menuSelected" : '' %>><a href="/listagens"><i class="fas fa-list"></i>Listagens</a></li>
             <% if(loggedUser.level === 10 || loggedUser.level === 5){ %>
-                <li class="admin_menu_item"><a href="/admin"><i class="fas fa-user-cog"></i>Administração</a>
+                <li class="admin_menu_item <%= (typeof menuAdmin != 'undefined')? 'admin_menu_item_open' : 'xpto' %>"><a href="/admin"><i class="fas fa-user-cog"></i>Administração</a>
                     <ul>
-                        <li><a href="/admin/localidades">Localidades</a></li>
-                        <li><a href="/admin/escaloes">Escalões</a></li>
-                        <li><a href="/admin/torneios">Competição</a></li>
+                        <li <%= (typeof menuAdminLocalidades != 'undefined')? "class=menuSelected" : '' %>><a href="/admin/localidades">Localidades</a></li>
+                        <li <%= (typeof menuAdminEscaloes != 'undefined')? "class=menuSelected" : '' %>><a href="/admin/escaloes">Escalões</a></li>
+                        <li <%= (typeof menuAdminTorneios != 'undefined')? "class=menuSelected" : '' %>><a href="/admin/torneios">Competição</a></li>
                         <% if(loggedUser.level === 10){ %>
-                            <li><a href="/admin/utilizadores">Utilizadores</a></li>
-                            <li><a href="/admin/configuracoes">Configurações</a></li>
+                            <li <%= (typeof menuAdminUtilizadores != 'undefined')? "class=menuSelected" : '' %>><a href="/admin/utilizadores">Utilizadores</a></li>
+                            <li <%= (typeof menuAdminConfig != 'undefined')? "class=menuSelected" : '' %>><a href="/admin/configuracoes">Configurações</a></li>
                         <% } %>
                     </ul>
                 </li>

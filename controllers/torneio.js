@@ -531,21 +531,32 @@ exports.createParciais = async (req, res, next) => {
     
     data = torneioHelpers.processaPontuacao(data);
 
-    dbFunctions.createParciais(jogoId, data)
+    try{
+        await dbFunctions.createParciais(jogoId, data);
+        res.status(200).json({
+            success: true,
+            equipa1_pontos: data.parciaisData.equipa1.pontos,
+            equipa2_pontos: data.parciaisData.equipa2.pontos
+        });
+    } catch(err) {
+        console.log(err);
+        res.status(200).json({
+            success: false
+        });
+    }
+    //const result = await dbFunctions.createParciais(jogoId, data);
+
+    /*dbFunctions.createParciais(jogoId, data)
     .then((result)=>{
+        console.log(result);
         res.status(200).json({
             success: true,
             equipa1_pontos: data.parciaisData.equipa1.pontos,
             equipa2_pontos: data.parciaisData.equipa2.pontos
         });
     }).catch((err)=>{
-        console.log(err);
-        res.status(200).json({
-            success: false,
-            equipa1_pontos: data.parciaisData.equipa1.pontos,
-            equipa2_pontos: data.parciaisData.equipa2.pontos
-        });
-    });
+        
+    });*/
 }
 
 exports.updateParciais = async (req, res, next) => {
@@ -558,21 +569,19 @@ exports.updateParciais = async (req, res, next) => {
 
     data = torneioHelpers.processaPontuacao(data);
 
-    dbFunctions.updateParciais(jogoId, data)
-    .then((result)=>{
+    try{
+        await dbFunctions.updateParciais(jogoId, data);
         res.status(200).json({
             success: true,
             equipa1_pontos: data.parciaisData.equipa1.pontos,
             equipa2_pontos: data.parciaisData.equipa2.pontos
         });
-    }).catch((err)=>{
+    } catch(err) {
         console.log(err);
         res.status(200).json({
-            success: false,
-            equipa1_pontos: data.parciaisData.equipa1.pontos,
-            equipa2_pontos: data.parciaisData.equipa2.pontos
+            success: false
         });
-    });
+    }
 }
 
 exports.getEscalaoInfo = async (req, res, next) => {

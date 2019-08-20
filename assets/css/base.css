@@ -192,3 +192,8 @@ h3 {
 .fa-search {
     cursor: pointer;
 }
+
+.swal-wide{
+    min-width: 512px !important;
+    width: 40% !important;
+}

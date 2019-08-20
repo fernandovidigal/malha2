@@ -25,6 +25,7 @@ function showDeleteMessage(equipa){
                 <p>${equipa.escalao}<br><small>(${equipa.sexo == 1 ? 'Masculino' : 'Feminino'})</small></p>
             </div>`,
         type: 'warning',
+        customClass: 'swal-wide',
         showCancelButton: true,
         confirmButtonText: 'Sim, eliminar!',
         confirmButtonColor: '#d9534f',

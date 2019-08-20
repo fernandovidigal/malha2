@@ -5,6 +5,7 @@ const { check } = require('express-validator/check');
 const LocalidadesController = require('../../controllers/admin/localidades');
 
 router.all('/*', [userAuthenticated, checkGestorStatus], (req, res, next) => {
+    res.locals.menuAdminLocalidades = true;
     next();
 });
 

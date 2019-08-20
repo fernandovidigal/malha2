@@ -976,10 +976,16 @@ animation-delay: -0.16s;
     display: flex;
     justify-content: space-around;
     align-items: center;
+    margin-top: 20px;
+}
+
+.deleteTeam p {
+    margin: 0 20px;
 }
 
 .deleteTeam__elementos {
     text-align: left;
+    margin-right: auto;
 }
 
 .deleteTeam__elementos p {
@@ -1199,4 +1205,24 @@ animation-delay: -0.16s;
 
 .admin__item > p {
     font-size: 120%;
+}
+
+.admin_menu_item ul {
+    display: none;
+}
+
+.admin_menu_item:hover ul {
+    display: block;
+}
+
+.admin_menu_item_open {
+    background-color: #6174cf;
+}
+
+.admin_menu_item_open ul {
+    display: block !important;
+}
+
+.menuSelected {
+    background-color: #6174cf;
 }

@@ -515,27 +515,29 @@ exports.updateEquipa = async (req, res, next) => {
 }
 
 exports.getEquipaToDelete = async (req, res, next) => {
-    const equipaId = req.params.equipaId;
+    const equipaId = parseInt(req.params.equipaId);
+    let response = {
+        success: false
+    };
+    
+    try {
+        const torneio = await getTorneioInfo();
+        const equipa = await getEquipaFullDetails(torneio.torneioId, equipaId);
 
-    const torneio = await getTorneioInfo();
-    const equipa = await getEquipaFullDetails(torneio.torneioId, equipaId);
-    let response;
-
-    if(equipa){
-        response = {
-            success: true,
-            equipa: {
-                equipaId: equipa.equipaId,
-                torneioId: equipa.torneioId,
-                primeiroElemento: equipa.primeiroElemento,
-                segundoElemento: equipa.segundoElemento,
-                localidade: equipa.localidade.nome,
-                sexo: equipa.escalao.sexo,
-                escalao: equipa.escalao.designacao
-            }
+        if(equipa){
+            response.success = true,
+            response.equipa = {
+                    equipaId: equipa.equipaId,
+                    torneioId: equipa.torneioId,
+                    primeiroElemento: equipa.primeiroElemento,
+                    segundoElemento: equipa.segundoElemento,
+                    localidade: equipa.localidade.nome,
+                    sexo: equipa.escalao.sexo,
+                    escalao: equipa.escalao.designacao
+                };
         }
-    } else {
-        response = { success: false }
+    } catch(err){
+        console.log(err);
     }
 
     res.status(200).json(response);
@@ -544,16 +546,20 @@ exports.getEquipaToDelete = async (req, res, next) => {
 exports.deleteEquipa = async (req, res, next) => {
     const equipaId = req.body.equipaId;
     const torneioId = req.body.torneioId;
-    let response;
+    let response = {
+        success: false
+    };
 
-    const equipa = await getEquipa(torneioId, equipaId, false);
-    if(equipa){
-        const result = await equipa.destroy();
-        response = {
-            success: (result) ? true: false,
+    try {
+        const equipa = await getEquipa(torneioId, equipaId, false);
+        if(equipa){
+            const result = await equipa.destroy();
+            response = {
+                success: (result) ? true: false,
+            }
         }
-    } else {
-        response = { success: false }
+    } catch(err) {
+        console.log(err);
     }
 
     res.status(200).json(response);

@@ -802,26 +802,26 @@ function makeFolhaParciais(dd, data, equipas, parciais){
         const row = [
             {
                 stack: [
-                    {text:`${equipa1.equipaId}`, alignment: 'center', fontSize: 12, margin: [0, 5]},
-                    {text:`${equipa2.equipaId}`, alignment: 'center', fontSize: 12, margin: [0, 5]}
+                    {text:`${equipa1.equipaId}`, alignment: 'center', fontSize: 10, margin: [0, 5]},
+                    {text:`${equipa2.equipaId}`, alignment: 'center', fontSize: 10, margin: [0, 5]}
                 ]
             },
             {
                 stack: [
-                    {text:`${equipa1.primeiroElemento}`, fontSize: 10, margin: [0, 7]},
-                    {text:`${equipa2.primeiroElemento}`, fontSize: 10, margin: [0, 7]}
+                    {text:`${equipa1.primeiroElemento}`, fontSize: 10, margin: [0, 5]},
+                    {text:`${equipa2.primeiroElemento}`, fontSize: 10, margin: [0, 5]}
                 ]
             },
             {
                 stack: [
-                    {text:`${equipa1.segundoElemento}`, fontSize: 10, margin: [0, 7]},
-                    {text:`${equipa2.segundoElemento}`, fontSize: 10, margin: [0, 7]}
+                    {text:`${equipa1.segundoElemento}`, fontSize: 10, margin: [0, 5]},
+                    {text:`${equipa2.segundoElemento}`, fontSize: 10, margin: [0, 5]}
                 ]
             },
             {
                 stack: [
-                    {text:`${equipa1.localidade.nome}`, fontSize: 10, margin: [0, 7]},
-                    {text:`${equipa2.localidade.nome}`, fontSize: 10, margin: [0, 7]}
+                    {text:`${equipa1.localidade.nome}`, fontSize: 10, margin: [0, 5]},
+                    {text:`${equipa2.localidade.nome}`, fontSize: 10, margin: [0, 5]}
                 ]
             },
             {
@@ -829,7 +829,7 @@ function makeFolhaParciais(dd, data, equipas, parciais){
                     {
                         table: {
                             widths:['*'],
-                            body: [[(equipa1parcial == null) ? {text:' '} : {text: `${equipa1parcial.parcial1}`, alignment: 'center', fontSize: 13}]]
+                            body: [[(equipa1parcial == null) ? {text:' '} : {text: `${equipa1parcial.parcial1}`, alignment: 'center', fontSize: 12}]]
                         },
                         margin: [5,2],
                         layout: 'noBorders'
@@ -837,9 +837,9 @@ function makeFolhaParciais(dd, data, equipas, parciais){
                     {
                         table: {
                             widths:['*'],
-                            body: [[(equipa2parcial == null) ? {text:' '} : {text: `${equipa2parcial.parcial1}`, alignment: 'center', fontSize: 13}]]
+                            body: [[(equipa2parcial == null) ? {text:' '} : {text: `${equipa2parcial.parcial1}`, alignment: 'center', fontSize: 12}]]
                         },
-                        margin: [5,4,5,0],
+                        margin: [5,2,5,0],
                         layout: 'noBorders'
                     }
                 ]
@@ -849,7 +849,7 @@ function makeFolhaParciais(dd, data, equipas, parciais){
                     {
                         table: {
                             widths:['*'],
-                            body: [[(equipa1parcial == null) ? {text:' '} : {text: `${equipa1parcial.parcial2}`, alignment: 'center', fontSize: 13}]]
+                            body: [[(equipa1parcial == null) ? {text:' '} : {text: `${equipa1parcial.parcial2}`, alignment: 'center', fontSize: 12}]]
                         },
                         margin: [5,2],
                         layout: 'noBorders'
@@ -857,9 +857,9 @@ function makeFolhaParciais(dd, data, equipas, parciais){
                     {
                         table: {
                             widths:['*'],
-                            body: [[(equipa2parcial == null) ? {text:' '} : {text: `${equipa2parcial.parcial2}`, alignment: 'center', fontSize: 13}]]
+                            body: [[(equipa2parcial == null) ? {text:' '} : {text: `${equipa2parcial.parcial2}`, alignment: 'center', fontSize: 12}]]
                         },
-                        margin: [5,4,5,0],
+                        margin: [5,2,5,0],
                         layout: 'noBorders'
                     }
                 ]
@@ -869,7 +869,7 @@ function makeFolhaParciais(dd, data, equipas, parciais){
                     {
                         table: {
                             widths:['*'],
-                            body: [[(equipa1parcial == null) ? {text:' '} : {text: `${equipa1parcial.parcial3}`, alignment: 'center', fontSize: 13}]]
+                            body: [[(equipa1parcial == null) ? {text:' '} : {text: `${(equipa1parcial.parcial3 != 0) ? equipa1parcial.parcial3 : ' '}`, alignment: 'center', fontSize: 12}]]
                         },
                         margin: [5,2],
                         layout: 'noBorders'
@@ -877,9 +877,9 @@ function makeFolhaParciais(dd, data, equipas, parciais){
                     {
                         table: {
                             widths:['*'],
-                            body: [[(equipa2parcial == null) ? {text:' '} : {text: `${equipa2parcial.parcial3}`, alignment: 'center', fontSize: 13}]]
+                            body: [[(equipa2parcial == null) ? {text:' '} : {text: `${(equipa2parcial.parcial3 != 0) ? equipa2parcial.parcial3 : ' '}`, alignment: 'center', fontSize: 12}]]
                         },
-                        margin: [5,4,5,0],
+                        margin: [5,2,5,0],
                         layout: 'noBorders'
                     }
                 ]
@@ -891,7 +891,7 @@ function makeFolhaParciais(dd, data, equipas, parciais){
                             widths:['*'],
                             body: [[(equipa1parcial == null) ? {text:' '} : {text: `${jogo.equipa1Pontos}`, alignment: 'center', fontSize: 14, bold: true}]]
                         },
-                        margin: [5,2],
+                        margin: [5,0],
                         layout: 'noBorders'
                     },
                     {
@@ -899,7 +899,7 @@ function makeFolhaParciais(dd, data, equipas, parciais){
                             widths:['*'],
                             body: [[(equipa2parcial == null) ? {text:' '} : {text: `${jogo.equipa2Pontos}`, alignment: 'center', fontSize: 14, bold: true}]]
                         },
-                        margin: [5,4,5,0],
+                        margin: [5,2,5,0],
                         layout: 'noBorders'
                     }
                 ]

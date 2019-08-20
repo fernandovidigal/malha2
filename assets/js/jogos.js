@@ -135,6 +135,7 @@ async function handleParciais(btn, url, moveToEnd, actualizar = 0){
                 type: 'error',
                 title: err.message,
             });
+            currentBtnWrapper.replaceChild(btn, loadingDiv);
         }
     }
 }

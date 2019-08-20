@@ -5,6 +5,7 @@ const { check } = require('express-validator/check');
 const EquipasController = require('../controllers/equipas');
 
 router.all('/*', userAuthenticated, (req, res, next) => {
+    res.locals.menuEquipas = true;
     next();
 });
 

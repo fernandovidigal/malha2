@@ -5,6 +5,7 @@ const { check } = require('express-validator/check');
 const ConfiguracoesController = require('../../controllers/admin/configuracoes');
 
 router.all('/*', [userAuthenticated, checkAdminStatus], (req, res, next) => {
+    res.locals.menuAdminConfig = true;
     next();
 });
 

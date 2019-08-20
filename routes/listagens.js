@@ -5,6 +5,7 @@ const { check } = require('express-validator/check');
 const ListagensController = require('../controllers/listagens');
 
 router.all('/*', userAuthenticated, (req, res, next) => {
+    res.locals.menuListagens = true;
     next();
 });
 

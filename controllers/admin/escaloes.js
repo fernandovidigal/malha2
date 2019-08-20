@@ -154,7 +154,7 @@ exports.updateEscalao = (req, res, next) => {
 }
 
 exports.deleteEscalao = (req, res, next) => {
-    const escalaoId = req.body.id;
+    const escalaoId = parseInt(req.body.id);
 
     Escaloes.destroy({where: {escalaoId: escalaoId}, limit: 1})
         .then(result => {

@@ -9,7 +9,7 @@
             <li <%= (typeof menuEquipas != 'undefined')? "class=menuSelected" : '' %>><a href="/equipas"><i class="fas fa-user-friends"></i>Equipas</a></li>
             <li <%= (typeof menuListagens != 'undefined')? "class=menuSelected" : '' %>><a href="/listagens"><i class="fas fa-list"></i>Listagens</a></li>
             <% if(loggedUser.level === 10 || loggedUser.level === 5){ %>
-                <li class="admin_menu_item <%= (typeof menuAdmin != 'undefined')? 'admin_menu_item_open' : 'xpto' %>"><a href="/admin"><i class="fas fa-user-cog"></i>Administração</a>
+                <li class="adminMenu <%= (typeof menuAdmin != 'undefined')? 'adminMenu_open' : 'adminMenu_dropMenu' %>"><a href="/admin"><i class="fas fa-user-cog"></i>Administração</a>
                     <ul>
                         <li <%= (typeof menuAdminLocalidades != 'undefined')? "class=menuSelected" : '' %>><a href="/admin/localidades">Localidades</a></li>
                         <li <%= (typeof menuAdminEscaloes != 'undefined')? "class=menuSelected" : '' %>><a href="/admin/escaloes">Escalões</a></li>

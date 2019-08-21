@@ -158,6 +158,18 @@ exports.getAllEquipas = (torneioId, escalaoId) => {
     });
 }
 
+exports.getAllEquipasEscalao = (torneioId, escalaoId) => {
+    return Equipas.findAll({
+        include: {
+            model: Localidades
+        },
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId
+        }
+    });
+}
+
 exports.getEquipasPorEscalao = (torneioId, escalaoId) => {
     return Equipas.findAll({
         where: {
@@ -190,6 +202,18 @@ exports.getNumEquipasPorCadaEscalao = (torneioId) => {
         group: ['escalaoId'],
         raw: true
       });
+}
+
+exports.getAllEquipasEscalao = (torneioId, escalaoId) => {
+    return Equipas.findAll({
+        include: {
+            model: Localidades
+        },
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId
+        }
+    });
 }
 
 exports.getNumEquipasPorLocalidadeAndEscalao = (torneioId, localidadeId, escalaoId) => {
@@ -375,27 +399,6 @@ exports.getNumGamesPlayed = (torneioId, escalaoId, fase, campo) => {
         type: sequelize.QueryTypes.SELECT
     });
 }
-
-/*exports.getNumGamesPlayed_old = (torneioId, escalaoId, fase, campo) => {
-    return Jogos.findAll({
-        col: 'jogoId',
-        where: {
-            torneioId: torneioId,
-            escalaoId: escalaoId,
-            fase: fase,
-            campo: campo
-        },
-        include: {
-            model: Parciais,
-            where: {
-                [Op.or]: [
-                    {equipaId: sequelize.col('jogos.equipa1Id')},
-                    {equipaId: sequelize.col('jogos.equipa2Id')}
-                ]
-            }
-        }
-    });
-}*/
 
 exports.getAllCamposPorEscalaoFase = (torneioId, escalaoId, fase) => {
     return Jogos.findAll({

@@ -193,6 +193,10 @@ h3 {
     cursor: pointer;
 }
 
+.fa-clipboard-list:hover {
+    color: #455cc7;
+}
+
 .swal-wide{
     min-width: 512px !important;
     width: 40% !important;

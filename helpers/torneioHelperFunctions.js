@@ -366,6 +366,43 @@ exports.processaPontuacao = function(data){
     return data;
 }
 
+exports.ordenaClassificacao = function(classificacao, listaJogos){
+    classificacao.sort((a, b) => {
+        // Diferença de Pontos
+        if(a.pontos > b.pontos){
+            return -1;
+        } else if(a.pontos === b.pontos){
+            // Mesmos pontos, desempata por número de vitórias
+            if(a.vitorias > b.vitorias){
+                return -1;
+            } else if(a.vitorias === b.vitorias) {
+                // Mesmo número de vitórias, desempata por resultado do confronto directo
+                const jogo = listaJogos.find(elemento => {
+                    return (elemento.equipa1Id == a.equipaId && elemento.equipa2Id == b.equipaId) || (elemento.equipa1Id == b.equipaId && elemento.equipa2Id == a.equipaId);
+                });
+
+                if(jogo.equipa1Pontos > jogo.equipa2Pontos){
+                    if(jogo.equipa1Id === a.equipaId){
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                } else {
+                    if(jogo.equipa2Id === a.equipaId){
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                }
+            } else {
+                return 1;
+            }
+        } else {
+            return 1;
+        }
+    });
+}
+
 exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo = 0){
     try {
         const _listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneioId, escalaoId, fase);
@@ -381,7 +418,7 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
             listaCampos.push({campo: campo});
         }
 
-        const listaCompletaEquipas = await getAllEquipasEscalao(torneioId, escalaoId);
+        const listaCompletaEquipas = await dbFunctions.getAllEquipasEscalao(torneioId, escalaoId);
 
         for(const campo of listaCampos){
             const numCampo = campo.campo;
@@ -433,7 +470,7 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
             }
             
             // 3. Ordena a Classificação
-            ordenaClassificacao(classificacao, listaJogos);
+            exports.ordenaClassificacao(classificacao, listaJogos);
         }
         return listaCampos;
     } catch(err) {
@@ -442,39 +479,3 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
     }
 }
 
-exports.ordenaClassificacao = function(classificacao, listaJogos){
-    classificacao.sort((a, b) => {
-        // Diferença de Pontos
-        if(a.pontos > b.pontos){
-            return -1;
-        } else if(a.pontos === b.pontos){
-            // Mesmos pontos, desempata por número de vitórias
-            if(a.vitorias > b.vitorias){
-                return -1;
-            } else if(a.vitorias === b.vitorias) {
-                // Mesmo número de vitórias, desempata por resultado do confronto directo
-                const jogo = listaJogos.find(elemento => {
-                    return (elemento.equipa1Id == a.equipaId && elemento.equipa2Id == b.equipaId) || (elemento.equipa1Id == b.equipaId && elemento.equipa2Id == a.equipaId);
-                });
-
-                if(jogo.equipa1Pontos > jogo.equipa2Pontos){
-                    if(jogo.equipa1Id === a.equipaId){
-                        return -1;
-                    } else {
-                        return 1;
-                    }
-                } else {
-                    if(jogo.equipa2Id === a.equipaId){
-                        return -1;
-                    } else {
-                        return 1;
-                    }
-                }
-            } else {
-                return 1;
-            }
-        } else {
-            return 1;
-        }
-    });
-}

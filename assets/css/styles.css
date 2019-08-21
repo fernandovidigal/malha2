@@ -36,7 +36,7 @@ small {
 }
 
 .logo{
-    width: 65%;
+    width: 75%;
     margin: 0 auto;
     display: block;
     margin-top: 20px;
@@ -1207,19 +1207,54 @@ animation-delay: -0.16s;
     font-size: 120%;
 }
 
-.admin_menu_item ul {
-    display: none;
+.adminMenu {
+    position: relative;
 }
 
-.admin_menu_item:hover ul {
+.adminMenu > a {
+    position: relative;
+}
+
+.adminMenu > a::after {
+    content: "";
+    display: block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 5px 0 5px 8px;
+    border-color: transparent transparent transparent #ffffff;
+    position: absolute;
+    top: 50%;
+    right: 10%;
+    transform: translateY(-50%);
+}
+
+.adminMenu ul {
     display: block;
 }
 
-.admin_menu_item_open {
+.adminMenu_dropMenu ul {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    z-index: 99;
+    font-size: 90%;
+}
+
+.adminMenu_dropMenu ul li a {
+    padding: 18px 32px !important;
+}
+
+.adminMenu:hover ul {
+    display: block;
+}
+
+.adminMenu_open {
     background-color: #6174cf;
 }
 
-.admin_menu_item_open ul {
+.adminMenu_open ul {
     display: block !important;
 }
 

@@ -137,6 +137,9 @@
                     <button class="btn print_btn"><i class="fas fa-print"></i>Imprimir</button>
                 </div>
             </div>
+            <% if(typeof numEquipas != 'undefined'){ %>
+                <p>Número de Equipas: <%= numEquipas %></p>
+            <% } %>
             <table class="listTable equipasTable">
                 <thead>
                     <tr>
@@ -154,7 +157,7 @@
                     <% equipas.forEach(function(equipa){ %>
                         <tr>
                             <td class="w5 equipasEquipaId"><%= equipa.equipaId %></td>
-                            <td class="w5"><a href="/equipas/percurso/<%= equipa.equipaId %>" class="classificacoes_icon"><i class="fas fa-clipboard-list"></i></a></td>
+                            <!--<td class="w5"><a href="/equipas/percurso/<%= equipa.equipaId %>" class="classificacoes_icon"><i class="fas fa-clipboard-list"></i></a></td>-->
                             <td class="equipasElementos"><%= equipa.primeiroElemento %><br><%= equipa.segundoElemento %></td>
                             <td class="w20 table_cell_center equipasLocalidade"><%= equipa.localidade %></td>
                             <td class="w20 table_cell_center equipasEscalao"><%= equipa.escalao %><br>(<%= equipa.sexo == 0 ? 'Feminino': 'Masculino' %>)</td>

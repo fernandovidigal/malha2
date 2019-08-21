@@ -85,18 +85,6 @@ function getNumCamposPorEscalaoFase(torneioId, escalaoId, fase){
     });
 }
 
-function getAllEquipasEscalao(torneioId, escalaoId){
-    return Equipas.findAll({
-        include: {
-            model: Localidades
-        },
-        where: {
-            torneioId: torneioId,
-            escalaoId: escalaoId
-        }
-    });
-}
-
 function getAllJogosEscalaoFase(torneioId, escalaoId, fase){
     return Jogos.findAll({
         where: {

@@ -88,7 +88,7 @@ function showValidationErrors(req, res, errors, page, oldData){
     });
 }
 
-function getAllEquipas(torneioId, offset, limit){
+function getAllEquipasPaginacao(torneioId, offset, limit){
     const _offset = (offset-1) * limit;
     return Equipas.findAll({ 
         include: [
@@ -282,7 +282,7 @@ exports.getAllEquipas = async (req, res, next) => {
         const listaCompletaEquipas = await getAllEquipasComJogos(torneio.torneioId);
         listaEquipasComJogos = geraListaEquipasUnicasComJogos(listaCompletaEquipas);
 
-        const _listaEquipas = await getAllEquipas(torneio.torneioId, page, perPage);
+        const _listaEquipas = await getAllEquipasPaginacao(torneio.torneioId, page, perPage);
         const listaEquipas = [];
 
         const numEquipas = await getNumTotalEquipas(torneio.torneioId);
@@ -314,6 +314,7 @@ exports.getAllEquipas = async (req, res, next) => {
             localidades: localidades,
             escaloes: escaloes,
             equipas: listaEquipas,
+            numEquipas: numEquipas,
             page: page,
             perPage: perPage,
             paginas: paginas,
@@ -692,6 +693,7 @@ exports.filtrarEquipas = async (req, res, next) => {
             localidades: localidades,
             escaloes: escaloes,
             equipas: listaEquipas,
+            numEquipas: numEquipas,
             filtro: filtro,
             page: page,
             perPage: perPage,

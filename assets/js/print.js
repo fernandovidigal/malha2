@@ -181,10 +181,9 @@ async function imprimeNumEquipasPorConcelho(escalaoId){
 async function imprimeEquipasAgrupadasPorCampos(escalaoId, fase, campo){
     try {
         const data = await getData(`/listagens/equipasAgrupadasPorCampos/${escalaoId}/${fase}/${campo}`);
-        console.log(data);
         docDefinition.content = [];
         docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
-            if (currentNode.id === 'tabela' && currentNode.pageNumbers.length != 1) {
+            if (currentNode.table && currentNode.pageNumbers.length != 1) {
               return true;
             }
             return false;
@@ -225,6 +224,7 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
         const data = await getData(`/listagens/getFichasJogo/${escalaoId}/${campo}/${fase}`);
 
         docDefinition.content = [];
+        delete docDefinition.footer;
 
         docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
             if(currentNode.text && currentNode.text.startsWith("Jogos a efectuar") && currentNode.startPosition.top > 120){

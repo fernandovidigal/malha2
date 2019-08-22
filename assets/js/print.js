@@ -240,7 +240,7 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
 
         if(data.success){
             makeHeader(docDefinition, data.torneio);
-            
+
             data.campos.forEach(async campo => {
                 const pageBreak = {
                     text: 'PageBreak',
@@ -264,6 +264,7 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
             });
 
             pdfMake.createPdf(docDefinition).print();
+            
         } else {
             Swal.fire({
                 type: 'error',

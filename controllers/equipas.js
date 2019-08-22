@@ -217,11 +217,8 @@ function uniao(setA, setB) {
 
 // Gera um array com a lista de equipas unicas com jogos
 function geraListaEquipasUnicasComJogos(listaCompletaEquipas){
-    //console.log(listaCompletaEquipas);
     let listaEquipas1 = listaCompletaEquipas.map(equipa => equipa.equipa1Id);
-    //console.log(listaEquipas1);
-    let listaEquipas2 = listaCompletaEquipas.map(equipa => equipa.equipa2Id);
-    //console.log(listaEquipas2);
+    let listaEquipas2 = listaCompletaEquipas.map(equipa => equipa.equipa2Id);;
     listaEquipas1 = [...new Set(listaEquipas1)];
     listaEquipas2 = [...new Set(listaEquipas2)];
     return listaFinal = uniao(listaEquipas1, listaEquipas2);
@@ -744,7 +741,6 @@ exports.listagemEquipas = async (req, res, next) => {
         }
 
         const _listaEquipas = await getAllEquipasFullDetails(query);
-        console.log(_listaEquipas);
         if(_listaEquipas.length > 0){
             for(const equipa of _listaEquipas){
                 const _equipa = {

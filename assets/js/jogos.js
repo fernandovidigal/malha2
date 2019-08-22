@@ -21,6 +21,18 @@ guardaResultados.forEach((btn, index) => {
     });
 });
 
+const parciaisInput = document.querySelectorAll('.parcial');
+parciaisInput.forEach(parcial => {
+    parcial.addEventListener('blur', function(e){
+        const value = parseInt(this.value) || 0;
+        if(value % 3 != 0 || value < 0 || value > 30){
+            this.classList.add('parcial_error');
+        } else {
+            this.classList.remove('parcial_error');
+        }
+    });
+});
+
 function getEquipasInputValues(form){
     return {
         equipa1: {
@@ -39,19 +51,19 @@ function getEquipasInputValues(form){
 function validaPontosEquipas(equipa1, equipa2){
     let valido = true;
 
-    if(equipa1.parcial1 < 0 || equipa1.parcial1 > 30 || equipa2.parcial1 < 0 || equipa2.parcial1 > 30 || equipa1.parcial1 == equipa2.parcial1){
+    if(equipa1.parcial1 < 0 || equipa1.parcial1 > 30 || equipa2.parcial1 < 0 || equipa2.parcial1 > 30 || equipa1.parcial1 == equipa2.parcial1 || equipa1.parcial1 % 3 != 0 || equipa2.parcial1 % 3 != 0){
         valido = false;
         Swal.fire({
             type: 'error',
             title: 'Parciais do primeiro jogo inválidos'
         });
-    } else if(equipa1.parcial2 < 0 || equipa1.parcial2 > 30 || equipa2.parcial2 < 0 || equipa2.parcial2 > 30 || equipa1.parcial2 == equipa2.parcial2){
+    } else if(equipa1.parcial2 < 0 || equipa1.parcial2 > 30 || equipa2.parcial2 < 0 || equipa2.parcial2 > 30 || equipa1.parcial2 == equipa2.parcial2 || equipa1.parcial2 % 3 != 0 || equipa2.parcial2 % 3 != 0){
         valido = false;
         Swal.fire({
             type: 'error',
             title: 'Parciais do segundo jogo inválidos'
         });
-    } else if(equipa1.parcial3 < 0 || equipa1.parcial2 > 30 || equipa2.parcial3 < 0 || equipa2.parcial3 > 30){
+    } else if(equipa1.parcial3 < 0 || equipa1.parcial2 > 30 || equipa2.parcial3 < 0 || equipa2.parcial3 > 30 || equipa1.parcial3 % 3 != 0 || equipa2.parcial3 % 3 != 0){
         valido = false;
         Swal.fire({
             type: 'error',

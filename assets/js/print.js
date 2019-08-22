@@ -295,6 +295,14 @@ async function imprimeResultados(escalaoId, fase, campo){
         if(data.success){
             makeHeader(docDefinition, data.torneio);
 
+            docDefinition.content.push({
+                text: `Resultados da ${fase != 100 ? fase + 'ª Fase' : 'fase Final'}`,
+                alignment: 'center',
+                fontSize: 14,
+                bold: true,
+                margin: [0,0,0,20]
+            });
+
             data.listaCampos.forEach(async campo => {
                 makeContentResultados(docDefinition, campo, fase)
             });

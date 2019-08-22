@@ -155,7 +155,7 @@ small {
 }
 
 .listTable th {
-    background-color: #455cc7;
+    background-color: #6174cf;
     color: #ffffff;
     letter-spacing: .8px;
 }
@@ -643,6 +643,10 @@ small {
     color: #ffffff;
     text-align: center;
     line-height: 3;
+}
+
+.campo__title:not(:first-child){
+    margin-top: 40px;
 }
 
 .campo__labels {
@@ -1260,4 +1264,8 @@ animation-delay: -0.16s;
 
 .menuSelected {
     background-color: #6174cf;
+}
+
+.parcial_error {
+    border: solid 1px red;
 }

@@ -147,7 +147,7 @@ function getAllCamposPorFase(torneioId, escalaoId, fase){
 
 async function processaListaEquipasAgrupadasPorCampos(torneioId, escalaoId, fase, listaCampos){
     try{
-        const _listaEquipasEscalao = getAllEquipasEscalao(torneioId, escalaoId);
+        const _listaEquipasEscalao = dbFunctions.getAllEquipasEscalao(torneioId, escalaoId);
         const _listaJogosEscalao = getAllJogosEscalaoFase(torneioId, escalaoId, fase);
         const [listaEquipasEscalao, listaJogosEscalao] = await Promise.all([_listaEquipasEscalao, _listaJogosEscalao])
 

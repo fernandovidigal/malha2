@@ -110,6 +110,9 @@ exports.getTorneio = async (req, res, next) => {
                 listaEscaloesComCampo.push(escalao.escalaoId);
             }
             const escaloesSemCampos = await getAllEscaloesSemCampos(torneioId, listaEscaloesComCampo);
+            for(const escalao of escaloesSemCampos){
+                escalao.editavel = true
+            }
 
             // Junta as duas Arrays (com e sem campos definidos)
             escaloes = escaloes.concat(escaloesSemCampos);

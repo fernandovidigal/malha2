@@ -153,15 +153,16 @@ async function imprimeNumEquipasPorConcelho(escalaoId){
             makeHeader(docDefinition, data.torneio);
 
             docDefinition.content.push({
-                text: 'Número de Equipas por Concelho',
+                text: 'Número de Equipas por Localidade',
                 alignment: 'center',
                 bold: true,
+                fontSize: 14,
                 margin: [0, 10]
             });
 
             makeNumEquipaPorConcelho(docDefinition, data.numEquipas, data.total);
 
-            pdfMake.createPdf(docDefinition).print({}, window);
+            pdfMake.createPdf(docDefinition).print();
         } else {
             Swal.fire({
                 type: 'error',
@@ -195,11 +196,13 @@ async function imprimeEquipasAgrupadasPorCampos(escalaoId, fase, campo){
             docDefinition.content.push({
                 text: `Equipas Agrupadas por Campos - ${data.fase != 100 ? data.fase + 'ª Fase' : 'Fase Final'}`,
                 alignment: 'center',
-                bold: true
+                bold: true,
+                fontSize: 14,
+                margin: [0,0,0,10]
             });
 
             makeEquipasAgrupadasPorCampos(docDefinition.content, data.listaCampos, data.fase);
-            makeFooter(docDefinition);
+            makeFooter(docDefinition, `Equipas Agrupadas por Campos - ${data.fase != 100 ? data.fase + 'ª Fase' : 'Fase Final'}`);
 
             pdfMake.createPdf(docDefinition).print();
         } else {
@@ -227,7 +230,7 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
         delete docDefinition.footer;
 
         docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
-            if(currentNode.text && currentNode.text.startsWith("Jogos a efectuar") && currentNode.startPosition.top > 120){
+            if(currentNode.text && currentNode.text.startsWith("pbJogosEfectuar") && currentNode.startPosition.top > 120){
                 return true;
             } else if(currentNode.text && currentNode.text.startsWith("PageBreak") && currentNode.startPosition.top > 120){
                 return true;
@@ -254,10 +257,10 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
                     makeFolhaRostoJogosPrimeiraFase(docDefinition, campo, equipas.listaEquipas, fase);
 
                     // Verifica se só se pretende imprimir a folha de rosto
-                    if(!soFolhaRosto.checked){
+                    if(!soFolhaRosto.checked){ 
                         docDefinition.content.push(pageBreak);
-                        makeContentFichaJogoPrimeiraFase(docDefinition, campo);
-                    } 
+                        makeContentFichaJogoPrimeiraFase(docDefinition, campo);  
+                    }
                 } else {
                     makeFichasJogoFasesSeguintes(docDefinition, campo, equipas.listaEquipas, fase);
                 }

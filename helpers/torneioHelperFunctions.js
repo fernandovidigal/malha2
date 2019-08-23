@@ -260,7 +260,7 @@ exports.distribuiEquipasPorCampos = async function(torneioId, escalao = 0){
     return escaloesDistribuidos;
 }
 
-exports.processaEquipas = async function(listaJogos){ 
+exports.processaEquipas = async function(torneioId, listaJogos){ 
     try{
         const jogos = [];
         for(const jogo of listaJogos){
@@ -268,8 +268,8 @@ exports.processaEquipas = async function(listaJogos){
             const equipa1Id = jogo.equipa1Id;
             const equipa2Id = jogo.equipa2Id;
 
-            const _equipa1Info = await dbFunctions.getEquipa(equipa1Id);
-            const _equipa2Info = await dbFunctions.getEquipa(equipa2Id);
+            const _equipa1Info = await dbFunctions.getEquipa(torneioId, equipa1Id);
+            const _equipa2Info = await dbFunctions.getEquipa(torneioId, equipa2Id);
 
             const [equipa1Info, equipa2Info] = await Promise.all([_equipa1Info, _equipa2Info]);
             const equipas = {

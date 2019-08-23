@@ -21,17 +21,34 @@ guardaResultados.forEach((btn, index) => {
     });
 });
 
-const parciaisInput = document.querySelectorAll('.parcial');
-parciaisInput.forEach(parcial => {
-    parcial.addEventListener('blur', function(e){
-        const value = parseInt(this.value) || 0;
-        if(value % 3 != 0 || value < 0 || value > 30){
-            this.classList.add('parcial_error');
-        } else {
-            this.classList.remove('parcial_error');
-        }
+function parciaisIguais(parcial, par){
+    if(parcial.value == par.value){
+        return true;
+    } else {
+        return false;
+    }
+}
+
+const equipaParciais = document.querySelectorAll('.equipa_parciais');
+equipaParciais.forEach(parciais => {
+    const parciaisInput = parciais.querySelectorAll('.parcial');
+    parciaisInput.forEach((parcial, index) => {
+        parcial.addEventListener('blur', function(e){
+            const value = parseInt(this.value) || 0;
+            const parcialPar = (index < 3) ? index + 3 : index - 3;
+            if(value % 3 != 0 || value < 0 || value > 30){
+                this.classList.add('parcial_error');
+            } else if(this.value == parciaisInput[parcialPar].value || this.value != 30 && parciaisInput[parcialPar].value != 30){
+                this.classList.add('parcial_error');
+                parciaisInput[parcialPar].classList.add('parcial_error');
+            } else {
+                this.classList.remove('parcial_error');
+                parciaisInput[parcialPar].classList.remove('parcial_error');
+            }
+        });
     });
 });
+
 
 function getEquipasInputValues(form){
     return {
@@ -51,13 +68,13 @@ function getEquipasInputValues(form){
 function validaPontosEquipas(equipa1, equipa2){
     let valido = true;
 
-    if(equipa1.parcial1 < 0 || equipa1.parcial1 > 30 || equipa2.parcial1 < 0 || equipa2.parcial1 > 30 || equipa1.parcial1 == equipa2.parcial1 || equipa1.parcial1 % 3 != 0 || equipa2.parcial1 % 3 != 0){
+    if(equipa1.parcial1 < 0 || equipa1.parcial1 > 30 || equipa2.parcial1 < 0 || equipa2.parcial1 > 30 || equipa1.parcial1 == equipa2.parcial1 || equipa1.parcial1 % 3 != 0 || equipa2.parcial1 % 3 != 0 || (equipa1.parcial1 != 30 && equipa2.parcial1 != 30)){
         valido = false;
         Swal.fire({
             type: 'error',
             title: 'Parciais do primeiro jogo inválidos'
         });
-    } else if(equipa1.parcial2 < 0 || equipa1.parcial2 > 30 || equipa2.parcial2 < 0 || equipa2.parcial2 > 30 || equipa1.parcial2 == equipa2.parcial2 || equipa1.parcial2 % 3 != 0 || equipa2.parcial2 % 3 != 0){
+    } else if(equipa1.parcial2 < 0 || equipa1.parcial2 > 30 || equipa2.parcial2 < 0 || equipa2.parcial2 > 30 || equipa1.parcial2 == equipa2.parcial2 || equipa1.parcial2 % 3 != 0 || equipa2.parcial2 % 3 != 0 || (equipa1.parcial2 != 30 && equipa2.parcial2 != 30)){
         valido = false;
         Swal.fire({
             type: 'error',
@@ -69,7 +86,7 @@ function validaPontosEquipas(equipa1, equipa2){
             type: 'error',
             title: 'Parciais do terceiro jogo inválidos'
         });
-    } else if(equipa1.parcial3 != 0 && equipa2.parcial3 != 0 && equipa1.parcial3 == equipa2.parcial3){
+    } else if(equipa1.parcial3 != 0 && equipa2.parcial3 != 0 && (equipa1.parcial3 == equipa2.parcial3 || (equipa1.parcial3 != 30 && equipa2.parcial3 != 30))){
         valido = false;
         Swal.fire({
             type: 'error',
@@ -272,15 +289,26 @@ async function imprimeFichaParciais(escalao, fase, campo){
         const data = await getData(`/torneio/fichaParciais/${escalao}/${fase}/${campo}`);
         docDefinition.content = [];
         docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
-            if(currentNode.text && currentNode.text.startsWith("Campo") && currentNode.startPosition.top > 130){
+            if(currentNode.table && currentNode.pageNumbers.length != 1){
                 return true;
             }
+            return false;
         };
 
-        if(data.success){           makeHeader(docDefinition, data.torneio);
-            data.listaCampos.forEach(campo => {
-                makeFolhaParciais(docDefinition, campo, data.listaEquipas, data.listaParciais);
+        if(data.success){           
+            makeHeader(docDefinition, data.torneio);
+            
+            docDefinition.content.push({
+                text: `Resultados dos parciais - ${(fase != 100) ? fase + 'ª Fase' : 'Fase Final'}`,
+                alignment: 'center',
+                bold: true,
+                fontSize: 16
             });
+            
+            data.listaCampos.forEach(campo => {
+                makeFolhaParciais(docDefinition, fase, campo, data.listaEquipas, data.listaParciais);
+            });
+            makeFooter(docDefinition, `Resultados dos parciais - ${(fase != 100) ? fase + 'ª Fase' : 'Fase Final'}`);
             pdfMake.createPdf(docDefinition).print();
         } else {
             Swal.fire({

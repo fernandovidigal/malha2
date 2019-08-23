@@ -135,12 +135,13 @@ exports.getAllLocalidadesID = () => {
 //                        EQUIPAS
 ////////////////////////////////////////////////////////
 
-exports.getEquipa = (equipaId) => {
+exports.getEquipa = (torneioId, equipaId) => {
     return Equipas.findOne({
         include: {
             model: Localidades
         },
         where: {
+            torneioId: torneioId,
             equipaId: equipaId
         }
     });

@@ -85,11 +85,14 @@ function makeHeaderOnlyTorneioInfo(dd, torneioInfo){
     }
 }
 
-function makeFooter(dd){
+function makeFooter(dd, text=null){
     dd.footer = function(currentPage, pageCount, pageSize) {
-	    if(pageCount > 1){
-            return { text: 'Pág. ' + currentPage.toString() + '/' + pageCount, fontSize: 8, alignment: 'right', margin: [0,0,40,0],};
-	    }
+        return {
+            columns: [
+                {text: `${(text != null) ? text: ''}`, fontSize: 8, alignment: 'left', margin: [40,0,0,0]},
+                {text: `Pág. ${currentPage.toString()}/${pageCount}`, fontSize: 8, alignment: 'right', margin: [0,0,40,0]},
+            ]
+        };
     }
 }
 
@@ -99,7 +102,7 @@ function makeNumEquipaPorConcelho(dd, numEquipas, total){
             headerRows: 1,
             widths: ['*', '*'],
             body: [
-                [{text: 'Concelho', margin: [10, 5]}, {text: 'Equipas', margin: [10, 5]}]
+                [{text: 'Localidade', margin: [10, 5], bold: true}, {text: 'Nº Equipas', margin: [10, 5], bold: true}]
             ]
         },
         layout: 'lightHorizontalLines'
@@ -158,7 +161,7 @@ function makeEquipasAgrupadasPorCampos(ddContent, listaCampos, fase){
                 ]
             },
             layout: 'lightHorizontalLines',
-            margin: [0,0,0,10]
+            margin: [0,0,0,12]
         }
 
         campo.listaEquipas.forEach(equipa => {
@@ -278,18 +281,26 @@ function makeContentFichaJogoPrimeiraFase(dd, data){
 }
 
 function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase){
+
+    const pageBreak = {
+        text: 'pbJogosEfectuar',
+        fontSize: 0,
+        color: '#ffffff',
+        margin: [0,0,0,0]
+    }
     
     dd.content.push({
         text: `Jogos a efectuar - ${fase}ª Fase`,
         alignment: 'center',
-        bold: true
+        bold: true,
+        fontSize: 14
     });
 
     dd.content.push({
         text: `Campo Nº ${data.campo}`,
         alignment: 'center',
         bold: true,
-        fontSize: 16,
+        fontSize: 12,
         margin: [0, 10]
     });
 
@@ -332,7 +343,14 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase){
         }
     }
 
+    let numPages = Math.ceil(data.listaJogos.length / 10);
+    let page = 1;
+
     data.listaJogos.forEach((jogo, index) => {
+        // Maior que 9 porque cada página leva 10 jogos e do 0 ao 9 são 10 jogos
+        if(index > 9){
+            page++;
+        }
         const equipa1 = equipas.find(equipa => equipa.equipaId == jogo.equipa1Id);
         const equipa2 = equipas.find(equipa => equipa.equipaId == jogo.equipa2Id);
 
@@ -434,6 +452,13 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase){
 
 
         _table.table.body.push(row);
+    });
+
+    dd.content.push({
+        columns: [
+            {text: `Jogos a efectuar - ${fase}ª Fase - Campo Nº ${data.campo}`, absolutePosition: {x: 40, y: 807}, fontSize: 8},
+            {text: `Pág. ${page}/${numPages}`, absolutePosition: {x: 520, y: 807}, fontSize: 8},
+        ]
     });
 
     dd.content.push(_table);
@@ -744,39 +769,48 @@ function makeEquipasContent(dd, data){
     dd.content.push(content);
 }
 
-function makeFolhaParciais(dd, data, equipas, parciais){
+function makeFolhaParciais(dd, fase, data, equipas, parciais){
 
-    dd.content.push({
-        text: `Campo Nº ${data.campo}`,
-        alignment: 'center',
-        bold: true,
-        fontSize: 16,
-        margin: [0, 10]
-    });
+    if(fase == 100){
+        dd.content.push({
+            text: `${data.campo == 1 ? 'Final' : '3º e 4º Lugar'}`,
+            fontSize: 20,
+            bold: true,
+            margin: [0, 40, 0, 10],
+            color: '#455cc7',
+            alignment: 'center'
+        })
+    }
 
     const _table = {
         table: {
-            headerRows: 1,
-            dontBreakRows: true,
+            headerRows: 2,
             widths: ['auto', '*', '*', 'auto', 40, 40, 40, 40],
-            body: [[
-                {text: 'Equipas', fontSize: 10, bold: true, border: [false, false, false, true]},
-                {text: 'Jogadores', colSpan: 2, fontSize: 10, bold: true, border: [false, false, false, true]},
-                {},
-                {text: 'Localidade', fontSize: 10, bold: true, border: [false, false, false, true]},
-                {text: 'Parcial 1', alignment: 'center', fontSize: 10, bold: true, border: [false, false, false, true]},
-                {text: 'Parcial 2', alignment: 'center', fontSize: 10, bold: true, border: [false, false, false, true]},
-                {text: 'Parcial 3', alignment: 'center', fontSize: 10, bold: true, border: [false, false, false, true]},
-                {text: 'Pontos', alignment: 'center', fontSize: 10, bold: true, border: [false, false, false, true]},
-                
-            ]]
+            body: [
+                [
+                    {text: `Campo Nº ${data.campo}`, alignment: 'center', bold: true, fontSize: 14, colSpan: 8, margin: [0,0,0,2]},
+                    {},{},{},{},{},{},{}
+                ],
+                [
+                    {text: 'Equipa', fontSize: 10, bold: true, border: [false, false, false, true]},
+                    {text: 'Jogadores', colSpan: 2, fontSize: 10, bold: true, border: [false, false, false, true]},
+                    {},
+                    {text: 'Localidade', fontSize: 10, bold: true, border: [false, false, false, true]},
+                    {text: 'Parcial 1', alignment: 'center', fontSize: 10, bold: true, border: [false, false, false, true]},
+                    {text: 'Parcial 2', alignment: 'center', fontSize: 10, bold: true, border: [false, false, false, true]},
+                    {text: 'Parcial 3', alignment: 'center', fontSize: 10, bold: true, border: [false, false, false, true]},
+                    {text: 'Pontos', alignment: 'center', fontSize: 10, bold: true, border: [false, false, false, true]},
+                    
+                ]
+            ]
         },
+        margin: [0,10],
         layout: {
             hLineWidth: function(i, node) {
-                if(i === 1) {
+                if(i === 2) {
                     return 2;
                 }
-                if(i > 1){
+                if(i > 2){
                     return 1;
                 }
             },
@@ -784,7 +818,7 @@ function makeFolhaParciais(dd, data, equipas, parciais){
                 return 0;
             },
             hLineColor: function(i, node) {
-                if(i > 1) {
+                if(i > 2) {
                     return 'gray';
                 } else {
                     return 'black';
@@ -826,82 +860,26 @@ function makeFolhaParciais(dd, data, equipas, parciais){
             },
             {
                 stack: [
-                    {
-                        table: {
-                            widths:['*'],
-                            body: [[(equipa1parcial == null) ? {text:' '} : {text: `${equipa1parcial.parcial1}`, alignment: 'center', fontSize: 12}]]
-                        },
-                        margin: [5,2],
-                        layout: 'noBorders'
-                    },
-                    {
-                        table: {
-                            widths:['*'],
-                            body: [[(equipa2parcial == null) ? {text:' '} : {text: `${equipa2parcial.parcial1}`, alignment: 'center', fontSize: 12}]]
-                        },
-                        margin: [5,2,5,0],
-                        layout: 'noBorders'
-                    }
+                    {text:`${(equipa1parcial == null) ? ' ' : equipa1parcial.parcial1}`, alignment: 'center', fontSize: 12, margin: [0, 5]},
+                    {text:`${(equipa2parcial == null) ? ' ' : equipa2parcial.parcial1}`, alignment: 'center', fontSize: 12, margin: [0, 2]}
                 ]
             },
             {
                 stack: [
-                    {
-                        table: {
-                            widths:['*'],
-                            body: [[(equipa1parcial == null) ? {text:' '} : {text: `${equipa1parcial.parcial2}`, alignment: 'center', fontSize: 12}]]
-                        },
-                        margin: [5,2],
-                        layout: 'noBorders'
-                    },
-                    {
-                        table: {
-                            widths:['*'],
-                            body: [[(equipa2parcial == null) ? {text:' '} : {text: `${equipa2parcial.parcial2}`, alignment: 'center', fontSize: 12}]]
-                        },
-                        margin: [5,2,5,0],
-                        layout: 'noBorders'
-                    }
+                    {text:`${(equipa1parcial == null) ? ' ' : equipa1parcial.parcial2}`, alignment: 'center', fontSize: 12, margin: [0, 5]},
+                    {text:`${(equipa2parcial == null) ? ' ' : equipa2parcial.parcial2}`, alignment: 'center', fontSize: 12, margin: [0, 2]}
                 ]
             },
             {
                 stack: [
-                    {
-                        table: {
-                            widths:['*'],
-                            body: [[(equipa1parcial == null) ? {text:' '} : {text: `${(equipa1parcial.parcial3 != 0) ? equipa1parcial.parcial3 : ' '}`, alignment: 'center', fontSize: 12}]]
-                        },
-                        margin: [5,2],
-                        layout: 'noBorders'
-                    },
-                    {
-                        table: {
-                            widths:['*'],
-                            body: [[(equipa2parcial == null) ? {text:' '} : {text: `${(equipa2parcial.parcial3 != 0) ? equipa2parcial.parcial3 : ' '}`, alignment: 'center', fontSize: 12}]]
-                        },
-                        margin: [5,2,5,0],
-                        layout: 'noBorders'
-                    }
+                    {text:`${(equipa1parcial == null) ? ' ' : equipa1parcial.parcial3}`, alignment: 'center', fontSize: 12, margin: [0, 5]},
+                    {text:`${(equipa2parcial == null) ? ' ' : equipa2parcial.parcial3}`, alignment: 'center', fontSize: 12, margin: [0, 2]}
                 ]
             },
             {
                 stack: [
-                    {
-                        table: {
-                            widths:['*'],
-                            body: [[(equipa1parcial == null) ? {text:' '} : {text: `${jogo.equipa1Pontos}`, alignment: 'center', fontSize: 14, bold: true}]]
-                        },
-                        margin: [5,0],
-                        layout: 'noBorders'
-                    },
-                    {
-                        table: {
-                            widths:['*'],
-                            body: [[(equipa2parcial == null) ? {text:' '} : {text: `${jogo.equipa2Pontos}`, alignment: 'center', fontSize: 14, bold: true}]]
-                        },
-                        margin: [5,2,5,0],
-                        layout: 'noBorders'
-                    }
+                    {text:`${(equipa1parcial == null) ? ' ' : jogo.equipa1Pontos}`, alignment: 'center', fontSize: 14, bold: true, margin: [0, 3]},
+                    {text:`${(equipa2parcial == null) ? ' ' : jogo.equipa2Pontos}`, alignment: 'center', fontSize: 14, bold: true, margin: [0, 3]}
                 ]
             },
         ];

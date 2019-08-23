@@ -395,8 +395,8 @@ exports.mostraResultados = async (req, res, next) => {
             const _listaJogosFinalizados = dbFunctions.getAllGamesPlayed(torneio.torneioId, escalaoId, fase, campos[i].campo);
 
             const [listaJogosPorJogar, listaJogosFinalizados] = await Promise.all([_listaJogosPorJogar, _listaJogosFinalizados]);
-            campos[i].jogos = await torneioHelpers.processaEquipas(listaJogosPorJogar);
-            campos[i].jogosFinalizados = await torneioHelpers.processaEquipas(listaJogosFinalizados);
+            campos[i].jogos = await torneioHelpers.processaEquipas(torneio.torneioId, listaJogosPorJogar);
+            campos[i].jogosFinalizados = await torneioHelpers.processaEquipas(torneio.torneioId, listaJogosFinalizados);
 
             // Obter parciais dos jogos já finalizados
             for(const jogo of campos[i].jogosFinalizados){
@@ -661,6 +661,7 @@ exports.fichasParciais = async (req, res, next) => {
 
             query.torneioId = torneio.torneioId;
             query.escalaoId = escalao.escalaoId;
+            query.fase = fase
         }
 
         if(campo == 0){

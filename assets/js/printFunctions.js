@@ -154,10 +154,11 @@ function makeEquipasAgrupadasPorCampos(ddContent, listaCampos, fase){
 
         const content = {
             table: {
-                widths:['auto',200,'*'],
-                headerRows: 1,
+                widths:['auto','auto','*','auto'],
+                headerRows: 2,
                 body: [
-                    [{text: `Campo ${campo.campo}`, style: 'tableHeader', colSpan: 3, alignment: 'left', bold: true, fontSize: 14}, {}, {}],
+                    [{text: `Campo ${campo.campo}`, style: 'tableHeader', colSpan: 4, alignment: 'left', bold: true, fontSize: 14}, {}, {}, {}],
+                    [{text: 'Equipa', bold: true}, {text: 'Jogadores', bold: true, colSpan: 2}, {}, {text: 'Localidade', bold: true}]
                 ]
             },
             layout: 'lightHorizontalLines',
@@ -165,12 +166,12 @@ function makeEquipasAgrupadasPorCampos(ddContent, listaCampos, fase){
         }
 
         campo.listaEquipas.forEach(equipa => {
-            const row = [{text: `${equipa.equipaId}`, fontSize: 11, margin: [15, 10, 20, 0]}, {
-                stack: [
-                    {text: `${equipa.primeiroElemento}`, fontSize: 10, margin: [0,2,0,0]},
-                    {text: `${equipa.segundoElemento}`, fontSize: 10, margin: [0,0,0,2]}
-                ]
-            }, {text: `${equipa.localidade}`, fontSize: 11, margin: [0, 10, 0, 0]}];
+            const row = [
+                {text: `${equipa.equipaId}`, fontSize: 12}, 
+                {text: `${equipa.primeiroElemento}`, fontSize: 12},
+                {text: `${equipa.segundoElemento}`, fontSize: 12},
+                {text: `${equipa.localidade}`, fontSize: 12}
+            ];
 
             content.table.body.push(row);
         });
@@ -617,14 +618,15 @@ function makeContentResultados(dd, data, fase){
     const _table = {
         table: {
             headerRows: 2,
-            widths: ['auto', 'auto', '*', '*', 'auto', 'auto'],
+            widths: ['auto', 'auto', '*', '*', 'auto', 'auto', 'auto'],
             body: [
-                [{text: `Campo ${data.campo}`, bold: true, fontSize: 14, colSpan: 6, alignment: 'center', border: [false, false, false, false]}, '', '', '', '', ''],
+                [{text: `Campo ${data.campo}`, bold: true, fontSize: 14, colSpan: 6, alignment: 'center', border: [false, false, false, false]}, '', '', '', '', '', ''],
                 [
                     {text: 'Classif.', bold: true},
                     {text: 'Equipa', bold: true},
                     {text: 'Jogadores', colSpan: 2, bold: true},
                     {text: ''},
+                    {text: 'Localidade', alignment: 'center', bold: true},
                     {text: 'Jogos Ganhos', bold: true},
                     {text: 'Pontos', bold: true},
                 ]
@@ -673,6 +675,7 @@ function makeContentResultados(dd, data, fase){
             {text: `${equipa.equipaId}`, fontSize: 10, alignment: 'center', margin: [0, 6]},
             {text: `${equipa.primeiroElemento}`, fontSize: 10, margin: [0, 6]},
             {text: `${equipa.segundoElemento}`, fontSize: 10, margin: [0, 6]},
+            {text: `${equipa.localidade}`, alignment: 'center', fontSize: 10, margin: [0, 6]},
             {text: `${equipa.vitorias}`, alignment: 'center', margin: [0, 5]},
             {text: `${equipa.pontos}`, alignment: 'center', margin: [0, 5]},
         ];

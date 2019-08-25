@@ -325,7 +325,7 @@ async function imprimeResultados(escalaoId, fase, campo){
                 ]
             });
 
-            makeFooter(docDefinition);
+            makeFooter(docDefinition, `Resultados da ${fase != 100 ? fase + 'ª Fase' : 'fase Final'}`);
 
             pdfMake.createPdf(docDefinition).print();
         } else {

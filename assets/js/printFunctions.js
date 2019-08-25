@@ -269,25 +269,25 @@ function makeContentFichaJogoPrimeiraFase(dd, data){
 
         if(Math.abs(index % 2) == 1){
             dd.content.push({text: 'Nota: O terceiro jogo de cada Partida só se joga em caso de empate.', alignment: 'center', fontSize: 10, margin:[0,0,0,10]});
-            dd.content.push({text: `Pág. ${page}/${totalPaginas}`, fontSize: 8, alignment: 'right', margin: [0,0,0,20]});
+            dd.content.push({text: `Pág. ${page}/${totalPaginas}`, absolutePosition: {x: 520, y: 807}, fontSize: 8});
             page++;
         }
     });
 
     if(listaJogos.length % 2 != 0){
         dd.content.push({text: 'Nota: O terceiro jogo de cada Partida só se joga em caso de empate.', alignment: 'center', fontSize: 10, margin:[0,0,0,10]});
-        dd.content.push({text: `Pág. ${page}/${totalPaginas}`, fontSize: 8, alignment: 'right', margin: [0,0,0,20]});
+        dd.content.push({text: `Pág. ${page}/${totalPaginas}`, absolutePosition: {x: 520, y: 807}, fontSize: 8});
     }
 }
 
 function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase){
-
-    const pageBreak = {
+    // Page Break
+    dd.content.push({
         text: 'pbJogosEfectuar',
         fontSize: 0,
         color: '#ffffff',
         margin: [0,0,0,0]
-    }
+    });
     
     dd.content.push({
         text: `Jogos a efectuar - ${fase}ª Fase`,
@@ -596,7 +596,12 @@ function makeContentResultados(dd, data, fase){
 
     // na primeira fase é 3 porque são duas equipas apuradas que ocupam a linha 2 e 3
     // nas fases seguintes é 2 porque só é apurada uma equipa na linha 2
-    let k = (fase == 1) ? 3 : 2;
+    let k = 0;
+    if(data.classificacao.length > 2){
+        k = (fase == 1) ? 3 : 2;
+    } else {
+        k = 2;
+    }
 
     if(fase == 100){
         dd.content.push({
@@ -616,8 +621,8 @@ function makeContentResultados(dd, data, fase){
             body: [
                 [{text: `Campo ${data.campo}`, bold: true, fontSize: 14, colSpan: 6, alignment: 'center', border: [false, false, false, false]}, '', '', '', '', ''],
                 [
-                    {text: ' '},
-                    {text: 'Equipas', bold: true},
+                    {text: 'Classif.', bold: true},
+                    {text: 'Equipa', bold: true},
                     {text: 'Jogadores', colSpan: 2, bold: true},
                     {text: ''},
                     {text: 'Jogos Ganhos', bold: true},

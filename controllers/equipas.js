@@ -1,74 +1,15 @@
-const Sequelize = require('sequelize');
+
 const Equipas = require('../models/Equipas');
-const Torneios = require('../models/Torneios');
-const Localidades = require('../models/Localidades');
-const Escaloes = require('../models/Escaloes');
-const Jogos = require('../models/Jogos');
+const dbFunctions = require('../helpers/DBFunctions');
 const { validationResult } = require('express-validator/check');
 const util = require('../helpers/util');
-const Op = Sequelize.Op;
 
 const faker = require('faker');
 faker.locale = "pt_BR";
 
-function getTorneioInfo(){
-    return Torneios.findOne({where: {activo: 1}, raw: true});
-}
-
-function getLocalidadesInfo(){
-    return Localidades.findAll({
-        order: ['nome'],
-        raw: true
-    })
-}
-
-function getLocalidade(localidadeId){
-    return Localidades.findOne({
-        where: {
-            localidadeId: localidadeId
-        },
-        raw: true
-    })
-}
-
-function getAllLocalidadesId(){
-    return Localidades.findAll({
-        attributes: ['localidadeId'],
-        raw: true
-    });
-}
-
-function getEscaloesInfo(){
-    return Escaloes.findAll({raw: true});
-}
-
-function getEscalao(escalaoId){
-    return Escaloes.findOne({
-        where: {
-            escalaoId: escalaoId
-        },
-        raw: true
-    })
-}
-
-function getNumJogosPorEscalao(torneioId, escalaoId){
-    return Jogos.count({
-        where: {
-            torneioId: torneioId,
-            escalaoId: escalaoId
-        }
-    });
-}
-
-function getLastEquipaID(torneioId){
-    return Equipas.max('equipaId', {
-        where: { torneioId: torneioId }
-    });
-}
-
 function showValidationErrors(req, res, errors, page, oldData){
-    const localidadesInfo = getLocalidadesInfo();
-    const escaloesInfo = getEscaloesInfo();
+    const localidadesInfo = dbFunctions.getLocalidadesInfo();
+    const escaloesInfo = dbFunctions.getEscaloesInfo();
 
     Promise.all([localidadesInfo, escaloesInfo])
     .then(([localidades, escaloes]) => {
@@ -85,125 +26,6 @@ function showValidationErrors(req, res, errors, page, oldData){
         console.log(err);
         req.flash('error', 'Não foi possível obter dados dos escalões e/ou localidades.')
         res.redirect('/equipas');
-    });
-}
-
-function getAllEquipasPaginacao(torneioId, offset, limit){
-    const _offset = (offset-1) * limit;
-    return Equipas.findAll({ 
-        include: [
-            {
-                model: Localidades,
-                attributes: ['nome']
-            },
-            {
-                model: Escaloes,
-                attributes: ['designacao', 'sexo']
-            }
-        ],
-        where: {torneioId: torneioId},
-        offset: _offset,
-        limit: limit
-    });
-}
-
-function getNumTotalEquipas(torneioId){
-    return Equipas.count({
-        where: {
-            torneioId: torneioId
-        }
-    });
-}
-
-function getEquipa(torneioId, equipaId, raw = true){
-    return Equipas.findOne({
-        where: {
-            equipaId: equipaId,
-            torneioId: torneioId
-        },
-        raw: raw
-    });
-}
-
-function getEquipaFullDetails(torneioId, equipaId){
-    return Equipas.findOne({
-        where: {
-            equipaId: equipaId,
-            torneioId: torneioId
-        }, 
-        include: [
-            {
-                model: Localidades,
-                attributes: ['nome']
-            },
-            {
-                model: Escaloes,
-                attributes: ['designacao', 'sexo']
-            }
-        ]
-    });
-}
-
-function getAllEquipasFullDetails(whereClause){
-    return Equipas.findAll({
-        where: whereClause, 
-        include: [
-            {
-                model: Localidades,
-                attributes: ['nome']
-            },
-            {
-                model: Escaloes,
-                attributes: ['designacao', 'sexo']
-            }
-        ]
-    });
-}
-
-function getAllEquipasPorFiltro(whereClause, offset, limit){
-    return Equipas.findAll({
-        where: whereClause, 
-        include: [
-            {
-                model: Localidades,
-                attributes: ['nome']
-            },
-            {
-                model: Escaloes,
-                attributes: ['designacao', 'sexo']
-            }
-        ],
-        offset: (offset - 1) * limit,
-        limit: limit
-    }); 
-}
-
-function getNumEquipasPorFiltro(whereClause){
-    return Equipas.count({
-        where: whereClause
-    });
-}
-
-function getNumJogosEquipa(torneioId, equipaId){
-    return Jogos.count({
-        where: {
-            torneioId: torneioId,
-            [Op.or]: [
-                {equipa1Id: equipaId},
-                {equipa2Id: equipaId}
-            ]
-        },
-        raw: true
-    });
-}
-
-function getAllEquipasComJogos(torneioId){
-    return Jogos.findAll({
-        attributes: ['equipa1Id', 'equipa2Id'],
-        where: {
-            torneioId: torneioId
-        },
-        raw: true
     });
 }
 
@@ -260,9 +82,9 @@ function geraPaginacao(total, perPage, page){
 
 exports.getAllEquipas = async (req, res, next) => {
     try{
-        const torneioInfo = getTorneioInfo();
-        const localidadesInfo = getLocalidadesInfo();
-        const escaloesInfo = getEscaloesInfo();
+        const torneioInfo = dbFunctions.getTorneioInfo();
+        const localidadesInfo = dbFunctions.getLocalidadesInfo();
+        const escaloesInfo = dbFunctions.getEscaloesInfo();
         const page = parseInt(req.params.page) || 1;
         const perPage = parseInt(req.params.perPage) || 15;
         const [torneio, localidades, escaloes] = await Promise.all([torneioInfo, localidadesInfo, escaloesInfo]);
@@ -276,13 +98,13 @@ exports.getAllEquipas = async (req, res, next) => {
         util.sort(localidades);
 
         // Lista de Equipas Únicas Com Jogos
-        const listaCompletaEquipas = await getAllEquipasComJogos(torneio.torneioId);
+        const listaCompletaEquipas = await dbFunctions.getAllEquipasComJogos(torneio.torneioId);
         listaEquipasComJogos = geraListaEquipasUnicasComJogos(listaCompletaEquipas);
 
-        const _listaEquipas = await getAllEquipasPaginacao(torneio.torneioId, page, perPage);
+        const _listaEquipas = await dbFunctions.getAllEquipasPaginacao(torneio.torneioId, page, perPage);
         const listaEquipas = [];
 
-        const numEquipas = await getNumTotalEquipas(torneio.torneioId);
+        const numEquipas = await dbFunctions.getNumTotalEquipas(torneio.torneioId);
         const numPages = Math.ceil(numEquipas / perPage);
 
         // Processa a paginação
@@ -329,16 +151,16 @@ exports.getEquipaToEdit = async (req, res, next) => {
     try {
         const equipaId = req.params.id;
 
-        const torneioInfo = getTorneioInfo();
-        const localidadesInfo = getLocalidadesInfo();
-        const escaloesInfo = getEscaloesInfo();
+        const torneioInfo = dbFunctions.getTorneioInfo();
+        const localidadesInfo = dbFunctions.getLocalidadesInfo();
+        const escaloesInfo = dbFunctions.getEscaloesInfo();
 
         const [torneio, localidades, escaloes] = await Promise.all([torneioInfo, localidadesInfo, escaloesInfo]);
         
-        const equipa = await getEquipa(torneio.torneioId, equipaId);    
+        const equipa = await dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId);    
         if(equipa){
             // Verifica se a equipa já foi atribuida a algum jogo
-            const numJogos = await getNumJogosEquipa(torneio.torneioId, equipaId);
+            const numJogos = await dbFunctions.getNumJogosEquipa(torneio.torneioId, equipaId);
             equipa.escaloesEditaveis = (numJogos == 0) ? true : false;
 
             res.render('equipas/editarEquipa', {
@@ -359,9 +181,9 @@ exports.getEquipaToEdit = async (req, res, next) => {
 
 exports.adicionarEquipa = async (req, res, next) => {
     try {
-        const torneioInfo = getTorneioInfo();
-        const localidadesInfo = getLocalidadesInfo();
-        const escaloesInfo = getEscaloesInfo();
+        const torneioInfo = dbFunctions.getTorneioInfo();
+        const localidadesInfo = dbFunctions.getLocalidadesInfo();
+        const escaloesInfo = dbFunctions.getEscaloesInfo();
 
         const [torneio, localidades, escaloes] = await Promise.all([torneioInfo, localidadesInfo, escaloesInfo]);
 
@@ -373,14 +195,14 @@ exports.adicionarEquipa = async (req, res, next) => {
             // Se já existe jogos distribuídos não é possível adicionar mais equipas
             const listaEscaloes = [];
             for(const escalao of escaloes){
-                const numJogosDistribuidos = await getNumJogosPorEscalao(torneio.torneioId, escalao.escalaoId);
+                const numJogosDistribuidos = await dbFunctions.getNumJogosPorEscalao(torneio.torneioId, escalao.escalaoId);
                 if(numJogosDistribuidos == 0){
                     listaEscaloes.push(escalao);
                 }
             }
 
             if(listaEscaloes.length == 0){
-                req.flash('warning', 'Todos os escalões disponíveis já têm os jogos distribuídos.')
+                req.flash('warning', 'Todos os escalões disponíveis têm os jogos distribuídos.')
                 res.redirect('/equipas');
             } else {
                 res.render('equipas/adicionarEquipa', {localidades: localidades, escaloes: listaEscaloes});
@@ -414,9 +236,9 @@ exports.createEquipa = async (req, res, next) => {
     if(!errors.isEmpty()){
         showValidationErrors(req, res, errors, 'adicionarEquipa', oldData);
     } else {
-        getTorneioInfo()
+        dbFunctions.getTorneioInfo()
         .then(async torneio => {
-            let nextEquipaID = await getLastEquipaID(torneio.torneioId) || 0;
+            let nextEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId) || 0;
             nextEquipaID++;
 
             Equipas.findOrCreate({
@@ -477,8 +299,8 @@ exports.updateEquipa = async (req, res, next) => {
     } else {
 
         try {
-            const torneio = await getTorneioInfo();
-            const equipa = await getEquipa(torneio.torneioId, equipaId, false);
+            const torneio = await dbFunctions.getTorneioInfo();
+            const equipa = await dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId, false);
 
             if(equipa){
                 equipa.primeiroElemento = primeiroElemento;
@@ -519,8 +341,8 @@ exports.getEquipaToDelete = async (req, res, next) => {
     };
     
     try {
-        const torneio = await getTorneioInfo();
-        const equipa = await getEquipaFullDetails(torneio.torneioId, equipaId);
+        const torneio = await dbFunctions.getTorneioInfo();
+        const equipa = await dbFunctions.getEquipaFullDetails(torneio.torneioId, equipaId);
 
         if(equipa){
             response.success = true,
@@ -549,7 +371,7 @@ exports.deleteEquipa = async (req, res, next) => {
     };
 
     try {
-        const equipa = await getEquipa(torneioId, equipaId, false);
+        const equipa = await dbFunctions.getSimpleEquipa(torneioId, equipaId, false);
         if(equipa){
             const result = await equipa.destroy();
             response = {
@@ -575,14 +397,14 @@ exports.searchEquipa = async (req, res, next) => {
     } else {
 
         try {
-            const torneio = await getTorneioInfo();
-            const equipa = await getEquipaFullDetails(torneio.torneioId, equipaId);
+            const torneio = await dbFunctions.getTorneioInfo();
+            const equipa = await dbFunctions.getEquipaFullDetails(torneio.torneioId, equipaId);
 
             if(equipa){
-                const localidadesInfo = getLocalidadesInfo();
-                const escaloesInfo = getEscaloesInfo();
+                const localidadesInfo = dbFunctions.getLocalidadesInfo();
+                const escaloesInfo = dbFunctions.getEscaloesInfo();
                 // Verifica se a equipa já está associada a jogos
-                const _numJogos = getNumJogosEquipa(torneio.torneioId, equipaId);
+                const _numJogos = dbFunctions.getNumJogosEquipa(torneio.torneioId, equipaId);
 
                 const [localidades, escaloes, numJogos] = await Promise.all([localidadesInfo, escaloesInfo, _numJogos]);
                 const _equipa = [{
@@ -623,7 +445,7 @@ exports.filtrarEquipas = async (req, res, next) => {
         const escalaoId = req.params.escalaoId;
         const page = parseInt(req.params.page) || 1;
         const perPage = parseInt(req.params.perPage) || 15;
-        const torneio = await getTorneioInfo();
+        const torneio = await dbFunctions.getTorneioInfo();
         
         const filtro = {
             torneioId: torneio.torneioId
@@ -637,10 +459,10 @@ exports.filtrarEquipas = async (req, res, next) => {
     
         if(escalaoId){ filtro.escalaoId = parseInt(escalaoId); }
     
-        const equipasInfo = getAllEquipasPorFiltro(filtro, page, perPage);
-        const localidadesInfo = getLocalidadesInfo();
-        const escaloesInfo = getEscaloesInfo();
-        const _numEquipas = getNumEquipasPorFiltro(filtro);
+        const equipasInfo = dbFunctions.getAllEquipasPorFiltroPaginacao(filtro, page, perPage);
+        const localidadesInfo = dbFunctions.getLocalidadesInfo();
+        const escaloesInfo = dbFunctions.getEscaloesInfo();
+        const _numEquipas = dbFunctions.getNumEquipasPorFiltro(filtro);
 
         const [_listaEquipas, localidades, escaloes, numEquipas] = await Promise.all([equipasInfo, localidadesInfo, escaloesInfo, _numEquipas]);
         
@@ -652,7 +474,7 @@ exports.filtrarEquipas = async (req, res, next) => {
         const paginas = geraPaginacao(numEquipas, perPage, page);
     
         // Lista de Equipas Únicas Com Jogos
-        const listaCompletaEquipas = await getAllEquipasComJogos(torneio.torneioId);
+        const listaCompletaEquipas = await dbFunctions.getAllEquipasComJogos(torneio.torneioId);
         listaEquipasComJogos = geraListaEquipasUnicasComJogos(listaCompletaEquipas);
     
         // Verificar se as equipas já estão atribuídas a jogos
@@ -709,7 +531,7 @@ exports.listagemEquipas = async (req, res, next) => {
     try {
         const localidadeId = parseInt(req.params.localidade);
         const escalaoId = parseInt(req.params.escalao);
-        const torneio = await getTorneioInfo();
+        const torneio = await dbFunctions.getTorneioInfo();
         const listaEquipas = [];
         const query = {
             torneioId: torneio.torneioId
@@ -732,15 +554,15 @@ exports.listagemEquipas = async (req, res, next) => {
 
         if(localidadeId != 0){
             query.localidadeId = localidadeId;
-            response.localidade = await getLocalidade(localidadeId);
+            response.localidade = await dbFunctions.getLocalidade(localidadeId);
         }
 
         if(escalaoId != 0){
             query.escalaoId = escalaoId;
-            response.escalao = await getEscalao(escalaoId);
+            response.escalao = await dbFunctions.getEscalao(escalaoId);
         }
 
-        const _listaEquipas = await getAllEquipasFullDetails(query);
+        const _listaEquipas = await dbFunctions.getAllEquipasFullDetails(query);
         if(_listaEquipas.length > 0){
             for(const equipa of _listaEquipas){
                 const _equipa = {
@@ -776,9 +598,9 @@ exports.createEquipasAleatoriamente = async (req, res, next) => {
     const num = req.params.num;
     let count = 0;
 
-    const torneioInfo = getTorneioInfo();
-    const localidadesInfo = getAllLocalidadesId();
-    const escaloesInfo = getEscaloesInfo();
+    const torneioInfo = dbFunctions.getTorneioInfo();
+    const localidadesInfo = dbFunctions.getAllLocalidadesID();
+    const escaloesInfo = dbFunctions.getEscaloesInfo();
 
     await Promise.all([torneioInfo, localidadesInfo, escaloesInfo])
     .then(async ([torneio, localidades, escaloes]) => {
@@ -786,7 +608,7 @@ exports.createEquipasAleatoriamente = async (req, res, next) => {
         const listaLocalidades = localidades.map(localidade => localidade.localidadeId);
         const listaEscaloes = escaloes.map(escalao => escalao.escalaoId);
 
-        let nextEquipaID = await getLastEquipaID(torneio.torneioId) || 0;
+        let nextEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId) || 0;
         for(let i = 0; i < num; i++){
             nextEquipaID++;
             await Equipas.create({
@@ -816,14 +638,14 @@ exports.createEquipasAleatoriamentePorEscalao = async (req, res, next) => {
     const num = req.params.num;
     let count = 0;
 
-    const torneioInfo = getTorneioInfo();
-    const localidadesInfo = getAllLocalidadesId();
+    const torneioInfo = dbFunctions.getTorneioInfo();
+    const localidadesInfo = dbFunctions.getAllLocalidadesID();
 
     await Promise.all([torneioInfo, localidadesInfo])
     .then(async ([torneio, localidades]) => {
         const listaLocalidades = localidades.map(localidade => localidade.localidadeId);
 
-        let nextEquipaID = await getLastEquipaID(torneio.torneioId) || 0;
+        let nextEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId) || 0;
         for(let i = 0; i < num; i++){
             nextEquipaID++;
             await Equipas.create({

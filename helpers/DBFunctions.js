@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = require('../helpers/database');
+const sequelize = require('./database');
 const Equipas = require('../models/Equipas');
 const Torneios = require('../models/Torneios');
 const Escaloes = require('../models/Escaloes');
@@ -36,8 +36,22 @@ exports.getEscalaoInfo = (escalaoId) => {
     return Escaloes.findOne({
         where: {
             escalaoId: escalaoId
-        }
+        },
+        raw: true
     });
+}
+
+exports.getEscalao = (escalaoId) => {
+    return Escaloes.findOne({
+        where: {
+            escalaoId: escalaoId
+        },
+        raw: true
+    });
+}
+
+exports.getEscaloesInfo = () => {
+    return Escaloes.findAll({raw: true});
 }
 
 exports.getEscaloesComEquipas = (torneioId) => {
@@ -49,6 +63,18 @@ exports.getEscaloesComEquipas = (torneioId) => {
         },
         group: ['equipas.escalaoId'],
         raw: true
+    });
+}
+
+exports.getAllEscaloesComJogos = (torneioId) => {
+    return Escaloes.findAll({
+        include: {
+            model: Jogos,
+            attributes: [],
+            where: {
+                torneioId: torneioId
+            }
+        }
     });
 }
 
@@ -124,6 +150,22 @@ exports.updateNumCampos = (torneioId, escalaoId, numCampos) => {
 //                        LOCALIDADES
 ////////////////////////////////////////////////////////
 
+exports.getLocalidade = (localidadeId) => {
+    return Localidades.findOne({
+        where: {
+            localidadeId: localidadeId
+        },
+        raw: true
+    })
+}
+
+exports.getLocalidadesInfo = () => {
+    return Localidades.findAll({
+        order: ['nome'],
+        raw: true
+    })
+}
+
 exports.getAllLocalidadesID = () => {
     return Localidades.findAll({
         attributes: ['localidadeId'],
@@ -147,6 +189,16 @@ exports.getEquipa = (torneioId, equipaId) => {
     });
 }
 
+exports.getSimpleEquipa = (torneioId, equipaId, raw = true) => {
+    return Equipas.findOne({
+        where: {
+            equipaId: equipaId,
+            torneioId: torneioId
+        },
+        raw: raw
+    });
+}
+
 exports.getAllEquipas = (torneioId, escalaoId) => {
     return Equipas.findAll({
         include: {
@@ -156,6 +208,74 @@ exports.getAllEquipas = (torneioId, escalaoId) => {
             torneioId: torneioId,
             escalaoId: escalaoId
         }
+    });
+}
+
+exports.getNumTotalEquipas = (torneioId) => {
+    return Equipas.count({
+        where: {
+            torneioId: torneioId
+        }
+    });
+}
+
+exports.getEquipaFullDetails = (torneioId, equipaId) => {
+    return Equipas.findOne({
+        where: {
+            equipaId: equipaId,
+            torneioId: torneioId
+        }, 
+        include: [
+            {
+                model: Localidades,
+                attributes: ['nome']
+            },
+            {
+                model: Escaloes,
+                attributes: ['designacao', 'sexo']
+            }
+        ]
+    });
+}
+
+exports.getAllEquipasFullDetails = (whereClause) => {
+    return Equipas.findAll({
+        where: whereClause, 
+        include: [
+            {
+                model: Localidades,
+                attributes: ['nome']
+            },
+            {
+                model: Escaloes,
+                attributes: ['designacao', 'sexo']
+            }
+        ]
+    });
+}
+
+exports.getAllEquipasPaginacao = (torneioId, offset, limit) => {
+    const _offset = (offset-1) * limit;
+    return Equipas.findAll({ 
+        include: [
+            {
+                model: Localidades,
+                attributes: ['nome']
+            },
+            {
+                model: Escaloes,
+                attributes: ['designacao', 'sexo']
+            }
+        ],
+        where: {torneioId: torneioId},
+        offset: _offset,
+        limit: limit
+    });
+}
+
+exports.getNumEquipasPorFiltro = (whereClause) => {
+    return Equipas.count({
+        where: whereClause
     });
 }
 
@@ -182,6 +302,12 @@ exports.getEquipasPorEscalao = (torneioId, escalaoId) => {
 
 exports.getNumEquipas = (torneioId) => {
     return Equipas.count({where: {torneioId: torneioId}});
+}
+
+exports.getLastEquipaID = (torneioId) => {
+    return Equipas.max('equipaId', {
+        where: { torneioId: torneioId }
+    });
 }
 
 exports.getNumEquipasPorEscalao = (torneio_id, escalaoId) => {
@@ -240,18 +366,43 @@ exports.getEquipasIDByLocalidadeAndEscalao = (torneioId, localidadeId, escalaoId
     });
 }
 
+exports.getAllEquipasPorFiltroPaginacao = (whereClause, offset, limit) => {
+    return Equipas.findAll({
+        where: whereClause, 
+        include: [
+            {
+                model: Localidades,
+                attributes: ['nome']
+            },
+            {
+                model: Escaloes,
+                attributes: ['designacao', 'sexo']
+            }
+        ],
+        offset: (offset - 1) * limit,
+        limit: limit
+    }); 
+}
+
+exports.getNumEquipasPorConcelhoInfo = (torneioId, escalaoId) => {
+    return sequelize.query(
+        `SELECT count(equipas.equipaId) AS numEquipas, localidades.nome FROM equipas
+        INNER JOIN escaloes
+        ON escaloes.escalaoId == equipas.escalaoId
+        INNER JOIN localidades
+        ON localidades.localidadeId == equipas.localidadeId
+        WHERE equipas.escalaoId == ? AND equipas.torneioId == ?
+        GROUP BY localidades.nome
+        ORDER BY localidades.nome ASC`,
+    {
+        replacements: [escalaoId, torneioId],
+        type: sequelize.QueryTypes.SELECT
+    });
+}
+
 ////////////////////////////////////////////////////////
 //                        JOGOS
 ////////////////////////////////////////////////////////
-
-exports.getEquipasPorJogo = (jogoId) => {
-    return Jogos.findOne({
-        attributes: ['equipa1Id', 'equipa2Id'],
-        where: {
-            jogoId: jogoId
-        }
-    });
-}
 
 exports.createJogo = (torneioId, escalaoId, fase, campo, equipa1Id, equipa2Id) => {
     return Jogos.create({
@@ -275,6 +426,38 @@ exports.getJogoPorEquipasID = (torneioId, escalaoId, fase, campo, equipa1Id, equ
             equipa2Id: equipa2Id
         },
         raw: true
+    });
+}
+
+exports.getAllJogosEscalaoFase = (torneioId, escalaoId, fase) => {
+    return Jogos.findAll({
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId,
+            fase: fase
+        },
+        raw: true
+    });
+}
+
+exports.getAllJogosEscalaoFaseCampo = (torneioId, escalaoId, fase, campo) => {
+    return Jogos.findAll({
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId,
+            fase: fase,
+            campo: campo
+        },
+        raw: true
+    });
+}
+
+exports.getNumJogosPorEscalao = (torneioId, escalaoId) => {
+    return Jogos.count({
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId
+        }
     });
 }
 
@@ -348,6 +531,19 @@ exports.getAllCampos = (torneioId, escalaoId, fase) => {
     });
 }
 
+exports.getNumJogosEquipa = (torneioId, equipaId) => {
+    return Jogos.count({
+        where: {
+            torneioId: torneioId,
+            [Op.or]: [
+                {equipa1Id: equipaId},
+                {equipa2Id: equipaId}
+            ]
+        },
+        raw: true
+    });
+}
+
 exports.getNumGamesPorCampo = (torneioId, escalaoId, fase, campo) => {
     return Jogos.count({
         where: {
@@ -382,6 +578,25 @@ exports.getPontuacoes = (jogoId) => {
     return Jogos.findOne({
         attributes: ['equipa1Pontos', 'equipa2Pontos'],
         where: { jogoId: jogoId }
+    });
+}
+
+exports.getEquipasPorJogo = (jogoId) => {
+    return Jogos.findOne({
+        attributes: ['equipa1Id', 'equipa2Id'],
+        where: {
+            jogoId: jogoId
+        }
+    });
+}
+
+exports.getAllEquipasComJogos = (torneioId) => {
+    return Jogos.findAll({
+        attributes: ['equipa1Id', 'equipa2Id'],
+        where: {
+            torneioId: torneioId
+        },
+        raw: true
     });
 }
 

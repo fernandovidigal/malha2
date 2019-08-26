@@ -225,12 +225,14 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
     try {
         const equipas = await getData(`/listagens/getEquipas/${escalaoId}`);
         const data = await getData(`/listagens/getFichasJogo/${escalaoId}/${campo}/${fase}`);
-
+    
         docDefinition.content = [];
         delete docDefinition.footer;
 
         docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
-            if(currentNode.text && currentNode.text.startsWith("pbJogosEfectuar") && currentNode.startPosition.top > 120){
+            if(currentNode.text && currentNode.text.startsWith("pbFichasJogo") && currentNode.startPosition.top > 120){
+                return true;
+            } else if(currentNode.text && currentNode.text.startsWith("pbJogosEfectuar") && currentNode.startPosition.top > 120){
                 return true;
             } else if(currentNode.text && currentNode.text.startsWith("PageBreak") && currentNode.startPosition.top > 120){
                 return true;
@@ -259,15 +261,15 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
                     // Verifica se só se pretende imprimir a folha de rosto
                     if(!soFolhaRosto.checked){ 
                         docDefinition.content.push(pageBreak);
-                        makeContentFichaJogoPrimeiraFase(docDefinition, campo);  
+                        makeContentFichaJogoPrimeiraFase(docDefinition, campo, fase);  
                     }
                 } else {
+                    docDefinition.content.push(pageBreak);
                     makeFichasJogoFasesSeguintes(docDefinition, campo, equipas.listaEquipas, fase);
                 }
             });
 
             pdfMake.createPdf(docDefinition).print();
-            
         } else {
             Swal.fire({
                 type: 'error',
@@ -437,11 +439,11 @@ equipasAgrupadasPorCamposBtn.addEventListener('click', function(e){
 
 // Processa o click no botão das fichas de Jogo
 const fichasJogoBtn = document.querySelector('.fichasJogo_btn');
-fichasJogoBtn.addEventListener('click', function(e){
+fichasJogoBtn.addEventListener('click', async function(e){
     e.preventDefault();
     const ctrlData = getControllersValues(this.parentNode);
     if(ctrlData.escalaoId != 0){
-        imprimeFichasJogo(ctrlData.escalaoId, ctrlData.fase, ctrlData.campo, this.parentNode);
+        await imprimeFichasJogo(ctrlData.escalaoId, ctrlData.fase, ctrlData.campo, this.parentNode);
     } else {
         Swal.fire({
             type: 'warning',

@@ -1,154 +1,11 @@
-const { validationResult } = require('express-validator/check');
-const sequelize = require('../helpers/database');
-const Torneios = require('../models/Torneios');
-const Escaloes = require('../models/Escaloes');
-const Jogos = require('../models/Jogos');
-const Campos = require('../models/Campos');
-const Localidades = require('../models/Localidades');
-const Equipas = require('../models/Equipas');
 const util = require('../helpers/util');
-const dbFunctions = require('../helpers/torneioDBFunctions');
+const dbFunctions = require('../helpers/DBFunctions');
 const torneioHelpers = require('../helpers/torneioHelperFunctions');
-
-function getTorneioInfo(){
-    return Torneios.findOne({where: {activo: 1}, raw: true});
-}
-
-function getEscaloesComEquipas(torneioId){
-    return Escaloes.findAll({
-        include: {
-            model: Equipas,
-            where: {torneioId: torneioId},
-            attributes: []
-        },
-        group: ['equipas.escalaoId'],
-        raw: true
-    });
-}
-
-function getEscalaoInfo(escalaoId){
-    return Escaloes.findOne({
-        where: {
-            escalaoId: escalaoId
-        },
-        raw: true
-    });
-}
-
-function getEquipas(torneioId, escalaoId){
-    return Equipas.findAll({
-        include: {
-            model: Localidades
-        },
-        where: {
-            torneioId: torneioId,
-            escalaoId: escalaoId
-        }
-    });
-}
-
-function getNumEquipasPorConcelhoInfo(torneioId, escalaoId){
-    return sequelize.query(
-        `SELECT count(equipas.equipaId) AS numEquipas, localidades.nome FROM equipas
-        INNER JOIN escaloes
-        ON escaloes.escalaoId == equipas.escalaoId
-        INNER JOIN localidades
-        ON localidades.localidadeId == equipas.localidadeId
-        WHERE equipas.escalaoId == ? AND equipas.torneioId == ?
-        GROUP BY localidades.nome
-        ORDER BY localidades.nome ASC`,
-    {
-        replacements: [escalaoId, torneioId],
-        type: sequelize.QueryTypes.SELECT
-    });
-}
-
-function getNumJogosPorEscalao(torneioId, escalaoId) {
-    return Jogos.count({
-        where: {
-            torneioId: torneioId,
-            escalaoId: escalaoId
-        }
-    });
-}
-
-function getNumCamposPorEscalaoFase(torneioId, escalaoId, fase){
-    return Jogos.findAll({
-        attributes: ['campo'],
-        where: {
-            torneioId: torneioId,
-            escalaoId: escalaoId,
-            fase: fase
-        },
-        group: ['campo'],
-        raw: true
-    });
-}
-
-function getAllJogosEscalaoFase(torneioId, escalaoId, fase){
-    return Jogos.findAll({
-        where: {
-            torneioId: torneioId,
-            escalaoId: escalaoId,
-            fase: fase
-        },
-        raw: true
-    });
-}
-
-function getAllJogosEscalaoFaseCampo(torneioId, escalaoId, fase, campo){
-    return Jogos.findAll({
-        where: {
-            torneioId: torneioId,
-            escalaoId: escalaoId,
-            fase: fase,
-            campo: campo
-        },
-        raw: true
-    });
-}
-
-function getAllEscaloesComJogos(torneioId){
-    return Escaloes.findAll({
-        include: {
-            model: Jogos,
-            attributes: [],
-            where: {
-                torneioId: torneioId
-            }
-        }
-    });
-}
-
-function getAllFasesEscalao(torneioId, escalaoId){
-    return Jogos.findAll({
-        attributes: ['fase'],
-        where: {
-            torneioId: torneioId,
-            escalaoId: escalaoId
-        },
-        group: ['fase'],
-        raw: true
-    });
-}
-
-function getAllCamposPorFase(torneioId, escalaoId, fase){
-    return Jogos.findAll({
-        attributes: ['campo'],
-        where: {
-            torneioId: torneioId,
-            escalaoId: escalaoId,
-            fase: fase
-        },
-        group: ['campo'],
-        raw: true
-    });
-}
 
 async function processaListaEquipasAgrupadasPorCampos(torneioId, escalaoId, fase, listaCampos){
     try{
         const _listaEquipasEscalao = dbFunctions.getAllEquipasEscalao(torneioId, escalaoId);
-        const _listaJogosEscalao = getAllJogosEscalaoFase(torneioId, escalaoId, fase);
+        const _listaJogosEscalao = dbFunctions.getAllJogosEscalaoFase(torneioId, escalaoId, fase);
         const [listaEquipasEscalao, listaJogosEscalao] = await Promise.all([_listaEquipasEscalao, _listaJogosEscalao])
 
         const listaEquipasId = listaEquipasEscalao.map(equipa => equipa.equipaId);
@@ -192,35 +49,35 @@ async function processaListaEquipasAgrupadasPorCampos(torneioId, escalaoId, fase
 }
 
 exports.mostraListagens = async (req, res, next) => {
-    const torneio = await getTorneioInfo();
+    const torneio = await dbFunctions.getTorneioInfo();
 
     if(!torneio){
         req.flash('error', 'Não existem torneios activos.');
         return res.redirect("../");
     }
 
-    const listaEscaloes = await getEscaloesComEquipas(torneio.torneioId);
-    const listaEscaloesComJogos = await getAllEscaloesComJogos(torneio.torneioId);
+    const listaEscaloes = await dbFunctions.getEscaloesComEquipas(torneio.torneioId);
+    const listaEscaloesComJogos = await dbFunctions.getAllEscaloesComJogos(torneio.torneioId);
 
     res.render('listagens/index', {torneio: torneio, escaloes: listaEscaloes, escaloesComJogos: listaEscaloesComJogos});
 }
 
 exports.numEquipasPorConcelho = async (req, res, next) => {
-    const torneio = await getTorneioInfo();
+    const torneio = await dbFunctions.getTorneioInfo();
     const escalaoId = req.body.escalao || 0;
 
     if(!torneio){
         // TODO: mostrar mensagem de erro
     }
 
-    const equipasPorConcelho = await getNumEquipasPorConcelhoInfo(torneio.torneioId, escalaoId);
+    const equipasPorConcelho = await dbFunctions.getNumEquipasPorConcelhoInfo(torneio.torneioId, escalaoId);
     util.sort(equipasPorConcelho);
 
     res.render('listagens/numEquipasPorConcelho', {torneio: torneio, escalaoId: escalaoId, localidades: equipasPorConcelho});
 }
 
 exports.equipasAgrupadasPorCampos = async (req, res, next) => {
-    const torneio = await getTorneioInfo();
+    const torneio = await dbFunctions.getTorneioInfo();
     let escalaoId = req.body.escalao || 0;
     let fase = req.body.fase || 0;
     let numCampos = 0;
@@ -231,14 +88,14 @@ exports.equipasAgrupadasPorCampos = async (req, res, next) => {
     }
 
     // 1. Verificar se para o escalão selecionado já existem jogos distribuidos
-    const numJogos = await getNumJogosPorEscalao(torneio.torneioId, escalaoId);
+    const numJogos = await dbFunctions.getNumJogosPorEscalao(torneio.torneioId, escalaoId);
     if(numJogos == 0){
         req.flash('error', 'O Escalão selecionado ainda não tem equipas distribuídas!');
         return res.redirect("/listagens");
     }
 
     // 2. Verificar o número de campos para o escalão e fase
-    numCampos = await getNumCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
+    numCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
 
     if(numCampos.length > 0){
         // Processa um array de objectos com o número do campo e placeholder para a lista de equipas
@@ -266,7 +123,7 @@ exports.equipasAgrupadasPorCampos = async (req, res, next) => {
 // API
 exports.getFases = async (req, res, next) => {
     try {
-        const torneio = await getTorneioInfo();
+        const torneio = await dbFunctions.getTorneioInfo();
         const escalaoId = parseInt(req.params.escalao);
 
         const response = {
@@ -278,7 +135,7 @@ exports.getFases = async (req, res, next) => {
             return res.status(200).json(response);
         }
 
-        let listaFases = await getAllFasesEscalao(torneio.torneioId, escalaoId);
+        let listaFases = await dbFunctions.getAllFasesPorEscalao(torneio.torneioId, escalaoId);
         listaFases = listaFases.map(_fase => _fase.fase);
 
         if(listaFases.length > 0){
@@ -300,7 +157,7 @@ exports.getFases = async (req, res, next) => {
 
 exports.getCampos = async (req, res, next) => {
     try {
-        const torneio = await getTorneioInfo();
+        const torneio = await dbFunctions.getTorneioInfo();
         const escalaoId = parseInt(req.params.escalao);
         const fase = parseInt(req.params.fase);
     
@@ -313,7 +170,7 @@ exports.getCampos = async (req, res, next) => {
             return res.status(200).json(response);
         }
     
-        let listaCampos = await getAllCamposPorFase(torneio.torneioId, escalaoId, fase);
+        let listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
         listaCampos = listaCampos.map(_campo => _campo.campo);
     
         if(listaCampos.length > 0){
@@ -335,7 +192,7 @@ exports.getCampos = async (req, res, next) => {
 
 exports.getEquipas = async (req, res, next) => {
     try {
-        const torneio = await getTorneioInfo();
+        const torneio = await dbFunctions.getTorneioInfo();
         const escalaoId = parseInt(req.params.escalao);
     
         const response = {
@@ -347,7 +204,7 @@ exports.getEquipas = async (req, res, next) => {
             return res.status(200).json(response);
         }
     
-        let listaEquipas = await getEquipas(torneio.torneioId, escalaoId);
+        let listaEquipas = await dbFunctions.getAllEquipas(torneio.torneioId, escalaoId);
     
         if(listaEquipas.length > 0){
             response.success = true;
@@ -369,8 +226,8 @@ exports.getEquipas = async (req, res, next) => {
 exports.getNumEquipasPorConcelho = async (req, res, next) => {
     try{
         const escalaoId = parseInt(req.params.escalao);
-        const torneioInfo = getTorneioInfo();
-        const escalaoInfo = getEscalaoInfo(escalaoId);
+        const torneioInfo = dbFunctions.getTorneioInfo();
+        const escalaoInfo = dbFunctions.getEscalaoInfo(escalaoId);
         const [torneio, escalao] = await Promise.all([torneioInfo, escalaoInfo]);
 
         const response = {
@@ -382,7 +239,7 @@ exports.getNumEquipasPorConcelho = async (req, res, next) => {
             return res.status(200).json(response);
         }
 
-        const equipasPorConcelho = await getNumEquipasPorConcelhoInfo(torneio.torneioId, escalaoId);
+        const equipasPorConcelho = await dbFunctions.getNumEquipasPorConcelhoInfo(torneio.torneioId, escalaoId);
         util.sort(equipasPorConcelho);
 
         if(equipasPorConcelho.length > 0){
@@ -419,8 +276,8 @@ exports.getEquipasAgrupadasPorCampos = async (req, res, next) => {
         const escalaoId = parseInt(req.params.escalao);
         const fase = parseInt(req.params.fase);
         const campo = parseInt(req.params.campo) || 0;
-        const torneioInfo = getTorneioInfo();
-        const escalaoInfo = getEscalaoInfo(escalaoId);
+        const torneioInfo = dbFunctions.getTorneioInfo();
+        const escalaoInfo = dbFunctions.getEscalaoInfo(escalaoId);
         const [torneio, escalao] = await Promise.all([torneioInfo, escalaoInfo]);
         let numCampos = [];
 
@@ -435,7 +292,7 @@ exports.getEquipasAgrupadasPorCampos = async (req, res, next) => {
 
         // 2. Verificar o número de campos para o escalão e fase
         if(campo == 0){
-            numCampos = await getNumCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
+            numCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
         } else {
             numCampos.push({
                 campo: campo
@@ -487,8 +344,8 @@ exports.getFichasJogo = async (req, res, next) => {
         const escalaoId = parseInt(req.params.escalao);
         const campo = parseInt(req.params.campo);
         const fase = parseInt(req.params.fase) || 1;
-        const torneioInfo = getTorneioInfo();
-        const escalaoInfo = getEscalaoInfo(escalaoId);
+        const torneioInfo = dbFunctions.getTorneioInfo();
+        const escalaoInfo = dbFunctions.getEscalaoInfo(escalaoId);
         const [torneio, escalao] = await Promise.all([torneioInfo, escalaoInfo]);
         let listaJogos = [];
         let listaCampos = [];
@@ -504,10 +361,10 @@ exports.getFichasJogo = async (req, res, next) => {
 
         // Todos os campos
         if(campo == 0){
-            listaCampos = await getNumCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
+            listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
             listaCampos = listaCampos.map(_campo => _campo.campo);
             if(listaCampos.length > 0){
-                listaJogos = await getAllJogosEscalaoFase(torneio.torneioId, escalaoId, fase);
+                listaJogos = await dbFunctions.getAllJogosEscalaoFase(torneio.torneioId, escalaoId, fase);
             } else {
                 response.errMsg = 'Não existem campos com jogos atribuídos.';
                 return res.status(200).json(response);
@@ -556,8 +413,8 @@ exports.getClassificacao = async (req, res, next) => {
         const escalaoId = parseInt(req.params.escalao);
         const campo = parseInt(req.params.campo);
         const fase = parseInt(req.params.fase) || 1;
-        const torneioInfo = getTorneioInfo();
-        const escalaoInfo = getEscalaoInfo(escalaoId);
+        const torneioInfo = dbFunctions.getTorneioInfo();
+        const escalaoInfo = dbFunctions.getEscalaoInfo(escalaoId);
         const [torneio, escalao] = await Promise.all([torneioInfo, escalaoInfo]);
 
         const response = {

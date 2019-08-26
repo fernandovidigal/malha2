@@ -1,4 +1,4 @@
-const dbFunctions = require('./torneioDBFunctions');
+const dbFunctions = require('./DBFunctions');
 const sequelize = require('../helpers/database');
 
 /*function determinaNumeroTotalCampos(numEquipas, numCamposTorneio, minEquipas, maxEquipas){

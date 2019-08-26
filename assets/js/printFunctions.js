@@ -4,6 +4,8 @@ let docDefinition = {
     content: []
 };
 
+
+
 function makeHeader(dd, torneioInfo){
     dd.header = {
         table: {
@@ -11,7 +13,7 @@ function makeHeader(dd, torneioInfo){
             body: [
                 [
                     {
-                        image: 'data:image/png;base64,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',
+                        image: 'data:image/png;base64,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',
                         width: 85,
                         height: 40,
                         fillColor: '#F5F5F5',
@@ -154,23 +156,43 @@ function makeEquipasAgrupadasPorCampos(ddContent, listaCampos, fase){
 
         const content = {
             table: {
-                widths:['auto','auto','*','auto'],
+                widths:[45,'auto','*','auto'],
                 headerRows: 2,
                 body: [
-                    [{text: `Campo ${campo.campo}`, style: 'tableHeader', colSpan: 4, alignment: 'left', bold: true, fontSize: 14}, {}, {}, {}],
-                    [{text: 'Equipa', bold: true}, {text: 'Jogadores', bold: true, colSpan: 2}, {}, {text: 'Localidade', bold: true}]
+                    [{text: `Campo ${campo.campo}`, style: 'tableHeader', colSpan: 4, alignment: 'center', bold: true, fontSize: 14}, {}, {}, {}],
+                    [{text: 'Equipa', alignment: 'center', bold: true, fontSize:10, margin: [0,0,10,0]}, {text: 'Jogadores', bold: true, colSpan: 2, fontSize:10}, {}, {text: 'Localidade', bold: true, fontSize:10, alignment: 'center'}]
                 ]
             },
-            layout: 'lightHorizontalLines',
-            margin: [0,0,0,12]
+            margin: [0,0,0,20],
+            layout: {
+                hLineWidth: function(i, node) {
+                    if(i === 0 || i === 1) {
+                        return 0;
+                    } else if(i === 2){
+                        return 1.5;
+                    } else {
+                        return 0.5;
+                    }
+                },
+                vLineWidth: function(i, node) {
+                    return 0;
+                },
+                hLineColor: function(i, node) {
+                    if(i > 2) {
+                        return 'gray';
+                    } else {
+                        return 'black';
+                    }
+                }
+            }
         }
 
         campo.listaEquipas.forEach(equipa => {
             const row = [
-                {text: `${equipa.equipaId}`, fontSize: 12}, 
-                {text: `${equipa.primeiroElemento}`, fontSize: 12},
-                {text: `${equipa.segundoElemento}`, fontSize: 12},
-                {text: `${equipa.localidade}`, fontSize: 12}
+                {text: `${equipa.equipaId}`, fontSize: 11, alignment: 'center', margin: [0,5,10,0]}, 
+                {text: `${equipa.primeiroElemento}`, fontSize: 11, margin: [0,5,20,5]},
+                {text: `${equipa.segundoElemento}`, fontSize: 11, margin: [0,5]},
+                {text: `${equipa.localidade}`, fontSize: 11, alignment: 'center', margin: [0,5,10,5]}
             ];
 
             content.table.body.push(row);
@@ -180,7 +202,7 @@ function makeEquipasAgrupadasPorCampos(ddContent, listaCampos, fase){
     });
 }
 
-function makeContentFichaJogoPrimeiraFase(dd, data){
+function makeContentFichaJogoPrimeiraFase(dd, data, fase){
     
     const listaJogos = splitIntoThree(data.listaJogos);
     const totalPaginas = Math.ceil(listaJogos.length / 2);
@@ -188,6 +210,13 @@ function makeContentFichaJogoPrimeiraFase(dd, data){
 
     listaJogos.forEach((jogos, index) => {
         if(Math.abs(index % 2) == 0 ){
+            dd.content.push({
+                text: 'pbFichasJogo',
+                fontSize: 0,
+                color: '#ffffff',
+                margin: [0,0,0,0]
+            });
+            
             dd.content.push({
                 text: `Campo Nº ${data.campo}`,
                 alignment: 'center',
@@ -219,7 +248,7 @@ function makeContentFichaJogoPrimeiraFase(dd, data){
                 },
                 hLineColor: function(i, node) {
                     if(i > 2 && i < 12) {
-                        return 'gray';
+                        return '#cdcdcd';
                     } else {
                         return 'black';
                     }
@@ -270,14 +299,26 @@ function makeContentFichaJogoPrimeiraFase(dd, data){
 
         if(Math.abs(index % 2) == 1){
             dd.content.push({text: 'Nota: O terceiro jogo de cada Partida só se joga em caso de empate.', alignment: 'center', fontSize: 10, margin:[0,0,0,10]});
-            dd.content.push({text: `Pág. ${page}/${totalPaginas}`, absolutePosition: {x: 520, y: 807}, fontSize: 8});
+            dd.content.push({
+                columns: [
+                    {text: `Fichas de Jogo - ${fase}ª Fase - Campo ${data.campo}`, absolutePosition: {x: 40, y: 807}, fontSize: 8},
+                    {text: `Pág. ${page}/${totalPaginas}`, absolutePosition: {x: 520, y: 807}, fontSize: 8},
+                ]
+            });
+            //dd.content.push({text: `Pág. ${page}/${totalPaginas}`, absolutePosition: {x: 520, y: 807}, fontSize: 8});
             page++;
         }
     });
 
     if(listaJogos.length % 2 != 0){
         dd.content.push({text: 'Nota: O terceiro jogo de cada Partida só se joga em caso de empate.', alignment: 'center', fontSize: 10, margin:[0,0,0,10]});
-        dd.content.push({text: `Pág. ${page}/${totalPaginas}`, absolutePosition: {x: 520, y: 807}, fontSize: 8});
+        dd.content.push({
+            columns: [
+                {text: `Fichas de Jogo - ${fase}ª Fase - Campo ${data.campo}`, absolutePosition: {x: 40, y: 807}, fontSize: 8},
+                {text: `Pág. ${page}/${totalPaginas}`, absolutePosition: {x: 520, y: 807}, fontSize: 8},
+            ]
+        });
+        //dd.content.push({text: `Pág. ${page}/${totalPaginas}`, absolutePosition: {x: 520, y: 807}, fontSize: 8});
     }
 }
 
@@ -311,14 +352,14 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase){
             dontBreakRows: true,
             widths: ['auto', '*', '*', 'auto', 40, 40, 40, 40],
             body: [[
-                {text: 'Equipas', fontSize: 10, bold: true, border: [false, false, false, true]},
-                {text: 'Jogadores', colSpan: 2, fontSize: 10, bold: true, border: [false, false, false, true]},
+                {text: 'Equipa', fontSize: 10, bold: true,},
+                {text: 'Jogadores', colSpan: 2, fontSize: 10, bold: true},
                 {},
-                {text: 'Localidade', fontSize: 10, bold: true, border: [false, false, false, true]},
-                {text: 'Parcial 1', alignment: 'center', fontSize: 10, bold: true, border: [false, false, false, true]},
-                {text: 'Parcial 2', alignment: 'center', fontSize: 10, bold: true, border: [false, false, false, true]},
-                {text: 'Parcial 3', alignment: 'center', fontSize: 10, bold: true, border: [false, false, false, true]},
-                {text: 'Pontos', alignment: 'center', fontSize: 10, bold: true, border: [false, false, false, true]},
+                {text: 'Localidade', fontSize: 10, bold: true},
+                {text: 'Parcial 1', alignment: 'center', fontSize: 10, bold: true},
+                {text: 'Parcial 2', alignment: 'center', fontSize: 10, bold: true},
+                {text: 'Parcial 3', alignment: 'center', fontSize: 10, bold: true},
+                {text: 'Pontos', alignment: 'center', fontSize: 10, bold: true},
                 
             ]]
         },
@@ -358,8 +399,8 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase){
         const row = [
             {
                 stack: [
-                    {text:`${equipa1.equipaId}`, alignment: 'center', fontSize: 12, margin: [0, 5]},
-                    {text:`${equipa2.equipaId}`, alignment: 'center', fontSize: 12, margin: [0, 5]}
+                    {text:`${equipa1.equipaId}`, alignment: 'center', fontSize: 10, margin: [0, 7]},
+                    {text:`${equipa2.equipaId}`, alignment: 'center', fontSize: 10, margin: [0, 7]}
                 ]
             },
             {
@@ -457,7 +498,7 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase){
 
     dd.content.push({
         columns: [
-            {text: `Jogos a efectuar - ${fase}ª Fase - Campo Nº ${data.campo}`, absolutePosition: {x: 40, y: 807}, fontSize: 8},
+            {text: `Jogos a efectuar - ${fase}ª Fase - Campo ${data.campo}`, absolutePosition: {x: 40, y: 807}, fontSize: 8},
             {text: `Pág. ${page}/${numPages}`, absolutePosition: {x: 520, y: 807}, fontSize: 8},
         ]
     });
@@ -466,13 +507,30 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase){
 }
 
 function makeFichasJogoFasesSeguintes(dd, data, equipas, fase){
+    let marginTop = 40;
+    
+    if(fase == 100){
+        marginTop = 20;
+    }
+
     dd.content.push({
-        text: `Fase da Competição: ${fase != 100 ? fase + 'ª Fase' : (data.campo == 1) ? 'Final' : '3º e 4º Lugar'}`,
+        text: `${(fase != 100) ? 'Fase da Competição: ' + fase + 'ª Fase' : 'Fase Final da Competição'}`,
         alignment: 'center',
         bold: true,
         fontSize: 16,
-        margin: [0, 40, 0, 15]
+        margin: [0, marginTop, 0, 15]
     });
+
+    if(fase == 100){
+        dd.content.push({
+            text: `${data.campo == 1 ? 'Final' : '3º e 4º Lugar'}`,
+            fontSize: 20,
+            bold: true,
+            margin: [0, 20, 0, 10],
+            color: '#455cc7',
+            alignment: 'center'
+        });
+    }
 
     dd.content.push({
         text: `Campo ${data.campo}`,
@@ -495,20 +553,38 @@ function makeFichasJogoFasesSeguintes(dd, data, equipas, fase){
 
         const _tableEquipas = {
             table: {
+                headerRows: 1,
                 widths: ['auto', '*', 120],
                 body: [
-                    [{text: `${equipa1.equipaId}`, margin: [20, 13], rowSpan: 2}, {text: `${equipa1.primeiroElemento}`, margin: [10, 2]}, {text: `${equipa1.localidade.nome}`, rowSpan: 2, margin: [10, 13]}],
-                    ['', {text: `${equipa1.segundoElemento}`, margin: [10, 2]}, ''],
-                    [{text: `${equipa2.equipaId}`, margin: [20, 13], rowSpan: 2}, {text: `${equipa2.primeiroElemento}`, margin: [10, 2]}, {text: `${equipa2.localidade.nome}`, rowSpan: 2, margin: [10, 13]}],
-                    ['', {text: `${equipa2.segundoElemento}`, margin: [10, 2]}, '']
+                    [
+                        {text: 'Equipa', bold: true, alignment: 'center', fontSize: 10, border: [false,false,false,false]},
+                        {text: 'Jogadores', bold: true, fontSize: 10, margin: [10,0,0,0], border: [false,false,false,false]},
+                        {text: 'Localidade', bold: true, fontSize: 10, margin: [10,0,0,0], border: [false,false,false,false]}
+                    ],
+                    [
+                        {text: `${equipa1.equipaId}`, margin: [20, 10]},
+                        {stack: [
+                            {text: `${equipa1.primeiroElemento}`, margin: [10, 2]},
+                            {text: `${equipa1.segundoElemento}`, margin: [10, 2]}
+                        ]},
+                        {text: `${equipa1.localidade.nome}`, margin: [10, 10]}
+                    ],
+                    [
+                        {text: `${equipa2.equipaId}`, margin: [20, 10]},
+                        {stack: [
+                            {text: `${equipa2.primeiroElemento}`, margin: [10, 2]},
+                            {text: `${equipa2.segundoElemento}`, margin: [10, 2]}
+                        ]},
+                        {text: `${equipa2.localidade.nome}`, margin: [10, 10]}
+                    ]
                 ]
             },
             layout: {
                 hLineWidth: function(i, node) {
-                    if(i === 0 || i === 2 || i === 4) {
-                        return 1.5;
+                    if(i === 0){
+                        return 0;
                     } else {
-                        return 0.5;
+                        return 1.5
                     }
                 },
                 vLineWidth: function(i, node) {
@@ -516,6 +592,13 @@ function makeFichasJogoFasesSeguintes(dd, data, equipas, fase){
                         return 1.5;
                     } else {
                         return 1;
+                    }
+                },
+                vLineColor: function(i, node){
+                    if(i === 1 || i === 2){
+                        return '#cdcdcd';
+                    } else {
+                        return 'black';
                     }
                 }
             },
@@ -548,7 +631,7 @@ function makeFichasJogoFasesSeguintes(dd, data, equipas, fase){
                 },
                 hLineColor: function(i, node) {
                     if(i > 2 && i < 12) {
-                        return 'gray';
+                        return '#cdcdcd';
                     } else {
                         return 'black';
                     }
@@ -574,8 +657,20 @@ function makeFichasJogoFasesSeguintes(dd, data, equipas, fase){
 
         const equipasRow = [];
         for(let i = 0; i < 3; i++){
-            equipasRow.push({text: `Equipa ${jogo.equipa1Id}`, alignment: 'center', bold: true, fillColor: '#eeeeee'});
-            equipasRow.push({text: `Equipa ${jogo.equipa2Id}`, alignment: 'center', bold: true, fillColor: '#eeeeee'});
+            /*equipasRow.push({
+                stack: [
+                    {text: `Equipa`, fontSize: 10, alignment: 'center', fillColor: '#eeeeee'},
+                    {text: `${jogo.equipa1Id}`, fontSize: 11, alignment: 'center', bold: true, fillColor: '#eeeeee'}
+                ]
+            });
+            equipasRow.push({
+                stack: [
+                    {text: `Equipa`, fontSize: 10, alignment: 'center', fillColor: '#eeeeee'},
+                    {text: `${jogo.equipa2Id}`, fontSize: 11, alignment: 'center', bold: true, fillColor: '#eeeeee'}
+                ]
+            });*/
+            equipasRow.push({text: `Equipa\n${jogo.equipa1Id}`, fontSize: 10, alignment: 'center', bold: true, fillColor: '#eeeeee'});
+            equipasRow.push({text: `Equipa\n${jogo.equipa2Id}`, fontSize: 10, alignment: 'center', bold: true, fillColor: '#eeeeee'});
         }
         
         _tablePontos.table.body.push(equipasRow);
@@ -612,7 +707,7 @@ function makeContentResultados(dd, data, fase){
             margin: [0, 20, 0, 10],
             color: '#455cc7',
             alignment: 'center'
-        })
+        });
     }
     
     const _table = {
@@ -620,15 +715,15 @@ function makeContentResultados(dd, data, fase){
             headerRows: 2,
             widths: ['auto', 'auto', '*', '*', 'auto', 'auto', 'auto'],
             body: [
-                [{text: `Campo ${data.campo}`, bold: true, fontSize: 14, colSpan: 6, alignment: 'center', border: [false, false, false, false]}, '', '', '', '', '', ''],
+                [{text: `Campo ${data.campo}`, bold: true, fontSize: 14, colSpan: 7, alignment: 'center', border: [false, false, false, false]}, '', '', '', '', '', ''],
                 [
-                    {text: 'Classif.', bold: true},
-                    {text: 'Equipa', bold: true},
-                    {text: 'Jogadores', colSpan: 2, bold: true},
+                    {text: 'Classif.', bold: true, fontSize: 10},
+                    {text: 'Equipa', bold: true, fontSize: 10},
+                    {text: 'Jogadores', colSpan: 2, bold: true, fontSize: 10},
                     {text: ''},
-                    {text: 'Localidade', alignment: 'center', bold: true},
-                    {text: 'Jogos Ganhos', bold: true},
-                    {text: 'Pontos', bold: true},
+                    {text: 'Localidade', alignment: 'center', bold: true, fontSize: 10},
+                    {text: 'Jogos Ganhos', bold: true, fontSize: 10},
+                    {text: 'Pontos', bold: true, fontSize: 10},
                 ]
             ]
         },
@@ -668,7 +763,7 @@ function makeContentResultados(dd, data, fase){
         }
     }
 
-    let ordem = 1;
+    let ordem = (fase != 100) ? 1 : (data.campo == 2) ? 3 : 1;
     data.classificacao.forEach((equipa) => {
         const classificacaoRow = [
             {text: `${ordem++}º`, alignment: 'center', margin: [5, 5]},
@@ -796,7 +891,7 @@ function makeFolhaParciais(dd, fase, data, equipas, parciais){
             widths: ['auto', '*', '*', 'auto', 40, 40, 40, 40],
             body: [
                 [
-                    {text: `Campo Nº ${data.campo}`, alignment: 'center', bold: true, fontSize: 14, colSpan: 8, margin: [0,0,0,2]},
+                    {text: `Campo ${data.campo}`, alignment: 'center', bold: true, fontSize: 14, colSpan: 8, margin: [0,0,0,2]},
                     {},{},{},{},{},{},{}
                 ],
                 [

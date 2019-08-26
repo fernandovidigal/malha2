@@ -159,6 +159,13 @@ exports.getLocalidade = (localidadeId) => {
     })
 }
 
+exports.getAllLocalidades = () => {
+    return Localidades.findAll({
+        order: ['nome'],
+        raw: true
+    });
+}
+
 exports.getLocalidadesInfo = () => {
     return Localidades.findAll({
         order: ['nome'],
@@ -397,6 +404,17 @@ exports.getNumEquipasPorConcelhoInfo = (torneioId, escalaoId) => {
     {
         replacements: [escalaoId, torneioId],
         type: sequelize.QueryTypes.SELECT
+    });
+}
+
+exports.getLocalidadesComEquipas = (torneioId) => {
+    return Equipas.findAll({
+        attributes: ['localidadeId'],
+        where: {
+            torneioId: torneioId
+        },
+        group: ['localidadeId'],
+        raw: true
     });
 }
 

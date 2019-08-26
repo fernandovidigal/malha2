@@ -86,7 +86,7 @@ async function imprimeListaEquipas(localidade, escalao){
         if(data.success){
             makeHeaderOnlyTorneioInfo(docDefinition, data.torneio);
             makeEquipasContent(docDefinition, data);
-            makeFooter(docDefinition);
+            makeFooter(docDefinition, `Lista de Equipas${(data.hasOwnProperty('localidade')) ? ' - ' + data.localidade.nome : ''}${(data.hasOwnProperty('escalao')) ? ' - ' + data.escalao.designacao + ' (' + (data.escalao.sexo == 1 ? 'Masculino' : 'Feminino') + ')' : ''}`);
             pdfMake.createPdf(docDefinition).print();
         } else {
             Swal.fire({

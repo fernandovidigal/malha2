@@ -1,21 +1,50 @@
 const Localidade = require('../../models/Localidades');
 const { validationResult } = require('express-validator/check');
 const util = require('../../helpers/util');
+const dbFunctions = require('../../helpers/DBFunctions');
 
-exports.getAllLocalidades = (req, res, next) => {
-    Localidade.findAll({
+exports.getAllLocalidades = async (req, res, next) => {
+    try {
+        const _localidades = await dbFunctions.getAllLocalidades();
+        const _torneio = await dbFunctions.getTorneioInfo();
+        let localidadesComEquipas = [];
+
+        const [localidades, torneio] = await Promise.all([_localidades, _torneio]);
+        if(torneio){
+            localidadesComEquipas = await dbFunctions.getLocalidadesComEquipas(torneio.torneioId);
+        }
+
+        localidades.forEach(localidade => {
+            const localidadeIndex = localidadesComEquipas.indexOf(localidade.localidadeId);
+            localidade.eliminavel = (localidadeIndex == -1) ? true : false;
+        });
+        
+        console.log(localidades);
+        console.log(localidadesComEquipas);
+
+    } catch(err){
+        console.log(err);
+        req.flash('error', 'Não foi possível obter os dados das localidades.');
+        res.redirect('/admin/localidades');
+    }
+
+
+
+
+    /*Localidade.findAll({
         order: ['nome'],
         raw: true
     })
     .then(localidades => {
         util.sort(localidades);
+        console.log(localidades);
         res.render('admin/localidades', {localidades: localidades});
     })
     .catch(err => {
         console.log(err);
         req.flash('error', 'Não foi possível obter os dados das localidades.');
         res.redirect('/admin/localidades');
-    });
+    });*/
 }
 
 exports.getLocalidade = (req, res, next) => {

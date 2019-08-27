@@ -1269,3 +1269,47 @@ animation-delay: -0.16s;
 .parcial_error {
     border: solid 1px red;
 }
+
+.breadcrumbs {
+    display: inline-flex;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.breadcrumbs__item {
+    list-style: none;
+    padding-right: 20px;
+    position: relative;
+}
+
+.breadcrumbs__item__selected {
+    color: #455cc7;
+}
+
+.breadcrumbs__item:not(:first-child) {
+    padding-left: 10px;
+}
+
+.breadcrumbs__item:not(:last-child)::after{
+    content: ">";
+    display: block;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.breadcrumbs__link {
+    color: #333333;
+    display: block;
+}
+
+.breadcrumbs__link:hover {
+    color: #455cc7;
+}
+
+.breadcrumbs__link i{
+    margin: 0;
+}

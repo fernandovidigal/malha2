@@ -20,10 +20,10 @@ exports.getStarting = async (req, res, next) => {
         const numEquipas = await dbFunctions.getNumEquipas(torneioId);
         if(numEquipas == 0){
             const error = { msg: "Não existem equipas registadas no torneio."};
-            return res.render('torneio/index', {torneio: torneio, messages: error});
+            return res.render('torneio/index', {torneio: torneio, messages: error, breadcrumbs: req.breadcrumbs()});
         } else if(numEquipas < 2){
             const error = { msg: "Existem menos de 2 equipas registadas."};
-            return res.render('torneio/index', {torneio: torneio, messages: error});
+            return res.render('torneio/index', {torneio: torneio, messages: error, breadcrumbs: req.breadcrumbs()});
         }
 
         // Lista dos Escalões com equipas registadas
@@ -62,7 +62,8 @@ exports.getStarting = async (req, res, next) => {
         }
 
         if(existemNumCamposNaoDefinidos){
-            return res.render('torneio/definirNumeroCampos', {torneio: torneio, escaloes: listaEscaloes});
+            req.breadcrumbs('Definir Número de Campos', '/torneio/definirNumeroCampos');
+            return res.render('torneio/definirNumeroCampos', {torneio: torneio, escaloes: listaEscaloes, breadcrumbs: req.breadcrumbs()});
         }
 
         if(numEquipas > 0 && !existemNumCamposNaoDefinidos){
@@ -161,7 +162,8 @@ exports.getStarting = async (req, res, next) => {
                 }
             }
 
-            res.render('torneio/selecionaEscalao', {torneio: torneio, numTotalJogos: numTotalJogos, escaloesMasculinos: escaloesMasculinos, escaloesFemininos: escaloesFemininos});
+            req.breadcrumbs('Selecionar Escalão', '/torneio/selecionaEscalao');
+            res.render('torneio/selecionaEscalao', {torneio: torneio, numTotalJogos: numTotalJogos, escaloesMasculinos: escaloesMasculinos, escaloesFemininos: escaloesFemininos, breadcrumbs: req.breadcrumbs()});
         }
     } catch(err) {
         console.log(err);
@@ -172,6 +174,7 @@ exports.getStarting = async (req, res, next) => {
 
 exports.setNumeroCampos = async (req, res, next) => {
     try{
+        req.breadcrumbs('Definir Número de Campos', '/torneio/definirNumeroCampos');
         const errors = validationResult(req).array({ onlyFirstError: true });
         const torneio = await dbFunctions.getTorneioInfo();
 
@@ -263,7 +266,7 @@ exports.setNumeroCampos = async (req, res, next) => {
         }
 
         if(errors.length > 0){
-            res.render('torneio/definirNumeroCampos', {validationErrors: errors, torneio: torneio, escaloes: listaEscaloes});
+            res.render('torneio/definirNumeroCampos', {validationErrors: errors, torneio: torneio, escaloes: listaEscaloes, breadcrumbs: req.breadcrumbs()});
         } else {
 
             let transaction;
@@ -420,7 +423,8 @@ exports.mostraResultados = async (req, res, next) => {
             }
         }
 
-        res.render('torneio/index', {torneio: torneio, info: info, campos: campos, listaCampos: listaCampos});
+        req.breadcrumbs('Resultados', '/torneio/index');
+        res.render('torneio/index', {torneio: torneio, info: info, campos: campos, listaCampos: listaCampos, breadcrumbs: req.breadcrumbs()});
     } catch(err){
         console.log(err);
         req.flash('error', 'Não foi possível obter os jogos');
@@ -512,7 +516,9 @@ exports.mostraClassificacao = async (req, res, next) => {
         
         const listaCampos = await torneioHelpers.processaClassificacao(torneio.torneioId, escalaoId, fase, campo);
 
-        res.render('torneio/classificacao', {torneio: torneio, listaCampos: listaCampos});
+        req.breadcrumbs('Resultados', `/torneio/resultados/escalao/${escalaoId}/fase/${fase}/campo/${campo}`);
+        req.breadcrumbs('Classificação', '/torneio/classificacao');
+        res.render('torneio/classificacao', {torneio: torneio, listaCampos: listaCampos, breadcrumbs: req.breadcrumbs()});
     } catch(err){
         console.log(err);
         req.flash('error', 'Não foi possível mostrar a classificação.');
@@ -544,19 +550,6 @@ exports.createParciais = async (req, res, next) => {
             success: false
         });
     }
-    //const result = await dbFunctions.createParciais(jogoId, data);
-
-    /*dbFunctions.createParciais(jogoId, data)
-    .then((result)=>{
-        console.log(result);
-        res.status(200).json({
-            success: true,
-            equipa1_pontos: data.parciaisData.equipa1.pontos,
-            equipa2_pontos: data.parciaisData.equipa2.pontos
-        });
-    }).catch((err)=>{
-        
-    });*/
 }
 
 exports.updateParciais = async (req, res, next) => {

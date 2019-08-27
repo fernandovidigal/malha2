@@ -32,6 +32,13 @@ exports.getTorneioInfo = () => {
 //                        ESCALÕES
 ////////////////////////////////////////////////////////
 
+exports.getAllEscaloes = () => {
+    return Escaloes.findAll({
+        order: [['sexo', 'DESC']],
+        raw: true
+    });
+}
+
 exports.getEscalaoInfo = (escalaoId) => {
     return Escaloes.findOne({
         where: {
@@ -407,13 +414,18 @@ exports.getNumEquipasPorConcelhoInfo = (torneioId, escalaoId) => {
     });
 }
 
-exports.getLocalidadesComEquipas = (torneioId) => {
+exports.getLocalidadesComEquipas = () => {
     return Equipas.findAll({
         attributes: ['localidadeId'],
-        where: {
-            torneioId: torneioId
-        },
         group: ['localidadeId'],
+        raw: true
+    });
+}
+
+exports.getAllEscaloesComEquipas = () => {
+    return Equipas.findAll({
+        attributes: ['escalaoId'],
+        group: ['escalaoId'],
         raw: true
     });
 }

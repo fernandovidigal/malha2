@@ -1,4 +1,5 @@
 <%- include('../includes/header.ejs') %>
+<%- include('../includes/breadcrumbs.ejs') %>
 
 <div class="buttons_bar">
     <div class="action_btns a-right">
@@ -19,7 +20,7 @@
             <tr>
                 <td class="localidade"><%= localidade.nome %></td>
                 <td class="w10"><a href="/admin/localidades/editarLocalidade/<%= localidade.localidadeId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
-                <td class="w10"><a href="" class="btn delete_btn" data-localidade="<%= localidade.localidadeId %>"><i class="fa fa-trash"></i>Eliminar</a></td>
+                <td class="w10"><% if(localidade.eliminavel){ %><a href="" class="btn delete_btn" data-localidade="<%= localidade.localidadeId %>"><i class="fa fa-trash"></i>Eliminar</a><% } %></td>
             </tr>
         <% }); %>
     <% } else { %>

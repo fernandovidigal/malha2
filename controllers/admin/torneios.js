@@ -74,7 +74,7 @@ exports.getAllTorneios = (req, res, next) => {
         raw: true
     })
     .then(torneios => {
-        res.render('admin/torneios', {torneios: torneios});
+        res.render('admin/torneios', {torneios: torneios, breadcrumbs: req.breadcrumbs()});
     })
     .catch(err => {
         console.log(err);
@@ -120,7 +120,8 @@ exports.getTorneio = async (req, res, next) => {
             // Ordena a lista de Escalões pelo escalão Id
             escaloes.sort((a,b) => (a.escalaoId > b.escalaoId) ? 1 : -1);
 
-            res.render('admin/editarTorneio', {torneio: _torneio, escaloes: escaloes});
+            req.breadcrumbs('Editar Torneio', '/admin/editarTorneio');
+            res.render('admin/editarTorneio', {torneio: _torneio, escaloes: escaloes, breadcrumbs: req.breadcrumbs()});
         })
         .catch(err => {
             throw new Error(err);
@@ -137,7 +138,8 @@ exports.adicionarTorneio = (req, res, next) => {
 
     getAllEscaloes()
     .then( escaloes => {
-        res.render('admin/adicionarTorneio', {torneio: {}, escaloes: escaloes});
+        req.breadcrumbs('Adicionar Torneio', '/admin/adicionarTorneio');
+        res.render('admin/adicionarTorneio', {torneio: {}, escaloes: escaloes, breadcrumbs: req.breadcrumbs()});
     })
     .catch(err => {
         console.log(err);
@@ -220,7 +222,8 @@ exports.createTorneio = async (req, res, next) => {
             localidade: localidade,
             ano: ano
         }
-        res.render('admin/adicionarTorneio', {validationErrors: errors, escaloes: listaEscaloes, torneio: oldData});
+        req.breadcrumbs('Adicionar Torneio', '/admin/adicionarTorneio');
+        res.render('admin/adicionarTorneio', {validationErrors: errors, escaloes: listaEscaloes, torneio: oldData, breadcrumbs: req.breadcrumbs()});
     } else {
         let torneioCriadoId = 0;
         let transaction;
@@ -406,7 +409,8 @@ exports.updateTorneio = async (req, res, next) => {
             localidade: localidade,
             ano: ano
         }
-        res.render('admin/editarTorneio', {validationErrors: errors, torneio: oldData, escaloes: listaEscaloes});
+        req.breadcrumbs('Editar Torneio', '/admin/editarTorneio');
+        res.render('admin/editarTorneio', {validationErrors: errors, torneio: oldData, escaloes: listaEscaloes, breadcrumbs: req.breadcrumbs()});
     } else {
 
         let transaction;

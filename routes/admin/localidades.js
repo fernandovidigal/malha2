@@ -6,13 +6,15 @@ const LocalidadesController = require('../../controllers/admin/localidades');
 
 router.all('/*', [userAuthenticated, checkGestorStatus], (req, res, next) => {
     res.locals.menuAdminLocalidades = true;
+    req.breadcrumbs('Localidades', '/admin/localidades');
     next();
 });
 
 router.get('/', LocalidadesController.getAllLocalidades);
 
 router.get('/adicionarLocalidade', (req, res) => {
-    res.render('admin/adicionarLocalidade');
+    req.breadcrumbs('Adicionar Localidade', '/admin/adicionarLocalidade');
+    res.render('admin/adicionarLocalidade', {breadcrumbs: req.breadcrumbs()});
 });
 
 router.post('/adicionarLocalidade', [

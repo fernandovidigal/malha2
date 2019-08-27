@@ -6,6 +6,7 @@ const EscaloesController = require('../../controllers/admin/escaloes');
 
 router.all('/*', [userAuthenticated, checkGestorStatus], (req, res, next) => {
     res.locals.menuAdminEscaloes = true;
+    req.breadcrumbs('Escalões', '/admin/escaloes');
     next();
 });
 
@@ -14,7 +15,8 @@ router.get('/', EscaloesController.getAllEscaloes);
 router.get('/filtro/:sexo', EscaloesController.getEscalaoBySexo);
 
 router.get('/adicionarEscalao', (req, res) => {
-    res.render('admin/adicionarEscalao');
+    req.breadcrumbs('Adicionar Escalão', '/admin/adicionarEscalao');
+    res.render('admin/adicionarEscalao', {breadcrumbs: req.breadcrumbs()});
 });
 
 

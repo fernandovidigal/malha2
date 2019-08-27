@@ -5,65 +5,46 @@ const dbFunctions = require('../../helpers/DBFunctions');
 
 exports.getAllLocalidades = async (req, res, next) => {
     try {
-        const _localidades = await dbFunctions.getAllLocalidades();
-        const _torneio = await dbFunctions.getTorneioInfo();
-        let localidadesComEquipas = [];
+        const _localidades = dbFunctions.getAllLocalidades();
+        const _listaLocalidadesComEquipas = dbFunctions.getLocalidadesComEquipas();
 
-        const [localidades, torneio] = await Promise.all([_localidades, _torneio]);
-        if(torneio){
-            localidadesComEquipas = await dbFunctions.getLocalidadesComEquipas(torneio.torneioId);
+        const [localidades, localidadesComEquipas] = await Promise.all([_localidades, _listaLocalidadesComEquipas]);
+
+        util.sort(localidades);
+
+        if(localidades.length > 0){
+            localidades.forEach(localidade => {
+                const localidadeIndex = localidadesComEquipas.find(_localidade => _localidade.localidadeId == localidade.localidadeId);
+                localidade.eliminavel = (!localidadeIndex) ? true : false;
+            });
         }
-
-        localidades.forEach(localidade => {
-            const localidadeIndex = localidadesComEquipas.indexOf(localidade.localidadeId);
-            localidade.eliminavel = (localidadeIndex == -1) ? true : false;
-        });
         
-        console.log(localidades);
-        console.log(localidadesComEquipas);
+        res.render('admin/localidades', {localidades: localidades, breadcrumbs: req.breadcrumbs()});
 
     } catch(err){
         console.log(err);
         req.flash('error', 'Não foi possível obter os dados das localidades.');
         res.redirect('/admin/localidades');
     }
-
-
-
-
-    /*Localidade.findAll({
-        order: ['nome'],
-        raw: true
-    })
-    .then(localidades => {
-        util.sort(localidades);
-        console.log(localidades);
-        res.render('admin/localidades', {localidades: localidades});
-    })
-    .catch(err => {
-        console.log(err);
-        req.flash('error', 'Não foi possível obter os dados das localidades.');
-        res.redirect('/admin/localidades');
-    });*/
 }
 
-exports.getLocalidade = (req, res, next) => {
-    const localidadeId = req.params.id;
-    
-    Localidade.findByPk(localidadeId)
-    .then(localidade => {
+exports.getLocalidade = async (req, res, next) => {
+    try {
+        const localidadeId = parseInt(req.params.id);
+
+        const localidade = await dbFunctions.getLocalidade(localidadeId);
         if(localidade){
-            res.render('admin/editarLocalidade', {localidade: localidade});
+            req.breadcrumbs('Editar Localidade', '/admin/editarLocalidade');
+            res.render('admin/editarLocalidade', {localidade: localidade, breadcrumbs: req.breadcrumbs()});
         } else {
             req.flash('error', 'Localidade não existe.');
             res.redirect('/admin/localidades.');
         }
-    })
-    .catch(err => {
+    } catch(err) {
         console.log(err);
         req.flash('error', 'Não foi possível obter os dados da localidade.');
         res.redirect('/admin/localidades');
-    });
+    }
 }
 
 exports.createLocalidade = (req, res, next) => {
@@ -75,7 +56,8 @@ exports.createLocalidade = (req, res, next) => {
     }
 
     if(!errors.isEmpty()){
-        res.render('admin/adicionarLocalidade', {validationErrors: errors.array({ onlyFirstError: true }), localidade: oldData});
+        req.breadcrumbs('Adicionar Localidade', '/admin/adicionarLocalidade');
+        res.render('admin/adicionarLocalidade', {validationErrors: errors.array({ onlyFirstError: true }), localidade: oldData, breadcrumbs: req.breadcrumbs()});
     } else {
         Localidade.findOrCreate({
             where: {
@@ -90,7 +72,7 @@ exports.createLocalidade = (req, res, next) => {
                 const errors = [{
                     msg: 'Localidade já existe.'
                 }]
-                res.render('admin/adicionarLocalidade', {validationErrors: errors.array({ onlyFirstError: true }), localidade: oldData});
+                res.render('admin/adicionarLocalidade', {validationErrors: errors.array({ onlyFirstError: true }), localidade: oldData, breadcrumbs: req.breadcrumbs()});
             }
         })
         .catch(err => {
@@ -112,7 +94,8 @@ exports.updateLocalidade = (req, res, next) => {
     }
 
     if(!errors.isEmpty()){
-        res.render('admin/editarLocalidade', {validationErrors: errors.array({ onlyFirstError: true }), localidade: localidade});
+        req.breadcrumbs('Editar Localidade', '/admin/editarLocalidade');
+        res.render('admin/editarLocalidade', {validationErrors: errors.array({ onlyFirstError: true }), localidade: localidade, breadcrumbs: req.breadcrumbs()});
     } else {
         Localidade.findByPk(localidadeId)
         .then(localidade => {
@@ -133,7 +116,7 @@ exports.updateLocalidade = (req, res, next) => {
                         const uniqueError = [{
                                 msg: err.errors[0].message
                             }];
-                        res.render('admin/editarLocalidade', {validationErrors: uniqueError, localidade: localidade});
+                        res.render('admin/editarLocalidade', {validationErrors: uniqueError, localidade: localidade, breadcrumbs: req.breadcrumbs()});
                     } else {
                         req.flash('error', "Ocurreu um erro ao adicionar a localidade.");
                         res.redirect('/admin/localidades');
@@ -156,14 +139,14 @@ exports.deleteLocalidade = (req, res, next) => {
     const localidadeId = req.body.id;
 
     Localidade.destroy({where: {localidadeId: localidadeId}, limit: 1})
-        .then(result => {
-            if(result){
-                res.status(200).json({success: true});
-            } else {
-                res.status(200).json({success: false});
-            }
-        })
-        .catch(err => { 
+    .then(result => {
+        if(result){
+            res.status(200).json({success: true});
+        } else {
             res.status(200).json({success: false});
-        });
+        }
+    })
+    .catch(err => { 
+        res.status(200).json({success: false});
+    });
 }

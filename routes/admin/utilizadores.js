@@ -6,6 +6,7 @@ const UsersController = require('../../controllers/admin/utilizadores');
 
 router.all('/*', [userAuthenticated, checkAdminStatus], (req, res, next) => {
     res.locals.menuAdminUtilizadores = true;
+    req.breadcrumbs('Utilizadores', '/admin/utilizadores');
     next();
 });
 
@@ -13,7 +14,8 @@ router.get('/', UsersController.getAllUsers);
 
 // ADICIONAR UTILIZADOR
 router.get('/adicionarUtilizador', (req, res) => {
-    res.render('admin/adicionarUtilizador');
+    req.breadcrumbs('Adicionar Utilizador', '/admin/adicionarUtilizador');
+    res.render('admin/adicionarUtilizador', {breadcrumbs: req.breadcrumbs()});
 });
 
 router.post('/adicionarUtilizador', [

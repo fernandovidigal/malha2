@@ -6,6 +6,7 @@ const ConfiguracoesController = require('../../controllers/admin/configuracoes')
 
 router.all('/*', [userAuthenticated, checkAdminStatus], (req, res, next) => {
     res.locals.menuAdminConfig = true;
+    req.breadcrumbs('Configuraçoes', '/admin/configuracoes');
     next();
 });
 

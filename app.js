@@ -7,6 +7,7 @@ const session = require('express-session');
 const passport = require('passport');
 const flash = require('connect-flash');
 const methodOverride = require('method-override');
+const breadcrumbs = require('express-breadcrumbs');
 
 const util = require('./helpers/util');
 const fileStruct = require('./helpers/fileStruct');
@@ -103,6 +104,9 @@ app.use(session({
     saveUninitialized: false,
 }));
 
+// BREADCRUMBS
+app.use(breadcrumbs.init());
+
 // PASSPORT
 app.use(passport.initialize());
 app.use(passport.session());
@@ -133,6 +137,12 @@ const adminConfiguracoes = require('./routes/admin/configuracoes');
 const equipas = require('./routes/equipas');
 const torneio = require('./routes/torneio');
 const listagens = require('./routes/listagens');
+
+// Define o inicio dos Breadcrumbs
+app.use('/', breadcrumbs.setHome({
+    name: 'Início',
+    url: '/'
+}));
 
 app.use('/login', login);
 app.use('/', index);

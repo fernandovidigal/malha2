@@ -6,6 +6,7 @@ const ListagensController = require('../controllers/listagens');
 
 router.all('/*', userAuthenticated, (req, res, next) => {
     res.locals.menuListagens = true;
+    req.breadcrumbs('Listagens', '/listagens');
     next();
 });
 

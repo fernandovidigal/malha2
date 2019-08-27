@@ -1,4 +1,5 @@
 <%- include('../includes/header.ejs') %>
+<%- include('../includes/breadcrumbs.ejs') %>
 
 <% if(torneio != null){ %>
     <div class="title__bar">
@@ -13,7 +14,7 @@
             <table class="listTable">
                 <thead>
                     <tr>
-                        <th>&nbsp;</th>
+                        <th>Classif.</th>
                         <th>Equipa</th>
                         <th colspan="2">Jogadores</th>
                         <th>Localidade</th>
@@ -25,13 +26,13 @@
                 <% if(campo.classificacao.length > 0) { %>
                     <% campo.classificacao.forEach(function(equipa){ %>
                         <tr>
-                            <td><%= posicao++ %></td>
-                            <td><%= equipa.equipaId %></td>
+                            <td align="center"><%= posicao++ %>º</td>
+                            <td align="center"><%= equipa.equipaId %></td>
                             <td><%= equipa.primeiroElemento %></td>
                             <td><%= equipa.segundoElemento %></td>
-                            <td><%= equipa.localidade %></td>
-                            <td><%= equipa.vitorias %></td>
-                            <td><%= equipa.pontos %></td>
+                            <td align="center"><%= equipa.localidade %></td>
+                            <td align="center"><%= equipa.vitorias %></td>
+                            <td align="center"><%= equipa.pontos %></td>
                         </tr>
                     <% }); %>
                 <% } else { %>

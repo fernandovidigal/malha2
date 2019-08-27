@@ -15,7 +15,7 @@ function showValidationErrors(req, res, errors, page, oldData){
     .then(([localidades, escaloes]) => {
         if(localidades.length > 0 && escaloes.length > 0){
             util.sort(localidades);
-            res.render('equipas/' + page, {validationErrors: errors.array({ onlyFirstError: true }), localidades: localidades, escaloes: escaloes, equipa: oldData});
+            res.render('equipas/' + page, {validationErrors: errors.array({ onlyFirstError: true }), localidades: localidades, escaloes: escaloes, equipa: oldData, breadcrumbs: req.breadcrumbs()});
         } else {
             console.log(err);
             req.flash('error', 'Não foi possível obter dados dos escalões e/ou localidades.')
@@ -137,7 +137,8 @@ exports.getAllEquipas = async (req, res, next) => {
             page: page,
             perPage: perPage,
             paginas: paginas,
-            numPages: numPages
+            numPages: numPages,
+            breadcrumbs: req.breadcrumbs()
         });
 
     } catch(err){
@@ -149,6 +150,7 @@ exports.getAllEquipas = async (req, res, next) => {
 
 exports.getEquipaToEdit = async (req, res, next) => {
     try {
+        req.breadcrumbs('Editar Equipa', '/equipas/editarEquipa');
         const equipaId = req.params.id;
 
         const torneioInfo = dbFunctions.getTorneioInfo();
@@ -166,7 +168,8 @@ exports.getEquipaToEdit = async (req, res, next) => {
             res.render('equipas/editarEquipa', {
                 localidades: localidades,
                 escaloes: escaloes,
-                equipa: equipa
+                equipa: equipa,
+                breadcrumbs: req.breadcrumbs()
             });
         } else {
             req.flash('error', 'Equipa não existe!');
@@ -205,7 +208,8 @@ exports.adicionarEquipa = async (req, res, next) => {
                 req.flash('warning', 'Todos os escalões disponíveis têm os jogos distribuídos.')
                 res.redirect('/equipas');
             } else {
-                res.render('equipas/adicionarEquipa', {localidades: localidades, escaloes: listaEscaloes});
+                req.breadcrumbs('Adicionar Equipa', '/equipas/adicionarEquipa');
+                res.render('equipas/adicionarEquipa', {localidades: localidades, escaloes: listaEscaloes, breadcrumbs: req.breadcrumbs()});
             }
         } else {
             console.log(err);
@@ -225,6 +229,7 @@ exports.createEquipa = async (req, res, next) => {
     const localidadeId = req.body.localidade;
     const escalaoId = req.body.escalao;
     const errors = validationResult(req);
+    req.breadcrumbs('Adicionar Equipa', '/equipas/adicionarEquipa');
     
     const oldData = {
         primeiroElemento: primeiroElemento,
@@ -261,7 +266,7 @@ exports.createEquipa = async (req, res, next) => {
                     const errors = [{
                         msg: 'Equipa já existe neste torneio.'
                     }]
-                    res.render('equipas/adicionarEquipa', {validationErrors: errors, equipa: oldData});
+                    res.render('equipas/adicionarEquipa', {validationErrors: errors, equipa: oldData, breadcrumbs: req.breadcrumbs()});
                 }
             })
             .catch(err => {
@@ -285,6 +290,7 @@ exports.updateEquipa = async (req, res, next) => {
     const localidadeId = req.body.localidade;
     const escalaoId = req.body.escalao;
     const errors = validationResult(req);
+    req.breadcrumbs('Editar Equipa', '/equipas/editarEquipa');
     
     const oldData = {
         equipaId: equipaId,
@@ -424,7 +430,8 @@ exports.searchEquipa = async (req, res, next) => {
                     equipas: _equipa,
                     torneio: torneio,
                     localidades: localidades,
-                    escaloes: escaloes
+                    escaloes: escaloes,
+                    breadcrumbs: req.breadcrumbs()
                 });
             } else {
                 req.flash("error", "Não exite equipa com o número indicado.");
@@ -517,7 +524,8 @@ exports.filtrarEquipas = async (req, res, next) => {
             page: page,
             perPage: perPage,
             paginas: paginas,
-            numPages: numPages
+            numPages: numPages,
+            breadcrumbs: req.breadcrumbs()
         });
     } catch(err) {
         console.log(err);

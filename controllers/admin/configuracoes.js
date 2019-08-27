@@ -4,7 +4,7 @@ const configFunctions = require('../../helpers/configFunctions');
 exports.getConfig = (req, res, next) => {
     configFunctions.readConfigFile()
     .then(data => {
-        res.render('admin/configuracoes', {server: data.server});
+        res.render('admin/configuracoes', {server: data.server, breadcrumbs: req.breadcrumbs()});
     })
     .catch(err => {
         console.log(err);
@@ -24,7 +24,7 @@ exports.writeConfigServerPorta = (req, res, next) => {
     }
 
     if(!errors.isEmpty()){
-        res.render('admin/configuracoes', {validationErrors: errors.array({onlyFirstError: true}), server: _server});
+        res.render('admin/configuracoes', {validationErrors: errors.array({onlyFirstError: true}), server: _server, breadcrumbs: req.breadcrumbs()});
     } else {
         configFunctions.writeConfigFile(_server)
         .then(()=> {

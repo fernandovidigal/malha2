@@ -6,6 +6,7 @@ const EquipasController = require('../controllers/equipas');
 
 router.all('/*', userAuthenticated, (req, res, next) => {
     res.locals.menuEquipas = true;
+    req.breadcrumbs('Equipas', '/equipas');
     next();
 });
 

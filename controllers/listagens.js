@@ -59,7 +59,7 @@ exports.mostraListagens = async (req, res, next) => {
     const listaEscaloes = await dbFunctions.getEscaloesComEquipas(torneio.torneioId);
     const listaEscaloesComJogos = await dbFunctions.getAllEscaloesComJogos(torneio.torneioId);
 
-    res.render('listagens/index', {torneio: torneio, escaloes: listaEscaloes, escaloesComJogos: listaEscaloesComJogos});
+    res.render('listagens/index', {torneio: torneio, escaloes: listaEscaloes, escaloesComJogos: listaEscaloesComJogos, breadcrumbs: req.breadcrumbs()});
 }
 
 exports.numEquipasPorConcelho = async (req, res, next) => {
@@ -372,7 +372,7 @@ exports.getFichasJogo = async (req, res, next) => {
         } else {
             // Foi indicado o número do campo
             listaCampos.push(campo);
-            listaJogos = await getAllJogosEscalaoFaseCampo(torneio.torneioId, escalaoId, fase, campo);   
+            listaJogos = await dbFunctions.getAllJogosEscalaoFaseCampo(torneio.torneioId, escalaoId, fase, campo);   
         }
 
         if(listaJogos.length > 0){

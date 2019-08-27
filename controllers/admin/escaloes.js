@@ -1,18 +1,28 @@
 const Escaloes = require('../../models/Escaloes');
 const { validationResult } = require('express-validator/check');
+const dbFunctions = require('../../helpers/DBFunctions');
 
-exports.getAllEscaloes = (req, res, next) => {
-    Escaloes.findAll({
-        order: [['sexo', 'DESC']]
-    })
-    .then(escaloes => {
-        res.render('admin/escaloes', {escaloes: escaloes, filtro: -1});
-    })
-    .catch(err => {
+exports.getAllEscaloes = async (req, res, next) => {
+    try {
+        const _escaloes = dbFunctions.getAllEscaloes();
+        const _listaEquipasComEscalao = dbFunctions.getAllEscaloesComEquipas();
+        
+        const [escaloes, listaEquipasComEscalao] = await Promise.all([_escaloes, _listaEquipasComEscalao]);
+
+        if(escaloes.length > 0){
+            escaloes.forEach(escalao => {
+                const escalaoIndex = listaEquipasComEscalao.find(_escalao => _escalao.escalaoId == escalao.escalaoId);
+                escalao.eliminavel = (!escalaoIndex) ? true : false;
+            });
+        }
+
+        res.render('admin/escaloes', {escaloes: escaloes, filtro: -1, breadcrumbs: req.breadcrumbs()});
+
+    } catch(err){
         console.log(err);
         req.flash('error', 'Não foi possível obter os dados dos escalões.');
         res.redirect('/admin/escaloes');
-    });
+    }
 }
 
 exports.getEscalao = (req, res, next) => {
@@ -21,7 +31,8 @@ exports.getEscalao = (req, res, next) => {
     Escaloes.findByPk(escalaoId)
     .then(escalao => {
         if(escalao){
-            res.render('admin/editarEscalao', {escalao: escalao});
+            req.breadcrumbs('Editar Escalão', '/admin/editarEscalao');
+            res.render('admin/editarEscalao', {escalao: escalao, breadcrumbs: req.breadcrumbs()});
         } else {
             req.flash('error', 'Escalão não existe.');
             res.redirect('/admin/escaloes');
@@ -46,7 +57,7 @@ exports.getEscalaoBySexo = (req, res, next) => {
         raw: true
     })
     .then(escaloes => {
-        res.render('admin/escaloes', {escaloes: escaloes, filtro: sexo});
+        res.render('admin/escaloes', {escaloes: escaloes, filtro: sexo, breadcrumbs: req.breadcrumbs()});
     })
     .catch(err => {
         console.log(err);
@@ -65,8 +76,9 @@ exports.createEscalao = (req, res, next) => {
         sexo: sexo
     }
 
-    if(!errors.isEmpty()){  
-        res.render('admin/adicionarEscalao', {validationErrors: errors.array(), escalao: oldData});
+    if(!errors.isEmpty()){
+        req.breadcrumbs('Adicionar Escalão', '/admin/adicionarEscalao');
+        res.render('admin/adicionarEscalao', {validationErrors: errors.array(), escalao: oldData, breadcrumbs: req.breadcrumbs()});
     } else {
         Escaloes.findOrCreate({
             where: {
@@ -106,7 +118,8 @@ exports.updateEscalao = (req, res, next) => {
     }
 
     if(!errors.isEmpty()){
-        res.render('admin/editarEscalao', {validationErrors: errors.array(), escalao: escalao});
+        req.breadcrumbs('Editar Escalão', '/admin/editarEscalao');
+        res.render('admin/editarEscalao', {validationErrors: errors.array(), escalao: escalao, breadcrumbs: req.breadcrumbs()});
     } else {
         Escaloes.findOne({
             where: {
@@ -119,7 +132,7 @@ exports.updateEscalao = (req, res, next) => {
                 const errors = [{
                     msg: 'Escalão já existe.'
                 }]
-                res.render('admin/editarEscalao', {validationErrors: errors, escalao: escalao});
+                res.render('admin/editarEscalao', {validationErrors: errors, escalao: escalao, breadcrumbs: req.breadcrumbs()});
             } else {
                 // Não existe escalão com a mesma designação e sexo
                 // Actualiza-se o escalão

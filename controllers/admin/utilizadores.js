@@ -5,7 +5,7 @@ const util = require('../../helpers/util');
 exports.getAllUsers = (req, res, next) => {
     User.findAll()
     .then(users => {
-        res.render('admin/utilizadores', {users: users});
+        res.render('admin/utilizadores', {users: users, breadcrumbs: req.breadcrumbs()});
     })
     .catch(err => {
         console.log(err);
@@ -20,7 +20,8 @@ exports.getUser = (req, res, next) => {
     User.findByPk(userId)
         .then( user => {
             if(user){
-                res.render('admin/alterarPasswordUtilizador', {user: user});
+                req.breadcrumbs('Alterar Password', '/admin/alterarPasswordUtilizador');
+                res.render('admin/alterarPasswordUtilizador', {user: user, breadcrumbs: req.breadcrumbs()});
             } else {
                 req.flash('error', 'Utilizador inválido.');
                 res.redirect('/admin/utilizadores');
@@ -46,7 +47,8 @@ exports.createUser = (req, res, next) => {
     }
 
     if (!errors.isEmpty()) {
-        res.render('admin/adicionarUtilizador', {validationErrors: errors.array(), utilizador: oldData});
+        req.breadcrumbs('Adicionar Utilizador', '/admin/adicionarUtilizador');
+        res.render('admin/adicionarUtilizador', {validationErrors: errors.array(), utilizador: oldData, breadcrumbs: req.breadcrumbs()});
     } else {
         User.findOrCreate({
             where: { username: username },
@@ -63,7 +65,7 @@ exports.createUser = (req, res, next) => {
                 const errors = [{
                     msg: 'Nome de utilizador já existe.'
                 }]
-                res.render('admin/adicionarUtilizador', {validationErrors: errors, utilizador: oldData});
+                res.render('admin/adicionarUtilizador', {validationErrors: errors, utilizador: oldData, breadcrumbs: req.breadcrumbs()});
             }
         })
         .catch(err => {
@@ -87,7 +89,8 @@ exports.updateUserPassword = (req, res, next) => {
             }
 
             if (!errors.isEmpty()) {
-                res.render('admin/alterarPasswordUtilizador', {validationErrors: errors.array(), user: user});
+                req.breadcrumbs('Alterar Password', '/admin/alterarPasswordUtilizador');
+                res.render('admin/alterarPasswordUtilizador', {validationErrors: errors.array(), user: user, breadcrumbs: req.breadcrumbs()});
             } else {
                 user.password = util.encrypt(password);
                 user.save()

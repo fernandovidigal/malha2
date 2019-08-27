@@ -6,6 +6,7 @@ const TorneiosController = require('../controllers/torneio');
 
 router.all('/*', userAuthenticated, (req, res, next) => {
     res.locals.menuTorneio = true;
+    req.breadcrumbs('Competição', '/torneio');
     next();
 });
 

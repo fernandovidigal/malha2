@@ -7,16 +7,17 @@ router.all('/*', userAuthenticated, (req, res, next) => {
 });
 
 router.get('/', (req, res) => {
-    res.render('index');
+    res.render('index', { breadcrumbs: req.breadcrumbs()});
 });
 
 router.get('/admin(/*)?', (req, res, next) => {
     res.locals.menuAdmin = true;
+    req.breadcrumbs('Administração', '/admin');
     next();
 });
 
 router.get('/admin', (req, res) => {
-    res.render('admin/index');
+    res.render('admin/index', { breadcrumbs: req.breadcrumbs()});
 });
 
 router.get('/logout', (req, res) => {

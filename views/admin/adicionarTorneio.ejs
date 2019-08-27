@@ -35,8 +35,8 @@
 
                     <div class="escalao__minMaxEquipas">
                         Equipas por Campo:
-                        <input type="text" maxlength="2" name="<%= (escalao.escalaoId * 100) + 1 %>" class="escalaoMinEquipas" placeholder="Mínimo" value="<%= (typeof escalao.minEquipas != undefined) ? escalao.minEquipas : '' %>">
-                        <input type="text" maxlength="2" name="<%= (escalao.escalaoId * 100) + 2 %>" class="escalaoMaxEquipas" placeholder="Máximo" value="<%= (typeof escalao.maxEquipas != undefined) ? escalao.maxEquipas : '' %>">
+                        <input type="text" maxlength="2" pattern="^[0-9]$" name="<%= (escalao.escalaoId * 100) + 1 %>" class="escalaoMinEquipas" placeholder="Mínimo" value="<%= (typeof escalao.minEquipas != undefined) ? escalao.minEquipas : '' %>">
+                        <input type="text" maxlength="2" pattern="^[0-9]$" name="<%= (escalao.escalaoId * 100) + 2 %>" class="escalaoMaxEquipas" placeholder="Máximo" value="<%= (typeof escalao.maxEquipas != undefined) ? escalao.maxEquipas : '' %>">
                         <button class="preFillMinMaxEquipas"><i class="fas fa-edit"></i>Min/Max por defeito</button>
                     </div>
                 </div>
@@ -66,8 +66,8 @@
 
                     <div class="escalao__minMaxEquipas">
                         Equipas por Campo:
-                        <input type="text" maxlength="2" name="<%= (escalao.escalaoId * 100) + 1 %>" class="escalaoMinEquipas" placeholder="Mínimo" value="<%= (typeof escalao.minEquipas != undefined) ? escalao.minEquipas : '' %>">
-                        <input type="text" maxlength="2" name="<%= (escalao.escalaoId * 100) + 2 %>" class="escalaoMaxEquipas" placeholder="Máximo" value="<%= (typeof escalao.maxEquipas != undefined) ? escalao.maxEquipas : '' %>">
+                        <input type="text" maxlength="2" pattern="^[0-9]$" name="<%= (escalao.escalaoId * 100) + 1 %>" class="escalaoMinEquipas" placeholder="Mínimo" value="<%= (typeof escalao.minEquipas != undefined) ? escalao.minEquipas : '' %>">
+                        <input type="text" maxlength="2" pattern="^[0-9]$" name="<%= (escalao.escalaoId * 100) + 2 %>" class="escalaoMaxEquipas" placeholder="Máximo" value="<%= (typeof escalao.maxEquipas != undefined) ? escalao.maxEquipas : '' %>">
                         <button class="preFillMinMaxEquipas"><i class="fas fa-edit"></i>Min/Max por defeito</button>
                     </div>
                 </div>

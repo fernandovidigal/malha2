@@ -162,7 +162,6 @@ exports.getStarting = async (req, res, next) => {
                 }
             }
 
-            req.breadcrumbs('Selecionar Escalão', '/torneio/selecionaEscalao');
             res.render('torneio/selecionaEscalao', {torneio: torneio, numTotalJogos: numTotalJogos, escaloesMasculinos: escaloesMasculinos, escaloesFemininos: escaloesFemininos, breadcrumbs: req.breadcrumbs()});
         }
     } catch(err) {

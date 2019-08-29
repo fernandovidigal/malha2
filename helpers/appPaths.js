@@ -10,7 +10,7 @@ exports.dbPath = "data/malha.db";
 
 // FICHEIRO DE CONFIGURAÇÃO
 exports.configFileName = 'config.json';
-//exports.configFileName = path.join(path.dirname(process.execPath), '/config.json');
+//exports.configFileName = path.join(path.dirname(process.execPath), 'config.json');
 
 // FICHEIRO DO SQLITE
 //exports.configFileName = path.join(path.dirname(process.execPath), '/node_sqlite3.node');

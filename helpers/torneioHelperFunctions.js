@@ -56,7 +56,103 @@ const sequelize = require('../helpers/database');
     }
 }*/
 
-function metodoEmparelhamento(equipas){
+function avancaRodada(rodizio){
+    
+    const numEquipasPorLinha = rodizio[0].length;
+    const ultimoLinhaSuperior = rodizio[0][rodizio[0].length-1];
+    //console.log(ultimoLinhaSuperior);
+    const primeiroLinhaInferior = rodizio[1][0];
+    //console.log(primeiroLinhaInferior);
+
+    // Processa Linha Superior
+    // Processamento por ordem inversa, ou seja, começa do fim do array para o principio
+    for(let i = (numEquipasPorLinha-1); i > 1; i--){
+        rodizio[0][i] = rodizio[0][i-1];
+    }
+    rodizio[0][1] = primeiroLinhaInferior;
+
+    // Processa Linha Inferior
+    for(let i = 0; i < (numEquipasPorLinha-1); i++){
+        rodizio[1][i] = rodizio[1][i+1];
+    }
+    rodizio[1][numEquipasPorLinha-1] = ultimoLinhaSuperior;
+}
+
+function processaInversao(rodadas){
+    // Inverte nos números impares e quando a rodade é impar inverte a primeira parelha
+    for(let i = 0; i < rodadas.length; i++){
+        if(i % 2 != 0){
+            const temp = rodadas[i][0][0];
+            rodadas[i][0][0] = rodadas[i][0][1];
+            rodadas[i][0][1] = temp;
+        }
+        for(let k = 0; k < rodadas[i].length; k++){
+            if(k % 2 != 0){
+                const temp = rodadas[i][k][0];
+                rodadas[i][k][0] = rodadas[i][k][1];
+                rodadas[i][k][1] = temp;
+            }
+        }
+    }
+}
+
+function processaEmparelhamento(numEquipas){
+    const par = (numEquipas % 2 == 0) ? true : false;
+    const numRodadas = (par) ? numEquipas - 1 : numEquipas;
+    const equipasPorlinha = Math.ceil(numEquipas/2);
+
+    // Constroi a base do Rodízio
+    const rodizio = [];
+    // linha Superior
+    rodizio.push([]);
+    // linha Inferior
+    rodizio.push([]);
+    
+    // Preencher o rodízio
+    for(let i = 0; i < equipasPorlinha; i++){
+        rodizio[0].push(i);
+
+        if(i == 0){
+            if(par){
+                rodizio[1].push(numEquipas-(1+i));
+            } else {
+                rodizio[1].push(null);
+            }
+        } else {
+            if(par){
+                rodizio[1].push(numEquipas-(1+i));
+            } else {
+                rodizio[1].push(numEquipas-i);
+            }
+        }
+    }
+    
+    const rodadas = [];
+    for(let i = 0; i < numRodadas; i++){
+        
+        const _rodada = [];
+        for(let k = 0; k < equipasPorlinha; k++){
+            if(rodizio[0][k] != null && rodizio[1][k] != null){
+                _rodada.push([rodizio[0][k], rodizio[1][k]]);
+            }
+        }
+        rodadas.push(_rodada);
+        avancaRodada(rodizio);
+    }
+
+    processaInversao(rodadas);
+
+    const emparelhamento = [];
+    for(let i = 0; i < numRodadas; i++){
+        for(let k = 0; k < rodadas[i].length; k++){
+            emparelhamento.push(rodadas[i][k]);
+        }
+    }
+
+    return emparelhamento;
+}
+
+/*function metodoEmparelhamento(equipas){
 
     const equipas2 = [[0,1]];
     const equipas3 = [[0,1],[0,2],[1,2]];
@@ -89,7 +185,7 @@ function metodoEmparelhamento(equipas){
     }
 
     return emparelhamento;
-}
+}*/
 
 function shuffleLocalidades(listaLocalidades) {
     const localidades = [];
@@ -222,7 +318,7 @@ exports.distribuiEquipasPorCampos = async function(torneioId, escalao = 0){
             // Faz o emparelhamento das equipas por cada campo
             const listaJogos = [];
             for(i = 0; i < listaCampos.length; i++){
-                let emparelhamento = metodoEmparelhamento(listaCampos[i]);
+                let emparelhamento = processaEmparelhamento(listaCampos[i].length);
                 for(const par of emparelhamento){
                     let equipa1 = listaCampos[i][par[0]];
                     let equipa2 = listaCampos[i][par[1]];

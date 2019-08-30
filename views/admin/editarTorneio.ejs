@@ -33,21 +33,12 @@
                                 <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
                         <% } %>
                     </div>
-
-                    <div class="escalao__minMaxEquipas">
-                        Equipas por Campo:
-                        <input type="text" maxlength="2" pattern="^[0-9]$" name="<%= (escalao.escalaoId * 100) + 1 %>" class="escalaoMinEquipas" placeholder="Mínimo" value="<%= (typeof escalao.minEquipas != undefined) ? escalao.minEquipas : '' %>">
-                        <input type="text" maxlength="2" pattern="^[0-9]$" name="<%= (escalao.escalaoId * 100) + 2 %>" class="escalaoMaxEquipas" placeholder="Máximo" value="<%= (typeof escalao.maxEquipas != undefined) ? escalao.maxEquipas : '' %>">
-                        <button class="preFillMinMaxEquipas"><i class="fas fa-edit"></i>Min/Max por defeito</button>
-                    </div>
                 </div>
                 <% } else { %>
                     <p class="escalao__designacao">
                         <%= escalao.designacao %>
                     </p>
                     <p>Campos: <%= escalao.campos %></p>
-                    <p>Mínimo de Equipas: <%= escalao.minEquipas %></p>
-                    <p>Máximo de Equipas: <%= escalao.maxEquipas %></p>
                 <% } %>
             <% } %>
         <% }); %>
@@ -73,21 +64,12 @@
                                 <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
                         <% } %>
                     </div>
-
-                    <div class="escalao__minMaxEquipas">
-                        Equipas por Campo:
-                        <input type="text" maxlength="2" pattern="^[0-9]$" name="<%= (escalao.escalaoId * 100) + 1 %>" class="escalaoMinEquipas" placeholder="Mínimo" value="<%= (typeof escalao.minEquipas != undefined) ? escalao.minEquipas : '' %>">
-                        <input type="text" maxlength="2" pattern="^[0-9]$" name="<%= (escalao.escalaoId * 100) + 2 %>" class="escalaoMaxEquipas" placeholder="Máximo" value="<%= (typeof escalao.maxEquipas != undefined) ? escalao.maxEquipas : '' %>">
-                        <button class="preFillMinMaxEquipas"><i class="fas fa-edit"></i>Min/Max por defeito</button>
-                    </div>
                 </div>
                 <% } else { %>
                     <p class="escalao__designacao">
                         <%= escalao.designacao %>
                     </p>
                     <p>Campos: <%= escalao.campos %></p>
-                    <p>Mínimo de Equipas: <%= escalao.minEquipas %></p>
-                    <p>Máximo de Equipas: <%= escalao.maxEquipas %></p>
                 <% } %>
             <% } %>
         <% }); %>
@@ -103,32 +85,4 @@
         <a href="/admin/torneios">Voltar</a>
 <% } %>
 
-<script>
-    const escalaoNumCampos = document.querySelectorAll('.escalaoNumCampos');
-    escalaoNumCampos.forEach(element => {
-        element.addEventListener('change', function(e){
-            const value = this.value;
-            if(value == 0){
-                const topNode = this.closest('.escalao');
-                const minEquipas = topNode.querySelector('.escalaoMinEquipas');
-                const maxEquipas = topNode.querySelector('.escalaoMaxEquipas');
-                minEquipas.value = '';
-                maxEquipas.value = '';
-            }
-        });
-    });
-    
-    const preFillButtons = document.querySelectorAll('.preFillMinMaxEquipas');
-    preFillButtons.forEach(element => {
-        element.addEventListener('click', function(e){
-            e.preventDefault();
-    
-            const parent = this.parentNode;
-            const minEquipas = parent.querySelector('.escalaoMinEquipas');
-            const maxEquipas = parent.querySelector('.escalaoMaxEquipas');
-            minEquipas.value = 4;
-            maxEquipas.value = 6;
-        });
-    });
-    </script>
 <%- include('../includes/footer.ejs') %>

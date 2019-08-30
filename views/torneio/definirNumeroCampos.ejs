@@ -30,13 +30,6 @@
                                 <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
                         <% } %>
                     </div>
-
-                    <div class="escalao__minMaxEquipas">
-                        Equipas por Campo:
-                        <input type="text" name="<%= (escalao.escalaoId * 100) + 1 %>" class="escalaoMinEquipas" placeholder="Mínimo" value="<%= (typeof escalao.minEquipas != undefined) ? escalao.minEquipas : '' %>">
-                        <input type="text" name="<%= (escalao.escalaoId * 100) + 2 %>" class="escalaoMaxEquipas" placeholder="Máximo" value="<%= (typeof escalao.maxEquipas != undefined) ? escalao.maxEquipas : '' %>">
-                        <button class="preFillMinMaxEquipas"><i class="fas fa-edit"></i></button>
-                    </div>
                 </div>
             <% } %>
         <% }); %>
@@ -60,13 +53,6 @@
                                 >
                                 <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
                         <% } %>
-                    </div>
-
-                    <div class="escalao__minMaxEquipas">
-                        Equipas por Campo:
-                        <input type="text" name="<%= (escalao.escalaoId * 100) + 1 %>" class="escalaoMinEquipas" placeholder="Mínimo" value="<%= (typeof escalao.minEquipas != undefined) ? escalao.minEquipas : '' %>">
-                        <input type="text" name="<%= (escalao.escalaoId * 100) + 2 %>" class="escalaoMaxEquipas" placeholder="Máximo" value="<%= (typeof escalao.maxEquipas != undefined) ? escalao.maxEquipas : '' %>">
-                        <button class="preFillMinMaxEquipas"><i class="fas fa-edit"></i></button>
                     </div>
                 </div>
             <% } %>

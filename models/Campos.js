@@ -14,17 +14,7 @@ const Campos = sequelize.define('campos', {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0
-    },
-    minEquipas: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0
-    },
-    maxEquipas: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0
-    },
+    }
 });
 
 module.exports = Campos;

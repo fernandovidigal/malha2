@@ -38,24 +38,14 @@ exports.getStarting = async (req, res, next) => {
         let existemNumCamposNaoDefinidos = false;
         for(const escalao of listaEscaloes){
             // Procura na lista de com o número de equipas pro escalão, qual o número de equipa para determinado escalão
-            const numEquipas = listaNumEquipasPorCadaEscalao.find(element => {
-                if(element.escalaoId == escalao.escalaoId){
-                    return element;
-                }
-            });
+            const numEquipas = listaNumEquipasPorCadaEscalao.find(element => element.escalaoId == escalao.escalaoId);
             escalao.numEquipas = numEquipas.numEquipas;
 
             // Se encontrar escalão é porque tem campos definidos
-            const _escalao = listaCamposPorEscalao.find(element => {
-                if(element.escalaoId == escalao.escalaoId){
-                    return element;
-                }
-            });
+            const _escalao = listaCamposPorEscalao.find(element => element.escalaoId == escalao.escalaoId);
 
-            if(_escalao){
+            if(_escalao != undefined){
                 escalao.campos = _escalao.numCampos;
-                escalao.minEquipas = _escalao.minEquipas;
-                escalao.maxEquipas = _escalao.maxEquipas;
             } else {
                 existemNumCamposNaoDefinidos = true;
             }  
@@ -79,8 +69,6 @@ exports.getStarting = async (req, res, next) => {
                     designacao: escalao.designacao,
                     sexo: escalao.sexo,
                     numTotalCampos: escalao.campos,
-                    minEquipas: escalao.minEquipas,
-                    maxEquipas: escalao.maxEquipas,
                     existeVencedor: false
                 }
 
@@ -182,86 +170,28 @@ exports.setNumeroCampos = async (req, res, next) => {
 
         const [listaEscaloes, listaNumEquipasPorCadaEscalao] = await Promise.all([_listaEscaloes, _listaNumEquipasPorCadaEscalao]);
 
-        // Gera um array com as potencias de 2 até 128
-        const potenciasdeDois = [];
-        potenciasdeDois.push(0);
-        for(let i = 1; i < 8; i++){
-            potenciasdeDois.push(Math.pow(2,i));
-        }
-
         for(const escalao of listaEscaloes){
-            const numCampos = req.body[escalao.escalaoId];
+            const numCampos = parseInt(req.body[escalao.escalaoId]);
             // Campos
-            if(Math.log2(parseInt(numCampos)) % 1 === 0){
-                escalao.campos = parseInt(numCampos);
+            if(Math.log2(numCampos) % 1 === 0){
+                escalao.campos = numCampos;
             } else {
                 escalao.campos = 0;
             }
 
             // Procura na lista de com o número de equipas pro escalão, qual o número de equipa para determinado escalão
-            const numEquipas = listaNumEquipasPorCadaEscalao.find(element => {
-                if(element.escalaoId == escalao.escalaoId){
-                    return element;
-                }
-            });
+            const numEquipas = listaNumEquipasPorCadaEscalao.find(element => element.escalaoId == escalao.escalaoId);
             escalao.numEquipas = numEquipas.numEquipas;
 
-            //Min Max Equipas
-            const minEquipas = parseInt(req.body[(escalao.escalaoId * 100) + 1]) || 0;
-            const maxEquipas = parseInt(req.body[(escalao.escalaoId * 100) + 2]) || 0;
-            escalao.minEquipas = minEquipas;
-            escalao.maxEquipas = maxEquipas;
-
+            // TODO: Ver se os calculos estão correctos
             // Calcula sugestão de número de campos
-            let sugestaoNumeroCampos = 0;
+            /*let sugestaoNumeroCampos = 0;
             for(let i = 0; i < potenciasdeDois.length; i++){
                 if(escalao.numEquipas  >= minEquipas * potenciasdeDois[i] && escalao.numEquipas  <= maxEquipas * potenciasdeDois[i]){
                     sugestaoNumeroCampos = potenciasdeDois[i];
                     break;
                 }
-            }
-
-            if(escalao.campos > 0){
-                if(minEquipas <= 0 && maxEquipas <= 0){
-                    errors.push({
-                        msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Deve indicar o número mínimo e máximo de equipas por campo'
-                    });
-                } else if(minEquipas <= 0){
-                    errors.push({
-                        msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Deve indicar o número mínimo de equipas por campo'
-                    });
-                } else if(maxEquipas <= 0){
-                    errors.push({
-                        msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Deve indicar o número máximo de equipas por campo'
-                    });
-                } else if(maxEquipas < minEquipas){
-                    errors.push({
-                        msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - O número máximo de equipas não pode ser inferior ao número mínimo de equipas'
-                    });
-                } else if(minEquipas < 2){
-                    errors.push({
-                        msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - O número mínimo de equipas por campo deve ser 2 ou mais'
-                    });
-                } else if(escalao.numEquipas < escalao.campos * minEquipas){
-                    errors.push({
-                        msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Número de equipas insuficentes' + ((sugestaoNumeroCampos != 0 ) ? `. Número de campos sugerido: ${sugestaoNumeroCampos}`: `. Necessário registar mais ${(escalao.campos * minEquipas) - escalao.numEquipas} equipas`)
-                    });
-                } else if(escalao.numEquipas > escalao.campos * maxEquipas){
-                    errors.push({
-                        msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Número excessivo de equipas' + ((sugestaoNumeroCampos != 0 ) ? `. Número de campos sugerido: ${sugestaoNumeroCampos}`: `. ${escalao.numEquipas - (escalao.campos * minEquipas)} equipas em excesso`)
-                    });
-                }
-            } else {
-                if(minEquipas > 0 || maxEquipas > 0){
-                    errors.push({
-                        msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Deve selecionar o número de campos'
-                    }); 
-                } else {
-                    errors.push({
-                        msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Deve selecionar o número de campos e indicar o número mínimo e máximo de equipas por campo'
-                    });
-                }
-            }
+            }*/
         }
 
         if(errors.length > 0){
@@ -279,7 +209,8 @@ exports.setNumeroCampos = async (req, res, next) => {
 
             } catch(err) {
                 console.log(err);
-                if(err) await transaction.rollback();
+                await transaction.rollback();
+                throw err;
             }
 
             if(transaction.finished === 'commit'){

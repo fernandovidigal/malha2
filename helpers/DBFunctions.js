@@ -15,17 +15,43 @@ const Op = Sequelize.Op;
 //                        TORNEIOS
 ////////////////////////////////////////////////////////
 
-exports.getNumCampos = (torneioId) => {
-    return Torneios.findOne({
-        attributes: ['campos'],
-        where: {
-            torneioId: torneioId
-        }
-    });
+exports.getTorneioById = (torneioId) => {
+    return Torneios.findByPk(torneioId);
 }
 
 exports.getTorneioInfo = () => {
     return Torneios.findOne({where: {activo: 1}, raw: true});
+}
+
+exports.getAllTorneios = () => {
+    return Torneios.findAll({
+        order: [['ano', 'DESC']],
+        raw: true
+    })
+}
+
+exports.getNumTorneios = () => {
+    return Torneios.count();
+}
+
+exports.setTorneioActivo = async (torneioId) => {
+    let transaction;
+    try {
+        transaction = await sequelize.transaction();
+
+        const affectedRows = await Torneios.update({activo: 0}, {where:{}},{transaction});
+        await Torneios.update(
+            {activo: 1},
+            {where: {torneioId: torneioId}, limit: 1},
+            {transaction}
+        );
+
+        await transaction.commit();
+        return Promise.resolve();
+    } catch(err){
+        await transaction.rollback();
+        return Promise.reject(err);
+    }
 }
 
 ////////////////////////////////////////////////////////
@@ -85,6 +111,29 @@ exports.getAllEscaloesComJogos = (torneioId) => {
     });
 }
 
+exports.getAllEscaloesComCampos = (torneioId) => {
+    return Escaloes.findAll({
+        attribute: [sequelize.col('campos.numCampos', 'numCampos')],
+        include: {
+            model: Campos,
+            where: {
+                torneioId: torneioId
+            },
+        }
+    });
+}
+
+exports.getAllEscaloesSemCampos = (torneioId, listaEscaloesComCampo) => {
+    return Escaloes.findAll({
+        where: {
+            escalaoId: {
+                [Op.notIn]: listaEscaloesComCampo
+            }
+        },
+        raw: true
+    });
+}
+
 ////////////////////////////////////////////////////////
 //                        CAMPOS
 ////////////////////////////////////////////////////////
@@ -108,6 +157,14 @@ exports.getNumCamposEscaloes = (torneioId) => {
     });
 }
 
+exports.getAllCamposTransaction = (torneioId, transaction) => {
+    return Campos.findAll({
+        where: {
+            torneioId: torneioId
+        }
+    }, {transaction});
+}
+
 exports.processaUpdateCampos = async (transaction, torneioId, listaEscaloes) => {
     for(const escalao of listaEscaloes){
         let escalaoCamposToUpdate = await Campos.findOne({
@@ -122,27 +179,22 @@ exports.processaUpdateCampos = async (transaction, torneioId, listaEscaloes) => 
                 await escalaoCamposToUpdate.destroy({transaction});
             } else {
                 await escalaoCamposToUpdate.update({
-                    numCampos: escalao.campos,
-                    minEquipas: escalao.minEquipas,
-                    maxEquipas: escalao.maxEquipas
+                    numCampos: escalao.campos
                 }, {transaction});
             }
         } else {
-            await Campos.create({
-                torneioId: torneioId,
-                escalaoId: escalao.escalaoId,
-                numCampos: escalao.campos,
-                minEquipas: escalao.minEquipas,
-                maxEquipas: escalao.maxEquipas
-            }, {transaction});
+            if(escalao.campos > 0){
+                await Campos.create({
+                    torneioId: torneioId,
+                    escalaoId: escalao.escalaoId,
+                    numCampos: escalao.campos
+                }, {transaction});
+            }
         }
     }
 }
 
 exports.updateNumCampos = (torneioId, escalaoId, numCampos) => {
-    console.log(torneioId);
-    console.log(escalaoId);
-    console.log(numCampos);
     return Campos.update({numCampos: numCampos},
         {
             where: {
@@ -689,6 +741,17 @@ exports.getAllGamesNotPlayed = (torneioId, escalaoId, fase, campo) => {
         replacements: [torneioId, escalaoId, fase, campo],
         type: sequelize.QueryTypes.SELECT
     })
+}
+
+exports.getNumJogosAllEscaloes = (torneioId) => {
+    return Jogos.findAll({
+        attributes: ['escalaoId'],
+        where: {
+            torneioId: torneioId
+        },
+        group: ['escalaoId'],
+        raw: true
+    });
 }
 
 ////////////////////////////////////////////////////////

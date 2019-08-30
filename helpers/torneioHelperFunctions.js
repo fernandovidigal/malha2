@@ -1,61 +1,6 @@
 const dbFunctions = require('./DBFunctions');
 const sequelize = require('../helpers/database');
 
-/*function determinaNumeroTotalCampos(numEquipas, numCamposTorneio, minEquipas, maxEquipas){
-    
-    // Minimo de campos necessário para se jogar
-    const minCampos = Math.ceil(numEquipas / maxEquipas);
-
-    if(numCamposTorneio < minCampos){
-        return 0;
-    }
-
-    let minEquipasIter = minEquipas;
-
-    let found = false;
-    let numCampos = 0;
-    while(!found){
-        //console.log("minEquipasIter: " + minEquipasIter);
-
-        numCampos = Math.floor(numEquipas / minEquipasIter);
-        //console.log("numCampos: " + numCampos);
-        // Calcula com quantas equipas fica o último campo
-        let calc = numEquipas - (numCampos * minEquipasIter);
-        //console.log("calc: " + calc);
-
-        // Verifica se o último campo tem menos que o mínimo das equipas requeridas no torneio
-        // e se o valor iterativo do mínimo das equipas não fica superior ao valor máximo das equipas
-        // requiridas no torneio
-        //console.log("minEquipas: " + minEquipas);
-        if(calc < minEquipas && minEquipasIter <= maxEquipas){
-            // Verifica se o valor iteractivo é maior que o número minimo de equipas, é que se não for, não é possível
-            // fazer a distribuição/redução dos ultimos campos para preencher o requisito de equipas minimas por campo.
-            // verifica também se existem número de campos suficientes para poder fazer a redução no número das equipas para compensar
-            // os campos que fiquem com menos do número minimo das equipas requeridas no torneio. Se existirem campos suficientes para fazer
-            // a redução econtrou-se o número de campos necessários para fazer a distribuição das equipas pelos campos 
-            //console.log("xpto: " + (numCampos-(minEquipas - calc)));
-            if(minEquipasIter > minEquipas && (numCampos-(minEquipas - calc)) < numCampos){
-                //console.log("aqui found 2");
-                found = true;
-            } else {
-                //console.log("aqui ++");
-                minEquipasIter++;
-            }
-        } else {
-            //console.log("aqui found 1");
-            found = true;
-        }
-    }
-
-    numCampos = Math.ceil(numEquipas / minEquipasIter);
-
-    if(numCamposTorneio > numCampos){
-        return numCampos;
-    } else {
-        return numCamposTorneio;
-    }
-}*/
-
 function avancaRodada(rodizio){
     
     const numEquipasPorLinha = rodizio[0].length;
@@ -151,41 +96,6 @@ function processaEmparelhamento(numEquipas){
 
     return emparelhamento;
 }
-
-/*function metodoEmparelhamento(equipas){
-
-    const equipas2 = [[0,1]];
-    const equipas3 = [[0,1],[0,2],[1,2]];
-    const equipas4 = [[1,0],[2,3],[0,2],[3,1],[3,0],[2,1]];
-    const equipas5 = [[1,0],[2,4],[0,2],[4,3],[3,0],[2,1],[0,4],[1,3],[4,1],[3,2]];
-    const equipas6 = [[1,0],[2,4],[3,5],[0,2],[5,1],[4,3],[3,0],[2,1],[5,4],[0,4],[1,3],[2,5],[5,0],[4,1],[3,2]];
-    // TODO: emparelhamento até 12 equipas e limitar o número max de equipas ao número de emparelhamentos disponíveis
-
-    let emparelhamento = null;
-
-    switch(equipas.length){
-        case 2 :
-            emparelhamento = equipas2;
-            break;
-        case 3 :
-            emparelhamento = equipas3;
-            break;
-        case 4 :
-            emparelhamento = equipas4;
-            break;
-        case 5 :
-            emparelhamento = equipas5;
-            break;
-        case 6 :
-            emparelhamento = equipas6;
-            break;
-        default:
-            emparelhamento = null;
-            break;    
-    }
-
-    return emparelhamento;
-}*/
 
 function shuffleLocalidades(listaLocalidades) {
     const localidades = [];

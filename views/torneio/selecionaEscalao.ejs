@@ -32,6 +32,7 @@
                                                 <p><%= escalao.equipaVencedora.primeiroElemento %></p>
                                                 <p><%= escalao.equipaVencedora.segundoElemento %></p>
                                             </div>
+                                            <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/0" class="escalaoSelect__btn">Todos os Campos</a>
                                         </div>
                                     <% } else { %>
                                         <% if(escalao.fase != 0){ %>
@@ -50,16 +51,12 @@
                                                 <% } %>
                                             <% } %>
                                         <% } else { %>
-                                            <% if(escalao.numEquipas < 2 || escalao.numEquipas < escalao.numTotalCampos * escalao.minEquipas){ %>
+                                            <% if(escalao.numTotalCampos * 3 > escalao.numEquipas){ %>
                                                 <p class="escalao_err_msg">Não existem equipas suficientes</p>
                                                 <a href="/equipas"><i class="fas fa-user-friends"></i></a>
                                                     <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
                                             <% } else if(escalao.numTotalCampos == 0) { %>
                                                 <p class="escalao_err_msg">Não foi definido o número de campos</p>
-                                                <a href="/equipas"><i class="fas fa-user-friends"></i></a>
-                                                    <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
-                                            <% } else if(escalao.numEquipas > escalao.numTotalCampos * escalao.maxEquipas) { %>
-                                                <p class="escalao_err_msg">Número excessivo de equipas</p>
                                                 <a href="/equipas"><i class="fas fa-user-friends"></i></a>
                                                     <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
                                             <% } else { %>
@@ -102,6 +99,7 @@
                                                     <p><%= escalao.equipaVencedora.primeiroElemento %></p>
                                                     <p><%= escalao.equipaVencedora.segundoElemento %></p>
                                                 </div>
+                                                <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/0" class="escalaoSelect__btn">Todos os Campos</a>
                                             </div>
                                         <% } else { %>
                                             <% if(escalao.fase != 0){ %>
@@ -120,18 +118,14 @@
                                                     <% } %>
                                                 <% } %>
                                             <% } else { %>
-                                                <% if(escalao.numEquipas < 2 || escalao.numEquipas < escalao.numTotalCampos * escalao.minEquipas){ %>
+                                                <% if(escalao.numTotalCampos * 3 > escalao.numEquipas){ %>
                                                     <p class="escalao_err_msg">Não existem equipas suficientes</p>
                                                     <a href="/equipas"><i class="fas fa-user-friends"></i></a>
-                                                    <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
+                                                        <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
                                                 <% } else if(escalao.numTotalCampos == 0) { %>
                                                     <p class="escalao_err_msg">Não foi definido o número de campos</p>
                                                     <a href="/equipas"><i class="fas fa-user-friends"></i></a>
-                                                    <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
-                                                    <% } else if(escalao.numEquipas > escalao.numTotalCampos * escalao.maxEquipas) { %>
-                                                    <p class="escalao_err_msg">Número excessivo de equipas</p>
-                                                    <a href="/equipas"><i class="fas fa-user-friends"></i></a>
-                                                    <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
+                                                        <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
                                                 <% } else { %>
                                                     <a href="/torneio/distribuirEquipasPorEscalao/escalao/<%= escalao.escalaoId %>" class="escalaoSelect__btn">Distribuir Equipas</a>
                                                 <% } %>

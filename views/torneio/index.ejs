@@ -36,6 +36,10 @@
             </div>
         </div>
 
+        <div class="escalaoInfo">
+            <h4><%= info.escalao.designacao %> (<%= (info.escalao.sexo == 1) ? 'Masculino' : 'Feminino' %>)</h4>
+        </div>
+
         <% if(typeof campos != 'undefined' && campos.length > 0) { %>
             <% campos.forEach(function(campo){ %>
                 <div class="campo__wrapper">
@@ -44,7 +48,7 @@
                         <div class="parcial_label">Parcial 1</div>
                         <div class="parcial_label">Parcial 2</div>
                         <div class="parcial_label">Parcial 3</div>
-                        <div class="vencedor_label">Pontos</div>
+                        <div class="vencedor_label">Pontuação</div>
                     </div>
 
                     <% campo.jogos.forEach(function(jogo){ %>
@@ -105,7 +109,9 @@
                                     </div>
                                 </div>
                                 <div class="btn_wrapper">
-                                    <a href="" class="btn__edit-resultados" name="editarResultados" data-jogoid="<%= jogo.jogoId %>"">Editar</a>
+                                    <% if(info.editavel){ %>
+                                        <a href="" class="btn__edit-resultados" name="editarResultados" data-jogoid="<%= jogo.jogoId %>"">Editar</a>
+                                    <% } %>
                                     <!--<a href="" class="btn__delete-resultados" name="eliminarResultados" data-jogoid="{{jogo_id}}">Eliminar</a>-->
                                 </div>
                             </div>

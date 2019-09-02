@@ -30,30 +30,42 @@ exports.getStarting = async (req, res, next) => {
         const _listaEscaloes = dbFunctions.getEscaloesComEquipas(torneioId);
         const _listaCamposPorEscalao = dbFunctions.getNumCamposEscaloes(torneioId);
         const _listaNumEquipasPorCadaEscalao = dbFunctions.getNumEquipasPorCadaEscalao(torneioId);
+        const _listaEscaloesComJogosDistribuídos = dbFunctions.getNumJogosAllEscaloes(torneioId);
 
-        const [listaEscaloes, listaCamposPorEscalao, listaNumEquipasPorCadaEscalao] = await Promise.all([_listaEscaloes, _listaCamposPorEscalao, _listaNumEquipasPorCadaEscalao]);
-
+        const [listaEscaloes, listaCamposPorEscalao, listaNumEquipasPorCadaEscalao, listaEscaloesComJogosDistribuídos] = await Promise.all([_listaEscaloes, _listaCamposPorEscalao, _listaNumEquipasPorCadaEscalao, _listaEscaloesComJogosDistribuídos]);
+        
         // Adiciona o número de campos definidos a cada escalão e verifica se existem
         // escalões ainda sem campos definidos
         let existemNumCamposNaoDefinidos = false;
+        const listaEscaloesEditaveis = [];
         for(const escalao of listaEscaloes){
-            // Procura na lista de com o número de equipas pro escalão, qual o número de equipa para determinado escalão
-            const numEquipas = listaNumEquipasPorCadaEscalao.find(element => element.escalaoId == escalao.escalaoId);
-            escalao.numEquipas = numEquipas.numEquipas;
+            // Verifica se já foram distríbuidos jogos para determinado escalão
+            // se já foram então o número de campos não pode ser alterado
+            const editavel = listaEscaloesComJogosDistribuídos.find(el => el.escalaoId == escalao.escalaoId);
+            if(!editavel){
+                // Verifica se o escalão já tem o número de campos definidos
+                const campos = listaCamposPorEscalao.find(element => element.escalaoId == escalao.escalaoId);
+                if(campos){
+                    if(campos.numCampos != 0){
+                        escalao.campos = campos.numCampos;
+                    } else {
+                        existemNumCamposNaoDefinidos = true;
+                    }
+                } else {
+                    existemNumCamposNaoDefinidos = true;
+                }
 
-            // Se encontrar escalão é porque tem campos definidos
-            const _escalao = listaCamposPorEscalao.find(element => element.escalaoId == escalao.escalaoId);
+                // Procura na lista de com o número de equipas por escalão, qual o número de equipas para determinado escalão
+                const numEquipas = listaNumEquipasPorCadaEscalao.find(element => element.escalaoId == escalao.escalaoId);
+                escalao.numEquipas = numEquipas.numEquipas;
 
-            if(_escalao != undefined){
-                escalao.campos = _escalao.numCampos;
-            } else {
-                existemNumCamposNaoDefinidos = true;
-            }  
+                listaEscaloesEditaveis.push(escalao);
+            }
         }
 
         if(existemNumCamposNaoDefinidos){
             req.breadcrumbs('Definir Número de Campos', '/torneio/definirNumeroCampos');
-            return res.render('torneio/definirNumeroCampos', {torneio: torneio, escaloes: listaEscaloes, breadcrumbs: req.breadcrumbs()});
+            return res.render('torneio/definirNumeroCampos', {torneio: torneio, escaloes: listaEscaloesEditaveis, breadcrumbs: req.breadcrumbs()});
         }
 
         if(numEquipas > 0 && !existemNumCamposNaoDefinidos){
@@ -169,33 +181,44 @@ exports.setNumeroCampos = async (req, res, next) => {
         const _listaNumEquipasPorCadaEscalao = dbFunctions.getNumEquipasPorCadaEscalao(torneio.torneioId);
 
         const [listaEscaloes, listaNumEquipasPorCadaEscalao] = await Promise.all([_listaEscaloes, _listaNumEquipasPorCadaEscalao]);
+        const listaEscaloesEditados = [];
 
         for(const escalao of listaEscaloes){
-            const numCampos = parseInt(req.body[escalao.escalaoId]);
-            // Campos
-            if(Math.log2(numCampos) % 1 === 0){
-                escalao.campos = numCampos;
-            } else {
-                escalao.campos = 0;
-            }
-
-            // Procura na lista de com o número de equipas pro escalão, qual o número de equipa para determinado escalão
+        
+            // Procura na lista com o número de equipas pro escalão, qual o número de equipa para determinado escalão
             const numEquipas = listaNumEquipasPorCadaEscalao.find(element => element.escalaoId == escalao.escalaoId);
             escalao.numEquipas = numEquipas.numEquipas;
 
-            // TODO: Ver se os calculos estão correctos
-            // Calcula sugestão de número de campos
-            /*let sugestaoNumeroCampos = 0;
-            for(let i = 0; i < potenciasdeDois.length; i++){
-                if(escalao.numEquipas  >= minEquipas * potenciasdeDois[i] && escalao.numEquipas  <= maxEquipas * potenciasdeDois[i]){
-                    sugestaoNumeroCampos = potenciasdeDois[i];
-                    break;
+            const numCampos = req.body[escalao.escalaoId];
+            if(numCampos){
+                // Verifica se o número de campos é potência de 2
+                if(Math.log2(numCampos) % 1 === 0){
+                    escalao.campos = numCampos;
+                
+                    // Verifica se existem equipas suficientes para o número de campos
+                    if(numCampos * 3 > escalao.numEquipas){
+                        errors.push({
+                            msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Equipas insuficientes para o número de campos selecionado.'
+                        });
+                    }
+                } else {
+                    if(numCampos == 0){
+                        errors.push({
+                            msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Número de campos deve ser superior a 0.'
+                        });
+                    } else {
+                        errors.push({
+                            msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Número de campos inválido.'
+                        });
+                    }
                 }
-            }*/
+
+                listaEscaloesEditados.push(escalao);
+            }
         }
 
         if(errors.length > 0){
-            res.render('torneio/definirNumeroCampos', {validationErrors: errors, torneio: torneio, escaloes: listaEscaloes, breadcrumbs: req.breadcrumbs()});
+            res.render('torneio/definirNumeroCampos', {validationErrors: errors, torneio: torneio, escaloes: listaEscaloesEditados, breadcrumbs: req.breadcrumbs()});
         } else {
 
             let transaction;
@@ -203,7 +226,7 @@ exports.setNumeroCampos = async (req, res, next) => {
             try {
                 transaction = await sequelize.transaction();
 
-                await dbFunctions.processaUpdateCampos(transaction, torneio.torneioId, listaEscaloes);
+                await dbFunctions.processaUpdateCampos(transaction, torneio.torneioId, listaEscaloesEditados);
 
                 await transaction.commit();
 
@@ -260,7 +283,7 @@ exports.distribuirTodasEquipas = async (req, res, next) => {
 exports.distribuirEquipasPorEscalao = async (req, res, next) => {
     try {
         const torneio = await dbFunctions.getTorneioInfo();
-        const escalaoId = req.params.escalao;
+        const escalaoId = parseInt(req.params.escalao);
 
         const escaloesDistribuidos = await torneioHelpers.distribuiEquipasPorCampos(torneio.torneioId, escalaoId);
 
@@ -299,9 +322,14 @@ exports.mostraResultados = async (req, res, next) => {
 
         let [listaCampos, listaFases, escalaoInfo] = await Promise.all([_listaCampos, _listaFases, _escalaoInfo]);
 
+        info.escalao = escalaoInfo;
+
         // 1. Obter a lista de fases do escalão
         // transforma a lista de fases num array com o número das fases
         listaFases = listaFases.map(fase => fase.fase);
+        
+        const ultimaFase = listaFases[listaFases.length-1];
+        info.editavel = (ultimaFase == fase) ? true : false;
 
         // Adicionar a lista de fase a info para que se possa alternar de fase nos resultados
         info.listaFases = listaFases;

@@ -181,15 +181,15 @@ exports.distribuiEquipasPorCampos = async function(torneioId, escalao = 0){
 
             // Define o número de campos, min e max de equipas por campo
             const numCampos = (camposInfo !== null) ? camposInfo.numCampos : 0;
-            const minEquipas = (camposInfo !== null) ? camposInfo.minEquipas : 0;
-            const maxEquipas = (camposInfo !== null) ? camposInfo.maxEquipas : 0;
+            //const minEquipas = (camposInfo !== null) ? camposInfo.minEquipas : 0;
+            //const maxEquipas = (camposInfo !== null) ? camposInfo.maxEquipas : 0;
 
             //Baralha as localidades para não haver sempre a mesma ordenação das equipas
             listaLocalidades = shuffleLocalidades(listaLocalidades);
 
             // Verifica se existem equipas suficientes para preencher o número de campos do escalão
-            // cumprindo o requisito do minímo e máximo de equipas e campos > 0
-            if(numEquipasPorEscalao < numCampos * minEquipas || numEquipasPorEscalao > numCampos * maxEquipas || numCampos == 0)
+            // cumprindo o requisito do minímo de 3 equipas por campo
+            if(numCampos * 3 > numEquipasPorEscalao)
             {
                 const distribuido = {
                     escalao: escalaoId,
@@ -451,8 +451,14 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
                         segundoElemento: equipa1.segundoElemento,
                         localidadeId: equipa1.localidade.localidadeId,
                         localidade: equipa1.localidade.nome,
-                        vitorias: (jogo.equipa1Pontos > jogo.equipa2Pontos) ? 1 : 0,
+                        //vitorias: (jogo.equipa1Pontos > jogo.equipa2Pontos) ? 1 : 0,
                         pontos: jogo.equipa1Pontos
+                    }
+
+                    if(fase > 1){
+                        equipa.vitorias = jogo.equipa1Pontos;
+                    } else {
+                        equipa.vitorias = (jogo.equipa1Pontos > jogo.equipa2Pontos) ? 1 : 0;
                     }
                     classificacao.push(equipa);
                 }
@@ -468,8 +474,14 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
                         segundoElemento: equipa2.segundoElemento,
                         localidadeId: equipa2.localidade.localidadeId,
                         localidade: equipa2.localidade.nome,
-                        vitorias: (jogo.equipa2Pontos > jogo.equipa1Pontos) ? 1 : 0,
+                        //vitorias: (jogo.equipa2Pontos > jogo.equipa1Pontos) ? 1 : 0,
                         pontos: jogo.equipa2Pontos
+                    }
+
+                    if(fase > 1){
+                        equipa.vitorias = jogo.equipa1Pontos;
+                    } else {
+                        equipa.vitorias = (jogo.equipa1Pontos > jogo.equipa2Pontos) ? 1 : 0;
                     }
                     classificacao.push(equipa);
                 }

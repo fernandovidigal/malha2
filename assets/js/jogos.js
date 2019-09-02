@@ -29,21 +29,97 @@ function parciaisIguais(parcial, par){
     }
 }
 
+function validaParesDeParciais(parcialEquipa1, parcialEquipa2){
+    const equipaParcial1Value = parseInt(parcialEquipa1.value);
+    const equipaParcial2Value = parseInt(parcialEquipa2.value);
+    var patt = new RegExp("[0-9]{1,2}");
+    let valido = true;
+
+    if(!isNaN(equipaParcial1Value) && (equipaParcial1Value % 3 != 0 || equipaParcial1Value < 0 || equipaParcial1Value > 30)){
+        parcialEquipa1.classList.add('parcial_error');
+        valido = false;
+    } else if(isNaN(equipaParcial1Value) && !patt.test(equipaParcial1Value)){
+        parcialEquipa1.classList.add('parcial_error');
+        valido = false;
+    } else if(!isNaN(equipaParcial2Value) && (equipaParcial2Value % 3 != 0 || equipaParcial2Value < 0 || equipaParcial2Value > 30)){
+        parcialEquipa2.classList.add('parcial_error');
+        valido = false;
+    } else if(isNaN(equipaParcial2Value) && !patt.test(equipaParcial2Value)){
+        parcialEquipa2.classList.add('parcial_error');
+        valido = false;
+    } else if(!isNaN(equipaParcial1Value) && !isNaN(equipaParcial2Value) && (equipaParcial1Value == equipaParcial2Value || (equipaParcial1Value != 30 && equipaParcial2Value != 30))){
+        parcialEquipa1.classList.add('parcial_error');
+        parcialEquipa2.classList.add('parcial_error');
+        valido = false;
+    }
+
+    return valido;
+}
+
+function verificaVencedor(parcialEquipa1Value, parcialEquipa2Value){
+    if(parcialEquipa1Value > parcialEquipa2Value){
+        return 1;
+    } else if(parcialEquipa1Value < parcialEquipa2Value){
+        return 2;
+    } else {
+        return -1;
+    }
+}
+
 const equipaParciais = document.querySelectorAll('.equipa_parciais');
 equipaParciais.forEach(parciais => {
     const parciaisInput = parciais.querySelectorAll('.parcial');
     parciaisInput.forEach((parcial, index) => {
+        parcial.addEventListener('keydown', function(e){
+            if(e.keyCode == 9){
+                let idx = index;
+                if(idx == 5){
+                    idx = 0;
+                } else {
+                    idx++;
+                }
+                parciaisInput[idx].focus();
+                e.preventDefault();
+            }
+        });
+
+
         parcial.addEventListener('blur', function(e){
-            const value = parseInt(this.value) || 0;
-            const parcialPar = (index < 3) ? index + 3 : index - 3;
-            if(value % 3 != 0 || value < 0 || value > 30){
-                this.classList.add('parcial_error');
-            } else if(this.value == parciaisInput[parcialPar].value || this.value != 30 && parciaisInput[parcialPar].value != 30){
-                this.classList.add('parcial_error');
-                parciaisInput[parcialPar].classList.add('parcial_error');
-            } else {
-                this.classList.remove('parcial_error');
-                parciaisInput[parcialPar].classList.remove('parcial_error');
+
+            const parcial1 = validaParesDeParciais(parciaisInput[0], parciaisInput[3]);
+            const parcial2 = validaParesDeParciais(parciaisInput[1], parciaisInput[4]);
+            const parcial3 = validaParesDeParciais(parciaisInput[2], parciaisInput[5]);
+
+            if(parcial1){
+                parciaisInput[0].classList.remove('parcial_error');
+                parciaisInput[3].classList.remove('parcial_error');
+            }
+
+            if(parcial2){
+                parciaisInput[1].classList.remove('parcial_error');
+                parciaisInput[4].classList.remove('parcial_error');
+            }
+
+            if(parcial3){
+                parciaisInput[2].classList.remove('parcial_error');
+                parciaisInput[5].classList.remove('parcial_error');
+            }
+
+            if(parcial1 && parcial2 && !isNaN(parseInt(parciaisInput[0].value)) && !isNaN(parseInt(parciaisInput[3].value)) && !isNaN(parseInt(parciaisInput[1].value)) && !isNaN(parseInt(parciaisInput[4].value))){
+                const vencedorParcial1 = verificaVencedor(parseInt(parciaisInput[0].value), parseInt(parciaisInput[3].value));
+                const vencedorParcial2 = verificaVencedor(parseInt(parciaisInput[1].value), parseInt(parciaisInput[4].value));
+
+                if(vencedorParcial1 == vencedorParcial2){
+                    parciaisInput[2].value = '';
+                    parciaisInput[2].disabled = true;
+                    parciaisInput[5].value = '';
+                    parciaisInput[5].disabled = true;
+                    parciaisInput[2].classList.remove('parcial_error');
+                    parciaisInput[5].classList.remove('parcial_error');
+                } else {
+                    parciaisInput[2].disabled = false;
+                    parciaisInput[5].disabled = false;
+                }
             }
         });
     });

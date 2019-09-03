@@ -223,11 +223,13 @@ async function imprimeEquipasAgrupadasPorCampos(escalaoId, fase, campo){
 
 async function imprimeFichasJogo(escalaoId, fase, campo, parent){
     try {
+        console.log("Aqui");
         const equipas = await getData(`/listagens/getEquipas/${escalaoId}`);
         const data = await getData(`/listagens/getFichasJogo/${escalaoId}/${campo}/${fase}`);
-    
+        console.log("Aqui2");
         docDefinition.content = [];
         delete docDefinition.footer;
+        console.log("Aqui3");
 
         docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
             if(currentNode.text && currentNode.text.startsWith("pbFichasJogo") && currentNode.startPosition.top > 120){
@@ -242,11 +244,14 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
                 return false;
             }
         };
+        console.log("Aqui4");
 
         if(data.success){
+            console.log("Aqui5");
             makeHeader(docDefinition, data.torneio);
-
+            console.log("Aqui6");
             data.campos.forEach(async campo => {
+                console.log("Aqui7");
                 const pageBreak = {
                     text: 'PageBreak',
                     fontSize: 0,
@@ -255,22 +260,29 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
                 }
 
                 if(fase == 1){
+                    console.log("Aqui8");
                     const soFolhaRosto = parent.querySelector('.soFolhaRosto');
                     makeFolhaRostoJogosPrimeiraFase(docDefinition, campo, equipas.listaEquipas, fase);
-
+                    console.log("Aqui9");
                     // Verifica se só se pretende imprimir a folha de rosto
                     if(!soFolhaRosto.checked){ 
+                        console.log("Aqui10");
                         docDefinition.content.push(pageBreak);
                         makeContentFichaJogoPrimeiraFase(docDefinition, campo, fase);  
+                        console.log("Aqui11");
                     }
                 } else {
+                    console.log("Aqui12");
                     docDefinition.content.push(pageBreak);
                     makeFichasJogoFasesSeguintes(docDefinition, campo, equipas.listaEquipas, fase);
+                    console.log("Aqui13");
                 }
             });
-
+            console.log("Aqui14");
             pdfMake.createPdf(docDefinition).print();
+            console.log("Aqui15");
         } else {
+            console.log("ERR");
             Swal.fire({
                 type: 'error',
                 title: 'Oops...',
@@ -278,6 +290,7 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
             });
         }
     } catch(err) {
+        console.log(err);
         Swal.fire({
             type: 'error',
             title: 'Oops...',

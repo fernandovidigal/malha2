@@ -456,7 +456,7 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
                     }
 
                     if(fase > 1){
-                        equipa.vitorias = jogo.equipa1Pontos;
+                        equipa.vitorias = (jogo.equipa1Pontos != 3) ? jogo.equipa1Pontos : 2;
                     } else {
                         equipa.vitorias = (jogo.equipa1Pontos > jogo.equipa2Pontos) ? 1 : 0;
                     }
@@ -479,9 +479,9 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
                     }
 
                     if(fase > 1){
-                        equipa.vitorias = jogo.equipa1Pontos;
+                        equipa.vitorias = (jogo.equipa2Pontos != 3) ? jogo.equipa2Pontos : 2;
                     } else {
-                        equipa.vitorias = (jogo.equipa1Pontos > jogo.equipa2Pontos) ? 1 : 0;
+                        equipa.vitorias = (jogo.equipa2Pontos > jogo.equipa1Pontos) ? 1 : 0;
                     }
                     classificacao.push(equipa);
                 }

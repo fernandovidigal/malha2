@@ -231,7 +231,7 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
         delete docDefinition.footer;
         console.log("Aqui3");
 
-        docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
+        /*docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
             if(currentNode.text && currentNode.text.startsWith("pbFichasJogo") && currentNode.startPosition.top > 120){
                 return true;
             } else if(currentNode.text && currentNode.text.startsWith("pbJogosEfectuar") && currentNode.startPosition.top > 120){
@@ -243,7 +243,7 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
             }else {
                 return false;
             }
-        };
+        };*/
         console.log("Aqui4");
 
         if(data.success){

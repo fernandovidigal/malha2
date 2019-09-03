@@ -1,74 +1,87 @@
-<%- include('../includes/header.ejs') %>
-<%- include('../includes/breadcrumbs.ejs') %>
+<%- include('../includes/header.ejs') %> <%-
+include('../includes/breadcrumbs.ejs') %> <% if(typeof torneio != 'undefined'){
+%>
+<div class="title__bar">
+  <h1><%= torneio.designacao %> - <%= torneio.localidade %></h1>
+  <h3><%= torneio.ano %></h3>
+</div>
 
-<% if(typeof torneio != 'undefined'){ %>
-    <div class="title__bar">
-        <h1><%= torneio.designacao %> - <%= torneio.localidade %></h1>
-        <h3><%= torneio.ano %></h3>
-    </div>
-
-    <div class="listagemWrapper">
-
-        <div class="listagemCard">
-            <form action="/listagens/numEquipasPorConcelho" method="POST">
-                <div class="listagemCard_wrapper">
-                    <div class="listagemCard__content">
-                        <p class="listagemCard__title">Número de Equipas por Localidade</p>
-                        <div class="listagemCard__controllers">
-                            <%- include('componentes/escaloes.ejs', {escaloes: escaloes, errMsg: 'Não existem equipas registadas!'}) %> 
-                        </div>
-                    </div>
-                    <button type="submit" class="listagem_btn numEquipasPorConcelho_btn"><i class="fas fa-print"></i></button>
-                </div>
-            </form>
+<div class="listagemWrapper">
+  <div class="listagemCard">
+    <form action="/listagens/numEquipasPorConcelho" method="POST">
+      <div class="listagemCard_wrapper">
+        <div class="listagemCard__content">
+          <p class="listagemCard__title">Número de Equipas por Localidade</p>
+          <div class="listagemCard__controllers">
+            <%- include('componentes/escaloes.ejs', {escaloes: escaloes, errMsg:
+            'Não existem equipas registadas!'}) %>
+          </div>
         </div>
+        <button type="submit" class="listagem_btn numEquipasPorConcelho_btn">
+          <i class="fas fa-print"></i>
+        </button>
+      </div>
+    </form>
+  </div>
 
-        <div class="listagemCard">
-            <form action="/listagens/equipasAgrupadasPorCampos" method="POST">
-                <div class="listagemCard_wrapper">
-                    <div class="listagemCard__content">
-                        <p class="listagemCard__title">Equipas Agrupadas por Campos</p>
-                        <div class="listagemCard__controllers">
-                            <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos, errMsg: 'Não existem jogos registados!'}) %>
-                        </div>
-                    </div>
-                    <button type="submit" class="listagem_btn equipasAgrupadasPorCampos_btn"><i class="fas fa-print"></i></button>
-                </div>
-            </form>
+  <div class="listagemCard">
+    <form action="/listagens/equipasAgrupadasPorCampos" method="POST">
+      <div class="listagemCard_wrapper">
+        <div class="listagemCard__content">
+          <p class="listagemCard__title">Equipas Agrupadas por Campos</p>
+          <div class="listagemCard__controllers">
+            <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos,
+            errMsg: 'Não existem jogos registados!'}) %>
+          </div>
         </div>
+        <button
+          type="submit"
+          class="listagem_btn equipasAgrupadasPorCampos_btn"
+        >
+          <i class="fas fa-print"></i>
+        </button>
+      </div>
+    </form>
+  </div>
 
-        <div class="listagemCard">
-            <form action="#" method="POST">
-                <div class="listagemCard_wrapper">
-                    <div class="listagemCard__content">
-                        <p class="listagemCard__title">Fichas de Jogo</p>
-                        <div class="listagemCard__controllers fichasJogo">
-                            <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos, errMsg: 'Não existem jogos registados!'}) %>
-                        </div>
-                    </div>
-                    <button type="submit" class="listagem_btn fichasJogo_btn"><i class="fas fa-print"></i></button>
-                </div>
-            </form>
+  <div class="listagemCard">
+    <form action="#" method="POST">
+      <div class="listagemCard_wrapper">
+        <div class="listagemCard__content">
+          <p class="listagemCard__title">Fichas de Jogo</p>
+          <div class="listagemCard__controllers fichasJogo">
+            <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos,
+            errMsg: 'Não existem jogos registados!'}) %>
+          </div>
         </div>
+        <button type="submit" class="listagem_btn fichasJogo_btn">
+          <i class="fas fa-print"></i>
+        </button>
+      </div>
+    </form>
+  </div>
 
-        <div class="listagemCard">
-            <form action="" method="POST">
-                <div class="listagemCard_wrapper">
-                    <div class="listagemCard__content">
-                        <p class="listagemCard__title">Resultados</p>
-                        <div class="listagemCard__controllers">
-                            <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos, errMsg: 'Não existem jogos registados!'}) %>
-                        </div>
-                    </div>
-                    <button type="submit" class="listagem_btn resultados_btn"><i class="fas fa-print"></i></button>
-                </div>
-            </form>
+  <div class="listagemCard">
+    <form action="" method="POST">
+      <div class="listagemCard_wrapper">
+        <div class="listagemCard__content">
+          <p class="listagemCard__title">Resultados</p>
+          <div class="listagemCard__controllers">
+            <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos,
+            errMsg: 'Não existem jogos registados!'}) %>
+          </div>
         </div>
-    </div>
+        <button type="submit" class="listagem_btn resultados_btn">
+          <i class="fas fa-print"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <% } else { %>
-    <h2>Oops.. Algo correu mal!</h2>
-    <p>Verifique se existem torneios registados ou activados.</p>
+<h2>Oops.. Algo correu mal!</h2>
+<p>Verifique se existem torneios registados ou activados.</p>
 <% } %>
 
 <script src="/js/pdfmake.min.js"></script>

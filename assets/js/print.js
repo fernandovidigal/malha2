@@ -183,12 +183,6 @@ async function imprimeEquipasAgrupadasPorCampos(escalaoId, fase, campo){
     try {
         const data = await getData(`/listagens/equipasAgrupadasPorCampos/${escalaoId}/${fase}/${campo}`);
         docDefinition.content = [];
-        docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
-            if (currentNode.table && currentNode.pageNumbers.length != 1) {
-              return true;
-            }
-            return false;
-        };
 
         if(data.success){
             makeHeader(docDefinition, data.torneio);
@@ -223,66 +217,44 @@ async function imprimeEquipasAgrupadasPorCampos(escalaoId, fase, campo){
 
 async function imprimeFichasJogo(escalaoId, fase, campo, parent){
     try {
-        console.log("Aqui");
         const equipas = await getData(`/listagens/getEquipas/${escalaoId}`);
         const data = await getData(`/listagens/getFichasJogo/${escalaoId}/${campo}/${fase}`);
-        console.log("Aqui2");
+
         docDefinition.content = [];
         delete docDefinition.footer;
-        console.log("Aqui3");
-
-        /*docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
-            if(currentNode.text && currentNode.text.startsWith("pbFichasJogo") && currentNode.startPosition.top > 120){
-                return true;
-            } else if(currentNode.text && currentNode.text.startsWith("pbJogosEfectuar") && currentNode.startPosition.top > 120){
-                return true;
-            } else if(currentNode.text && currentNode.text.startsWith("PageBreak") && currentNode.startPosition.top > 120){
-                return true;
-            } else if(currentNode.text && currentNode.text.startsWith("Fase") && currentNode.startPosition.top > 750){
-                return true;
-            }else {
-                return false;
-            }
-        };*/
-        console.log("Aqui4");
 
         if(data.success){
-            console.log("Aqui5");
             makeHeader(docDefinition, data.torneio);
-            console.log("Aqui6");
-            data.campos.forEach(async campo => {
-                console.log("Aqui7");
+
+            data.campos.forEach((campo, index) => {
                 const pageBreak = {
                     text: 'PageBreak',
                     fontSize: 0,
                     color: '#ffffff',
-                    margin: [0,0,0,0]
+                    margin: [0,0,0,0],
+                    pageBreak: 'before'
                 }
 
                 if(fase == 1){
-                    console.log("Aqui8");
+
+                    if(index > 0){
+                        docDefinition.content.push(pageBreak);
+                    }
                     const soFolhaRosto = parent.querySelector('.soFolhaRosto');
                     makeFolhaRostoJogosPrimeiraFase(docDefinition, campo, equipas.listaEquipas, fase);
-                    console.log("Aqui9");
+                    
                     // Verifica se só se pretende imprimir a folha de rosto
                     if(!soFolhaRosto.checked){ 
-                        console.log("Aqui10");
-                        docDefinition.content.push(pageBreak);
+                        //docDefinition.content.push(pageBreak);
                         makeContentFichaJogoPrimeiraFase(docDefinition, campo, fase);  
-                        console.log("Aqui11");
                     }
                 } else {
-                    console.log("Aqui12");
                     docDefinition.content.push(pageBreak);
                     makeFichasJogoFasesSeguintes(docDefinition, campo, equipas.listaEquipas, fase);
-                    console.log("Aqui13");
                 }
             });
-            console.log("Aqui14");
             pdfMake.createPdf(docDefinition).print();
-            console.log("Aqui15");
         } else {
-            console.log("ERR");
             Swal.fire({
                 type: 'error',
                 title: 'Oops...',
@@ -290,7 +262,6 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent){
             });
         }
     } catch(err) {
-        console.log(err);
         Swal.fire({
             type: 'error',
             title: 'Oops...',
@@ -304,12 +275,6 @@ async function imprimeResultados(escalaoId, fase, campo){
         const data = await getData(`/listagens/getClassificacao/${escalaoId}/${campo}/${fase}`);
 
         docDefinition.content = [];
-
-        docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
-            if (currentNode.table && currentNode.pageNumbers.length != 1) {
-                return true;
-            }
-        }
         
         if(data.success){
             makeHeader(docDefinition, data.torneio);
@@ -322,22 +287,8 @@ async function imprimeResultados(escalaoId, fase, campo){
                 margin: [0,0,0,20]
             });
 
-            data.listaCampos.forEach(async campo => {
-                makeContentResultados(docDefinition, campo, fase)
-            });
-
-            docDefinition.content.push({
-                stack: [
-                    {text: 'Critérios de classificação:', bold: true, fontSize: 8},
-                    {
-                        ol: [
-                            'Número de Pontos',
-                            'Número de jogos ganhos',
-                            'Confronto entre equipas empatadas'
-                        ],
-                        fontSize: 8
-                    }
-                ]
+            data.listaCampos.forEach((campo, index) => {
+                makeContentResultados(docDefinition, campo, fase, index, data.listaCampos.length)
             });
 
             makeFooter(docDefinition, `Resultados da ${fase != 100 ? fase + 'ª Fase' : 'fase Final'}`);

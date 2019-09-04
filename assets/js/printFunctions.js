@@ -250,6 +250,7 @@ function makeEquipasAgrupadasPorCampos(ddContent, listaCampos, fase) {
         ]
       },
       margin: [0, 0, 0, 20],
+      unbreakable: true,
       layout: {
         hLineWidth: function(i, node) {
           if (i === 0 || i === 1) {
@@ -310,43 +311,18 @@ function makeContentFichaJogoPrimeiraFase(dd, data, fase) {
   listaJogos.forEach((jogos, index) => {
     if (Math.abs(index % 2) == 0) {
       dd.content.push({
-        text: "pbFichasJogo",
-        fontSize: 0,
-        color: "#ffffff",
-        margin: [0, 0, 0, 0]
-      });
-
-      dd.content.push({
         text: `Campo Nº ${data.campo}`,
         alignment: "center",
         bold: true,
-        fontSize: 14
+        fontSize: 14,
+        pageBreak: 'before'
       });
     }
 
     const _table = {
       table: {
         headerRows: 1,
-        widths: [
-          "*",
-          "*",
-          "*",
-          "*",
-          "*",
-          "*",
-          "*",
-          "*",
-          "*",
-          "*",
-          "*",
-          "*",
-          "*",
-          "*",
-          "*",
-          "*",
-          "*",
-          "*"
-        ],
+        widths: ["*","*","*","*","*","*","*","*","*","*","*","*","*","*","*","*","*","*"],
         body: []
       },
       layout: {
@@ -384,22 +360,10 @@ function makeContentFichaJogoPrimeiraFase(dd, data, fase) {
 
     const equipasRow = [];
     jogos.forEach(jogo => {
-      equipasRow.push({
-        text: `Equipa ${jogo.equipa1Id}`,
-        colSpan: 3,
-        alignment: "center",
-        bold: true,
-        fillColor: "#dddddd"
-      });
+      equipasRow.push({text: `Equipa ${jogo.equipa1Id}`, colSpan: 3, alignment: "center", bold: true, fillColor: "#dddddd"});
       equipasRow.push("");
       equipasRow.push("");
-      equipasRow.push({
-        text: `Equipa ${jogo.equipa2Id}`,
-        colSpan: 3,
-        alignment: "center",
-        bold: true,
-        fillColor: "#dddddd"
-      });
+      equipasRow.push({text: `Equipa ${jogo.equipa2Id}`, colSpan: 3, alignment: "center", bold: true, fillColor: "#dddddd"});
       equipasRow.push("");
       equipasRow.push("");
     });
@@ -407,29 +371,11 @@ function makeContentFichaJogoPrimeiraFase(dd, data, fase) {
 
     const jogosRow = [];
     for (let i = 0; i < jogos.length; i++) {
-      jogosRow.push({
-        text: `1º Jogo`,
-        colSpan: 2,
-        alignment: "center",
-        bold: true,
-        fillColor: "#eeeeee"
-      });
+      jogosRow.push({text: `1º Jogo`, colSpan: 2, alignment: "center", bold: true, fillColor: "#eeeeee"});
       jogosRow.push("");
-      jogosRow.push({
-        text: `2º Jogo`,
-        colSpan: 2,
-        alignment: "center",
-        bold: true,
-        fillColor: "#eeeeee"
-      });
+      jogosRow.push({text: `2º Jogo`, colSpan: 2, alignment: "center", bold: true, fillColor: "#eeeeee"});
       jogosRow.push("");
-      jogosRow.push({
-        text: `3º Jogo`,
-        colSpan: 2,
-        alignment: "center",
-        bold: true,
-        fillColor: "#eeeeee"
-      });
+      jogosRow.push({text: `3º Jogo`, colSpan: 2, alignment: "center", bold: true, fillColor: "#eeeeee"});
       jogosRow.push("");
     }
     _table.table.body.push(jogosRow);
@@ -504,14 +450,6 @@ function makeContentFichaJogoPrimeiraFase(dd, data, fase) {
 }
 
 function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase) {
-  // Page Break
-  dd.content.push({
-    text: "pbJogosEfectuar",
-    fontSize: 0,
-    color: "#ffffff",
-    margin: [0, 0, 0, 0],
-    pageBreak: "before"
-  });
 
   dd.content.push({
     text: `Jogos a efectuar - ${fase}ª Fase`,
@@ -951,7 +889,7 @@ function makeFichasJogoFasesSeguintes(dd, data, equipas, fase) {
   });
 }
 
-function makeContentResultados(dd, data, fase) {
+function makeContentResultados(dd, data, fase, index, numCampos) {
   // na primeira fase é 3 porque são duas equipas apuradas que ocupam a linha 2 e 3
   // nas fases seguintes é 2 porque só é apurada uma equipa na linha 2
   let k = 0;
@@ -1005,6 +943,7 @@ function makeContentResultados(dd, data, fase) {
       ]
     },
     margin: [0, 0, 0, 20],
+    unbreakable: true,
     layout: {
       hLineWidth: function(i, node) {
         if (i === 1) {
@@ -1063,6 +1002,25 @@ function makeContentResultados(dd, data, fase) {
     ];
     _table.table.body.push(classificacaoRow);
   });
+
+  if(index == (numCampos-1)){
+    _table.table.body.push([{
+        stack: [
+            {text: 'Critérios de classificação:', bold: true, fontSize: 8},
+            {
+                ol: [
+                    'Número de Pontos',
+                    'Número de jogos ganhos',
+                    'Confronto entre equipas empatadas'
+                ],
+                fontSize: 8
+            }
+        ],
+        colSpan: 7,
+        margin: [0,20,0,0],
+        border: [false, false, false, false]
+    }]);
+  }
 
   dd.content.push(_table);
 }

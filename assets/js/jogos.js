@@ -364,15 +364,23 @@ async function imprimeFichaParciais(escalao, fase, campo){
     try {
         const data = await getData(`/torneio/fichaParciais/${escalao}/${fase}/${campo}`);
         docDefinition.content = [];
-        docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
+        /*docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
             if(currentNode.table && currentNode.pageNumbers.length != 1){
                 return true;
             }
             return false;
-        };
+        };*/
 
         if(data.success){           
             makeHeader(docDefinition, data.torneio);
+
+            const pageBreak = {
+                text: 'PageBreak',
+                fontSize: 0,
+                color: '#ffffff',
+                margin: [0,0,0,0],
+                pageBreak: 'before'
+            }
             
             docDefinition.content.push({
                 text: `Resultados dos parciais - ${(fase != 100) ? fase + 'ª Fase' : 'Fase Final'}`,
@@ -381,7 +389,10 @@ async function imprimeFichaParciais(escalao, fase, campo){
                 fontSize: 16
             });
             
-            data.listaCampos.forEach(campo => {
+            data.listaCampos.forEach((campo, index) => {
+                if(index > 0){
+                    docDefinition.content.push(pageBreak);
+                }
                 makeFolhaParciais(docDefinition, fase, campo, data.listaEquipas, data.listaParciais);
             });
             makeFooter(docDefinition, `Resultados dos parciais - ${(fase != 100) ? fase + 'ª Fase' : 'Fase Final'}`);

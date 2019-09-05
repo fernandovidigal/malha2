@@ -1,87 +1,86 @@
-<%- include('../includes/header.ejs') %> <%-
-include('../includes/breadcrumbs.ejs') %> <%-
-include('../includes/validationErrors.ejs') %> <% if(torneio != null && escaloes
-!= null){ %>
-<div class="title__bar">
-  <h1><%= torneio.designacao %> - <%= torneio.localidade %></h1>
-  <h3><%= torneio.ano %></h3>
-</div>
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/breadcrumbs.ejs') %>
+<%- include('../includes/validationErrors.ejs') %>
 
-<p>Definir número de campos!</p>
-<form action="/torneio/definirNumeroCampos" method="post">
-  <% const escalaoMasculino = escaloes.find(el => el.sexo == 1);
-  if(escalaoMasculino){ %>
-  <p class="escalao__genero">Masculinos:</p>
-  <% escaloes.forEach(escalao => { if(escalao.sexo == 1) { %>
-  <div class="escalao">
-    <p class="escalao__designacao">
-      <%= escalao.designacao %> (<%= escalao.numEquipas %> equipas registadas)
-    </p>
-    <div class="escalao__numCampos-wrapper">
-      <% if(escalao.numEquipas > 2){ %> Campos: <% for(let i = 0; i < 8; i++){
-      %>
-      <input
-        type="radio"
-        class="escalaoNumCampos"
-        value="<%= (i != 0) ? Math.pow(2,i): 0 %>"
-        name="<%= escalao.escalaoId %>"
-        id="<%= (escalao.escalaoId * 10) + i %>"
-        <%
-        if(typeof
-        escalao.campos
-        !="undefined"
-        &&
-        escalao.campos
-      />
-      0){ %> <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %> <% } else
-      { %> <%= (i == 0) ? 'checked' : '' %> <% } %> >
-      <label for="<%= (escalao.escalaoId * 10) + i %>"
-        ><%= (i != 0) ? Math.pow(2,i): 0 %></label
-      >
-      <% } %> <% } else { %>
-      <p>Têm de existir mais que 3 equipas registadas!</p>
-      <% } %>
+<% if(torneio != null && escaloes != null){ %>
+    <div class="title__bar">
+        <h1><%= torneio.designacao %> - <%= torneio.localidade %></h1>
+        <h3><%= torneio.ano %></h3>
     </div>
-  </div>
-  <% } %> <% }); %> <% } %> <% const escalaoFeminino = escaloes.find(el =>
-  el.sexo == 0); if(escalaoFeminino){ %>
-  <p class="escalao__genero">Femininos:</p>
-  <% escaloes.forEach(escalao => { if(escalao.sexo == 0) { %>
-  <div class="escalao">
-    <p class="escalao__designacao">
-      <%= escalao.designacao %> (<%= escalao.numEquipas %> equipas registadas)
-    </p>
-    <div class="escalao__numCampos-wrapper">
-      <% if(escalao.numEquipas > 2){ %> Campos: <% for(let i = 0; i < 8; i++){
-      %>
-      <input
-        type="radio"
-        class="escalaoNumCampos"
-        value="<%= (i != 0) ? Math.pow(2,i): 0 %>"
-        name="<%= escalao.escalaoId %>"
-        id="<%= (escalao.escalaoId * 10) + i %>"
-        <%
-        if(typeof
-        escalao.campos
-        !="undefined"
-        &&
-        escalao.campos
-      />
-      0){ %> <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %> <% } else
-      { %> <%= (i == 0) ? 'checked' : '' %> <% } %> >
-      <label for="<%= (escalao.escalaoId * 10) + i %>"
-        ><%= (i != 0) ? Math.pow(2,i): 0 %></label
-      >
-      <% } %> <% } else { %>
-      <p>Têm de existir mais que 3 equipas registadas!</p>
-      <% } %>
-    </div>
-  </div>
-  <% } %> <% }); %> <% } %>
-  <br />
-  <input type="submit" value="Definir e avançar" />
-</form>
+
+    <p>Definir número de campos!</p>
+    <form action="/torneio/definirNumeroCampos" method="post">
+        <% 
+            const escalaoMasculino = escaloes.find(el => el.sexo == 1); 
+            if(escalaoMasculino){
+        %>
+            <p class="escalao__genero">Masculinos:</p>
+            <% escaloes.forEach(escalao => { 
+                if(escalao.sexo == 1) { %>
+                    <div class="escalao">
+                        <p class="escalao__designacao">
+                        <%= escalao.designacao %> (<%= escalao.numEquipas %> equipas registadas)
+                        </p>
+                        <div class="escalao__numCampos-wrapper">
+                        <% if(escalao.numEquipas > 2){ %>
+                            Campos:
+                                <% for(let i = 0; i < 8; i++){ %>
+                                    <input type="radio" class="escalaoNumCampos" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
+                                        <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
+                                            <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %>
+                                        <% } else { %>
+                                            <%= (i == 0) ? 'checked' : '' %>
+                                        <% } %>
+                                    >
+                                    <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
+                                <% } %>
+                        <% } else { %>
+                            <p>Têm de existir mais que 3 equipas registadas!</p>
+                        <% } %>
+                        </div>
+                    </div>
+                <% } %>
+            <% }); %>
+        <% } %>
+
+        <% 
+            const escalaoFeminino = escaloes.find(el => el.sexo == 0); 
+            if(escalaoFeminino){
+        %>
+            <p class="escalao__genero">Femininos:</p>
+            <% escaloes.forEach(escalao => { 
+                if(escalao.sexo == 0) { %>
+                    <div class="escalao">
+                        <p class="escalao__designacao">
+                        <%= escalao.designacao %> (<%= escalao.numEquipas %> equipas registadas)
+                        </p>
+                        <div class="escalao__numCampos-wrapper">
+                        <% if(escalao.numEquipas > 2){ %>
+                            Campos:
+                                <% for(let i = 0; i < 8; i++){ %>
+                                    <input type="radio" class="escalaoNumCampos" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
+                                        <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
+                                            <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %>
+                                        <% } else { %>
+                                            <%= (i == 0) ? 'checked' : '' %>
+                                        <% } %>
+                                    >
+                                    <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
+                                <% } %>
+                        <% } else { %>
+                            <p>Têm de existir mais que 3 equipas registadas!</p>
+                        <% } %>
+                        </div>
+                    </div>
+                <% } %>
+            <% }); %>
+        <% } %>
+        <br>
+        <input type="submit" value="Definir e avançar">
+    </form>
 <% } else { %>
-<h2>Oops.. Algo correu mal!</h2>
-<p>Verifique se existem torneios registados ou activados.</p>
-<% } %> <%- include('../includes/footer.ejs') %>
+    <h2>Oops.. Algo correu mal!</h2>
+    <p>Verifique se existem torneios registados ou activados.</p>
+<% } %>
+
+<%- include('../includes/footer.ejs') %>

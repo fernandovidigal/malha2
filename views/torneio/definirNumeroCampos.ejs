@@ -22,10 +22,10 @@
                         <%= escalao.designacao %> (<%= escalao.numEquipas %> equipas registadas)
                         </p>
                         <div class="escalao__numCampos-wrapper">
-                        <% if(escalao.numEquipas > 2){ %>
+                        <% if(escalao.numEquipas > 5){ %>
                             Campos:
                                 <% for(let i = 0; i < 8; i++){ %>
-                                    <input type="radio" class="escalaoNumCampos" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
+                                    <input type="radio" class="escalaoNumCampos<%= (typeof escalao.numCamposMax != 'undefined' && escalao.numCamposMax == Math.pow(2,i) ? ' escalaoNumCamposMaxRecomendado' : '') %>" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
                                         <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
                                             <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %>
                                         <% } else { %>
@@ -35,7 +35,7 @@
                                     <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
                                 <% } %>
                         <% } else { %>
-                            <p>Têm de existir mais que 3 equipas registadas!</p>
+                            <p class="escalao_err_msg">Na 1ª Fase devem existir o mínimo de 3 equipas por campo!</p>
                         <% } %>
                         </div>
                     </div>
@@ -55,10 +55,10 @@
                         <%= escalao.designacao %> (<%= escalao.numEquipas %> equipas registadas)
                         </p>
                         <div class="escalao__numCampos-wrapper">
-                        <% if(escalao.numEquipas > 2){ %>
+                        <% if(escalao.numEquipas > 5){ %>
                             Campos:
                                 <% for(let i = 0; i < 8; i++){ %>
-                                    <input type="radio" class="escalaoNumCampos" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
+                                    <input type="radio" class="escalaoNumCampos<%= (typeof escalao.numCamposMax != 'undefined' && escalao.numCamposMax == Math.pow(2,i) ? ' escalaoNumCamposMaxRecomendado' : '') %>" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
                                         <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
                                             <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %>
                                         <% } else { %>
@@ -68,7 +68,7 @@
                                     <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
                                 <% } %>
                         <% } else { %>
-                            <p>Têm de existir mais que 3 equipas registadas!</p>
+                            <p class="escalao_err_msg">Na 1ª Fase devem existir o mínimo de 3 equipas por campo!</p>
                         <% } %>
                         </div>
                     </div>

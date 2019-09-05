@@ -1239,6 +1239,12 @@ function makeFolhaParciais(dd, fase, data, equipas, parciais) {
     }
   };
 
+  if(fase > 1){
+    _table.table.unbreakable = true;
+  } else {
+    _table.table.dontBreakRows = true;
+  }
+
   data.listaJogos.forEach((jogo, index) => {
     const equipa1 = equipas.find(equipa => equipa.equipaId == jogo.equipa1Id);
     const equipa2 = equipas.find(equipa => equipa.equipaId == jogo.equipa2Id);

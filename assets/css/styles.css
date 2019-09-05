@@ -571,10 +571,15 @@ small {
     align-items: center;
 }
 
+.escalaoSelect__fase-info {
+    width: 50%;
+    margin-right: 20px;
+}
+
 .escalaoSelect__fase-info p {
     margin: 0;
     padding: 0;
-    font-size: 130%;
+    font-size: 100%;
     text-align: center;
 }
 
@@ -621,6 +626,10 @@ small {
     color: #a94442;
     background-color: #f2dede;
     border-color: #ebccd1; 
+}
+
+.escalao_err_msg {
+    display: inline-block;
 }
 
 .errMsg {
@@ -1096,6 +1105,10 @@ animation-delay: -0.16s;
     -ms-user-select: none;
     user-select: none;
     transition: all .2s;
+}
+
+.escalaoNumCamposMaxRecomendado + label{
+    border: solid 2px #6174cf;
 }
 
 .escalaoNumCampos{

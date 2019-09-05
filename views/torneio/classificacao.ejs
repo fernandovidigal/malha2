@@ -7,6 +7,10 @@
         <h3><%= torneio.ano %></h3>
     </div>
 
+    <div class="escalaoInfo">
+        <h2><%= escalao.designacao %> (<%= (escalao.sexo == 1) ? 'Masculino' : 'Feminino' %>) - <%= (fase != 100) ? fase + 'ª Fase' : 'Fase Final' %></h2>
+    </div>
+
     <% if(listaCampos.length > 0) { %>
         <% listaCampos.forEach(function(campo){ %>
             <% let posicao = 1; %>

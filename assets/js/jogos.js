@@ -374,13 +374,13 @@ async function imprimeFichaParciais(escalao, fase, campo){
         if(data.success){           
             makeHeader(docDefinition, data.torneio);
 
-            const pageBreak = {
+            /*const pageBreak = {
                 text: 'PageBreak',
                 fontSize: 0,
                 color: '#ffffff',
                 margin: [0,0,0,0],
                 pageBreak: 'before'
-            }
+            }*/
             
             docDefinition.content.push({
                 text: `Resultados dos parciais - ${(fase != 100) ? fase + 'ª Fase' : 'Fase Final'}`,
@@ -390,9 +390,9 @@ async function imprimeFichaParciais(escalao, fase, campo){
             });
             
             data.listaCampos.forEach((campo, index) => {
-                if(index > 0){
+                /*if(index > 0){
                     docDefinition.content.push(pageBreak);
-                }
+                }*/
                 makeFolhaParciais(docDefinition, fase, campo, data.listaEquipas, data.listaParciais);
             });
             makeFooter(docDefinition, `Resultados dos parciais - ${(fase != 100) ? fase + 'ª Fase' : 'Fase Final'}`);

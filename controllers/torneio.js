@@ -31,9 +31,10 @@ exports.getStarting = async (req, res, next) => {
         const _listaCamposPorEscalao = dbFunctions.getNumCamposEscaloes(torneioId);
         const _listaNumEquipasPorCadaEscalao = dbFunctions.getNumEquipasPorCadaEscalao(torneioId);
         const _listaEscaloesComJogosDistribuídos = dbFunctions.getNumJogosAllEscaloes(torneioId);
+        const listaDeCamposPotenciaDeDois = [2,4,8,16,32,64,128];
 
         const [listaEscaloes, listaCamposPorEscalao, listaNumEquipasPorCadaEscalao, listaEscaloesComJogosDistribuídos] = await Promise.all([_listaEscaloes, _listaCamposPorEscalao, _listaNumEquipasPorCadaEscalao, _listaEscaloesComJogosDistribuídos]);
-        
+
         // Adiciona o número de campos definidos a cada escalão e verifica se existem
         // escalões ainda sem campos definidos
         let existemNumCamposNaoDefinidos = false;
@@ -58,6 +59,15 @@ exports.getStarting = async (req, res, next) => {
                 // Procura na lista de com o número de equipas por escalão, qual o número de equipas para determinado escalão
                 const numEquipas = listaNumEquipasPorCadaEscalao.find(element => element.escalaoId == escalao.escalaoId);
                 escalao.numEquipas = numEquipas.numEquipas;
+
+                // Calcula o número de campos mínimo para o número de equipas
+                const numCamposMaximo = Math.ceil(escalao.numEquipas / 3);
+                for(let i = (listaDeCamposPotenciaDeDois.length - 1); i >= 0; i--){
+                    if(numCamposMaximo >= listaDeCamposPotenciaDeDois[i]){
+                        escalao.numCamposMax = listaDeCamposPotenciaDeDois[i];
+                        break;
+                    }
+                }
 
                 listaEscaloesEditaveis.push(escalao);
             }
@@ -214,6 +224,16 @@ exports.setNumeroCampos = async (req, res, next) => {
                 }
 
                 listaEscaloesEditados.push(escalao);
+            }
+
+            const listaDeCamposPotenciaDeDois = [2,4,8,16,32,64,128];
+            // Calcula o número de campos mínimo para o número de equipas
+            const numCamposMaximo = Math.ceil(escalao.numEquipas / 3);
+            for(let i = (listaDeCamposPotenciaDeDois.length - 1); i >= 0; i--){
+                if(numCamposMaximo >= listaDeCamposPotenciaDeDois[i]){
+                    escalao.numCamposMax = listaDeCamposPotenciaDeDois[i];
+                    break;
+                }
             }
         }
 
@@ -466,17 +486,20 @@ exports.processaProximaFase = async (req, res, next) => {
 // Classificação
 exports.mostraClassificacao = async (req, res, next) => {
     try {
-        const escalaoId = req.params.escalao;
+        const escalaoId = parseInt(req.params.escalao);
         const fase = parseInt(req.params.fase);
         const campo = parseInt(req.params.campo);
 
-        const torneio = await dbFunctions.getTorneioInfo();
+        const _torneio = dbFunctions.getTorneioInfo();
+        const _escalaoInfo = dbFunctions.getEscalaoInfo(escalaoId);
+
+        const [torneio, escalaoInfo] = await Promise.all([_torneio,_escalaoInfo]);
         
         const listaCampos = await torneioHelpers.processaClassificacao(torneio.torneioId, escalaoId, fase, campo);
 
         req.breadcrumbs('Resultados', `/torneio/resultados/escalao/${escalaoId}/fase/${fase}/campo/${campo}`);
         req.breadcrumbs('Classificação', '/torneio/classificacao');
-        res.render('torneio/classificacao', {torneio: torneio, listaCampos: listaCampos, breadcrumbs: req.breadcrumbs()});
+        res.render('torneio/classificacao', {torneio: torneio, listaCampos: listaCampos, escalao: escalaoInfo, fase: fase, breadcrumbs: req.breadcrumbs()});
     } catch(err){
         console.log(err);
         req.flash('error', 'Não foi possível mostrar a classificação.');

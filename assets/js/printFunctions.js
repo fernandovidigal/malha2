@@ -4,6 +4,39 @@ let docDefinition = {
   content: []
 };
 
+function splitIntoThree(listaJogos) {
+  const three = [];
+  while (listaJogos.length > 0) {
+    if (listaJogos.length > 3) {
+      const threeRow = [];
+      threeRow.push(listaJogos[0]);
+      threeRow.push(listaJogos[1]);
+      threeRow.push(listaJogos[2]);
+      listaJogos.splice(0, 3);
+      three.push(threeRow);
+    } else {
+      three.push(listaJogos);
+      break;
+    }
+  }
+  return three;
+}
+
+function splitIntoEleven(listaJogos) {
+  const listaJogosCopy = [...listaJogos];
+  const eleven = [];
+  while (listaJogosCopy.length > 0) {
+    if (listaJogosCopy.length > 11) {
+      const elevenRow = listaJogosCopy.splice(0, 11);
+      eleven.push(elevenRow);
+    } else {
+      eleven.push(listaJogosCopy);
+      break;
+    }
+  }
+  return eleven;
+}
+
 function makeHeader(dd, torneioInfo) {
   dd.header = {
     table: {
@@ -451,6 +484,8 @@ function makeContentFichaJogoPrimeiraFase(dd, data, fase) {
 
 function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase) {
 
+  const listaJogosSplited = splitIntoEleven(data.listaJogos);
+
   dd.content.push({
     text: `Jogos a efectuar - ${fase}ª Fase`,
     alignment: "center",
@@ -466,188 +501,188 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase) {
     margin: [0, 5]
   });
 
-  const _table = {
-    table: {
-      headerRows: 1,
-      dontBreakRows: true,
-      widths: ["auto", "*", "*", "auto", 40, 40, 40, 40],
-      body: [
-        [
-          { text: "Equipa", fontSize: 10, bold: true },
-          { text: "Jogadores", colSpan: 2, fontSize: 10, bold: true },
-          {},
-          { text: "Localidade", fontSize: 10, bold: true },
-          { text: "Parcial 1", alignment: "center", fontSize: 10, bold: true },
-          { text: "Parcial 2", alignment: "center", fontSize: 10, bold: true },
-          { text: "Parcial 3", alignment: "center", fontSize: 10, bold: true },
-          { text: "Pontos", alignment: "center", fontSize: 10, bold: true }
-        ]
-      ]
-    },
-    layout: {
-      hLineWidth: function(i, node) {
-        if (i === 1) {
-          return 2;
-        }
-        if (i > 1) {
-          return 1;
-        }
-      },
-      vLineWidth: function(i, node) {
-        return 0;
-      },
-      hLineColor: function(i, node) {
-        if (i > 1) {
-          return "gray";
-        } else {
-          return "black";
-        }
-      }
-    }
-  };
-
-  let numPages = Math.ceil(data.listaJogos.length / 11);
+  let numPages = listaJogosSplited.length;
   let page = 1;
-
-  data.listaJogos.forEach((jogo, index) => {
-
-    // Maior que 10 porque cada página leva 11 jogos e do 0 ao 10 são 11 jogos
-    if (index == 10) {
-      page++;
-    }
-
-    const equipa1 = equipas.find(equipa => equipa.equipaId == jogo.equipa1Id);
-    const equipa2 = equipas.find(equipa => equipa.equipaId == jogo.equipa2Id);
-
-    const row = [
-      {
-        stack: [
-          {
-            text: `${equipa1.equipaId}`,
-            alignment: "center",
-            fontSize: 10,
-            margin: [0, 7]
-          },
-          {
-            text: `${equipa2.equipaId}`,
-            alignment: "center",
-            fontSize: 10,
-            margin: [0, 7]
+  listaJogosSplited.forEach((listaJogos, index) => {
+    const _table = {
+      table: {
+        headerRows: 1,
+        dontBreakRows: true,
+        widths: ["auto", "*", "*", "auto", 40, 40, 40, 40],
+        body: [
+          [
+            { text: "Equipa", fontSize: 10, bold: true },
+            { text: "Jogadores", colSpan: 2, fontSize: 10, bold: true },
+            {},
+            { text: "Localidade", fontSize: 10, bold: true },
+            { text: "Parcial 1", alignment: "center", fontSize: 10, bold: true },
+            { text: "Parcial 2", alignment: "center", fontSize: 10, bold: true },
+            { text: "Parcial 3", alignment: "center", fontSize: 10, bold: true },
+            { text: "Pontos", alignment: "center", fontSize: 10, bold: true }
+          ]
+        ]
+      },
+      unbreakable: true,
+      layout: {
+        hLineWidth: function(i, node) {
+          if (i === 1) {
+            return 2;
           }
-        ]
-      },
-      {
-        stack: [
-          { text: `${equipa1.primeiroElemento}`, fontSize: 10, margin: [0, 7] },
-          { text: `${equipa2.primeiroElemento}`, fontSize: 10, margin: [0, 7] }
-        ]
-      },
-      {
-        stack: [
-          { text: `${equipa1.segundoElemento}`, fontSize: 10, margin: [0, 7] },
-          { text: `${equipa2.segundoElemento}`, fontSize: 10, margin: [0, 7] }
-        ]
-      },
-      {
-        stack: [
-          { text: `${equipa1.localidade.nome}`, fontSize: 10, margin: [0, 7] },
-          { text: `${equipa2.localidade.nome}`, fontSize: 10, margin: [0, 7] }
-        ]
-      },
-      {
-        stack: [
-          {
-            table: {
-              widths: ["*"],
-              body: [[{ text: " ", border: [false, false, false, true] }]]
-            },
-            margin: [5, 2]
-          },
-          {
-            table: {
-              widths: ["*"],
-              body: [[{ text: " ", border: [false, false, false, true] }]]
-            },
-            margin: [5, 4, 5, 0]
+          if (i > 1) {
+            return 1;
           }
-        ]
-      },
-      {
-        stack: [
-          {
-            table: {
-              widths: ["*"],
-              body: [[{ text: " ", border: [false, false, false, true] }]]
-            },
-            margin: [5, 2]
-          },
-          {
-            table: {
-              widths: ["*"],
-              body: [[{ text: " ", border: [false, false, false, true] }]]
-            },
-            margin: [5, 4, 5, 0]
+        },
+        vLineWidth: function(i, node) {
+          return 0;
+        },
+        hLineColor: function(i, node) {
+          if (i > 1) {
+            return "gray";
+          } else {
+            return "black";
           }
-        ]
-      },
-      {
-        stack: [
-          {
-            table: {
-              widths: ["*"],
-              body: [[{ text: " ", border: [false, false, false, true] }]]
-            },
-            margin: [5, 2]
-          },
-          {
-            table: {
-              widths: ["*"],
-              body: [[{ text: " ", border: [false, false, false, true] }]]
-            },
-            margin: [5, 4, 5, 0]
-          }
-        ]
-      },
-      {
-        stack: [
-          {
-            table: {
-              widths: ["*"],
-              body: [[" "]]
-            },
-            margin: [5, 2]
-          },
-          {
-            table: {
-              widths: ["*"],
-              body: [[" "]]
-            },
-            margin: [5, 4, 5, 0]
-          }
-        ]
+        }
       }
-    ];
+    };
+  
+    listaJogos.forEach((jogo, index) => {
+  
+      const equipa1 = equipas.find(equipa => equipa.equipaId == jogo.equipa1Id);
+      const equipa2 = equipas.find(equipa => equipa.equipaId == jogo.equipa2Id);
+  
+      const row = [
+        {
+          stack: [
+            {
+              text: `${equipa1.equipaId}`,
+              alignment: "center",
+              fontSize: 10,
+              margin: [0, 7]
+            },
+            {
+              text: `${equipa2.equipaId}`,
+              alignment: "center",
+              fontSize: 10,
+              margin: [0, 7]
+            }
+          ]
+        },
+        {
+          stack: [
+            { text: `${equipa1.primeiroElemento}`, fontSize: 10, margin: [0, 7] },
+            { text: `${equipa2.primeiroElemento}`, fontSize: 10, margin: [0, 7] }
+          ]
+        },
+        {
+          stack: [
+            { text: `${equipa1.segundoElemento}`, fontSize: 10, margin: [0, 7] },
+            { text: `${equipa2.segundoElemento}`, fontSize: 10, margin: [0, 7] }
+          ]
+        },
+        {
+          stack: [
+            { text: `${equipa1.localidade.nome}`, fontSize: 10, margin: [0, 7] },
+            { text: `${equipa2.localidade.nome}`, fontSize: 10, margin: [0, 7] }
+          ]
+        },
+        {
+          stack: [
+            {
+              table: {
+                widths: ["*"],
+                body: [[{ text: " ", border: [false, false, false, true] }]]
+              },
+              margin: [5, 2]
+            },
+            {
+              table: {
+                widths: ["*"],
+                body: [[{ text: " ", border: [false, false, false, true] }]]
+              },
+              margin: [5, 4, 5, 0]
+            }
+          ]
+        },
+        {
+          stack: [
+            {
+              table: {
+                widths: ["*"],
+                body: [[{ text: " ", border: [false, false, false, true] }]]
+              },
+              margin: [5, 2]
+            },
+            {
+              table: {
+                widths: ["*"],
+                body: [[{ text: " ", border: [false, false, false, true] }]]
+              },
+              margin: [5, 4, 5, 0]
+            }
+          ]
+        },
+        {
+          stack: [
+            {
+              table: {
+                widths: ["*"],
+                body: [[{ text: " ", border: [false, false, false, true] }]]
+              },
+              margin: [5, 2]
+            },
+            {
+              table: {
+                widths: ["*"],
+                body: [[{ text: " ", border: [false, false, false, true] }]]
+              },
+              margin: [5, 4, 5, 0]
+            }
+          ]
+        },
+        {
+          stack: [
+            {
+              table: {
+                widths: ["*"],
+                body: [[" "]]
+              },
+              margin: [5, 2]
+            },
+            {
+              table: {
+                widths: ["*"],
+                body: [[" "]]
+              },
+              margin: [5, 4, 5, 0]
+            }
+          ]
+        }
+      ];
+  
+      _table.table.body.push(row);
+    });
 
-    _table.table.body.push(row);
+    dd.content.push(_table);
+    
+    dd.content.push({
+      columns: [
+        {text: `Jogos a efectuar - ${fase}ª Fase - Campo ${data.campo}`, absolutePosition: { x: 40, y: 807 }, fontSize: 8},
+        {text: `Pág. ${page}/${numPages}`, absolutePosition: { x: 520, y: 807 },fontSize: 8}
+      ]
+    });
+    page++;
   });
 
+  
 
-  dd.content.push({
-    columns: [
-      {
-        text: `Jogos a efectuar - ${fase}ª Fase - Campo ${data.campo}`,
-        absolutePosition: { x: 40, y: 807 },
-        fontSize: 8
-      },
-      {
-        text: `Pág. ${page}/${numPages}`,
-        absolutePosition: { x: 520, y: 807 },
-        fontSize: 8
-      }
-    ]
-  });
-
-  dd.content.push(_table);
+  /*if(data.listaJogos.length % 11 != 0){
+    dd.content.push({
+      columns: [
+        {text: `Jogos a efectuar - ${fase}ª Fase - Campo ${data.campo}`, absolutePosition: { x: 40, y: 807 }, fontSize: 8},
+        {text: `Pág. ${page}/${numPages}`, absolutePosition: { x: 520, y: 807 },fontSize: 8}
+      ]
+    });
+  }*/
 }
 
 function makeFichasJogoFasesSeguintes(dd, data, equipas, fase) {

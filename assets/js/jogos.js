@@ -32,23 +32,29 @@ function parciaisIguais(parcial, par){
 function validaParesDeParciais(parcialEquipa1, parcialEquipa2){
     const equipaParcial1Value = parseInt(parcialEquipa1.value);
     const equipaParcial2Value = parseInt(parcialEquipa2.value);
-    var patt = new RegExp("[0-9]{1,2}");
+    var patt = new RegExp("^[0-9]{1,2}$");
     let valido = true;
 
+
     if(!isNaN(equipaParcial1Value) && (equipaParcial1Value % 3 != 0 || equipaParcial1Value < 0 || equipaParcial1Value > 30)){
-        parcialEquipa1.classList.add('parcial_error');
-        valido = false;
-    } else if(isNaN(equipaParcial1Value) && !patt.test(equipaParcial1Value)){
         parcialEquipa1.classList.add('parcial_error');
         valido = false;
     } else if(!isNaN(equipaParcial2Value) && (equipaParcial2Value % 3 != 0 || equipaParcial2Value < 0 || equipaParcial2Value > 30)){
         parcialEquipa2.classList.add('parcial_error');
         valido = false;
-    } else if(isNaN(equipaParcial2Value) && !patt.test(equipaParcial2Value)){
-        parcialEquipa2.classList.add('parcial_error');
-        valido = false;
     } else if(!isNaN(equipaParcial1Value) && !isNaN(equipaParcial2Value) && (equipaParcial1Value == equipaParcial2Value || (equipaParcial1Value != 30 && equipaParcial2Value != 30))){
         parcialEquipa1.classList.add('parcial_error');
+        parcialEquipa2.classList.add('parcial_error');
+        valido = false;
+    }
+
+    if(!patt.test(parcialEquipa1.value) && isNaN(equipaParcial1Value)){
+        parcialEquipa1.classList.add('parcial_error');
+        valido = false;
+    }
+    console.log(patt.test(parcialEquipa2.value));
+    if(!patt.test(parcialEquipa2.value) && isNaN(equipaParcial2Value)){
+        console.log("aqui");
         parcialEquipa2.classList.add('parcial_error');
         valido = false;
     }
@@ -207,7 +213,11 @@ async function handleParciais(btn, url, moveToEnd, actualizar = 0){
             const data = await response.json();
 
             if(!data.success){
-                throw new Error((actualizar == 0) ? 'Não foi possível adicionar os parciais' : 'Não foi possível actualizar os parciais');
+                if(typeof data.message != undefined){
+                    throw new Error(data.message);
+                } else {
+                    throw new Error((actualizar == 0) ? 'Não foi possível adicionar os parciais' : 'Não foi possível actualizar os parciais');
+                }
             }
 
             Swal.fire({
@@ -272,17 +282,6 @@ function createEditButton(jogo_id){
     editButton.innerHTML = "Editar";
 
     return editButton;
-}
-
-function createDeleteButton(jogo_id){
-    const deleteButton = document.createElement("A");
-    deleteButton.setAttribute("href", "");
-    deleteButton.classList.add("btn__delete-resultados");
-    deleteButton.setAttribute("name", "deleteResultados");
-    deleteButton.setAttribute("data-jogoid", jogo_id);
-    deleteButton.innerHTML = "Eliminar";
-
-    return deleteButton;
 }
 
 function createUdpateButton(jogo_id){
@@ -364,24 +363,10 @@ async function imprimeFichaParciais(escalao, fase, campo){
     try {
         const data = await getData(`/torneio/fichaParciais/${escalao}/${fase}/${campo}`);
         docDefinition.content = [];
-        /*docDefinition.pageBreakBefore = function(currentNode, followingNodesOnPage, nodesOnNextPage, previousNodesOnPage) {
-            if(currentNode.table && currentNode.pageNumbers.length != 1){
-                return true;
-            }
-            return false;
-        };*/
 
         if(data.success){           
             makeHeader(docDefinition, data.torneio);
 
-            /*const pageBreak = {
-                text: 'PageBreak',
-                fontSize: 0,
-                color: '#ffffff',
-                margin: [0,0,0,0],
-                pageBreak: 'before'
-            }*/
-            
             docDefinition.content.push({
                 text: `Resultados dos parciais - ${(fase != 100) ? fase + 'ª Fase' : 'Fase Final'}`,
                 alignment: 'center',
@@ -390,9 +375,6 @@ async function imprimeFichaParciais(escalao, fase, campo){
             });
             
             data.listaCampos.forEach((campo, index) => {
-                /*if(index > 0){
-                    docDefinition.content.push(pageBreak);
-                }*/
                 makeFolhaParciais(docDefinition, fase, campo, data.listaEquipas, data.listaParciais);
             });
             makeFooter(docDefinition, `Resultados dos parciais - ${(fase != 100) ? fase + 'ª Fase' : 'Fase Final'}`);

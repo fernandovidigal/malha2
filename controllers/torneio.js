@@ -61,10 +61,10 @@ exports.getStarting = async (req, res, next) => {
                 escalao.numEquipas = numEquipas.numEquipas;
 
                 // Calcula o número de campos mínimo para o número de equipas
-                const numCamposMaximo = Math.ceil(escalao.numEquipas / 3);
-                for(let i = (listaDeCamposPotenciaDeDois.length - 1); i >= 0; i--){
-                    if(numCamposMaximo >= listaDeCamposPotenciaDeDois[i]){
-                        escalao.numCamposMax = listaDeCamposPotenciaDeDois[i];
+                const numCamposMaximo = Math.floor(escalao.numEquipas / 3);;
+                for(let i = 0; i < listaDeCamposPotenciaDeDois.length; i++){
+                    if(numCamposMaximo < listaDeCamposPotenciaDeDois[i]){
+                        escalao.numCamposMax = listaDeCamposPotenciaDeDois[i-1];
                         break;
                     }
                 }
@@ -228,10 +228,10 @@ exports.setNumeroCampos = async (req, res, next) => {
 
             const listaDeCamposPotenciaDeDois = [2,4,8,16,32,64,128];
             // Calcula o número de campos mínimo para o número de equipas
-            const numCamposMaximo = Math.ceil(escalao.numEquipas / 3);
-            for(let i = (listaDeCamposPotenciaDeDois.length - 1); i >= 0; i--){
-                if(numCamposMaximo >= listaDeCamposPotenciaDeDois[i]){
-                    escalao.numCamposMax = listaDeCamposPotenciaDeDois[i];
+            const numCamposMaximo = Math.floor(escalao.numEquipas / 3);
+            for(let i = 0; i < listaDeCamposPotenciaDeDois.length; i++){
+                if(numCamposMaximo < listaDeCamposPotenciaDeDois[i]){
+                    escalao.numCamposMax = listaDeCamposPotenciaDeDois[i-1];
                     break;
                 }
             }
@@ -509,16 +509,23 @@ exports.mostraClassificacao = async (req, res, next) => {
 
 // API
 exports.createParciais = async (req, res, next) => {
-    let data = req.body;
-    const jogoId = data.jogoId;
-    const equipas = await dbFunctions.getEquipasPorJogo(jogoId);
-
-    data.parciaisData.equipa1.equipaId = equipas.equipa1Id;
-    data.parciaisData.equipa2.equipaId = equipas.equipa2Id;
-    
-    data = torneioHelpers.processaPontuacao(data);
-
     try{
+        let data = req.body;
+        const jogoId = parseInt(data.jogoId);
+        const _equipas = dbFunctions.getEquipasPorJogo(jogoId);
+        const _existemParciais = dbFunctions.verificaExistenticaJogo(jogoId);
+
+        const [equipas, existemParciais] = await Promise.all([_equipas, _existemParciais]);
+
+        if(existemParciais.length > 0){
+            throw err;
+        }
+
+        data.parciaisData.equipa1.equipaId = equipas.equipa1Id;
+        data.parciaisData.equipa2.equipaId = equipas.equipa2Id;
+        
+        data = torneioHelpers.processaPontuacao(data);
+
         await dbFunctions.createParciais(jogoId, data);
         res.status(200).json({
             success: true,
@@ -526,9 +533,9 @@ exports.createParciais = async (req, res, next) => {
             equipa2_pontos: data.parciaisData.equipa2.pontos
         });
     } catch(err) {
-        console.log(err);
         res.status(200).json({
-            success: false
+            success: false,
+            message: "Parciais já introduzidos anteriormente. Recarregue a página!"
         });
     }
 }

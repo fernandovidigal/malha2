@@ -1,21 +1,3 @@
-function splitIntoThree(listaJogos) {
-  const three = [];
-  while (listaJogos.length > 0) {
-    if (listaJogos.length > 3) {
-      const threeRow = [];
-      threeRow.push(listaJogos[0]);
-      threeRow.push(listaJogos[1]);
-      threeRow.push(listaJogos[2]);
-      listaJogos.splice(0, 3);
-      three.push(threeRow);
-    } else {
-      three.push(listaJogos);
-      break;
-    }
-  }
-  return three;
-}
-
 async function getData(url) {
   try {
     let response = await fetch(url);
@@ -234,9 +216,7 @@ async function imprimeEquipasAgrupadasPorCampos(escalaoId, fase, campo) {
 async function imprimeFichasJogo(escalaoId, fase, campo, parent) {
   try {
     const equipas = await getData(`/listagens/getEquipas/${escalaoId}`);
-    const data = await getData(
-      `/listagens/getFichasJogo/${escalaoId}/${campo}/${fase}`
-    );
+    const data = await getData(`/listagens/getFichasJogo/${escalaoId}/${campo}/${fase}`);
 
     docDefinition.content = [];
     delete docDefinition.footer;
@@ -259,34 +239,21 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent) {
 
         if (fase == 1) {
           const soFolhaRosto = parent.querySelector(".soFolhaRosto");
-          makeFolhaRostoJogosPrimeiraFase(
-            docDefinition,
-            campo,
-            equipas.listaEquipas,
-            fase
-          );
+          makeFolhaRostoJogosPrimeiraFase(docDefinition, campo, equipas.listaEquipas, fase);
 
           // Verifica se só se pretende imprimir a folha de rosto
           if (!soFolhaRosto.checked) {
-            //docDefinition.content.push(pageBreak);
             makeContentFichaJogoPrimeiraFase(docDefinition, campo, fase);
           }
         } else {
-          makeFichasJogoFasesSeguintes(
-            docDefinition,
-            campo,
-            equipas.listaEquipas,
-            fase
-          );
+          makeFichasJogoFasesSeguintes(docDefinition, campo, equipas.listaEquipas, fase);
         }
       });
 
       if (fase > 1) {
-        makeFooter(
-          docDefinition,
-          `Fichas de Jogo - ${fase != 100 ? fase + "ª Fase" : "Fase Final"}`
-        );
+        makeFooter(docDefinition, `Fichas de Jogo - ${fase != 100 ? fase + "ª Fase" : "Fase Final"}`);
       }
+      
       pdfMake.createPdf(docDefinition).print();
     } else {
       Swal.fire({
@@ -306,9 +273,7 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent) {
 
 async function imprimeResultados(escalaoId, fase, campo) {
   try {
-    const data = await getData(
-      `/listagens/getClassificacao/${escalaoId}/${campo}/${fase}`
-    );
+    const data = await getData(`/listagens/getClassificacao/${escalaoId}/${campo}/${fase}`);
 
     docDefinition.content = [];
 
@@ -324,19 +289,10 @@ async function imprimeResultados(escalaoId, fase, campo) {
       });
 
       data.listaCampos.forEach((campo, index) => {
-        makeContentResultados(
-          docDefinition,
-          campo,
-          fase,
-          index,
-          data.listaCampos.length
-        );
+        makeContentResultados(docDefinition, campo, fase, index, data.listaCampos.length);
       });
 
-      makeFooter(
-        docDefinition,
-        `Resultados da ${fase != 100 ? fase + "ª Fase" : "fase Final"}`
-      );
+      makeFooter(docDefinition, `Resultados da ${fase != 100 ? fase + "ª Fase" : "fase Final"}`);
 
       pdfMake.createPdf(docDefinition).print();
     } else {

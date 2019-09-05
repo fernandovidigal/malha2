@@ -778,6 +778,15 @@ exports.getAllParciais = (listaJogos) => {
     });
 }
 
+exports.verificaExistenticaJogo = (jogoId) => {
+    return Parciais.findAll({
+        where: {
+            jogoId: jogoId
+        },
+        raw: true
+    });
+}
+
 exports.createParciais = async (jogoId, data) => {
     const equipa1ParciaisData = data.parciaisData.equipa1;
     const equipa2ParciaisData = data.parciaisData.equipa2;

@@ -10,60 +10,77 @@
     <label for="ano">Ano: </label>
     <input type="text" name="ano" maxlength="4" pattern="^[0-9]{4}$" required value="<%= torneio.ano %>"><small>(AAAA)</small><br>
 
-    <p>Número de campos</p>
+    <p><strong>Número de campos</strong></p>
     <% if(typeof escaloes != 'undefined'){ %>
-        <p class="escalao__genero">Masculinos:</p>
-        <% escaloes.forEach(escalao => { 
-            if(escalao.sexo == 1) { %>
-                <div class="escalao">
-                    <p class="escalao__designacao">
-                    <%= escalao.designacao %>
-                    </p>
-                    <div class="escalao__numCampos-wrapper">
-                        Campos: 
-                        <% for(let i = 0; i < 8; i++){ %>
-                                <input type="radio" class="escalaoNumCampos" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
-                                <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
-                                    <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %>
-                                <% } else { %>
-                                    <%= (i == 0) ? 'checked' : '' %>
-                                <% } %>
-                                >
-                                <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
-                        <% } %>
-                    </div>
-                </div>
-            <% } %>
-        <% }); %>
 
-        <p class="escalao__genero">Femininos:</p>
-        <% escaloes.forEach(escalao => { 
-            if(escalao.sexo == 0) { %>
-                <div class="escalao">
-                    <p class="escalao__designacao">
-                    <%= escalao.designacao %>
-                    </p>
-                    <div class="escalao__numCampos-wrapper">
-                        Campos: 
-                        <% for(let i = 0; i < 8; i++){ %>
-                                <input type="radio" class="escalaoNumCampos" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
-                                <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
-                                    <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %>
-                                <% } else { %>
-                                    <%= (i == 0) ? 'checked' : '' %>
+        <% if(escaloes.length > 0) { %>
+            <% 
+                const escalaoMasculino = escaloes.find(el => el.sexo == 1); 
+                if(escalaoMasculino){
+            %>
+                <p class="escalao__genero">Masculinos:</p>
+                <% escaloes.forEach(escalao => { 
+                    if(escalao.sexo == 1) { %>
+                        <div class="escalao">
+                            <p class="escalao__designacao">
+                            <%= escalao.designacao %>
+                            </p>
+                            <div class="escalao__numCampos-wrapper">
+                                Campos: 
+                                <% for(let i = 0; i < 8; i++){ %>
+                                        <input type="radio" class="escalaoNumCampos" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
+                                        <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
+                                            <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %>
+                                        <% } else { %>
+                                            <%= (i == 0) ? 'checked' : '' %>
+                                        <% } %>
+                                        >
+                                        <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
                                 <% } %>
-                                >
-                                <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
-                        <% } %>
-                    </div>
-                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                <% }); %>
             <% } %>
-        <% }); %>
+
+
+            <% 
+                const escalaoFeminino = escaloes.find(el => el.sexo == 0); 
+                if(escalaoFeminino){
+            %>
+                <p class="escalao__genero">Femininos:</p>
+                <% escaloes.forEach(escalao => { 
+                    if(escalao.sexo == 0) { %>
+                        <div class="escalao">
+                            <p class="escalao__designacao">
+                            <%= escalao.designacao %>
+                            </p>
+                            <div class="escalao__numCampos-wrapper">
+                                Campos: 
+                                <% for(let i = 0; i < 8; i++){ %>
+                                        <input type="radio" class="escalaoNumCampos" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
+                                        <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
+                                            <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %>
+                                        <% } else { %>
+                                            <%= (i == 0) ? 'checked' : '' %>
+                                        <% } %>
+                                        >
+                                        <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% } %>
+                <% }); %>
+            <% } %>
+        <% } else { %>
+            <p>Não existem escalões registados!<br><a href="/admin/escaloes" class="btn primary_btn">Adicionar Escalões</a></p>
+        <% }%>
+        
         <br>
         <input type="submit" name="adicionar" value="Adicionar">
         <input type="submit" name="adicionar_activar" value="Adicionar e Activar">
     <% } else { %>
-        <p>Não foi possível aceder aos escalões.</p>
+        <p>Não foi possível obter os escalões.</p>
     <% } %>
     <a href="/admin/torneios">Cancelar</a>
 </form>

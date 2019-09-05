@@ -463,7 +463,7 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase) {
     alignment: "center",
     bold: true,
     fontSize: 12,
-    margin: [0, 10]
+    margin: [0, 5]
   });
 
   const _table = {
@@ -506,14 +506,16 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase) {
     }
   };
 
-  let numPages = Math.ceil(data.listaJogos.length / 10);
+  let numPages = Math.ceil(data.listaJogos.length / 11);
   let page = 1;
 
   data.listaJogos.forEach((jogo, index) => {
-    // Maior que 9 porque cada página leva 10 jogos e do 0 ao 9 são 10 jogos
-    if (index > 9) {
+
+    // Maior que 10 porque cada página leva 11 jogos e do 0 ao 10 são 11 jogos
+    if (index == 10) {
       page++;
     }
+
     const equipa1 = equipas.find(equipa => equipa.equipaId == jogo.equipa1Id);
     const equipa2 = equipas.find(equipa => equipa.equipaId == jogo.equipa2Id);
 
@@ -628,6 +630,7 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase) {
 
     _table.table.body.push(row);
   });
+
 
   dd.content.push({
     columns: [

@@ -30,13 +30,44 @@ function parciaisIguais(parcial, par){
 }
 
 function validaParesDeParciais(parcialEquipa1, parcialEquipa2){
-    const equipaParcial1Value = parseInt(parcialEquipa1.value);
-    const equipaParcial2Value = parseInt(parcialEquipa2.value);
+    const equipaParcial1Value = parseInt(parcialEquipa1.value.trim());
+    const equipaParcial2Value = parseInt(parcialEquipa2.value.trim());
     var patt = new RegExp("^[0-9]{1,2}$");
     let valido = true;
 
+    if(equipaParcial1Value != null || !isNaN(equipaParcial1Value)){
+        if(!patt.test(parcialEquipa1.value)){
+            parcialEquipa1.classList.add('parcial_error');
+            valido = false;
+        } else {
+            if(equipaParcial1Value % 3 != 0 || equipaParcial1Value < 0 || equipaParcial1Value > 30){
+                parcialEquipa1.classList.add('parcial_error');
+                valido = false;
+            }
+        }
+    }
 
-    if(!isNaN(equipaParcial1Value) && (equipaParcial1Value % 3 != 0 || equipaParcial1Value < 0 || equipaParcial1Value > 30)){
+    if(equipaParcial2Value != null || !isNaN(equipaParcial2Value)){
+        if(!patt.test(parcialEquipa2.value)){
+            parcialEquipa2.classList.add('parcial_error');
+            valido = false;
+        } else {
+            if(equipaParcial2Value % 3 != 0 || equipaParcial2Value < 0 || equipaParcial2Value > 30){
+                parcialEquipa2.classList.add('parcial_error');
+                valido = false;
+            }
+        }
+    }
+
+    if((equipaParcial1Value != null || !isNaN(equipaParcial1Value)) && (equipaParcial2Value != null || !isNaN(equipaParcial2Value))){
+        if(equipaParcial1Value == equipaParcial2Value || (equipaParcial1Value != 30 && equipaParcial2Value != 30)){
+            parcialEquipa1.classList.add('parcial_error');
+            parcialEquipa2.classList.add('parcial_error');
+            valido = false;
+        }
+    }
+
+    /*if(!isNaN(equipaParcial1Value) && (equipaParcial1Value % 3 != 0 || equipaParcial1Value < 0 || equipaParcial1Value > 30)){
         parcialEquipa1.classList.add('parcial_error');
         valido = false;
     } else if(!isNaN(equipaParcial2Value) && (equipaParcial2Value % 3 != 0 || equipaParcial2Value < 0 || equipaParcial2Value > 30)){
@@ -52,12 +83,10 @@ function validaParesDeParciais(parcialEquipa1, parcialEquipa2){
         parcialEquipa1.classList.add('parcial_error');
         valido = false;
     }
-    console.log(patt.test(parcialEquipa2.value));
     if(!patt.test(parcialEquipa2.value) && isNaN(equipaParcial2Value)){
-        console.log("aqui");
         parcialEquipa2.classList.add('parcial_error');
         valido = false;
-    }
+    }*/
 
     return valido;
 }

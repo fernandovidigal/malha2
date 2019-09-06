@@ -4,14 +4,9 @@
 <h1>ADMIN PAGE</h1>
 
 <div class="adminWrapper">
-    <a href="/admin/utilizadores" class="admin__item">
-        <i class="fas fa-users"></i>
-        <p>Utilizadores</p>
-    </a>
-
-    <a href="/admin/torneios" class="admin__item">
-        <i class="fas fa-trophy"></i>
-        <p>Torneios</p>
+    <a href="/admin/localidades" class="admin__item">
+        <i class="fas fa-map-marked-alt"></i>
+        <p>Localidades</p>
     </a>
 
     <a href="/admin/escaloes" class="admin__item">
@@ -19,15 +14,24 @@
         <p>Escalões</p>
     </a>
 
-    <a href="/admin/localidades" class="admin__item">
-        <i class="fas fa-map-marked-alt"></i>
-        <p>Localidades</p>
+    <a href="/admin/torneios" class="admin__item">
+        <i class="fas fa-trophy"></i>
+        <p>Torneios</p>
     </a>
 
-    <a href="/admin/configuracoes" class="admin__item">
-        <i class="fas fa-cogs"></i>
-        <p>Configurações</p>
-    </a>
+    <% if(loggedUser.level === 10){ %>
+        <a href="/admin/utilizadores" class="admin__item">
+            <i class="fas fa-users"></i>
+            <p>Utilizadores</p>
+        </a>
+        
+        <a href="/admin/configuracoes" class="admin__item">
+            <i class="fas fa-cogs"></i>
+            <p>Configurações</p>
+        </a>
+    <% } %>
+
+    
 </div>
 
 <%- include('../includes/footer.ejs') %>

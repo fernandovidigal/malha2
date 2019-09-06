@@ -625,10 +625,7 @@ small {
     border-radius: 4px;
     color: #a94442;
     background-color: #f2dede;
-    border-color: #ebccd1; 
-}
-
-.escalao_err_msg {
+    border-color: #ebccd1;
     display: inline-block;
 }
 

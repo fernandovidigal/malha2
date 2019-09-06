@@ -60,6 +60,12 @@
                                                 <a href="/equipas"><i class="fas fa-user-friends"></i></a>
                                                     <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
                                             <% } else { %>
+                                                <div class="escalaoSelect__fase">
+                                                    <div class="escalaoSelect__fase-info">
+                                                        <p>Nº Campos</p>
+                                                        <p><%= escalao.numTotalCampos %></p>
+                                                    </div>
+                                                </div>
                                                 <a href="/torneio/distribuirEquipasPorEscalao/escalao/<%= escalao.escalaoId %>" class="escalaoSelect__btn">Distribuir Equipas</a>
                                             <% } %>
                                         <% } %>
@@ -127,6 +133,12 @@
                                                     <a href="/equipas"><i class="fas fa-user-friends"></i></a>
                                                         <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
                                                 <% } else { %>
+                                                    <div class="escalaoSelect__fase">
+                                                        <div class="escalaoSelect__fase-info">
+                                                            <p>Nº Campos</p>
+                                                            <p><%= escalao.numTotalCampos %></p>
+                                                        </div>
+                                                    </div>
                                                     <a href="/torneio/distribuirEquipasPorEscalao/escalao/<%= escalao.escalaoId %>" class="escalaoSelect__btn">Distribuir Equipas</a>
                                                 <% } %>
                                             <% } %>

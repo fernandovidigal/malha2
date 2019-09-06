@@ -56,7 +56,15 @@ exports.getEscalaoBySexo = (req, res, next) => {
         where: {sexo: sexo},
         raw: true
     })
-    .then(escaloes => {
+    .then(async escaloes => {
+        if(escaloes.length > 0){
+            const listaEquipasComEscalao = await dbFunctions.getAllEscaloesComEquipas();
+            escaloes.forEach(escalao => {
+                const escalaoIndex = listaEquipasComEscalao.find(_escalao => _escalao.escalaoId == escalao.escalaoId);
+                escalao.eliminavel = (!escalaoIndex) ? true : false;
+            });
+        }
+    
         res.render('admin/escaloes', {escaloes: escaloes, filtro: sexo, breadcrumbs: req.breadcrumbs()});
     })
     .catch(err => {

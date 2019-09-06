@@ -1183,6 +1183,7 @@ function makeFolhaParciais(dd, fase, data, equipas, parciais) {
   const _table = {
     table: {
       headerRows: 2,
+      dontBreakRows: true,
       widths: ["auto", "*", "*", "auto", 40, 40, 40, 40],
       body: [
         [

@@ -2,4 +2,28 @@
 
 <h1>Festa da Malha</h1>
 
+<div class="adminWrapper">
+    <a href="/torneio" class="admin__item">
+        <i class="fas fa-trophy"></i>
+        <p>Competição</p>
+    </a>
+
+    <a href="/equipas" class="admin__item">
+        <i class="fas fa-user-friends"></i>
+        <p>Equipas</p>
+    </a>
+
+    <a href="/listagens" class="admin__item">
+        <i class="fas fa-list"></i>
+        <p>Listagens</p>
+    </a>
+
+    <% if(loggedUser.level === 10 || loggedUser.level === 5){ %>
+    <a href="/admin" class="admin__item">
+        <i class="fas fa-user-cog"></i>
+        <p><%= (loggedUser.level === 10) ? 'Administração' : 'Gestão' %></p>
+    </a>
+    <% } %>
+</div>
+
 <%- include('includes/footer.ejs') %>

@@ -1270,7 +1270,7 @@ animation-delay: -0.16s;
 .adminMenu_open {
     background-color: #6174cf;
 }
-
+    
 .adminMenu_open ul {
     display: block !important;
 }

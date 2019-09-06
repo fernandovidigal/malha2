@@ -35,7 +35,7 @@ function validaParesDeParciais(parcialEquipa1, parcialEquipa2){
     var patt = new RegExp("^[0-9]{1,2}$");
     let valido = true;
 
-    if(equipaParcial1Value != null || !isNaN(equipaParcial1Value)){
+    if(parcialEquipa1.value != null && parcialEquipa1.value.length > 0){
         if(!patt.test(parcialEquipa1.value)){
             parcialEquipa1.classList.add('parcial_error');
             valido = false;
@@ -47,7 +47,7 @@ function validaParesDeParciais(parcialEquipa1, parcialEquipa2){
         }
     }
 
-    if(equipaParcial2Value != null || !isNaN(equipaParcial2Value)){
+    if(parcialEquipa2.value != null && parcialEquipa2.value.length > 0){
         if(!patt.test(parcialEquipa2.value)){
             parcialEquipa2.classList.add('parcial_error');
             valido = false;
@@ -59,7 +59,7 @@ function validaParesDeParciais(parcialEquipa1, parcialEquipa2){
         }
     }
 
-    if((equipaParcial1Value != null || !isNaN(equipaParcial1Value)) && (equipaParcial2Value != null || !isNaN(equipaParcial2Value))){
+    if(parcialEquipa1.value != null && parcialEquipa1.value.length > 0 && parcialEquipa2.value != null && parcialEquipa2.value.length > 0){
         if(equipaParcial1Value == equipaParcial2Value || (equipaParcial1Value != 30 && equipaParcial2Value != 30)){
             parcialEquipa1.classList.add('parcial_error');
             parcialEquipa2.classList.add('parcial_error');
@@ -67,34 +67,13 @@ function validaParesDeParciais(parcialEquipa1, parcialEquipa2){
         }
     }
 
-    /*if(!isNaN(equipaParcial1Value) && (equipaParcial1Value % 3 != 0 || equipaParcial1Value < 0 || equipaParcial1Value > 30)){
-        parcialEquipa1.classList.add('parcial_error');
-        valido = false;
-    } else if(!isNaN(equipaParcial2Value) && (equipaParcial2Value % 3 != 0 || equipaParcial2Value < 0 || equipaParcial2Value > 30)){
-        parcialEquipa2.classList.add('parcial_error');
-        valido = false;
-    } else if(!isNaN(equipaParcial1Value) && !isNaN(equipaParcial2Value) && (equipaParcial1Value == equipaParcial2Value || (equipaParcial1Value != 30 && equipaParcial2Value != 30))){
-        parcialEquipa1.classList.add('parcial_error');
-        parcialEquipa2.classList.add('parcial_error');
-        valido = false;
-    }
-
-    if(!patt.test(parcialEquipa1.value) && isNaN(equipaParcial1Value)){
-        parcialEquipa1.classList.add('parcial_error');
-        valido = false;
-    }
-    if(!patt.test(parcialEquipa2.value) && isNaN(equipaParcial2Value)){
-        parcialEquipa2.classList.add('parcial_error');
-        valido = false;
-    }*/
-
     return valido;
 }
 
 function verificaVencedor(parcialEquipa1Value, parcialEquipa2Value){
-    if(parcialEquipa1Value > parcialEquipa2Value){
+    if(parcialEquipa1Value > parcialEquipa2Value && parcialEquipa1Value == 30){
         return 1;
-    } else if(parcialEquipa1Value < parcialEquipa2Value){
+    } else if(parcialEquipa1Value < parcialEquipa2Value && parcialEquipa2Value == 30){
         return 2;
     } else {
         return -1;
@@ -119,8 +98,7 @@ equipaParciais.forEach(parciais => {
         });
 
 
-        parcial.addEventListener('blur', function(e){
-
+        parcial.addEventListener('change', function(e){
             const parcial1 = validaParesDeParciais(parciaisInput[0], parciaisInput[3]);
             const parcial2 = validaParesDeParciais(parciaisInput[1], parciaisInput[4]);
             const parcial3 = validaParesDeParciais(parciaisInput[2], parciaisInput[5]);
@@ -140,11 +118,12 @@ equipaParciais.forEach(parciais => {
                 parciaisInput[5].classList.remove('parcial_error');
             }
 
-            if(parcial1 && parcial2 && !isNaN(parseInt(parciaisInput[0].value)) && !isNaN(parseInt(parciaisInput[3].value)) && !isNaN(parseInt(parciaisInput[1].value)) && !isNaN(parseInt(parciaisInput[4].value))){
+            // Desactiva os inputs para o parcial 3 se já houver dois jogos ganhos pela mesma equipa
+            if(parcial1 && parcial2){
                 const vencedorParcial1 = verificaVencedor(parseInt(parciaisInput[0].value), parseInt(parciaisInput[3].value));
                 const vencedorParcial2 = verificaVencedor(parseInt(parciaisInput[1].value), parseInt(parciaisInput[4].value));
 
-                if(vencedorParcial1 == vencedorParcial2){
+                if(vencedorParcial1 == vencedorParcial2 && vencedorParcial1 != -1 && vencedorParcial2 != -1){
                     parciaisInput[2].value = '';
                     parciaisInput[2].disabled = true;
                     parciaisInput[5].value = '';

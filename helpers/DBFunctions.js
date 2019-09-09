@@ -370,9 +370,12 @@ exports.getNumEquipas = (torneioId) => {
     return Equipas.count({where: {torneioId: torneioId}});
 }
 
-exports.getLastEquipaID = (torneioId) => {
+exports.getLastEquipaID = (torneioId, escalaoId) => {
     return Equipas.max('equipaId', {
-        where: { torneioId: torneioId }
+        where: { 
+            torneioId: torneioId,
+            escalaoId: escalaoId 
+        }
     });
 }
 

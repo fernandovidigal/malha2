@@ -227,7 +227,7 @@ exports.createEquipa = async (req, res, next) => {
     const primeiroElemento = req.body.primeiro_elemento.trim();
     const segundoElemento = req.body.segundo_elemento.trim();
     const localidadeId = req.body.localidade;
-    const escalaoId = req.body.escalao;
+    const escalaoId = parseInt(req.body.escalao);
     const errors = validationResult(req);
     req.breadcrumbs('Adicionar Equipa', '/equipas/adicionarEquipa');
     
@@ -243,7 +243,7 @@ exports.createEquipa = async (req, res, next) => {
     } else {
         dbFunctions.getTorneioInfo()
         .then(async torneio => {
-            let nextEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId) || 0;
+            let nextEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId) || 0;
             nextEquipaID++;
 
             Equipas.findOrCreate({
@@ -642,7 +642,7 @@ exports.createEquipasAleatoriamente = async (req, res, next) => {
 }
 
 exports.createEquipasAleatoriamentePorEscalao = async (req, res, next) => {
-    const escalaoId = req.params.escalao;
+    const escalaoId = parseInt(req.params.escalao);
     const num = req.params.num;
     let count = 0;
 
@@ -653,7 +653,7 @@ exports.createEquipasAleatoriamentePorEscalao = async (req, res, next) => {
     .then(async ([torneio, localidades]) => {
         const listaLocalidades = localidades.map(localidade => localidade.localidadeId);
 
-        let nextEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId) || 0;
+        let nextEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId) || 0;
         for(let i = 0; i < num; i++){
             nextEquipaID++;
             await Equipas.create({

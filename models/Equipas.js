@@ -5,12 +5,11 @@ const Equipas = sequelize.define('equipas', {
     equipaId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        primaryKey: true,
+        primaryKey: true
     },
     torneioId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        primaryKey: true
     },
     primeiroElemento: {
         type: Sequelize.STRING,
@@ -26,7 +25,8 @@ const Equipas = sequelize.define('equipas', {
     },
     escalaoId: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
+        primaryKey: true
     }
 });
 

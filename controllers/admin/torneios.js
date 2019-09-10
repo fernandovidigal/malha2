@@ -22,22 +22,22 @@ exports.getTorneio = async (req, res, next) => {
   try {
     const torneioId = parseInt(req.params.id);
 
-    const _listaEscaloes = await dbFunctions.getAllEscaloesComCampos(torneioId);
-    const _listaNumJogos = await dbFunctions.getNumJogosAllEscaloes(torneioId);
-    const _torneio = await dbFunctions.getTorneioById(torneioId);
+    const _listaEscaloes = dbFunctions.getAllEscaloesComCampos(torneioId);
+    const _listaNumJogos = dbFunctions.getNumJogosAllEscaloes(torneioId);
+    const _torneio = dbFunctions.getTorneioById(torneioId);
+    const _listaUltimaFasePorEscalao = dbFunctions.getUltimaFasePorEscalao(torneioId);
     let escaloes = [];
     const listaEscaloesComCampo = [];
 
-    const [listaEscaloes, torneio, listaNumJogos] = await Promise.all([
+    const [listaEscaloes, torneio, listaNumJogos, listaUltimaFasePorEscalao] = await Promise.all([
       _listaEscaloes,
       _torneio,
-      _listaNumJogos
+      _listaNumJogos,
+      _listaUltimaFasePorEscalao
     ]);
 
     for (const escalao of listaEscaloes) {
-      const jogos = listaNumJogos.find(
-        _escalao => _escalao.escalaoId == escalao.escalaoId
-      );
+      const jogos = listaNumJogos.find(_escalao => _escalao.escalaoId == escalao.escalaoId);
 
       const _escalao = {
         escalaoId: escalao.escalaoId,
@@ -51,10 +51,8 @@ exports.getTorneio = async (req, res, next) => {
       listaEscaloesComCampo.push(escalao.escalaoId);
     }
 
-    const escaloesSemCampos = await dbFunctions.getAllEscaloesSemCampos(
-      torneioId,
-      listaEscaloesComCampo
-    );
+    const escaloesSemCampos = await dbFunctions.getAllEscaloesSemCampos(torneioId,listaEscaloesComCampo);
+
     for (const escalao of escaloesSemCampos) {
       escalao.editavel = true;
     }
@@ -65,10 +63,23 @@ exports.getTorneio = async (req, res, next) => {
     // Ordena a lista de Escalões pelo escalão Id
     escaloes.sort((a, b) => (a.escalaoId > b.escalaoId ? 1 : -1));
 
+
+    // Lista dos escalões já com fases definidas para ser possível eliminar a última fase
+    for(const faseEscalao of listaUltimaFasePorEscalao){
+      let escalao = listaEscaloes.find(el => el.escalaoId == faseEscalao.escalaoId);
+      if(!escalao){
+        escalao = escaloesSemCampos.find(el => el.escalaoId == faseEscalao.escalaoId);
+      }
+
+      faseEscalao.designacao = escalao.designacao
+      faseEscalao.sexo = escalao.sexo;
+    }
+
     req.breadcrumbs("Editar Torneio", "/admin/editarTorneio");
     res.render("admin/editarTorneio", {
       torneio: torneio,
       escaloes: escaloes,
+      resetFase: listaUltimaFasePorEscalao,
       breadcrumbs: req.breadcrumbs()
     });
   } catch (err) {

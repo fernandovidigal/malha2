@@ -13,7 +13,7 @@
                     <ul>
                         <li <%= (typeof menuAdminLocalidades != 'undefined')? "class=menuSelected" : '' %>><a href="/admin/localidades">Localidades</a></li>
                         <li <%= (typeof menuAdminEscaloes != 'undefined')? "class=menuSelected" : '' %>><a href="/admin/escaloes">Escalões</a></li>
-                        <li <%= (typeof menuAdminTorneios != 'undefined')? "class=menuSelected" : '' %>><a href="/admin/torneios">Competição</a></li>
+                        <li <%= (typeof menuAdminTorneios != 'undefined')? "class=menuSelected" : '' %>><a href="/admin/torneios">Torneios</a></li>
                         <% if(loggedUser.level === 10){ %>
                             <li <%= (typeof menuAdminUtilizadores != 'undefined')? "class=menuSelected" : '' %>><a href="/admin/utilizadores">Utilizadores</a></li>
                             <li <%= (typeof menuAdminConfig != 'undefined')? "class=menuSelected" : '' %>><a href="/admin/configuracoes">Configurações</a></li>

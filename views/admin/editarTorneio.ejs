@@ -74,6 +74,39 @@
             <% } %>
         <% }); %>
         <br>
+
+        <% if(loggedUser.level === 10){ %>
+            <div class="torneioConfig_wrapper">
+            <p>Remover das Fases</p>
+            <% resetFase.forEach(escalao => { 
+                if(escalao.sexo == 1) { %>
+                    Masculinos:
+                    <div class="faseReset_item">
+                        <p class="faseReset_item-escalao"><%= escalao.designacao %></p>
+                        <div class="faseReset__fase">
+                            <p class="faseReset__fase-title">Fase Actual</p>
+                            <p class="faseReset__fase-number"><%= escalao.fase != 100 ? escalao.fase : 'Final' %></p>
+                        </div>
+                        <a href="" class="faseReset__erase-btn" data-escalao="<%= escalao.escalaoId %>" data-fase="<%= escalao.fase %>" data-designacao="<%= escalao.designacao %> (<%= escalao.sexo == 1? 'Masculino': 'Feminino' %>)"><i class="fas fa-eraser"></i></a>
+                    </div>
+                <% } %>
+            <% }); %>
+
+            <% resetFase.forEach(escalao => { 
+                if(escalao.sexo == 0) { %>
+                    Femininos:
+                    <div class="faseReset_item">
+                        <p class="faseReset_item-escalao"><%= escalao.designacao %></p>
+                        <div class="faseReset__fase">
+                            <p class="faseReset__fase-title">Fase Actual</p>
+                            <p class="faseReset__fase-number"><%= escalao.fase != 100 ? escalao.fase : 'Final' %></p>
+                        </div>
+                        <a href="" class="faseReset__erase-btn" data-escalao="<%= escalao.escalaoId %>" data-fase="<%= escalao.fase %>" data-designacao="<%= escalao.designacao %> (<%= escalao.sexo == 1? 'Masculino': 'Feminino' %>)"><i class="fas fa-eraser"></i></a>
+                    </div>
+                <% } %>
+            <% }); %>
+            </div>
+        <% } %>
         <input type="submit" value="Actualizar">
     <% } else { %>
         <p>Não foi possível aceder aos escalões.</p>
@@ -84,5 +117,5 @@
         <h2>Oops...Algo correu mal!</h2>
         <a href="/admin/torneios">Voltar</a>
 <% } %>
-
+<script src="/js/torneios.js"></script>
 <%- include('../includes/footer.ejs') %>

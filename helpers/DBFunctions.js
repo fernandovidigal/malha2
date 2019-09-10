@@ -255,11 +255,12 @@ exports.getEquipa = (torneioId, equipaId) => {
     });
 }
 
-exports.getSimpleEquipa = (torneioId, equipaId, raw = true) => {
+exports.getSimpleEquipa = (torneioId, equipaId, escalaoId, raw = true) => {
     return Equipas.findOne({
         where: {
+            torneioId: torneioId,
             equipaId: equipaId,
-            torneioId: torneioId
+            escalaoId: escalaoId
         },
         raw: raw
     });
@@ -285,11 +286,12 @@ exports.getNumTotalEquipas = (torneioId) => {
     });
 }
 
-exports.getEquipaFullDetails = (torneioId, equipaId) => {
+exports.getEquipaFullDetails = (torneioId, equipaId, escalaoId) => {
     return Equipas.findOne({
         where: {
+            torneioId: torneioId,
             equipaId: equipaId,
-            torneioId: torneioId
+            escalaoId: escalaoId
         }, 
         include: [
             {
@@ -297,8 +299,7 @@ exports.getEquipaFullDetails = (torneioId, equipaId) => {
                 attributes: ['nome']
             },
             {
-                model: Escaloes,
-                attributes: ['designacao', 'sexo']
+                model: Escaloes
             }
         ]
     });
@@ -329,8 +330,7 @@ exports.getAllEquipasPaginacao = (torneioId, offset, limit) => {
                 attributes: ['nome']
             },
             {
-                model: Escaloes,
-                attributes: ['designacao', 'sexo']
+                model: Escaloes
             }
         ],
         where: {torneioId: torneioId},
@@ -444,8 +444,7 @@ exports.getAllEquipasPorFiltroPaginacao = (whereClause, offset, limit) => {
                 attributes: ['nome']
             },
             {
-                model: Escaloes,
-                attributes: ['designacao', 'sexo']
+                model: Escaloes
             }
         ],
         offset: (offset - 1) * limit,
@@ -564,6 +563,17 @@ exports.getAllFasesPorEscalao = (torneioId, escalaoId) => {
             escalaoId: escalaoId
         },
         group: ['fase'],
+        raw: true
+    });
+}
+
+exports.getUltimaFasePorEscalao = (torneioId) => {
+    return Jogos.findAll({
+        attributes: ['escalaoId', [sequelize.fn('max', sequelize.col('fase')), 'fase']],
+        where: {
+            torneioId: torneioId
+        },
+        group: ['escalaoId'],
         raw: true
     });
 }

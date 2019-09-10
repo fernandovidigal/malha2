@@ -27,10 +27,10 @@
                             <a href="/equipas"><i class="fas fa-times-circle"></i></a>
                         </div>
                     <% } %>
-                    <form action="/equipas/pesquisa" method="post" class="searchBox">
+                    <!--<form action="/equipas/pesquisa" method="post" class="searchBox">
                         <input type="text" name="pesquisaEquipaId" class="searchBox__input" pattern="^[0-9]+$" placeholder="Nº Equipa" required/>
                         <button class="searchBox__btn"><i class="fa fa-search no-margin"></i></button>
-                    </form>
+                    </form>-->
                     <div class="localidadesSearchWrapper">
                         <ul>
                             <li class="topDropMenu">
@@ -163,7 +163,7 @@
                             <td class="w20 table_cell_center equipasEscalao"><%= equipa.escalao %><br>(<%= equipa.sexo == 0 ? 'Feminino': 'Masculino' %>)</td>
                             <td class="w5"><a href="/equipas/editarEquipa/<%= equipa.equipaId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
                             <% if(equipa.eliminavel) {%>
-                                <td class="w10"><a href="" class="btn delete_btn" data-equipa="<%= equipa.equipaId %>"><i class="fa fa-trash"></i>Eliminar</a></td>
+                                <td class="w10"><a href="" class="btn delete_btn" data-equipa="<%= equipa.equipaId %>" data-escalao="<%= equipa.escalaoId %>"><i class="fa fa-trash"></i>Eliminar</a></td>
                             <% } else { %>
                                 <td class="w10">&nbsp;</td>
                             <% } %>

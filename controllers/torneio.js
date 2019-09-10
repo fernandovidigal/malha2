@@ -412,16 +412,19 @@ exports.mostraResultados = async (req, res, next) => {
 
 exports.processaProximaFase = async (req, res, next) => {
     try{
-        const escalaoId = req.params.escalao;
+        const escalaoId = parseInt(req.params.escalao);
 
         const torneio = await dbFunctions.getTorneioInfo();
         const ultimaFase = await dbFunctions.getUltimaFase(torneio.torneioId, escalaoId);
         const proximaFase = ultimaFase + 1;
 
-        const listaCampos = await torneioHelpers.processaClassificacao(torneio.torneioId, escalaoId, ultimaFase);
+        const _listaCampos = torneioHelpers.processaClassificacao(torneio.torneioId, escalaoId, ultimaFase);
+        const _numJogosPorCampo = dbFunctions.getNumeroJogosPorFase(torneio.torneioId, escalaoId, ultimaFase);
+        const [listaCampos, numJogosPorCampo] = await Promise.all([_listaCampos, _numJogosPorCampo]);
 
         // Só existem 2 campos, então processa jogos 3ª e 4ª lugar e final
-        if(listaCampos.length == 2){
+        // verifica-se se só existem dois jogos porque pode haver competição só em 2 campos e depois não há fases de apuramento dos finalistas
+        if(listaCampos.length == 2 && numJogosPorCampo == 2){
             // Adiciona jogo do 3º e 4º lugar
             await dbFunctions.createJogo(torneio.torneioId, escalaoId, 100, 2, listaCampos[0].classificacao[1].equipaId, listaCampos[1].classificacao[1].equipaId);
             // Adiciona jogo da final

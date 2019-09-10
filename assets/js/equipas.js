@@ -4,10 +4,7 @@ async function getData(url) {
         let data = await response.json();
         return data;
     } catch(err){
-        return {
-            success: false,
-            msg: 'Não foi possível obter os dados!'
-        }
+        throw new Error("Não foi possível obter os dados!");
     }    
 }
 
@@ -31,7 +28,6 @@ function showDeleteMessage(equipa){
         confirmButtonColor: '#d9534f',
         cancelButtonText: 'Não!',
         reverseButtons: true,
-        showLoaderOnConfirm: true,
         animation: true
     }).then(result => {
         if(result.value){
@@ -39,8 +35,9 @@ function showDeleteMessage(equipa){
                 headers: {'Content-Type': 'application/json'},
                 method: 'DELETE',
                 body: JSON.stringify({
+                    torneioId: equipa.torneioId,
                     equipaId: equipa.equipaId,
-                    torneioId: equipa.torneioId
+                    escalaoId: equipa.escalaoId
                 })
             })
             .then(response => {
@@ -66,6 +63,7 @@ function showDeleteMessage(equipa){
                 }
             })
             .catch(err => {
+                console.log(err);
                 Swal.fire({
                     type: 'error',
                     title: 'Oops...',
@@ -105,34 +103,22 @@ async function imprimeListaEquipas(localidade, escalao){
 // Delete Buttons
 const deleteBtns = document.querySelectorAll('.delete_btn');
 deleteBtns.forEach(function(item, index){
-    item.addEventListener('click', function(e){
+    item.addEventListener('click', async function(e){
         e.preventDefault();
-        const equipaId = this.dataset.equipa;
 
-        // Obter dados da equipa
-        fetch(`/equipas/eliminarEquipa/${equipaId}`)
-        .then(response => {
-            if(response.ok){
-                return response.json();
-            } else {
-                return Promise.reject('Não foi possível connectar ao servidor.');
-            }
-        })
-        .then(data => {
-            if(data.success){
-                const equipa = data.equipa;
-                showDeleteMessage(equipa);
-            } else {
-                return Promise.reject('Não foi possível obter os dados da equipa.');
-            }
-        })
-        .catch(err => {
+        try {
+            const equipaId = this.dataset.equipa;
+            const escalaoId = this.dataset.escalao;
+
+            const data = await getData(`/equipas/eliminarEquipa/${equipaId}/${escalaoId}`);
+            const equipa = data.equipa;
+            showDeleteMessage(equipa);
+        } catch(err){
             Swal.fire({
                 type: 'error',
-                title: 'Oops...',
-                text: err,
+                title: err.message,
             });
-        });
+        }
     });
 });
 

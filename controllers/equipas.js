@@ -119,6 +119,7 @@ exports.getAllEquipas = async (req, res, next) => {
                 primeiroElemento: equipa.primeiroElemento,
                 segundoElemento: equipa.segundoElemento,
                 localidade: equipa.localidade.nome,
+                escalaoId: equipa.escalao.escalaoId,
                 escalao: equipa.escalao.designacao,
                 sexo: equipa.escalao.sexo,
                 eliminavel: (listaEquipasComJogos.has(equipa.equipaId)) ? false : true
@@ -342,13 +343,15 @@ exports.updateEquipa = async (req, res, next) => {
 
 exports.getEquipaToDelete = async (req, res, next) => {
     const equipaId = parseInt(req.params.equipaId);
+    const escalaoId = parseInt(req.params.escalaoId);
+
     let response = {
         success: false
     };
     
     try {
         const torneio = await dbFunctions.getTorneioInfo();
-        const equipa = await dbFunctions.getEquipaFullDetails(torneio.torneioId, equipaId);
+        const equipa = await dbFunctions.getEquipaFullDetails(torneio.torneioId, equipaId, escalaoId);
 
         if(equipa){
             response.success = true,
@@ -359,7 +362,8 @@ exports.getEquipaToDelete = async (req, res, next) => {
                     segundoElemento: equipa.segundoElemento,
                     localidade: equipa.localidade.nome,
                     sexo: equipa.escalao.sexo,
-                    escalao: equipa.escalao.designacao
+                    escalao: equipa.escalao.designacao,
+                    escalaoId: equipa.escalao.escalaoId
                 };
         }
     } catch(err){
@@ -370,14 +374,16 @@ exports.getEquipaToDelete = async (req, res, next) => {
 }
 
 exports.deleteEquipa = async (req, res, next) => {
-    const equipaId = req.body.equipaId;
-    const torneioId = req.body.torneioId;
+    const equipaId = parseInt(req.body.equipaId);
+    const torneioId = parseInt(req.body.torneioId);
+    const escalaoId = parseInt(req.body.escalaoId);
+
     let response = {
         success: false
     };
 
     try {
-        const equipa = await dbFunctions.getSimpleEquipa(torneioId, equipaId, false);
+        const equipa = await dbFunctions.getSimpleEquipa(torneioId, equipaId, escalaoId, false);
         if(equipa){
             const result = await equipa.destroy();
             response = {
@@ -494,6 +500,7 @@ exports.filtrarEquipas = async (req, res, next) => {
                 primeiroElemento: equipa.primeiroElemento,
                 segundoElemento: equipa.segundoElemento,
                 localidade: equipa.localidade.nome,
+                escalaoId: equipa.escalao.escalaoId,
                 escalao: equipa.escalao.designacao,
                 sexo: equipa.escalao.sexo,
                 eliminavel: (listaEquipasComJogos.has(equipa.equipaId)) ? false : true

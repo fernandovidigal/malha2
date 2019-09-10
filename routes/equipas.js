@@ -32,8 +32,7 @@ router.put('/editarEquipa/:id', [
     check('escalao').exists().withMessage('Deve selecionar o escalão ao qual pertence a equipa.')
 ], EquipasController.updateEquipa);
 
-//router.get('/eliminarEquipa/:id', EquipasController.getEquipaToDelete);
-router.get('/eliminarEquipa/:equipaId', EquipasController.getEquipaToDelete);
+router.get('/eliminarEquipa/:equipaId/:escalaoId', EquipasController.getEquipaToDelete);
 
 router.delete('/eliminarEquipa', EquipasController.deleteEquipa);
 

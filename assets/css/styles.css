@@ -856,7 +856,7 @@ animation-delay: -0.16s;
 }
 
 /* //////////////////////////////////// */
-.localidadesSearchWrapper,
+
 .escaloesSearchWrapper {
     margin-left: 20px;
 }
@@ -1323,3 +1323,64 @@ animation-delay: -0.16s;
 .breadcrumbs__link i{
     margin: 0;
 }
+
+.torneioConfig_wrapper {
+    width: 100%;
+}
+
+.faseReset_item {
+    width: 50%;
+    display: flex;
+    background-color: #f4f5f9;
+    border-radius: 8px;
+    overflow: hidden;
+    align-items: stretch;
+}
+
+.faseReset_item-escalao {
+    padding-left: 20px;
+    color: #455cc7;
+    font-weight: bold;
+    font-size: 120%;
+    margin-right: auto;
+}
+
+.faseReset__fase {
+    align-self: center;
+    margin-right: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.faseReset__fase-title {
+    color: #797979;
+    font-size: 90%;
+    margin: 0;
+    padding: 0;
+}
+
+.faseReset__fase-number {
+    margin: 0;
+    padding: 0;
+    font-size: 120%;
+}
+
+.faseReset__erase-btn {
+    background-color: #455cc7;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    color: white;
+    transition: all 0.2s;
+}
+
+.faseReset__erase-btn:hover {
+    background-color: #6174cf;
+}
+
+.faseReset__erase-btn > * {
+    margin: 0;
+    font-size: 180%;
+}
+

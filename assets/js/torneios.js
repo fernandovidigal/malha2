@@ -53,3 +53,32 @@ deleteBtns.forEach(function(item, index){
 
     });
 });
+
+
+// RESET BUTTONS
+const resetButtons = document.querySelectorAll('.faseReset__erase-btn');
+
+resetButtons.forEach(btn => {
+    btn.addEventListener('click', function(e){
+        e.preventDefault();
+        try {
+            const escalaoId = parseInt(this.dataset.escalao);
+            const fase = parseInt(this.dataset.fase);
+            const designacao = this.dataset.designacao;
+
+            swal.fire({
+                title: 'Tem a certeza?',
+                html: "A fase " + ((fase != 100) ? fase : 'Final' ) + " do escalão <strong>" + designacao + "</strong> será eliminada!",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, eliminar!',
+                confirmButtonColor: '#d9534f',
+                cancelButtonText: 'Não!',
+                reverseButtons: true,
+                animation: true
+            })
+        } catch(err) {
+
+        }
+    });
+});

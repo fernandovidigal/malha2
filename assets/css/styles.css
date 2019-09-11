@@ -588,7 +588,8 @@ small {
     color: #797979;
 }
 
-.escalaoSelect__btn {
+.escalaoSelect__btn,
+.interditaCampos__btn {
     background-color: #6174cf;
     color: #ffffff;
     padding: 0 14px;
@@ -605,6 +606,27 @@ small {
 
 .escalaoSelect__btn:hover img.arrow {
     transform: scale(1.15);
+}
+
+.interditaCampos__btn {
+    background-color: #858ca8;
+    display: flex;
+    flex-direction: column;
+    font-size: 70%;
+}
+
+.interditaCampos__btn i {
+    margin: 0;
+    font-size: 140%;
+    margin-bottom: 4px;
+}
+
+.interditaCampos__btn:hover {
+    background-color: #8f9de2;
+}
+
+.interditaCampos__btn:hover i {
+    color: red;
 }
 
 .escalaoSelect__campos {
@@ -1085,6 +1107,11 @@ animation-delay: -0.16s;
     margin-bottom: 10px;
 }
 
+.interditarCampos_listaCampos_Wrapper {
+    width: 40%;
+    display: flex;
+}
+
 .escalaoNumCampos + label{
     display: inline-block;
     position: relative;
@@ -1126,6 +1153,11 @@ animation-delay: -0.16s;
     background-color: #ffffff;
     border: solid 1px #dddfe8;
     box-shadow: 0 2px 16px rgba(69, 92, 199, .2);
+}
+
+.campoInterdito:checked + label {
+    background-color: #a94442;
+    color: white;
 }
 
 .pagination__wrapper {

@@ -364,3 +364,34 @@ exports.deleteTorneio = (req, res, next) => {
       res.status(200).json({ success: false });
     });
 };
+
+exports.deleteFase = async (req, res, next) => {
+  const escalaoId = parseInt(req.body.escalaoId);
+  const fase = parseInt(req.body.fase);
+
+  try {
+    const torneio = await dbFunctions.getTorneioInfo();
+    const ultimaFase = await dbFunctions.getUltimaFase(torneio.torneioId, escalaoId);
+
+    if(ultimaFase == fase){
+      await dbFunctions.deleteFase(torneio.torneioId, escalaoId, ultimaFase);
+      res.status(200).json({ 
+        success: true ,
+        fase: fase,
+        escalaoId: escalaoId
+      });
+    } else {
+      res.status(200).json({
+        success: false,
+        errMsg: `Fase Inválida!`
+      });
+    }
+
+  } catch(err) {
+    console.log(err);
+    res.status(200).json({
+      success: false,
+      errMsg: `Não foi possível eliminar a fase ${((fase != 100) ? fase : 'Final')}`
+    });
+  }
+}

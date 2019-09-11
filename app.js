@@ -59,6 +59,7 @@ const Equipas = require('./models/Equipas');
 const Jogos = require('./models/Jogos');
 const Parciais = require('./models/Parciais');
 const Campos = require('./models/Campos');
+const Interdicoes = require('./models/Interdicoes');
 
 // Definir relações entre as bases de dados
 Torneios.hasMany(Equipas, { foreignKey: 'torneioId', onDelete: 'cascade' });
@@ -85,6 +86,9 @@ Jogos.hasMany(Parciais, { foreignKey: 'jogoId', onDelete: 'cascade' });
 Parciais.belongsTo(Jogos, { foreignKey: 'jogoId' });
 Equipas.hasMany(Parciais, { foreignKey: 'equipaId', onDelete: 'cascade' });
 Parciais.belongsTo(Equipas, { foreignKey: 'equipaId' });
+
+Torneios.hasMany(Interdicoes, { foreignKey: 'torneioId', onDelete: 'cascade' });
+Interdicoes.belongsTo(Torneios, { foreignKey: 'torneioId' });
 
 // Template View Engine
 app.set('view engine', 'ejs');

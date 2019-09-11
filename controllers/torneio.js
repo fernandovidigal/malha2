@@ -510,6 +510,46 @@ exports.mostraClassificacao = async (req, res, next) => {
     }
 }
 
+exports.interditarCampos = async (req, res, next) => {
+    const escalaoId = parseInt(req.params.escalao);
+
+    const torneio = await dbFunctions.getTorneioInfo();
+
+    const _escalaoInfo = dbFunctions.getEscalaoInfo(escalaoId);
+    const _numCampos = dbFunctions.getNumeroCamposPorEscalao(torneio.torneioId, escalaoId);
+    const _listaCamposInterditos = dbFunctions.getCamposInterditados(torneio.torneioId, escalaoId);
+    const [{numCampos}, listaCamposInterditos, escalaoInfo] = await Promise.all([_numCampos, _listaCamposInterditos, _escalaoInfo]);
+    
+    const listaCampos = [];
+    for(let i = 1; i <= numCampos; i++){
+        const interdito = listaCamposInterditos.find(el => el.campo == i);
+        const campo = {
+            campo: i,
+            interdito: (!interdito) ? false : true
+        }
+        listaCampos.push(campo);
+    }
+    
+    req.breadcrumbs('Interditar Campos', `/torneio/interditarCampos/${escalaoId}`);
+    res.render('torneio/interditarCampos', {torneio: torneio, listaCampos: listaCampos, escalao: escalaoInfo, breadcrumbs: req.breadcrumbs()});
+}
+
+exports.adicionarCamposInterditos = async (req, res, next) => {
+    const escalaoId = parseInt(req.params.escalao);
+
+    const campos = req.body.campo;
+    // quando nada selecionado retorna undefined
+    const listaCamposInput = [];
+    if(campos){
+        listaCamposInput = campos.map(el => parseInt(el))
+    }
+
+    // 1. Obter lista de campos Interditados
+    // 2. Da lista de Campos interditádos
+    // 2.1 Se estiver na lista do input e não estiver na lista de campos interditados, então adicionar
+    // 2.2 Se não estiver na lista do input e estiver na lista de campos interditados, então remover (campos deixou de estar interdito)
+}
+
 // API
 exports.createParciais = async (req, res, next) => {
     try{

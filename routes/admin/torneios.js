@@ -36,4 +36,6 @@ router.put('/editarTorneio/:id', [
 
 router.delete('/deleteTorneio', TorneiosController.deleteTorneio);
 
+router.delete('/deleteFase', TorneiosController.deleteFase);
+
 module.exports = router;

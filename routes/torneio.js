@@ -29,6 +29,9 @@ router.get('/processaProximaFase/escalao/:escalao', TorneiosController.processaP
 // Classificação
 router.get('/classificacao/escalao/:escalao/fase/:fase/campo/:campo', TorneiosController.mostraClassificacao);
 
+router.get('/interditarCampos/escalao/:escalao', TorneiosController.interditarCampos);
+router.post('/interditarCampos/escalao/:escalao', TorneiosController.adicionarCamposInterditos);
+
 // API
 router.post('/registaParciais', TorneiosController.createParciais);
 

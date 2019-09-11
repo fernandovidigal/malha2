@@ -7,6 +7,7 @@ const Localidades = require('../models/Localidades');
 const Jogos = require('../models/Jogos');
 const Campos = require('../models/Campos');
 const Parciais = require('../models/Parciais');
+const Interdicoes = require('../models/Interdicoes');
 
 const Op = Sequelize.Op;
 
@@ -235,6 +236,19 @@ exports.getLocalidadesInfo = () => {
 exports.getAllLocalidadesID = () => {
     return Localidades.findAll({
         attributes: ['localidadeId'],
+        raw: true
+    });
+}
+
+////////////////////////////////////////////////////////
+//                        INTERDIÇÕES
+////////////////////////////////////////////////////////
+exports.getCamposInterditados = (torneioId, escalaoId) => {
+    return Interdicoes.findAll({
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId
+        },
         raw: true
     });
 }
@@ -764,6 +778,16 @@ exports.getNumJogosAllEscaloes = (torneioId) => {
         },
         group: ['escalaoId'],
         raw: true
+    });
+}
+
+exports.deleteFase = (torneioId, escalaoId, fase) => {
+    return Jogos.destroy({
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId,
+            fase: fase
+        }
     });
 }
 

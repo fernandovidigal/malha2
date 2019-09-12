@@ -41,9 +41,9 @@
         </div>
 
         <% if(typeof campos != 'undefined' && campos.length > 0) { %>
-            <% campos.forEach(function(campo){ %>
+            <% campos.forEach(campo => { %>
                 <div class="campo__wrapper">
-                    <div class="campo__title">Campo <%= (info.fase != 100) ? campo.campo : (campo.campo == 1) ? campo.campo + ' - Final' : campo.campo + ' - 3º e 4º lugar' %></div>
+                    <div class="campo__title">Campo <%= (info.fase != 100) ? campo.campo : campo.campo + ' - ' + campo.designacao %></div>
                     <div class="campo__labels">
                         <div class="parcial_label">Parcial 1</div>
                         <div class="parcial_label">Parcial 2</div>
@@ -126,9 +126,9 @@
                     Todos os Campos
                 </a>
                 <div class="campos">
-                    <% listaCampos.forEach(function(campo){ %>
+                    <% listaCampos.forEach(campo => { %>
                         <a href="/torneio/resultados/escalao/<%= info.escalaoId %>/fase/<%= info.fase %>/campo/<%= campo.campo %>" class="campo <%= (info.campo != 0 && info.campo == campo.campo) ? 'campo_selected' : '' %> <%= campo.campoCompleto ? 'campo_completed' : '' %>">
-                            <%= (info.fase != 100) ? campo.campo : (campo.campo == 1) ? 'Final' : '3º e 4º' %>
+                            <%= (info.fase != 100) ? campo.campo : campo.designacao %>
                         </a>
                     <% }); %>
                 </div>

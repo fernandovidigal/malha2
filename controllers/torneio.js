@@ -358,29 +358,40 @@ exports.mostraResultados = async (req, res, next) => {
         const campos = [];
         if(campo == 0){
             for(let i = 0; i < listaCampos.length; i++){
-                campos.push({campo: i+1});
+                campos.push(JSON.parse(JSON.stringify(listaCampos[i])));
+                if(fase == 100){
+                    campos[i].designacao = (i == 0) ? 'Final' : '3º e 4º';
+                    listaCampos[i].designacao = (i == 0) ? 'Final' : '3º e 4º';
+                }
             }
         } else {
             // Número do campo é passado como parametro
             campos.push({campo: campo});
             info.campo = campo;
+            if(fase == 100){
+                const index = listaCampos.map(el => el.campo).indexOf(campo);
+                campos[0].designacao = (index == 0) ? 'Final' : '3º e 4º';
+                listaCampos[0].designacao = 'Final';
+                listaCampos[1].designacao = '3º e 4º';
+            }
         }
 
         listaCampos = await torneioHelpers.verificaCamposCompletos(listaCampos, torneio.torneioId, escalaoId, fase);
 
         // 3. Obter todos os jogos de cada campo
-        for(let i = 0; i < campos.length; i++){
+        //for(let i = 0; i < campos.length; i++){
+        for(const campo of campos){
             // Processa a lista de jogos que ainda falta jogar
-            const _listaJogosPorJogar = dbFunctions.getAllGamesNotPlayed(torneio.torneioId, escalaoId, fase, campos[i].campo);
+            const _listaJogosPorJogar = dbFunctions.getAllGamesNotPlayed(torneio.torneioId, escalaoId, fase, campo.campo);
             // Processa a lista de jogos que já foram jogados
-            const _listaJogosFinalizados = dbFunctions.getAllGamesPlayed(torneio.torneioId, escalaoId, fase, campos[i].campo);
+            const _listaJogosFinalizados = dbFunctions.getAllGamesPlayed(torneio.torneioId, escalaoId, fase, campo.campo);
 
             const [listaJogosPorJogar, listaJogosFinalizados] = await Promise.all([_listaJogosPorJogar, _listaJogosFinalizados]);
-            campos[i].jogos = await torneioHelpers.processaEquipas(torneio.torneioId, listaJogosPorJogar);
-            campos[i].jogosFinalizados = await torneioHelpers.processaEquipas(torneio.torneioId, listaJogosFinalizados);
+            campo.jogos = await torneioHelpers.processaEquipas(torneio.torneioId, listaJogosPorJogar);
+            campo.jogosFinalizados = await torneioHelpers.processaEquipas(torneio.torneioId, listaJogosFinalizados);
 
             // Obter parciais dos jogos já finalizados
-            for(const jogo of campos[i].jogosFinalizados){
+            for(const jogo of campo.jogosFinalizados){
                 const _equipa1Parciais = dbFunctions.getParciais(jogo.jogoId, jogo.equipa1Id);
                 const _equipa2Parciais = dbFunctions.getParciais(jogo.jogoId, jogo.equipa2Id);
                 const _pontuacoes = dbFunctions.getPontuacoes(jogo.jogoId);
@@ -420,16 +431,29 @@ exports.processaProximaFase = async (req, res, next) => {
 
         const _listaCampos = torneioHelpers.processaClassificacao(torneio.torneioId, escalaoId, ultimaFase);
         const _numJogosPorCampo = dbFunctions.getNumeroJogosPorFase(torneio.torneioId, escalaoId, ultimaFase);
-        const [listaCampos, numJogosPorCampo] = await Promise.all([_listaCampos, _numJogosPorCampo]);
+        const _listaCamposInterditos = await dbFunctions.getCamposInterditados(torneio.torneioId, escalaoId);
+        const [listaCampos, numJogosPorCampo, listaCamposInterditos] = await Promise.all([_listaCampos, _numJogosPorCampo, _listaCamposInterditos]);
+
+        const camposInterditos = listaCamposInterditos.map(el => el.campo);
 
         // Só existem 2 campos, então processa jogos 3ª e 4ª lugar e final
         // verifica-se se só existem dois jogos porque pode haver competição só em 2 campos e depois não há fases de apuramento dos finalistas
         if(listaCampos.length == 2 && numJogosPorCampo == 2){
-            // Adiciona jogo do 3º e 4º lugar
-            await dbFunctions.createJogo(torneio.torneioId, escalaoId, 100, 2, listaCampos[0].classificacao[1].equipaId, listaCampos[1].classificacao[1].equipaId);
+            let campoJogo = 1;
+            while(camposInterditos.includes(campoJogo)){
+                campoJogo++;
+            }
             // Adiciona jogo da final
-            await dbFunctions.createJogo(torneio.torneioId, escalaoId, 100, 1, listaCampos[0].classificacao[0].equipaId, listaCampos[1].classificacao[0].equipaId);
-        
+            await dbFunctions.createJogo(torneio.torneioId, escalaoId, 100, campoJogo, listaCampos[0].classificacao[0].equipaId, listaCampos[1].classificacao[0].equipaId);
+            campoJogo++;
+
+            while(camposInterditos.includes(campoJogo)){
+                campoJogo++;
+            }
+            // Adiciona jogo do 3º e 4º lugar
+            await dbFunctions.createJogo(torneio.torneioId, escalaoId, 100, campoJogo, listaCampos[0].classificacao[1].equipaId, listaCampos[1].classificacao[1].equipaId);
+            
+            req.flash('success', 'Próxima fase processada com sucesso');
             res.redirect('/torneio');
         } else {
 
@@ -461,22 +485,25 @@ exports.processaProximaFase = async (req, res, next) => {
                 listaEquipasPorCampo.push(new Array());
             }
 
-            while(k < listaEquipasApuradas.length){
+            for(let k = 0; k < listaEquipasApuradas.length; k++){
                 if(campoActual >= numCampos){
                     campoActual = 0;
                 }
 
                 listaEquipasPorCampo[campoActual].push(listaEquipasApuradas[k]);
                 campoActual++;
-                k++;
             }
 
             campoActual = 1;
             for(const par of listaEquipasPorCampo){
+                while(camposInterditos.includes(campoActual)){
+                    campoActual++;
+                }
                 await dbFunctions.createJogo(torneio.torneioId, escalaoId, proximaFase, campoActual, par[0].equipaId, par[1].equipaId);
                 campoActual++;
             }
-            
+
+            req.flash('success', 'Próxima fase processada com sucesso');
             res.redirect('/torneio');
         }
     } catch(err){
@@ -511,43 +538,107 @@ exports.mostraClassificacao = async (req, res, next) => {
 }
 
 exports.interditarCampos = async (req, res, next) => {
-    const escalaoId = parseInt(req.params.escalao);
+    try {
+        const escalaoId = parseInt(req.params.escalao);
 
-    const torneio = await dbFunctions.getTorneioInfo();
+        const torneio = await dbFunctions.getTorneioInfo();
 
-    const _escalaoInfo = dbFunctions.getEscalaoInfo(escalaoId);
-    const _numCampos = dbFunctions.getNumeroCamposPorEscalao(torneio.torneioId, escalaoId);
-    const _listaCamposInterditos = dbFunctions.getCamposInterditados(torneio.torneioId, escalaoId);
-    const [{numCampos}, listaCamposInterditos, escalaoInfo] = await Promise.all([_numCampos, _listaCamposInterditos, _escalaoInfo]);
-    
-    const listaCampos = [];
-    for(let i = 1; i <= numCampos; i++){
-        const interdito = listaCamposInterditos.find(el => el.campo == i);
-        const campo = {
-            campo: i,
-            interdito: (!interdito) ? false : true
+        const _escalaoInfo = dbFunctions.getEscalaoInfo(escalaoId);
+        const _numCampos = dbFunctions.getNumeroCamposPorEscalao(torneio.torneioId, escalaoId);
+        const _listaCamposInterditos = dbFunctions.getCamposInterditados(torneio.torneioId, escalaoId);
+        const [{numCampos}, listaCamposInterditos, escalaoInfo] = await Promise.all([_numCampos, _listaCamposInterditos, _escalaoInfo]);
+        
+        const listaCampos = [];
+        for(let i = 1; i <= numCampos; i++){
+            const interdito = listaCamposInterditos.find(el => el.campo == i);
+            const campo = {
+                campo: i,
+                interdito: (!interdito) ? false : true
+            }
+            listaCampos.push(campo);
         }
-        listaCampos.push(campo);
+        
+        req.breadcrumbs('Interditar Campos', `/torneio/interditarCampos/${escalaoId}`);
+        res.render('torneio/interditarCampos', {torneio: torneio, listaCampos: listaCampos, escalao: escalaoInfo, breadcrumbs: req.breadcrumbs()});
+    } catch(err) {
+        console.log(err);
+        req.flash('error', 'Não foi possível obter dados dos campos interditados');
+        res.redirect('/torneio');
     }
-    
-    req.breadcrumbs('Interditar Campos', `/torneio/interditarCampos/${escalaoId}`);
-    res.render('torneio/interditarCampos', {torneio: torneio, listaCampos: listaCampos, escalao: escalaoInfo, breadcrumbs: req.breadcrumbs()});
 }
 
 exports.adicionarCamposInterditos = async (req, res, next) => {
-    const escalaoId = parseInt(req.params.escalao);
 
-    const campos = req.body.campo;
-    // quando nada selecionado retorna undefined
-    const listaCamposInput = [];
-    if(campos){
-        listaCamposInput = campos.map(el => parseInt(el))
+    try {
+        const escalaoId = parseInt(req.params.escalao);
+        const torneio = await dbFunctions.getTorneioInfo();
+
+        const campos = req.body.campo;
+        // quando nada selecionado retorna undefined
+        let listaCamposInput = [];
+        if(campos){
+            listaCamposInput = campos.map(el => parseInt(el))
+        }
+
+        // 1. Obter lista de campos Interditados
+        const listaCamposInterditados = await dbFunctions.getCamposInterditados(torneio.torneioId, escalaoId);
+        //console.log(listaCamposInterditados);
+
+        // Não existem campso interditados então regista os campos selecionados como interditados
+        if(listaCamposInterditados.length == 0 && listaCamposInput.length > 0){
+            const bulkCreate = [];
+            for(let i = 0; i < listaCamposInput.length; i++){
+                bulkCreate.push({
+                    torneioId: torneio.torneioId,
+                    escalaoId: escalaoId,
+                    campo: listaCamposInput[i]
+                });
+            }
+
+            await dbFunctions.createBulkCamposInterditados(bulkCreate);
+        // Existem campos interditados mas o utilizador não selecionou nenhum, então elimina os campos interditados
+        } else if(listaCamposInterditados.length > 0 && listaCamposInput.length == 0){
+            for(const campo of listaCamposInterditados){
+                await dbFunctions.deleteCampoInterditado(campo);
+            }
+        } else {
+            // Verifica quais os campos do input que não estão na lista de campos interditados e cria-os
+            const novosCamposAInterditar = [];
+            for(let i = 0; i < listaCamposInput.length; i ++){
+                const found = listaCamposInterditados.find(el => el.campo == listaCamposInput[i]);
+                if(!found){
+                    novosCamposAInterditar.push({
+                        torneioId: torneio.torneioId,
+                        escalaoId: escalaoId,
+                        campo: listaCamposInput[i]
+                    });
+                }
+            }
+            // Regista os campos novos interditados
+            await dbFunctions.createBulkCamposInterditados(novosCamposAInterditar);
+
+            // Verifica quais os campos que existem na lista de campos interditados mas não existem no input, ou seja, os campos
+            // voltaram a ficar disponíveis, então elimina-os da interdição
+            const camposADisponibilizar = [];
+            for(let i = 0; i < listaCamposInterditados.length; i++){
+                const found = listaCamposInput.find(el => el == listaCamposInterditados[i].campo);
+                if(!found){
+                    camposADisponibilizar.push(listaCamposInterditados[i]);
+                }
+            }
+            // remove os campos da interdição
+            for(const campo of camposADisponibilizar){
+                await dbFunctions.deleteCampoInterditado(campo);
+            } 
+        }
+
+        req.flash('success', 'Interdição de campos processada com sucesso');
+        res.redirect('/torneio');
+    } catch(err){
+        console.log(err);
+        req.flash('error', 'Não foi possível interditar os campos');
+        res.redirect('/torneio');
     }
-
-    // 1. Obter lista de campos Interditados
-    // 2. Da lista de Campos interditádos
-    // 2.1 Se estiver na lista do input e não estiver na lista de campos interditados, então adicionar
-    // 2.2 Se não estiver na lista do input e estiver na lista de campos interditados, então remover (campos deixou de estar interdito)
 }
 
 // API

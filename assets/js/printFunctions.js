@@ -236,7 +236,7 @@ function makeEquipasAgrupadasPorCampos(ddContent, listaCampos, fase) {
   listaCampos.forEach(campo => {
     if (fase == 100) {
       ddContent.push({
-        text: `${campo.campo == 1 ? "Final" : "3º e 4º Lugar"}`,
+        text: `${campo.designacao}`,
         fontSize: 20,
         bold: true,
         margin: [0, 20, 0, 10],

@@ -189,6 +189,7 @@ async function imprimeEquipasAgrupadasPorCampos(escalaoId, fase, campo) {
         data.listaCampos,
         data.fase
       );
+      
       makeFooter(
         docDefinition,
         `Equipas Agrupadas por Campos - ${
@@ -341,9 +342,7 @@ escalaoSelect.forEach(function(escalao, index) {
 });
 
 // Processa as alterações na escalho da fase
-const cardsControllers = document.querySelectorAll(
-  ".listagemCard__controllers"
-);
+const cardsControllers = document.querySelectorAll(".listagemCard__controllers");
 cardsControllers.forEach(controller => {
   controller.addEventListener("change", async function(e) {
     if (e.target.name == "fase") {
@@ -372,9 +371,7 @@ cardsControllers.forEach(controller => {
   });
 });
 
-const numEquipasPorConcelhoBtn = document.querySelector(
-  ".numEquipasPorConcelho_btn"
-);
+const numEquipasPorConcelhoBtn = document.querySelector(".numEquipasPorConcelho_btn");
 numEquipasPorConcelhoBtn.addEventListener("click", function(e) {
   e.preventDefault();
   const ctrlData = getControllersValues(this.parentNode);
@@ -389,9 +386,7 @@ numEquipasPorConcelhoBtn.addEventListener("click", function(e) {
   }
 });
 
-const equipasAgrupadasPorCamposBtn = document.querySelector(
-  ".equipasAgrupadasPorCampos_btn"
-);
+const equipasAgrupadasPorCamposBtn = document.querySelector(".equipasAgrupadasPorCampos_btn");
 equipasAgrupadasPorCamposBtn.addEventListener("click", function(e) {
   e.preventDefault();
   const ctrlData = getControllersValues(this.parentNode);

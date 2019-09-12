@@ -12,10 +12,6 @@ router.all('/*', userAuthenticated, (req, res, next) => {
 
 router.get('/', ListagensController.mostraListagens);
 
-router.post('/numEquipasPorConcelho', ListagensController.numEquipasPorConcelho);
-
-router.post('/equipasAgrupadasPorCampos', ListagensController.equipasAgrupadasPorCampos);
-
 // API
 router.get('/getFases/:escalao', ListagensController.getFases);
 

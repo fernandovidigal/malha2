@@ -318,7 +318,7 @@ exports.verificaCamposCompletos = async function(listaCampos, torneioId, escalao
         return listaCampos;
     } catch(err){
         console.log(err);
-        return Promise.reject();
+        return Promise.reject(err);
     }
 }
 
@@ -417,11 +417,20 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
         const listaCampos = [];
         if(campo == 0){
             for(let i = 0; i < _listaCampos.length; i++){
-                listaCampos.push({campo: i+1});
+                listaCampos.push(JSON.parse(JSON.stringify(_listaCampos[i])));
+                if(fase == 100){
+                    listaCampos[i].designacao = (i == 0) ? 'Final' : '3º e 4º';
+                    listaCampos[i].inicioClassificacao = (i == 0) ? 1 : 3;
+                }
             }
         } else {
             // Número do campo é passado como parametro
             listaCampos.push({campo: campo});
+            if(fase == 100){
+                const index = _listaCampos.map(el => el.campo).indexOf(campo);
+                listaCampos[0].designacao = (index == 0) ? 'Final' : '3º e 4º';
+                listaCampos[0].inicioClassificacao = (index == 0) ? 1 : 3;
+            }
         }
 
         const listaCompletaEquipas = await dbFunctions.getAllEquipasEscalao(torneioId, escalaoId);
@@ -433,7 +442,6 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
             const listaJogos = await dbFunctions.getAllGamesPorCampo(torneioId, escalaoId, fase, numCampo);
             campo.classificacao = [];
             const classificacao = campo.classificacao;
-            //const listaEquipas = new Set();
 
             // 2. Percorre a lista de jogos e coloca as equipas na lista de classificação
             for(const jogo of listaJogos){
@@ -451,7 +459,6 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
                         segundoElemento: equipa1.segundoElemento,
                         localidadeId: equipa1.localidade.localidadeId,
                         localidade: equipa1.localidade.nome,
-                        //vitorias: (jogo.equipa1Pontos > jogo.equipa2Pontos) ? 1 : 0,
                         pontos: jogo.equipa1Pontos
                     }
 
@@ -474,7 +481,6 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
                         segundoElemento: equipa2.segundoElemento,
                         localidadeId: equipa2.localidade.localidadeId,
                         localidade: equipa2.localidade.nome,
-                        //vitorias: (jogo.equipa2Pontos > jogo.equipa1Pontos) ? 1 : 0,
                         pontos: jogo.equipa2Pontos
                     }
 

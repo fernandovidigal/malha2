@@ -62,64 +62,6 @@ exports.mostraListagens = async (req, res, next) => {
     res.render('listagens/index', {torneio: torneio, escaloes: listaEscaloes, escaloesComJogos: listaEscaloesComJogos, breadcrumbs: req.breadcrumbs()});
 }
 
-exports.numEquipasPorConcelho = async (req, res, next) => {
-    const torneio = await dbFunctions.getTorneioInfo();
-    const escalaoId = req.body.escalao || 0;
-
-    if(!torneio){
-        // TODO: mostrar mensagem de erro
-    }
-
-    const equipasPorConcelho = await dbFunctions.getNumEquipasPorConcelhoInfo(torneio.torneioId, escalaoId);
-    util.sort(equipasPorConcelho);
-
-    res.render('listagens/numEquipasPorConcelho', {torneio: torneio, escalaoId: escalaoId, localidades: equipasPorConcelho});
-}
-
-exports.equipasAgrupadasPorCampos = async (req, res, next) => {
-    const torneio = await dbFunctions.getTorneioInfo();
-    let escalaoId = req.body.escalao || 0;
-    let fase = req.body.fase || 0;
-    let numCampos = 0;
-
-    if(escalaoId == 0 || fase == 0){
-        req.flash('error', 'Deve selecionar o escalão e a fase.');
-        return res.redirect("/listagens");
-    }
-
-    // 1. Verificar se para o escalão selecionado já existem jogos distribuidos
-    const numJogos = await dbFunctions.getNumJogosPorEscalao(torneio.torneioId, escalaoId);
-    if(numJogos == 0){
-        req.flash('error', 'O Escalão selecionado ainda não tem equipas distribuídas!');
-        return res.redirect("/listagens");
-    }
-
-    // 2. Verificar o número de campos para o escalão e fase
-    numCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
-
-    if(numCampos.length > 0){
-        // Processa um array de objectos com o número do campo e placeholder para a lista de equipas
-        const listaCampos = numCampos.map(campo => {
-            return _campo = {
-                campo: campo.campo,
-                listaEquipas: []
-            }
-        });
-
-        processaListaEquipasAgrupadasPorCampos(torneio.torneioId, escalaoId, fase, listaCampos)
-        .then(_listaCampos => {
-            res.render('listagens/equipasAgrupadasPorCampos', {torneio: torneio, escalaoId: escalaoId, fase: fase, campos: _listaCampos});
-        })
-        .catch(err => {
-            console.log(err);
-            // TODO: Handle ERROR
-        });
-    } else {
-        req.flash('error', 'Número de campos ainda não foi definido.');
-        return res.redirect("/listagens");
-    }
-}
-
 // API
 exports.getFases = async (req, res, next) => {
     try {
@@ -291,25 +233,26 @@ exports.getEquipasAgrupadasPorCampos = async (req, res, next) => {
         }
 
         // 2. Verificar o número de campos para o escalão e fase
+        let listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
         if(campo == 0){
-            numCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
+            for(let i = 0; i < listaCampos.length; i++){
+                numCampos.push(JSON.parse(JSON.stringify(listaCampos[i])));
+                if(fase == 100){
+                    numCampos[i].designacao = (i == 0) ? 'Final' : '3º e 4º';
+                }
+                numCampos[i].listaEquipas = []
+            }
         } else {
-            numCampos.push({
-                campo: campo
-            });
+            numCampos.push({campo: campo});
+            if(fase == 100){
+                const index = listaCampos.map(el => el.campo).indexOf(campo);
+                numCampos[0].designacao = (index == 0) ? 'Final' : '3º e 4º';
+            }
+            numCampos[0].listaEquipas = []
         }
         
-        
         if(numCampos.length > 0){
-            // Processa um array de objectos com o número do campo e placeholder para a lista de equipas
-            const listaCampos = numCampos.map(campo => {
-                return _campo = {
-                    campo: campo.campo,
-                    listaEquipas: []
-                }
-            });
-
-            await processaListaEquipasAgrupadasPorCampos(torneio.torneioId, escalaoId, fase, listaCampos)
+            await processaListaEquipasAgrupadasPorCampos(torneio.torneioId, escalaoId, fase, numCampos)
             .then(_listaCampos => {
                 response.success = true;
                 response.torneio = {
@@ -393,6 +336,8 @@ exports.getFichasJogo = async (req, res, next) => {
                 response.campos.push(_campo);
             });
             response.success = true;
+
+            console.log(response.campos);
         } else {
             response.errMsg = 'Não existem jogos para os campos selecionados.';
         }

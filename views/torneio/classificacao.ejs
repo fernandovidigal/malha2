@@ -13,8 +13,8 @@
 
     <% if(listaCampos.length > 0) { %>
         <% listaCampos.forEach(function(campo){ %>
-            <% let posicao = (fase != 100)? 1 : (campo.campo == 2) ? 3 : 1; %>
-            <div class="campo__title">Campo <%= campo.campo %><%= (fase != 100) ? '' : (campo.campo == 1) ? ' - Final' : ' - 3º e 4º Lugar' %></div>
+            <% let posicao = (fase != 100)? 1 : campo.inicioClassificacao %>
+            <div class="campo__title">Campo <%= campo.campo %><%= (fase == 100) ? ' - ' + campo.designacao : '' %></div>
             <table class="listTable">
                 <thead>
                     <tr>

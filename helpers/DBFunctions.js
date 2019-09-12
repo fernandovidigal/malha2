@@ -248,9 +248,16 @@ exports.getCamposInterditados = (torneioId, escalaoId) => {
         where: {
             torneioId: torneioId,
             escalaoId: escalaoId
-        },
-        raw: true
+        }
     });
+}
+
+exports.createBulkCamposInterditados = (bulk) => {
+    return Interdicoes.bulkCreate(bulk);
+}
+
+exports.deleteCampoInterditado = (campo) => {
+    return campo.destroy();
 }
 
 ////////////////////////////////////////////////////////

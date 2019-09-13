@@ -418,17 +418,17 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
         if(campo == 0){
             for(let i = 0; i < _listaCampos.length; i++){
                 listaCampos.push(JSON.parse(JSON.stringify(_listaCampos[i])));
-                if(fase == 100){
-                    listaCampos[i].designacao = (i == 0) ? 'Final' : '3º e 4º';
+                if(fase == 100 && _listaCampos.length == 2){
+                    listaCampos[i].designacao = (i == 0) ? 'Final' : '3º e 4º Lugar';
                     listaCampos[i].inicioClassificacao = (i == 0) ? 1 : 3;
                 }
             }
         } else {
             // Número do campo é passado como parametro
             listaCampos.push({campo: campo});
-            if(fase == 100){
+            if(fase == 100 && _listaCampos.length == 2){
                 const index = _listaCampos.map(el => el.campo).indexOf(campo);
-                listaCampos[0].designacao = (index == 0) ? 'Final' : '3º e 4º';
+                listaCampos[0].designacao = (index == 0) ? 'Final' : '3º e 4º Lugar';
                 listaCampos[0].inicioClassificacao = (index == 0) ? 1 : 3;
             }
         }
@@ -502,4 +502,3 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
         return Promise.reject(err);
     }
 }
-

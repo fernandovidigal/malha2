@@ -686,11 +686,6 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase) {
 }
 
 function makeFichasJogoFasesSeguintes(dd, data, equipas, fase) {
-  let marginTop = 40;
-
-  if (fase == 100) {
-    marginTop = 20;
-  }
 
   dd.content.push({
     text: `${
@@ -701,15 +696,15 @@ function makeFichasJogoFasesSeguintes(dd, data, equipas, fase) {
     alignment: "center",
     bold: true,
     fontSize: 16,
-    margin: [0, marginTop, 0, 15]
+    margin: [0, 10, 0, 15]
   });
 
   if (fase == 100) {
     dd.content.push({
-      text: `${data.campo == 1 ? "Final" : "3º e 4º Lugar"}`,
+      text: `${data.designacao}`,
       fontSize: 20,
       bold: true,
-      margin: [0, 20, 0, 10],
+      margin: [0, 0, 0, 10],
       color: "#455cc7",
       alignment: "center"
     });
@@ -726,7 +721,7 @@ function makeFichasJogoFasesSeguintes(dd, data, equipas, fase) {
     text: "Ficha de Jogo",
     alignment: "center",
     bold: true,
-    margin: [0, 40, 0, 10]
+    margin: [0, 20, 0, 5]
   });
 
   data.listaJogos.forEach((jogo, index) => {
@@ -879,18 +874,6 @@ function makeFichasJogoFasesSeguintes(dd, data, equipas, fase) {
 
     const equipasRow = [];
     for (let i = 0; i < 3; i++) {
-      /*equipasRow.push({
-                stack: [
-                    {text: `Equipa`, fontSize: 10, alignment: 'center', fillColor: '#eeeeee'},
-                    {text: `${jogo.equipa1Id}`, fontSize: 11, alignment: 'center', bold: true, fillColor: '#eeeeee'}
-                ]
-            });
-            equipasRow.push({
-                stack: [
-                    {text: `Equipa`, fontSize: 10, alignment: 'center', fillColor: '#eeeeee'},
-                    {text: `${jogo.equipa2Id}`, fontSize: 11, alignment: 'center', bold: true, fillColor: '#eeeeee'}
-                ]
-            });*/
       equipasRow.push({
         text: `Equipa\n${jogo.equipa1Id}`,
         fontSize: 10,
@@ -916,8 +899,8 @@ function makeFichasJogoFasesSeguintes(dd, data, equipas, fase) {
         pontuacaoRow.push({
           text: `${i != 11 ? value : " "}`,
           alignment: "center",
-          margin: [0, 3],
-          fontSize: 10
+          margin: [0, 5],
+          fontSize: 13
         });
       }
       _tablePontos.table.body.push(pontuacaoRow);
@@ -939,7 +922,7 @@ function makeContentResultados(dd, data, fase, index, numCampos) {
 
   if (fase == 100) {
     dd.content.push({
-      text: `${data.campo == 1 ? "Final" : "3º e 4º Lugar"}`,
+      text: `${data.designacao}`,
       fontSize: 20,
       bold: true,
       margin: [0, 20, 0, 10],
@@ -1017,7 +1000,7 @@ function makeContentResultados(dd, data, fase, index, numCampos) {
     }
   };
 
-  let ordem = fase != 100 ? 1 : data.campo == 2 ? 3 : 1;
+  let ordem = fase != 100 ? 1 : data.inicioClassificacao;
   data.classificacao.forEach(equipa => {
     const classificacaoRow = [
       { text: `${ordem++}º`, alignment: "center", margin: [5, 5] },
@@ -1171,7 +1154,7 @@ function makeEquipasContent(dd, data) {
 function makeFolhaParciais(dd, fase, data, equipas, parciais) {
   if (fase == 100) {
     dd.content.push({
-      text: `${data.campo == 1 ? "Final" : "3º e 4º Lugar"}`,
+      text: `${data.designacao}`,
       fontSize: 20,
       bold: true,
       margin: [0, 40, 0, 10],

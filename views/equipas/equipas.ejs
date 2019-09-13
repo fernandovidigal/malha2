@@ -21,16 +21,7 @@
         <div class="table__content">
             <div class="buttons_bar">
                 <div class="search_bar">
-                    <% if(typeof equipaId != 'undefined'){ %>
-                        <div class="search_equipaID">
-                            <%= equipaId %>
-                            <a href="/equipas"><i class="fas fa-times-circle"></i></a>
-                        </div>
-                    <% } %>
-                    <!--<form action="/equipas/pesquisa" method="post" class="searchBox">
-                        <input type="text" name="pesquisaEquipaId" class="searchBox__input" pattern="^[0-9]+$" placeholder="Nº Equipa" required/>
-                        <button class="searchBox__btn"><i class="fa fa-search no-margin"></i></button>
-                    </form>-->
+
                     <div class="localidadesSearchWrapper">
                         <ul>
                             <li class="topDropMenu">
@@ -132,6 +123,19 @@
                             </li>
                         </ul>
                     </div>
+                    <% if(typeof filtro != 'undefined' && typeof filtro.escalaoId != 'undefined'){ %>
+                        <% if(typeof equipaId != 'undefined'){ %>
+                            <div class="search_equipaID">
+                                <%= equipaId %>
+                                <a href="/equipas/filtro/escalao/<%= filtro.escalaoId %>"><i class="fas fa-times-circle"></i></a>
+                            </div>
+                        <% } else { %>
+                            <form action="/equipas/pesquisa/<%= filtro.escalaoId %>" method="post" class="searchBox">
+                                <input type="text" name="pesquisaEquipaId" class="searchBox__input" pattern="^[0-9]+$" placeholder="Nº Equipa" required/>
+                                <button class="searchBox__btn"><i class="fa fa-search no-margin"></i></button>
+                            </form>
+                        <% } %>
+                    <% } %>
                 </div>
                 <div class="action_btns a-right">
                         <a href="/equipas/adicionarEquipa" class="btn primary_btn"><i class="fa fa-plus"></i>Adicionar Equipa</a>
@@ -161,7 +165,7 @@
                             <td class="equipasElementos"><%= equipa.primeiroElemento %><br><%= equipa.segundoElemento %></td>
                             <td class="w20 table_cell_center equipasLocalidade"><%= equipa.localidade %></td>
                             <td class="w20 table_cell_center equipasEscalao"><%= equipa.escalao %><br>(<%= equipa.sexo == 0 ? 'Feminino': 'Masculino' %>)</td>
-                            <td class="w5"><a href="/equipas/editarEquipa/<%= equipa.equipaId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
+                            <td class="w5"><a href="/equipas/editarEquipa/<%= equipa.escalaoId %>/<%= equipa.equipaId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
                             <% if(equipa.eliminavel) {%>
                                 <td class="w10"><a href="" class="btn delete_btn" data-equipa="<%= equipa.equipaId %>" data-escalao="<%= equipa.escalaoId %>"><i class="fa fa-trash"></i>Eliminar</a></td>
                             <% } else { %>

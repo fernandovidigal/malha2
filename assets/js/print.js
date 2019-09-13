@@ -72,8 +72,8 @@ async function mostraCamposSelect(escalaoId, fase, parent) {
 
   data.listaCampos.forEach(function(campo) {
     const option = document.createElement("option");
-    option.value = campo;
-    option.text = `Campo ${campo}`;
+    option.value = `${campo.campo}`;
+    option.text = `Campo ${campo.campo}${(campo.designacao != undefined) ? ' - ' + campo.designacao : ''}`;
     selectBox.appendChild(option);
   });
   parent.appendChild(selectBox);

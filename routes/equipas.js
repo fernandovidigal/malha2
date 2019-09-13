@@ -21,7 +21,7 @@ router.post('/adicionarEquipa', [
     check('escalao').exists().withMessage('Deve selecionar o escalão ao qual pertence a equipa.')
 ], EquipasController.createEquipa);
 
-router.get('/editarEquipa/:id', EquipasController.getEquipaToEdit);
+router.get('/editarEquipa/:escalao/:id', EquipasController.getEquipaToEdit);
 
 router.put('/editarEquipa/:id', [
     check('primeiro_elemento').trim().escape().not().isEmpty().withMessage('Deve indicar o nome do primeiro elemento da equipa.'),
@@ -37,7 +37,7 @@ router.get('/eliminarEquipa/:equipaId/:escalaoId', EquipasController.getEquipaTo
 router.delete('/eliminarEquipa', EquipasController.deleteEquipa);
 
 // Pesquisa de equipas
-router.post('/pesquisa', [
+router.post('/pesquisa/:escalao', [
     check('pesquisaEquipaId').trim().escape().not().isEmpty().withMessage('Deve indicar o Nº da Equipa a pesquisar.'),
     check('pesquisaEquipaId').trim().escape().matches(/^[0-9]+$/).withMessage('Nº da Equipa inválido.')
 ], EquipasController.searchEquipa);

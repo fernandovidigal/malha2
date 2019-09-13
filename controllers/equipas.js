@@ -152,18 +152,22 @@ exports.getAllEquipas = async (req, res, next) => {
 exports.getEquipaToEdit = async (req, res, next) => {
     try {
         req.breadcrumbs('Editar Equipa', '/equipas/editarEquipa');
-        const equipaId = req.params.id;
+        const equipaId = parseInt(req.params.id);
+        const escalaoId = parseInt(req.params.escalao);
 
         const torneioInfo = dbFunctions.getTorneioInfo();
         const localidadesInfo = dbFunctions.getLocalidadesInfo();
         const escaloesInfo = dbFunctions.getEscaloesInfo();
 
         const [torneio, localidades, escaloes] = await Promise.all([torneioInfo, localidadesInfo, escaloesInfo]);
+
+        console.log(escalaoId);
         
-        const equipa = await dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId);    
+        const equipa = await dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId, escalaoId);    
         if(equipa){
             // Verifica se a equipa já foi atribuida a algum jogo
-            const numJogos = await dbFunctions.getNumJogosEquipa(torneio.torneioId, equipaId);
+            const numJogos = await dbFunctions.getNumJogosEquipa(torneio.torneioId, escalaoId, equipaId);
+            console.log(numJogos);
             equipa.escaloesEditaveis = (numJogos == 0) ? true : false;
 
             res.render('equipas/editarEquipa', {
@@ -399,7 +403,8 @@ exports.deleteEquipa = async (req, res, next) => {
 
 // Pesquisar Equipas
 exports.searchEquipa = async (req, res, next) => {
-    const equipaId = req.body.pesquisaEquipaId;
+    const equipaId = parseInt(req.body.pesquisaEquipaId);
+    const escalaoId = parseInt(req.params.escalao);
     const errors = validationResult(req);
 
     if(!errors.isEmpty()){
@@ -410,13 +415,13 @@ exports.searchEquipa = async (req, res, next) => {
 
         try {
             const torneio = await dbFunctions.getTorneioInfo();
-            const equipa = await dbFunctions.getEquipaFullDetails(torneio.torneioId, equipaId);
+            const equipa = await dbFunctions.getEquipaFullDetails(torneio.torneioId, equipaId, escalaoId);
 
             if(equipa){
                 const localidadesInfo = dbFunctions.getLocalidadesInfo();
                 const escaloesInfo = dbFunctions.getEscaloesInfo();
                 // Verifica se a equipa já está associada a jogos
-                const _numJogos = dbFunctions.getNumJogosEquipa(torneio.torneioId, equipaId);
+                const _numJogos = dbFunctions.getNumJogosEquipa(torneio.torneioId, escalaoId, equipaId);
 
                 const [localidades, escaloes, numJogos] = await Promise.all([localidadesInfo, escaloesInfo, _numJogos]);
                 const _equipa = [{
@@ -431,10 +436,19 @@ exports.searchEquipa = async (req, res, next) => {
 
                 util.sort(localidades);
 
+                let i = escaloes.map(escalao => escalao.escalaoId).indexOf(parseInt(escalaoId));
+                const filtro = {
+                    escalaoId: escalaoId,
+                    escalao: (i != -1) ? escaloes[i].designacao : '',
+                    sexo: (i != -1) ? (escaloes[i].sexo == 1) ? 'Masculino' : 'Feminino' : ''
+                }
+                
+
                 res.render("equipas/equipas", {
                     equipaId: equipaId,
                     equipas: _equipa,
                     torneio: torneio,
+                    filtro: filtro,
                     localidades: localidades,
                     escaloes: escaloes,
                     breadcrumbs: req.breadcrumbs()
@@ -454,8 +468,8 @@ exports.searchEquipa = async (req, res, next) => {
 // Filtrar Equipas
 exports.filtrarEquipas = async (req, res, next) => {
     try {
-        const localidadeId = req.params.localidadeId;
-        const escalaoId = req.params.escalaoId;
+        const localidadeId = parseInt(req.params.localidadeId);
+        const escalaoId = parseInt(req.params.escalaoId);
         const page = parseInt(req.params.page) || 1;
         const perPage = parseInt(req.params.perPage) || 15;
         const torneio = await dbFunctions.getTorneioInfo();
@@ -610,8 +624,7 @@ exports.listagemEquipas = async (req, res, next) => {
 
 // Faker
 exports.createEquipasAleatoriamente = async (req, res, next) => {
-    const num = req.params.num;
-    let count = 0;
+    const num = parseInt(req.params.num) || 0;
 
     const torneioInfo = dbFunctions.getTorneioInfo();
     const localidadesInfo = dbFunctions.getAllLocalidadesID();
@@ -620,25 +633,39 @@ exports.createEquipasAleatoriamente = async (req, res, next) => {
     await Promise.all([torneioInfo, localidadesInfo, escaloesInfo])
     .then(async ([torneio, localidades, escaloes]) => {
         
-        const listaLocalidades = localidades.map(localidade => localidade.localidadeId);
-        const listaEscaloes = escaloes.map(escalao => escalao.escalaoId);
+        const _listaLocalidades = localidades.map(localidade => localidade.localidadeId);
+        const _listaEscaloes = escaloes.map(escalao => escalao.escalaoId);
+        const listaEquipas = [];
 
-        let nextEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId) || 0;
+        let listaEscaloes = await dbFunctions.getLastEquipaIDTodosEscaloes(torneio.torneioId);
+
+        for(const escalao of _listaEscaloes){
+            const found = listaEscaloes.find(el => el.escalaoId == escalao);
+            if(!found){
+                listaEscaloes.push({
+                    escalaoId: escalao,
+                    lastId: 0
+                });
+            }
+        }
+
         for(let i = 0; i < num; i++){
-            nextEquipaID++;
-            await Equipas.create({
-                equipaId: nextEquipaID,
+            const _escalao = listaEscaloes[Math.floor(Math.random() * listaEscaloes.length)];
+            _escalao.lastId++;
+            const equipa = {
+                equipaId: _escalao.lastId,
                 torneioId: torneio.torneioId,
                 primeiroElemento: faker.name.firstName() + " " + faker.name.lastName(),
                 segundoElemento: faker.name.firstName() + " " + faker.name.lastName(),
-                localidadeId: listaLocalidades[Math.floor(Math.random() * listaLocalidades.length)],
-                escalaoId: listaEscaloes[Math.floor(Math.random() * listaEscaloes.length)]
-            }).then(equipa => {
-                count++;
-            });
-        }        
+                localidadeId: _listaLocalidades[Math.floor(Math.random() * _listaLocalidades.length)],
+                escalaoId: _escalao.escalaoId
+            }
+            listaEquipas.push(equipa);
+        }
+
+        await Equipas.bulkCreate(listaEquipas);     
     }).then(() => {
-        req.flash('success', `${count} equipas adicionadas com sucesso.`);
+        req.flash('success', `${num} equipas adicionadas com sucesso.`);
         res.redirect('/equipas');
     })
     .catch(err => {
@@ -650,8 +677,7 @@ exports.createEquipasAleatoriamente = async (req, res, next) => {
 
 exports.createEquipasAleatoriamentePorEscalao = async (req, res, next) => {
     const escalaoId = parseInt(req.params.escalao);
-    const num = req.params.num;
-    let count = 0;
+    const num = parseInt(req.params.num) || 0;
 
     const torneioInfo = dbFunctions.getTorneioInfo();
     const localidadesInfo = dbFunctions.getAllLocalidadesID();
@@ -659,24 +685,26 @@ exports.createEquipasAleatoriamentePorEscalao = async (req, res, next) => {
     await Promise.all([torneioInfo, localidadesInfo])
     .then(async ([torneio, localidades]) => {
         const listaLocalidades = localidades.map(localidade => localidade.localidadeId);
+        const listaEquipas = [];
 
-        let nextEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId) || 0;
+        let lastEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId) || 0;
         for(let i = 0; i < num; i++){
-            nextEquipaID++;
-            await Equipas.create({
-                equipaId: nextEquipaID,
+            lastEquipaID++;
+            const equipa = {
+                equipaId: lastEquipaID,
                 torneioId: torneio.torneioId,
                 primeiroElemento: faker.name.firstName() + " " + faker.name.lastName(),
                 segundoElemento: faker.name.firstName() + " " + faker.name.lastName(),
                 localidadeId: listaLocalidades[Math.floor(Math.random() * listaLocalidades.length)],
                 escalaoId: escalaoId
-            }).then(equipa => {
-                count++;
-            });
+            }
+            listaEquipas.push(equipa);
         }
+
+        await Equipas.bulkCreate(listaEquipas);
     })
     .then(() => {
-        req.flash('success', `${count} equipas adicionadas com sucesso.`);
+        req.flash('success', `${num} equipas adicionadas com sucesso.`);
         res.redirect('/equipas');
     })
     .catch(err => {

@@ -112,8 +112,12 @@ exports.getCampos = async (req, res, next) => {
             return res.status(200).json(response);
         }
     
-        let listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
-        listaCampos = listaCampos.map(_campo => _campo.campo);
+        const listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
+
+        if(fase == 100 && listaCampos.length == 2){
+            listaCampos[0].designacao = 'Final';
+            listaCampos[1].designacao = '3º e 4º Lugar';
+        }
     
         if(listaCampos.length > 0){
             response.success = true;
@@ -237,16 +241,16 @@ exports.getEquipasAgrupadasPorCampos = async (req, res, next) => {
         if(campo == 0){
             for(let i = 0; i < listaCampos.length; i++){
                 numCampos.push(JSON.parse(JSON.stringify(listaCampos[i])));
-                if(fase == 100){
-                    numCampos[i].designacao = (i == 0) ? 'Final' : '3º e 4º';
+                if(fase == 100 && listaCampos.length == 2){
+                    numCampos[i].designacao = (i == 0) ? 'Final' : '3º e 4º Lugar';
                 }
                 numCampos[i].listaEquipas = []
             }
         } else {
             numCampos.push({campo: campo});
-            if(fase == 100){
+            if(fase == 100 && listaCampos.length == 2){
                 const index = listaCampos.map(el => el.campo).indexOf(campo);
-                numCampos[0].designacao = (index == 0) ? 'Final' : '3º e 4º';
+                numCampos[0].designacao = (index == 0) ? 'Final' : '3º e 4º Lugar';
             }
             numCampos[0].listaEquipas = []
         }
@@ -302,20 +306,24 @@ exports.getFichasJogo = async (req, res, next) => {
             return res.status(200).json(response);
         }
 
+        const _listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
         // Todos os campos
         if(campo == 0){
-            listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
-            listaCampos = listaCampos.map(_campo => _campo.campo);
-            if(listaCampos.length > 0){
-                listaJogos = await dbFunctions.getAllJogosEscalaoFase(torneio.torneioId, escalaoId, fase);
-            } else {
-                response.errMsg = 'Não existem campos com jogos atribuídos.';
-                return res.status(200).json(response);
+            listaJogos = await dbFunctions.getAllJogosEscalaoFase(torneio.torneioId, escalaoId, fase);
+            for(let i = 0; i < _listaCampos.length; i++){
+                listaCampos.push(JSON.parse(JSON.stringify(_listaCampos[i])));
+                if(fase == 100 && _listaCampos.length == 2){
+                    listaCampos[i].designacao = (i == 0) ? 'Final' : '3º e 4º Lugar';
+                }
             }
         } else {
             // Foi indicado o número do campo
-            listaCampos.push(campo);
-            listaJogos = await dbFunctions.getAllJogosEscalaoFaseCampo(torneio.torneioId, escalaoId, fase, campo);   
+            listaCampos.push({campo: campo});
+            listaJogos = await dbFunctions.getAllJogosEscalaoFaseCampo(torneio.torneioId, escalaoId, fase, campo); 
+            if(fase == 100 && _listaCampos.length == 2){
+                const index = _listaCampos.map(el => el.campo).indexOf(campo);
+                listaCampos[0].designacao = (index == 0) ? 'Final' : '3º e 4º Lugar';
+            }  
         }
 
         if(listaJogos.length > 0){
@@ -328,16 +336,12 @@ exports.getFichasJogo = async (req, res, next) => {
             
             response.campos = [];
             listaCampos.forEach(campo => {
-                const _listaJogosCampo = listaJogos.filter(jogo => jogo.campo == campo);
-                const _campo = {
-                    campo: campo,
-                    listaJogos: _listaJogosCampo
-                }
-                response.campos.push(_campo);
+                const _listaJogosCampo = listaJogos.filter(jogo => jogo.campo == campo.campo);
+                campo.listaJogos = _listaJogosCampo;
+                response.campos.push(campo);
             });
             response.success = true;
 
-            console.log(response.campos);
         } else {
             response.errMsg = 'Não existem jogos para os campos selecionados.';
         }

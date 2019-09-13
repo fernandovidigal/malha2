@@ -400,6 +400,17 @@ exports.getLastEquipaID = (torneioId, escalaoId) => {
     });
 }
 
+exports.getLastEquipaIDTodosEscaloes = (torneioId) => {
+    return Equipas.findAll({
+        attributes: ['escalaoId', [sequelize.fn('max', sequelize.col('equipaId')), 'lastId']],
+        where: {
+            torneioId: torneioId
+        },
+        group: ['escalaoId'],
+        raw: true
+    });
+}
+
 exports.getNumEquipasPorEscalao = (torneio_id, escalaoId) => {
     return Equipas.count({
         col: 'equipaId',
@@ -647,10 +658,11 @@ exports.getAllCampos = (torneioId, escalaoId, fase) => {
     });
 }
 
-exports.getNumJogosEquipa = (torneioId, equipaId) => {
+exports.getNumJogosEquipa = (torneioId, escalaoId, equipaId) => {
     return Jogos.count({
         where: {
             torneioId: torneioId,
+            escalaoId: escalaoId,
             [Op.or]: [
                 {equipa1Id: equipaId},
                 {equipa2Id: equipaId}

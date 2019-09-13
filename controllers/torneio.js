@@ -127,6 +127,7 @@ exports.getStarting = async (req, res, next) => {
                     // Obtem a lista de campos para determinado escalão em determinada fase
                     // [1,2,3,4,5,6,7,8,9,...]
                     const listaCampos = await dbFunctions.getAllCampos(torneioId, _escalao.escalaoId, _escalao.fase);
+
                     _escalao.numCamposFase = listaCampos.length;
                     
                     // Para cada campo da lista de campos
@@ -359,27 +360,26 @@ exports.mostraResultados = async (req, res, next) => {
         if(campo == 0){
             for(let i = 0; i < listaCampos.length; i++){
                 campos.push(JSON.parse(JSON.stringify(listaCampos[i])));
-                if(fase == 100){
-                    campos[i].designacao = (i == 0) ? 'Final' : '3º e 4º';
-                    listaCampos[i].designacao = (i == 0) ? 'Final' : '3º e 4º';
+                if(fase == 100 && listaCampos.length == 2){
+                    campos[i].designacao = (i == 0) ? 'Final' : '3º e 4º Lugar';
+                    listaCampos[i].designacao = (i == 0) ? 'Final' : '3º e 4º Lugar';
                 }
             }
         } else {
             // Número do campo é passado como parametro
             campos.push({campo: campo});
             info.campo = campo;
-            if(fase == 100){
+            if(fase == 100 && listaCampos.length == 2){
                 const index = listaCampos.map(el => el.campo).indexOf(campo);
-                campos[0].designacao = (index == 0) ? 'Final' : '3º e 4º';
+                campos[0].designacao = (index == 0) ? 'Final' : '3º e 4º Lugar';
                 listaCampos[0].designacao = 'Final';
-                listaCampos[1].designacao = '3º e 4º';
+                listaCampos[1].designacao = '3º e 4º Lugar';
             }
         }
 
         listaCampos = await torneioHelpers.verificaCamposCompletos(listaCampos, torneio.torneioId, escalaoId, fase);
 
         // 3. Obter todos os jogos de cada campo
-        //for(let i = 0; i < campos.length; i++){
         for(const campo of campos){
             // Processa a lista de jogos que ainda falta jogar
             const _listaJogosPorJogar = dbFunctions.getAllGamesNotPlayed(torneio.torneioId, escalaoId, fase, campo.campo);
@@ -756,7 +756,7 @@ exports.fichasParciais = async (req, res, next) => {
         const torneioInfo = dbFunctions.getTorneioInfo();
         const escalaoInfo = dbFunctions.getEscalaoInfo(escalaoId);
         const [torneio, escalao] = await Promise.all([torneioInfo, escalaoInfo]);
-        let listaCampos = [];
+        const listaCampos = [];
         const query = {};
 
         const response = {
@@ -779,11 +779,21 @@ exports.fichasParciais = async (req, res, next) => {
             query.fase = fase
         }
 
+        const _listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
         if(campo == 0){
-            listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
+            for(let i = 0; i < _listaCampos.length; i++){
+                listaCampos.push(JSON.parse(JSON.stringify(_listaCampos[i])));
+                if(fase == 100 && _listaCampos.length == 2){
+                    listaCampos[i].designacao = (i == 0) ? 'Final' : '3º e 4º Lugar';
+                }
+            }
         } else {
             listaCampos.push({campo: campo});
             query.campo = campo;
+            if(fase == 100 && _listaCampos.length == 2){
+                const index = _listaCampos.map(el => el.campo).indexOf(campo);
+                listaCampos[0].designacao = (index == 0) ? 'Final' : '3º e 4º Lugar';
+            }
         }
 
         const listaJogos = await dbFunctions.getAllGames(query);

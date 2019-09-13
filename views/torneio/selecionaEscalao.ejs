@@ -75,7 +75,7 @@
                                         <div class="escalaoSelect__campos">
                                             <% escalao.campos.forEach((campo, index) => { %>
                                                 <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/<%= campo.campo %>" class="campo <%= campo.completo ? 'campo_completed' : '' %>">
-                                                    <%= (escalao.fase != 100) ? campo.campo : (index == 0) ? 'Final' : '3º e 4º' %>
+                                                    <%= (escalao.fase != 100) ? campo.campo : (index == 0) ? 'Final' : '3º e 4º Lugar' %>
                                                 </a>
                                             <% }); %>
                                         </div>
@@ -147,7 +147,7 @@
                                             <div class="escalaoSelect__campos">
                                                 <% escalao.campos.forEach((campo, index) => { %>
                                                     <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/<%= campo.campo %>" class="campo <%= campo.completo ? 'campo_completed' : '' %>">
-                                                        <%= (escalao.fase != 100) ? campo.campo : (index == 0) ? 'Final' : '3º e 4º' %>
+                                                        <%= (escalao.fase != 100) ? campo.campo : (index == 0) ? 'Final' : '3º e 4º Lugar' %>
                                                     </a>
                                                 <% }); %>
                                             </div>

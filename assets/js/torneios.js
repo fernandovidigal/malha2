@@ -11,7 +11,7 @@ deleteBtns.forEach(function(item, index){
 
         swal.fire({
             title: 'Tem a certeza?',
-            html: "O torneio <strong>" + designacao + " (" + localidade + ")</strong> será eliminado!",
+            html: "O torneio <strong>" + designacao + " (" + localidade + ")</strong> será eliminado!<br>Todas as Equipas, Jogos e Resultados serão eliminados!<br><p class='smallWarningText'>Esta acção não é reversível.</p>",
             type: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Sim, eliminar!',
@@ -37,9 +37,15 @@ deleteBtns.forEach(function(item, index){
                 .then(data => {
                     if(!data.success){
                         throw new Error("Não foi possível eliminar o torneio.");
+                    } else {
+                        Swal.fire({
+                            type: 'success',
+                            html: "O torneio <strong>" + designacao + " (" + localidade + ")</strong> foi eliminado com sucesso!",
+                            onClose: () => {
+                                location.reload();
+                            }
+                        });
                     }
-
-                    location.reload();
                 })
                 .catch(err => {
                     Swal.fire({
@@ -67,7 +73,7 @@ resetButtons.forEach(btn => {
 
         swal.fire({
             title: 'Tem a certeza?',
-            html: "A fase <strong>" + ((fase != 100) ? fase : 'Final' ) + "</strong> do escalão <strong>" + designacao + "</strong> será eliminada!<br><small>Esta acção é irreversível.</small>",
+            html: "A fase <strong>" + ((fase != 100) ? fase : 'Final' ) + "</strong> do escalão <strong>" + designacao + "</strong> será eliminada!<br><p class='smallWarningText'>Esta acção não é reversível.</p>",
             type: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Sim, eliminar!',

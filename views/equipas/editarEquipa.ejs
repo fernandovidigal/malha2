@@ -32,21 +32,21 @@
             <p>Masculino</p>
             <% escaloes.forEach(function(escalao){ %>
                 <% if(escalao.sexo == 1){ %>
-                    <input type="radio" name="escalao" required value="<%= escalao.escalaoId %>"  
+                    <label></label><input type="radio" name="escalao" required value="<%= escalao.escalaoId %>"  
                         <% if(equipa.escalaoId == escalao.escalaoId){ %>
                             checked
                         <% } %>
-                    ><%= escalao.designacao %>
+                    ><%= escalao.designacao %></label>
                 <% } %>
             <% }); %>
             <p>Feminino</p>
             <% escaloes.forEach(function(escalao){ %>
                 <% if(escalao.sexo == 0){ %>
-                    <input type="radio" name="escalao" required value="<%= escalao.escalaoId %>"  
+                    <label></label><input type="radio" name="escalao" required value="<%= escalao.escalaoId %>"  
                         <% if(equipa.escalaoId == escalao.escalaoId){ %>
                             checked
                         <% } %>
-                    ><%= escalao.designacao %>
+                    ><%= escalao.designacao %></label>
                 <% } %>
             <% }); %>
         <% } else { %>

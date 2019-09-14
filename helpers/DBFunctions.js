@@ -287,6 +287,15 @@ exports.getSimpleEquipa = (torneioId, equipaId, escalaoId, raw = true) => {
     });
 }
 
+exports.createEquipa = (equipa, equipaId) => {
+    return Equipas.findOrCreate({
+        where: equipa,
+        defaults: {
+            equipaId: equipaId
+        }
+    })
+}
+
 exports.getAllEquipas = (torneioId, escalaoId) => {
     return Equipas.findAll({
         include: {
@@ -720,7 +729,7 @@ exports.getEquipasPorJogo = (jogoId) => {
 
 exports.getAllEquipasComJogos = (torneioId) => {
     return Jogos.findAll({
-        attributes: ['equipa1Id', 'equipa2Id'],
+        attributes: ['escalaoId', 'equipa1Id', 'equipa2Id'],
         where: {
             torneioId: torneioId
         },

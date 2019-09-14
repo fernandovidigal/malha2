@@ -75,7 +75,7 @@
         <% }); %>
         <br>
 
-        <% if(loggedUser.level === 10){ %>
+        <% if(resetFase.length > 0 && loggedUser.level === 10){ %>
             <div class="torneioConfig_wrapper">
             <p>Remover das Fases</p>
             <% resetFase.forEach(escalao => { 

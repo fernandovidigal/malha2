@@ -175,14 +175,11 @@ exports.getEquipaToEdit = async (req, res, next) => {
         const escaloesInfo = dbFunctions.getEscaloesInfo();
 
         const [torneio, localidades, escaloes] = await Promise.all([torneioInfo, localidadesInfo, escaloesInfo]);
-
-        console.log(escalaoId);
         
         const equipa = await dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId, escalaoId);    
         if(equipa){
             // Verifica se a equipa já foi atribuida a algum jogo
             const numJogos = await dbFunctions.getNumJogosEquipa(torneio.torneioId, escalaoId, equipaId);
-            console.log(numJogos);
             equipa.escaloesEditaveis = (numJogos == 0) ? true : false;
 
             res.render('equipas/editarEquipa', {

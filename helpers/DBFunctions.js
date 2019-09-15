@@ -264,13 +264,14 @@ exports.deleteCampoInterditado = (campo) => {
 //                        EQUIPAS
 ////////////////////////////////////////////////////////
 
-exports.getEquipa = (torneioId, equipaId) => {
+exports.getEquipa = (torneioId, escalaoId, equipaId) => {
     return Equipas.findOne({
         include: {
             model: Localidades
         },
         where: {
             torneioId: torneioId,
+            escalaoId: escalaoId,
             equipaId: equipaId
         }
     });
@@ -816,6 +817,18 @@ exports.deleteFase = (torneioId, escalaoId, fase) => {
             escalaoId: escalaoId,
             fase: fase
         }
+    });
+}
+
+exports.getListaCamposActuais = (torneioId, escalaoId) => {
+    return Jogos.findAll({
+        attributes: ['campo'],
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId
+        },
+        group: ['campo'],
+        raw: true
     });
 }
 

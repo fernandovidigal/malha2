@@ -60,6 +60,11 @@ exports.getStarting = async (req, res, next) => {
                 const numEquipas = listaNumEquipasPorCadaEscalao.find(element => element.escalaoId == escalao.escalaoId);
                 escalao.numEquipas = numEquipas.numEquipas;
 
+                if(escalao.campos * 3 > escalao.numEquipas){
+                    existemNumCamposNaoDefinidos = true;
+                    escalao.excessoCampos = true;
+                }
+
                 // Calcula o número de campos mínimo para o número de equipas
                 const numCamposMaximo = Math.floor(escalao.numEquipas / 3);;
                 for(let i = 0; i < listaDeCamposPotenciaDeDois.length; i++){
@@ -325,7 +330,7 @@ exports.distribuirEquipasPorEscalao = async (req, res, next) => {
 // Resultados
 exports.mostraResultados = async (req, res, next) => {
     try{
-        const escalaoId = req.params.escalao;
+        const escalaoId = parseInt(req.params.escalao);
         const fase = parseInt(req.params.fase);
         const campo = parseInt(req.params.campo);
 
@@ -387,8 +392,8 @@ exports.mostraResultados = async (req, res, next) => {
             const _listaJogosFinalizados = dbFunctions.getAllGamesPlayed(torneio.torneioId, escalaoId, fase, campo.campo);
 
             const [listaJogosPorJogar, listaJogosFinalizados] = await Promise.all([_listaJogosPorJogar, _listaJogosFinalizados]);
-            campo.jogos = await torneioHelpers.processaEquipas(torneio.torneioId, listaJogosPorJogar);
-            campo.jogosFinalizados = await torneioHelpers.processaEquipas(torneio.torneioId, listaJogosFinalizados);
+            campo.jogos = await torneioHelpers.processaEquipas(torneio.torneioId, escalaoId, listaJogosPorJogar);
+            campo.jogosFinalizados = await torneioHelpers.processaEquipas(torneio.torneioId, escalaoId, listaJogosFinalizados);
 
             // Obter parciais dos jogos já finalizados
             for(const jogo of campo.jogosFinalizados){
@@ -546,10 +551,22 @@ exports.interditarCampos = async (req, res, next) => {
         const _escalaoInfo = dbFunctions.getEscalaoInfo(escalaoId);
         const _numCampos = dbFunctions.getNumeroCamposPorEscalao(torneio.torneioId, escalaoId);
         const _listaCamposInterditos = dbFunctions.getCamposInterditados(torneio.torneioId, escalaoId);
-        const [{numCampos}, listaCamposInterditos, escalaoInfo] = await Promise.all([_numCampos, _listaCamposInterditos, _escalaoInfo]);
-        
-        const listaCampos = [];
+        const _listaCamposActual = dbFunctions.getListaCamposActuais(torneio.torneioId, escalaoId);
+        const [{numCampos}, listaCamposInterditos, escalaoInfo, listaCamposActual] = await Promise.all([_numCampos, _listaCamposInterditos, _escalaoInfo, _listaCamposActual]);
+
+        listaTotalCampos = new Set();
         for(let i = 1; i <= numCampos; i++){
+            listaTotalCampos.add(i);
+        }
+        for(let i = 0; i < listaCamposInterditos.length; i++){
+            listaTotalCampos.add(listaCamposInterditos[i].campo);
+        }
+        for(let i = 0; i < listaCamposActual.length; i++){
+            listaTotalCampos.add(listaCamposActual[i].campo);
+        }
+              
+        const listaCampos = [];
+        for(let i = 1; i <= listaTotalCampos.size; i++){
             const interdito = listaCamposInterditos.find(el => el.campo == i);
             const campo = {
                 campo: i,
@@ -732,9 +749,9 @@ exports.getEscalaoInfo = async (req, res, next) => {
 }
 
 exports.setNumeroCamposAPI = (req, res, next) => {
-    const torneioId = req.body.torneioId;
-    const escalaoId = req.body.escalaoId;
-    const numCampos = req.body.numCampos;
+    const torneioId = parseInt(req.body.torneioId);
+    const escalaoId = parseInt(req.body.escalaoId);
+    const numCampos = parseInt(req.body.numCampos);
 
     dbFunctions.updateNumCampos(torneioId, escalaoId, numCampos)
     .then(() => {

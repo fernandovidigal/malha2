@@ -181,8 +181,6 @@ exports.distribuiEquipasPorCampos = async function(torneioId, escalao = 0){
 
             // Define o número de campos, min e max de equipas por campo
             const numCampos = (camposInfo !== null) ? camposInfo.numCampos : 0;
-            //const minEquipas = (camposInfo !== null) ? camposInfo.minEquipas : 0;
-            //const maxEquipas = (camposInfo !== null) ? camposInfo.maxEquipas : 0;
 
             //Baralha as localidades para não haver sempre a mesma ordenação das equipas
             listaLocalidades = shuffleLocalidades(listaLocalidades);
@@ -266,7 +264,7 @@ exports.distribuiEquipasPorCampos = async function(torneioId, escalao = 0){
     return escaloesDistribuidos;
 }
 
-exports.processaEquipas = async function(torneioId, listaJogos){ 
+exports.processaEquipas = async function(torneioId, escalaoId, listaJogos){ 
     try{
         const jogos = [];
         for(const jogo of listaJogos){
@@ -274,8 +272,8 @@ exports.processaEquipas = async function(torneioId, listaJogos){
             const equipa1Id = jogo.equipa1Id;
             const equipa2Id = jogo.equipa2Id;
 
-            const _equipa1Info = await dbFunctions.getEquipa(torneioId, equipa1Id);
-            const _equipa2Info = await dbFunctions.getEquipa(torneioId, equipa2Id);
+            const _equipa1Info = await dbFunctions.getEquipa(torneioId, escalaoId, equipa1Id);
+            const _equipa2Info = await dbFunctions.getEquipa(torneioId, escalaoId, equipa2Id);
 
             const [equipa1Info, equipa2Info] = await Promise.all([_equipa1Info, _equipa2Info]);
             const equipas = {

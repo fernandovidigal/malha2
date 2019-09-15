@@ -1142,10 +1142,6 @@ animation-delay: -0.16s;
     transition: all .2s;
 }
 
-.escalaoNumCamposMaxRecomendado + label{
-    border: solid 2px #6174cf;
-}
-
 .escalaoNumCampos{
     position: absolute;
     opacity: 0;
@@ -1159,6 +1155,15 @@ animation-delay: -0.16s;
     box-shadow: 0 2px 16px rgba(69, 92, 199, .2);
 }
 
+.escalaoNumCamposMaxRecomendado + label{
+    background-color: #e1e5fb;
+    border: solid 2px #6174cf;
+}
+
+.escalaoNumCamposMaxRecomendado + label:hover {
+    border: solid 2px #6174cf;
+}
+
 .escalaoNumCampos:checked + label {
     color: #2c3641;
     background-color: #ffffff;
@@ -1169,6 +1174,11 @@ animation-delay: -0.16s;
 .campoInterdito:checked + label {
     background-color: #a94442;
     color: white;
+}
+
+.escalaoExcessoCampos:checked + label {
+    background-color: #f7d1d0;
+    border: solid 2px #a94442;
 }
 
 .pagination__wrapper {

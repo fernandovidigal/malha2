@@ -383,6 +383,15 @@ async function imprimeFichaParciais(escalao, fase, campo){
             });
             
             data.listaCampos.forEach((campo, index) => {
+                if(index > 0 && campo.listaJogos.length > 7){
+                    docDefinition.content.push({
+                        text: "PageBreak",
+                        fontSize: 0,
+                        color: "#ffffff",
+                        margin: [0, 0, 0, 0],
+                        pageBreak: "before"
+                      });
+                }
                 makeFolhaParciais(docDefinition, fase, campo, data.listaEquipas, data.listaParciais);
             });
             makeFooter(docDefinition, `Resultados dos parciais - ${(fase != 100) ? fase + 'ª Fase' : 'Fase Final'}`);
@@ -395,6 +404,7 @@ async function imprimeFichaParciais(escalao, fase, campo){
             });
         }
     } catch(err){
+        console.log(err);
         Swal.fire({
             type: 'error',
             title: 'Oops...',

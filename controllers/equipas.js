@@ -182,9 +182,13 @@ exports.getEquipaToEdit = async (req, res, next) => {
             const numJogos = await dbFunctions.getNumJogosEquipa(torneio.torneioId, escalaoId, equipaId);
             equipa.escaloesEditaveis = (numJogos == 0) ? true : false;
 
+            // Exclui da lista de esclões os escalões que já tenham jogos distribuídos
+            // Se já existe jogos distribuídos não é possível adicionar mais equipas
+            const listaEscaloes = await processaListaEscaloes(escaloes, torneio.torneioId);
+
             res.render('equipas/editarEquipa', {
                 localidades: localidades,
-                escaloes: escaloes,
+                escaloes: listaEscaloes,
                 equipa: equipa,
                 breadcrumbs: req.breadcrumbs()
             });
@@ -341,8 +345,8 @@ exports.updateEquipa = async (req, res, next) => {
     const equipaId = req.params.id;
     const primeiroElemento = req.body.primeiro_elemento.trim();
     const segundoElemento = req.body.segundo_elemento.trim();
-    const localidadeId = req.body.localidade;
-    const escalaoId = req.body.escalao;
+    const localidadeId = parseInt(req.body.localidade);
+    const escalaoId = parseInt(req.body.escalao);
     const errors = validationResult(req);
     req.breadcrumbs('Editar Equipa', '/equipas/editarEquipa');
     
@@ -360,7 +364,7 @@ exports.updateEquipa = async (req, res, next) => {
 
         try {
             const torneio = await dbFunctions.getTorneioInfo();
-            const equipa = await dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId, false);
+            const equipa = await dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId, escalaoId, false);
 
             if(equipa){
                 equipa.primeiroElemento = primeiroElemento;

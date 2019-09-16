@@ -60,7 +60,7 @@ router.post('/', (req,res,next) => {
     passport.authenticate('local', {
         successRedirect: '/',
         failureRedirect: '/login',
-        failureFlash: "Username ou password inválidos"
+        failureFlash: "Dados de login inválidos"
     })(req, res, next);
 });
 

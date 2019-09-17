@@ -210,7 +210,6 @@ exports.distribuiEquipasPorCampos = async function(torneioId, escalao = 0){
 
                 if(numEquipasPorLocalidade > 0){
                     const listaEquipasPorLocalidade = await dbFunctions.getEquipasIDByLocalidadeAndEscalao(torneioId, localidade.localidadeId, escalaoId);
-
                     // Adiciona a equipa à lista de campos
                     for(const equipa of listaEquipasPorLocalidade){
                         if(k >= numCampos){
@@ -235,8 +234,8 @@ exports.distribuiEquipasPorCampos = async function(torneioId, escalao = 0){
                 }
             }
 
+            const transaction = await sequelize.transaction();
             try {
-                const transaction = await sequelize.transaction();
                 // Regista os Jogos na Base de dados
                 await Promise.all(listaJogos, { transaction });
                 await transaction.commit();
@@ -371,6 +370,7 @@ exports.processaPontuacao = function(data){
 }
 
 exports.ordenaClassificacao = function(classificacao, listaJogos){
+    console.log(listaJogos);
     classificacao.sort((a, b) => {
         // Diferença de Pontos
         if(a.pontos > b.pontos){

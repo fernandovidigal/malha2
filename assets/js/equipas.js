@@ -101,7 +101,7 @@ async function imprimeListaEquipas(localidade, escalao){
 }
 
 // Delete Buttons
-const deleteBtns = document.querySelectorAll('.delete_btn');
+const deleteBtns = document.querySelectorAll('.btn-delete');
 deleteBtns.forEach(function(item, index){
     item.addEventListener('click', async function(e){
         e.preventDefault();
@@ -123,7 +123,7 @@ deleteBtns.forEach(function(item, index){
 });
 
 // Print Button
-const printBtn = document.querySelector('.print_btn');
+const printBtn = document.querySelector('.btn-print');
 printBtn.addEventListener('click', function(e){
     e.preventDefault();
     const path = window.location.pathname;
@@ -138,8 +138,29 @@ printBtn.addEventListener('click', function(e){
 });
 
 //Mudança da selecção de resultados por página
-const perPage = document.querySelector('.perPage');
+/*const perPage = document.querySelector('.perPage');
 perPage.addEventListener('change', function(e){
     window.location = this.options[this.selectedIndex].value;
     return false;
+});*/
+
+function closeAllCheckboxes(selectBoxesDropList){
+    for(let i = 0; i < selectBoxesDropList.length; i++){
+        selectBoxesDropList[i].classList.remove("customSelect__list-open");
+    }
+}
+
+// CHECKBOXES
+const selectBoxes = document.querySelectorAll('.customSelect__header');
+const selectBoxesDropList = document.querySelectorAll('.customSelect__list');
+selectBoxes.forEach((selectBox, index) => {
+    selectBox.addEventListener('click', function(e){
+        e.stopPropagation();
+        closeAllCheckboxes(selectBoxesDropList);
+        selectBoxesDropList[index].classList.toggle('customSelect__list-open');
+    });
+});
+
+document.addEventListener('click', function(){
+    closeAllCheckboxes(selectBoxesDropList);
 });

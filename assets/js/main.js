@@ -41,12 +41,14 @@ const eyeSlash = '<svg xmlns="http://www.w3.org/2000/svg" width="23.268" height=
 const passwordField = document.querySelector('.passwordField');
 const passwordIconContainer = document.querySelector('.showPassword__icon');
 
-passwordIconContainer.addEventListener('click', function(){
-	if(passwordField.type === 'password'){
-		passwordField.type = 'text';
-		passwordIconContainer.innerHTML = eyeSlash;
-	} else {
-		passwordField.type = 'password';
-		passwordIconContainer.innerHTML = eye;
-	}
-});
+if(passwordIconContainer){
+	passwordIconContainer.addEventListener('click', function(){
+		if(passwordField.type === 'password'){
+			passwordField.type = 'text';
+			passwordIconContainer.innerHTML = eyeSlash;
+		} else {
+			passwordField.type = 'password';
+			passwordIconContainer.innerHTML = eye;
+		}
+	});
+}

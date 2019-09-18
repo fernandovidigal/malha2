@@ -6,33 +6,65 @@
             <h1><%= torneio.designacao %></h1>
             <h3><%= torneio.localidade %>, <%= torneio.ano %></h3>
         </div>
-        <div class="barraTorneio__buttons">
-            <a href="/equipas/adicionarEquipa" class="btn btn-primary">Adicionar Equipa</a>
-            <button class="btn btn-print"><i class="fas fa-print"></i></button>
-        </div>
+        <% if(escaloes.length > 0 && localidades.length > 0){ %>
+            <div class="barraTorneio__buttons">
+                <a href="/equipas/adicionarEquipa" class="btn btn-primary">Adicionar Equipa</a>
+                <button class="btn btn-print"><i class="fas fa-print"></i></button>
+            </div>
+        <% } %>
     </div>
 
     <%- include('../includes/breadcrumbs.ejs') %>
 
     <% if(escaloes == null || escaloes.length == 0){ %>
-        <div class="xpto">
-            <div class="messages">
-                <p>Não existem escalões registados. Deve adicionar escalões para poder adicionar equipas.</p>
-                <a href="/admin/escaloes" class="btn btn-secondary msg_link">Adicionar escalões</a>
+        <div class="equipasWarning__wrapper">
+            <div class="equipasWarning">
+                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="layer-group" class="equipasWarning__icon svg-inline--fa fa-layer-group fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M12.41 148.02l232.94 105.67c6.8 3.09 14.49 3.09 21.29 0l232.94-105.67c16.55-7.51 16.55-32.52 0-40.03L266.65 2.31a25.607 25.607 0 0 0-21.29 0L12.41 107.98c-16.55 7.51-16.55 32.53 0 40.04zm487.18 88.28l-58.09-26.33-161.64 73.27c-7.56 3.43-15.59 5.17-23.86 5.17s-16.29-1.74-23.86-5.17L70.51 209.97l-58.1 26.33c-16.55 7.5-16.55 32.5 0 40l232.94 105.59c6.8 3.08 14.49 3.08 21.29 0L499.59 276.3c16.55-7.5 16.55-32.5 0-40zm0 127.8l-57.87-26.23-161.86 73.37c-7.56 3.43-15.59 5.17-23.86 5.17s-16.29-1.74-23.86-5.17L70.29 337.87 12.41 364.1c-16.55 7.5-16.55 32.5 0 40l232.94 105.59c6.8 3.08 14.49 3.08 21.29 0L499.59 404.1c16.55-7.5 16.55-32.5 0-40z"></path></svg>
+                <div class="equipasWarning__text-wrapper">
+                    <h2 class="equipasWarning__text">Não existem escalões registados.</h2>
+                    <p class="equipasWarning__subText">Deve adicionar escalões para poder adicionar equipas.</p>
+                </div>
+                <a href="/admin/escaloes" class="btn btn-secondary">Adicionar Escalões</a>
             </div>
         </div>
     <% } else if(localidades == null || localidades.length == 0){ %>
-        <div class="messages">
-            Não existem localidades registadas. Deve adicionar localidades para poder adicionar equipas.<br><a href="/admin/localidades" class="btn primary_btn msg_link">Adicionar localidades</a>
+        <div class="equipasWarning__wrapper">
+            <div class="equipasWarning">
+                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="map-marked-alt" class="equipasWarning__icon svg-inline--fa fa-map-marked-alt fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M288 0c-69.59 0-126 56.41-126 126 0 56.26 82.35 158.8 113.9 196.02 6.39 7.54 17.82 7.54 24.2 0C331.65 284.8 414 182.26 414 126 414 56.41 357.59 0 288 0zm0 168c-23.2 0-42-18.8-42-42s18.8-42 42-42 42 18.8 42 42-18.8 42-42 42zM20.12 215.95A32.006 32.006 0 0 0 0 245.66v250.32c0 11.32 11.43 19.06 21.94 14.86L160 448V214.92c-8.84-15.98-16.07-31.54-21.25-46.42L20.12 215.95zM288 359.67c-14.07 0-27.38-6.18-36.51-16.96-19.66-23.2-40.57-49.62-59.49-76.72v182l192 64V266c-18.92 27.09-39.82 53.52-59.49 76.72-9.13 10.77-22.44 16.95-36.51 16.95zm266.06-198.51L416 224v288l139.88-55.95A31.996 31.996 0 0 0 576 426.34V176.02c0-11.32-11.43-19.06-21.94-14.86z"></path></svg>
+                <div class="equipasWarning__text-wrapper">
+                    <h2 class="equipasWarning__text">Não existem localidades registadas.</h2>
+                    <p class="equipasWarning__subText">Deve adicionar localidades para poder adicionar equipas.</p>
+                </div>
+                <a href="/admin/localidades" class="btn btn-secondary">Adicionar localidades</a>
+            </div>
         </div>
     <% } else { %>
+
+    <div class="container_wrapper">
+        <div class="actionBar__wrapper">
+            <p class="actionBar__title">Equipas</p>
+            <div class="actionBar__buttons">
+                <div class="customSelect">
+                    <div class="customSelect__header">
+                        Localidades
+                    </div>
+                    <div class="customSelect__list">
+                        <a href="" class="customSelect__links">Borba</a>
+                        <a href="" class="customSelect__links">Évora</a>
+                        <a href="" class="customSelect__links">Montemor-o-Novo</a>
+                        <a href="" class="customSelect__links">Vendas-Novas</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="table_sidebar__wrapper">
         <div class="table__content">
             <div class="buttons_bar">
                 <div class="search_bar">
 
-                    <div class="localidadesSearchWrapper">
+                    <!--<div class="localidadesSearchWrapper">
                         <ul>
                             <li class="topDropMenu">
                                 <% if(typeof filtro != 'undefined'){ %>
@@ -132,7 +164,7 @@
                                 </div>
                             </li>
                         </ul>
-                    </div>
+                    </div>-->
                     <% if(typeof filtro != 'undefined' && typeof filtro.escalaoId != 'undefined'){ %>
                         <% if(typeof equipaId != 'undefined'){ %>
                             <div class="search_equipaID">

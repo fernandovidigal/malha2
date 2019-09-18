@@ -60,7 +60,7 @@ li {
     border-radius: 100px;
     color: white;
     font-size: 16px;
-    line-height: 2;
+    line-height: 2.3;
     cursor: pointer;
     box-shadow: none;
     transition: all .2s;
@@ -83,7 +83,7 @@ li {
 }
 
 .btn-print {
-    background-color: #FFBB00;
+    background-color: #f0ad4e;
     padding: 0 10px;
 }
 
@@ -377,7 +377,7 @@ li {
     top: -300%;
     left: 100%;
     background-color: #F2F2F2;
-    border-radius: 8px;
+    border-radius: 4px;
     box-shadow: 0 3px 18px rgba(0, 0, 0, 0.25);
     overflow: hidden;
     border: solid 1px #e4e4e4;
@@ -418,8 +418,10 @@ li {
 
 .content__wrapper {
     width: 100%;
-    margin-left: 17%;
     min-height: 100vh;
+    margin-left: 17%;
+    display: flex;
+    flex-direction: column;
 }
 
 /************************************
@@ -493,18 +495,89 @@ li {
     margin: 0;
 }
 
+/************************************
+    EQUIPAS
+************************************/
 
-
-
-.xpto {
+.equipasWarning__wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100%;
 }
 
-.messages {
+.equipasWarning {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-around;
+    height: 65%;
+    margin-top: -50px;
+}
+
+.equipasWarning__icon {
+    width: 200px;
+    color: #f1f1f1;
+}
+
+.equipasWarning__text-wrapper {
+    text-align: center;
+}
+
+.equipasWarning__subText {
+    color: #333F4D;
+}
+
+.actionBar__wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+.customSelect {
+    width: 200px;
+    position: relative;
+    margin-right: 50px;
+}
+
+.customSelect__header {
+    border: solid 2px #E5E5E7;
+    padding: 6px 20px;
+    border-radius: 20px;
+    color: #576575;
+}
+
+.customSelect__header::after {
+    position: absolute;
+    content: "";
+    top: 14px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 8px 5px 0 5px;
+    border-color: #576575 transparent transparent transparent;
+}
+
+.customSelect__list {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #F1F5F8;
+    z-index: 100;
+    box-shadow: 0 3px 16px rgba(0, 0, 0, 0.1);
+}
+
+.customSelect__links {
+    display: block;
+    text-decoration: none;
+    line-height: 2.5;
+    padding: 0 20px;
+    color: #4A4949;
+}
+
+.customSelect__links:hover {
+    background-color: #333F4D;
+    color: white;
 }

@@ -4,7 +4,7 @@
 
 <% if(typeof equipa !== 'undefined'){ %>
 
-<form action="/equipas/editarEquipa/<%= equipa.equipaId %>?_method=PUT" method="post">
+<form action="/equipas/editarEquipa/<%= equipa.oldEscalaoId %>/<%= equipa.equipaId %>?_method=PUT" method="post">
     <p>Equipa: <%= equipa.equipaId %></p>
     <label for="primeiro_elemento">Nome do Primeiro Elemento</label>
     <input type="text" name="primeiro_elemento" pattern="^[^0-9]+$" required value="<%= equipa.primeiroElemento %>"><br>

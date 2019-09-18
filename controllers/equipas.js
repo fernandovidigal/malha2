@@ -175,13 +175,17 @@ exports.getEquipaToEdit = async (req, res, next) => {
         const escaloesInfo = dbFunctions.getEscaloesInfo();
 
         const [torneio, localidades, escaloes] = await Promise.all([torneioInfo, localidadesInfo, escaloesInfo]);
-        
+
         const equipa = await dbFunctions.getEquipaFullDetails(torneio.torneioId, equipaId, escalaoId);    
         if(equipa){
             // Verifica se a equipa já foi atribuida a algum jogo
             const numJogos = await dbFunctions.getNumJogosEquipa(torneio.torneioId, escalaoId, equipaId);
             equipa.escaloesEditaveis = (numJogos == 0) ? true : false;
 
+            // Para ser possível mudar de escalão
+            equipa.oldEscalaoId = escalaoId;
+
+            util.sort(localidades);
             // Exclui da lista de esclões os escalões que já tenham jogos distribuídos
             // Se já existe jogos distribuídos não é possível adicionar mais equipas
             const listaEscaloesDisponiveis = await processaListaEscaloes(escaloes, torneio.torneioId);
@@ -342,10 +346,11 @@ exports.createEquipa = async (req, res, next) => {
 }
 
 exports.updateEquipa = async (req, res, next) => {
-    const equipaId = req.params.id;
+    const equipaId = parseInt(req.params.id);
     const primeiroElemento = req.body.primeiro_elemento.trim();
     const segundoElemento = req.body.segundo_elemento.trim();
     const localidadeId = parseInt(req.body.localidade);
+    const oldEscalaoId = parseInt(req.params.escalao);
     const escalaoId = parseInt(req.body.escalao);
     const errors = validationResult(req);
     req.breadcrumbs('Editar Equipa', '/equipas/editarEquipa');
@@ -355,7 +360,8 @@ exports.updateEquipa = async (req, res, next) => {
         primeiroElemento: primeiroElemento,
         segundoElemento: segundoElemento,
         localidadeId: localidadeId,
-        escalaoId: escalaoId
+        escalaoId: escalaoId,
+        oldEscalaoId: oldEscalaoId
     }
 
     if(!errors.isEmpty()){
@@ -364,13 +370,19 @@ exports.updateEquipa = async (req, res, next) => {
 
         try {
             const torneio = await dbFunctions.getTorneioInfo();
-            const equipa = await dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId, escalaoId, false);
+            const equipa = await dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId, oldEscalaoId, false);
 
             if(equipa){
+                if(escalaoId != oldEscalaoId){
+                    const lastId = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId);
+                    equipa.equipaId = lastId + 1;
+                }
+
                 equipa.primeiroElemento = primeiroElemento;
                 equipa.segundoElemento = segundoElemento;
                 equipa.localidadeId = localidadeId;
                 equipa.escalaoId = escalaoId;
+
                 equipa.save()
                 .then(result => {
                     if(result){

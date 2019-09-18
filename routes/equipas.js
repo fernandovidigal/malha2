@@ -23,7 +23,7 @@ router.post('/adicionarEquipa', [
 
 router.get('/editarEquipa/:escalao/:id', EquipasController.getEquipaToEdit);
 
-router.put('/editarEquipa/:id', [
+router.put('/editarEquipa/:escalao/:id', [
     check('primeiro_elemento').trim().escape().not().isEmpty().withMessage('Deve indicar o nome do primeiro elemento da equipa.'),
     check('primeiro_elemento').trim().escape().matches(/^[^0-9]+$/).withMessage('Nome do primeiro elemento inválido.'),
     check('segundo_elemento').trim().escape().not().isEmpty().withMessage('Deve indicar o nome do segundo elemento da equipa.'),

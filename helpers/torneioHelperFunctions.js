@@ -235,8 +235,9 @@ exports.distribuiEquipasPorCampos = async function(torneioId, escalao = 0){
                 }
             }
 
+            let transaction;
             try {
-                const transaction = await sequelize.transaction();
+                transaction = await sequelize.transaction();
                 // Regista os Jogos na Base de dados
                 await Promise.all(listaJogos, { transaction });
                 await transaction.commit();

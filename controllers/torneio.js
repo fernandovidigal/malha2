@@ -165,7 +165,7 @@ exports.getStarting = async (req, res, next) => {
 
                     // Verifica se já existe vencedor
                     if(_escalao.fase == 100 && _escalao.todosCamposCompletos){
-                        const vencedor = await torneioHelpers.processaClassificacao(torneioId, _escalao.escalaoId, _escalao.fase, 1);
+                        const vencedor = await torneioHelpers.processaClassificacao(torneioId, _escalao.escalaoId, _escalao.fase, listaCampos[0].num);
                         _escalao.existeVencedor = true;
                         _escalao.equipaVencedora = vencedor[0].classificacao[0];
                     }

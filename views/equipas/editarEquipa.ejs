@@ -53,8 +53,7 @@
             Não existem escalões registadas.
         <% } %>
     <% } else { %>
-        <% const index = escaloes.map(escalao => escalao.escalaoId).indexOf(equipa.escalaoId); %>
-        <p>Escalão: <%= escaloes[index].designacao %> (<%= (escaloes[index].sexo == 1) ? 'Masculino' : 'Feminino' %>)</p>
+        <p>Escalão: <%= equipa.escalao.designacao %> (<%= (equipa.escalao.sexo == 1) ? 'Masculino' : 'Feminino' %>)</p>
         <input type="hidden" name="escalao" value="<%= equipa.escalaoId %>">
     <% } %>
 

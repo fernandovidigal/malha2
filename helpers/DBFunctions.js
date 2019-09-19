@@ -294,7 +294,7 @@ exports.createEquipa = (equipa, equipaId) => {
         defaults: {
             equipaId: equipaId
         }
-    })
+    });
 }
 
 exports.getAllEquipas = (torneioId, escalaoId) => {

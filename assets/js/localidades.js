@@ -10,7 +10,7 @@ deleteBtns.forEach(function(item, index){
 
         swal.fire({
             title: 'Tem a certeza?',
-            html: "O localidade <strong>" + localidade + "</strong> será eliminada!",
+            html: "A localidade <strong>" + localidade + "</strong> será eliminada!",
             type: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Sim, eliminar!',

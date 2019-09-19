@@ -1,6 +1,7 @@
 
 const Equipas = require('../models/Equipas');
 const dbFunctions = require('../helpers/DBFunctions');
+const sequelize = require('../helpers/database');
 const { validationResult } = require('express-validator/check');
 const util = require('../helpers/util');
 
@@ -370,34 +371,59 @@ exports.updateEquipa = async (req, res, next) => {
 
         try {
             const torneio = await dbFunctions.getTorneioInfo();
-            const equipa = await dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId, oldEscalaoId, false);
+            let equipa = await dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId, oldEscalaoId, false);
 
             if(equipa){
+                let updateResult = false;
+
                 if(escalaoId != oldEscalaoId){
-                    const lastId = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId);
-                    equipa.equipaId = lastId + 1;
+                    const lastId = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId) || 0;
+
+                    const _equipa = {
+                        equipaId: lastId+1,
+                        torneioId: torneio.torneioId,
+                        primeiroElemento: primeiroElemento,
+                        segundoElemento: segundoElemento,
+                        localidadeId: localidadeId,
+                        escalaoId: escalaoId
+                    }
+
+                    let transaction;
+                    try{
+                        transaction = await sequelize.transaction();
+
+                        await equipa.destroy({transaction});
+                        [equipa, updateResult] = await Equipas.findOrCreate({
+                            where: _equipa,
+                            transaction
+                        });
+
+                        if(updateResult) {
+                            await transaction.commit();
+                        } else {
+                            throw "Não foi possível actualizar a equipa";
+                        }
+                    } catch(err){
+                        if(transaction) await transaction.rollback();
+                        throw err;
+                    }
+                    
+                } else {
+                    equipa.primeiroElemento = primeiroElemento;
+                    equipa.segundoElemento = segundoElemento;
+                    equipa.localidadeId = localidadeId;
+                    equipa.escalaoId = escalaoId;
+
+                    updateResult = await equipa.save();
                 }
 
-                equipa.primeiroElemento = primeiroElemento;
-                equipa.segundoElemento = segundoElemento;
-                equipa.localidadeId = localidadeId;
-                equipa.escalaoId = escalaoId;
-
-                equipa.save()
-                .then(result => {
-                    if(result){
-                        req.flash('success', 'Equipa actualizada com sucesso.')
-                        res.redirect('/equipas');
-                    } else {
-                        req.flash('error', 'Não foi possível actualizar a equipa.')
-                        res.redirect('/equipas');
-                    }
-                })
-                .catch(err => {
-                    console.log(err);
+                if(updateResult){
+                    req.flash('success', 'Equipa actualizada com sucesso.')
+                    res.redirect('/equipas');
+                } else {
                     req.flash('error', 'Não foi possível actualizar a equipa.')
                     res.redirect('/equipas');
-                });
+                }
             } else {
                 req.flash('error', 'Equipa não existe.')
                 res.redirect('/equipas');

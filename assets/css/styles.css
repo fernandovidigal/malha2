@@ -618,9 +618,9 @@ li {
 
 .perPageSelect__list {
     width: 100%;
-    display: block;
+    display: none;
     position: absolute;
-    top: -360%;
+    top: -655%;
     background-color: white;
     border: solid 2px #E5E5E7;
     border-radius: 8px;
@@ -632,7 +632,8 @@ li {
 }
 
 .customSelect__links,
-.customSelect__groupTitle {
+.customSelect__groupTitle,
+.perPageSelect__link {
     display: block;
     text-decoration: none;
     padding: 10.5px 20px;
@@ -640,8 +641,8 @@ li {
 }
 
 .perPageSelect__link {
-    display: block;
     text-align: center;
+    padding: 8px 0; 
 }
 
 .customSelect__groupTitle {
@@ -649,12 +650,15 @@ li {
     border-bottom: solid 1px #f1f1f1;
 }
 
-.customSelect__links:not(:last-child){
+.customSelect__links:not(:last-child),
+.perPageSelect__link:not(:last-child) {
     border-bottom: solid 1px #f1f1f1;
 }
 
 .customSelect__links:hover,
-.customSelect__links-selected {
+.customSelect__links-selected,
+.perPageSelect__link:hover,
+.perPageSelect__link-selected {
     background-color: #333F4D;
     color: white;
 }
@@ -738,11 +742,11 @@ li {
 } 
 
 .customTable tbody tr:nth-child(odd) {
-    background-color: #F6F5FA;
+    background-color: #f8f9ff;
 }
 
 .customTable tbody tr td {
-    padding: 18px 0;
+    padding: 14px 0;
 }
 
 .escalao__column {
@@ -755,4 +759,20 @@ li {
 
 .deleteBtn__column {
     width: 80px;
+}
+
+.paginacao__item {
+    padding: 6px 12px;
+    min-width: 20px;
+    background-color: #f8f9ff;
+    border: solid 1px #eaebf1;
+    border-radius: 8px;
+    text-align: center;
+    color: #333333;
+    text-decoration: none;
+}
+
+.paginacao__item:hover,
+.paginacao__selected {
+    background-color: #ffffff;
 }

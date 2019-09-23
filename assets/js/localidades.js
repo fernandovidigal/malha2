@@ -1,5 +1,5 @@
 // Delete Buttons
-const deleteBtns = document.querySelectorAll('.delete_btn');
+const deleteBtns = document.querySelectorAll('.btn-delete');
 
 deleteBtns.forEach(function(item, index){
     item.addEventListener('click', function(e){

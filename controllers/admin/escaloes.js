@@ -100,9 +100,11 @@ exports.createEscalao = (req, res, next) => {
                 res.redirect('/admin/escaloes');
             } else {
                 const errors = [{
-                    msg: 'Escalão já existe.'
-                }]
-                res.render('admin/adicionarEscalao', {validationErrors: errors, escalao: oldData});
+                    msg: 'Escalão já existe',
+                    param: 'designacao'
+                }];
+                req.breadcrumbs('Adicionar Escalão', '/admin/adicionarEscalao');
+                res.render('admin/adicionarEscalao', {validationErrors: errors, escalao: oldData, breadcrumbs: req.breadcrumbs()});
             }
         })
         .catch(err => {
@@ -138,8 +140,10 @@ exports.updateEscalao = (req, res, next) => {
             // Existe escalão com a mesma designação e sexo
             if(escaloes != null){
                 const errors = [{
-                    msg: 'Escalão já existe.'
-                }]
+                    msg: 'Escalão já existe.',
+                    param: 'designacao'
+                }];
+                req.breadcrumbs('Editar Escalão', '/admin/editarEscalao');
                 res.render('admin/editarEscalao', {validationErrors: errors, escalao: escalao, breadcrumbs: req.breadcrumbs()});
             } else {
                 // Não existe escalão com a mesma designação e sexo

@@ -129,15 +129,14 @@
         </div>
 
         <div class="table__wrapper equipasTable_wrapper">
-            <table class="customTable">
+            <table class="mainTable">
                 <thead>
                     <tr>
-                        <th>Equipa</th>
-                        <th align="left">Elementos</th>
+                        <th class="equipas__column">Equipa</th>
+                        <th class="mainTable-headerElement-left">Elementos</th>
                         <th>Localidade</th>
                         <th>Escalão</th>
                         <th></th>
-
                         <th></th>
                     </tr>
                 </thead>
@@ -149,13 +148,14 @@
                                 <td class="equipasElementos"><%= equipa.primeiroElemento %><br><%= equipa.segundoElemento %></td>
                                 <td align="center"><%= equipa.localidade %></td>
                                 <td class="escalao__column" align="center"><%= equipa.escalao %><br><small>(<%= equipa.sexo == 0 ? 'Feminino': 'Masculino' %>)</small></td>
-                                <td class="detalhesBtn__column"><a href="/equipas/editarEquipa/<%= equipa.escalaoId %>/<%= equipa.equipaId %>" class="btn btn-detalhes">Detalhes</a></td>
-                                <td class="deleteBtn__column"><a href="" class="btn btn-delete" data-equipa="<%= equipa.equipaId %>" data-escalao="<%= equipa.escalaoId %>"><i class="fa fa-trash"></i></a></td>
-                                <% if(equipa.eliminavel) {%>
-                                    <td class="w10"><a href="" class="btn delete_btn" data-equipa="<%= equipa.equipaId %>" data-escalao="<%= equipa.escalaoId %>"><i class="fa fa-trash"></i>Eliminar</a></td>
-                                <% } else { %>
-                                    <td class="w10">&nbsp;</td>
-                                <% } %>
+                                <td class="detalhesBtn__column"><a href="/equipas/editarEquipa/<%= equipa.escalaoId %>/<%= equipa.equipaId %>" class="btn btn-secondary">Detalhes</a></td>
+                                <td class="deleteBtn__column">
+                                    <% if(equipa.eliminavel) {%>
+                                        <a href="" class="btn btn-delete" data-equipa="<%= equipa.equipaId %>" data-escalao="<%= equipa.escalaoId %>"><i class="fa fa-trash-alt"></i></a>
+                                    <% } else { %>
+                                        <p class="btn-disabled"><i class="fas fa-trash-alt"></i></p>
+                                    <% } %>
+                                </td>
                             </tr>
                         <% }); %>
                     <% } else { %>
@@ -171,36 +171,37 @@
             <% if(typeof numEquipas != 'undefined'){ %>
                 <p><%= numEquipas %> Equipas</p>
             <% } %>
-            
-            <% 
-                let path = '';
-                if(typeof filtro != 'undefined'){
-                    path = (typeof filtro.localidadeId != 'undefined' || typeof filtro.escalaoId != 'undefined') ? '/filtro' : '' 
-                    path += (typeof filtro.localidadeId != 'undefined') ? '/localidade/' + filtro.localidadeId : '';
-                    path += (typeof filtro.escalaoId != 'undefined') ? '/escalao/' + filtro.escalaoId : '';
-                }
-            %>
-            <div class="paginacao">
-                <a href="/equipas<%= path %>/<%= perPage %>/1" class="paginacao__item"><i class="fas fa-angle-double-left"></i></a>
-                <% paginas.forEach(function(pagina){ %>
-                    <a href="/equipas<%= path %>/<%= perPage %>/<%= pagina %>" class="paginacao__item <%= (pagina == page) ? 'paginacao__selected' : '' %>"><%= pagina %></a>
-                <% }); %>
-                <a href="/equipas<%= path %>/<%= perPage %>/<%= numPages %>" class="paginacao__item"><i class="fas fa-angle-double-right"></i></a>
-            </div>
 
-            <div class="perPage__wrapper">
-                <div class="perPageSelect">
-                    15
+            <% if(typeof perPage != 'undefined'){ %>
+                <%
+                    let path = '';
+                    if(typeof filtro != 'undefined'){
+                        path = (typeof filtro.localidadeId != 'undefined' || typeof filtro.escalaoId != 'undefined') ? '/filtro' : '' 
+                        path += (typeof filtro.localidadeId != 'undefined') ? '/localidade/' + filtro.localidadeId : '';
+                        path += (typeof filtro.escalaoId != 'undefined') ? '/escalao/' + filtro.escalaoId : '';
+                    }
+                %>
+                <div class="paginacao">
+                    <a href="/equipas<%= path %>/<%= perPage %>/1" class="paginacao__item"><i class="fas fa-angle-double-left"></i></a>
+                    <% paginas.forEach(function(pagina){ %>
+                        <a href="/equipas<%= path %>/<%= perPage %>/<%= pagina %>" class="paginacao__item <%= (pagina == page) ? 'paginacao__selected' : '' %>"><%= pagina %></a>
+                    <% }); %>
+                    <a href="/equipas<%= path %>/<%= perPage %>/<%= numPages %>" class="paginacao__item"><i class="fas fa-angle-double-right"></i></a>
                 </div>
-                <div class="perPageSelect__list">
-                    <a class="perPageSelect__link" href="">15</a>
-                    <a class="perPageSelect__link" href="">25</a>
-                    <a class="perPageSelect__link" href="">50</a>
-                    <a class="perPageSelect__link" href="">75</a>
-                    <a class="perPageSelect__link" href="">100</a>
-                    <a class="perPageSelect__link" href="">Todas</a>
+
+                <div class="customSelect perPageSelect">
+                    <div class="customSelect__header">
+                        <%= perPage %>
+                    </div>
+                    <div class="customSelect__list perPageSelect__list">
+                        <a class="customSelect__links perPageSelect__link<%= (perPage == 15) ? ' customSelect__links-selected' : '' %>" href="/equipas<%= path %>">15</a>
+                        <a class="customSelect__links perPageSelect__link<%= (perPage == 25) ? ' customSelect__links-selected' : '' %>" href="/equipas<%= path %>/25">25</a>
+                        <a class="customSelect__links perPageSelect__link<%= (perPage == 50) ? ' customSelect__links-selected' : '' %>" href="/equipas<%= path %>/50">50</a>
+                        <a class="customSelect__links perPageSelect__link<%= (perPage == 75) ? ' customSelect__links-selected' : '' %>" href="/equipas<%= path %>/75">75</a>
+                        <a class="customSelect__links perPageSelect__link<%= (perPage == 100) ? ' customSelect__links-selected' : '' %>" href="/equipas<%= path %>/100">100</a>
+                    </div>
                 </div>
-            </div>
+            <% } %>
         </div>
     </div>
 

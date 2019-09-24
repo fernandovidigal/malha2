@@ -599,7 +599,6 @@ exports.adicionarCamposInterditos = async (req, res, next) => {
 
         // 1. Obter lista de campos Interditados
         const listaCamposInterditados = await dbFunctions.getCamposInterditados(torneio.torneioId, escalaoId);
-        //console.log(listaCamposInterditados);
 
         // Não existem campso interditados então regista os campos selecionados como interditados
         if(listaCamposInterditados.length == 0 && listaCamposInput.length > 0){

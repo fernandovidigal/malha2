@@ -1,155 +1,139 @@
 <%- include('../includes/header.ejs') %>
-<%- include('../includes/breadcrumbs.ejs') %>
 
 <% if(torneio != null){ %>
-    <div class="title__bar">
-        <h1><%= torneio.designacao %> - <%= torneio.localidade %></h1>
-        <h3><%= torneio.ano %></h3>
+    <div class="barraTorneio">
+        <div class="barraTorneio__title">
+            <h1><%= torneio.designacao %></h1>
+            <h3><%= torneio.localidade %>, <%= torneio.ano %></h3>
+        </div>
+        <% if(escaloes.length > 0 && localidades.length > 0){ %>
+            <div class="barraTorneio__buttons">
+                <a href="/equipas/adicionarEquipa" class="btn btn-primary">Adicionar Equipa</a>
+                <button class="btn btn-print"><i class="fas fa-print"></i></button>
+            </div>
+        <% } %>
     </div>
 
+    <%- include('../includes/breadcrumbs.ejs') %>
+
     <% if(escaloes == null || escaloes.length == 0){ %>
-        <div class="messages">
-            Não existem escalões registados. Deve adicionar escalões para poder adicionar equipas.<br><a href="/admin/escaloes" class="btn primary_btn msg_link">Adicionar escalões</a>
+        <div class="equipasWarning__wrapper">
+            <div class="equipasWarning">
+                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="layer-group" class="equipasWarning__icon svg-inline--fa fa-layer-group fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M12.41 148.02l232.94 105.67c6.8 3.09 14.49 3.09 21.29 0l232.94-105.67c16.55-7.51 16.55-32.52 0-40.03L266.65 2.31a25.607 25.607 0 0 0-21.29 0L12.41 107.98c-16.55 7.51-16.55 32.53 0 40.04zm487.18 88.28l-58.09-26.33-161.64 73.27c-7.56 3.43-15.59 5.17-23.86 5.17s-16.29-1.74-23.86-5.17L70.51 209.97l-58.1 26.33c-16.55 7.5-16.55 32.5 0 40l232.94 105.59c6.8 3.08 14.49 3.08 21.29 0L499.59 276.3c16.55-7.5 16.55-32.5 0-40zm0 127.8l-57.87-26.23-161.86 73.37c-7.56 3.43-15.59 5.17-23.86 5.17s-16.29-1.74-23.86-5.17L70.29 337.87 12.41 364.1c-16.55 7.5-16.55 32.5 0 40l232.94 105.59c6.8 3.08 14.49 3.08 21.29 0L499.59 404.1c16.55-7.5 16.55-32.5 0-40z"></path></svg>
+                <div class="equipasWarning__text-wrapper">
+                    <h2 class="equipasWarning__text">Não existem escalões registados.</h2>
+                    <p class="equipasWarning__subText">Deve adicionar escalões para poder adicionar equipas.</p>
+                </div>
+                <a href="/admin/escaloes" class="btn btn-secondary">Adicionar Escalões</a>
+            </div>
         </div>
     <% } else if(localidades == null || localidades.length == 0){ %>
-        <div class="messages">
-            Não existem localidades registadas. Deve adicionar localidades para poder adicionar equipas.<br><a href="/admin/localidades" class="btn primary_btn msg_link">Adicionar localidades</a>
+        <div class="equipasWarning__wrapper">
+            <div class="equipasWarning">
+                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="map-marked-alt" class="equipasWarning__icon svg-inline--fa fa-map-marked-alt fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M288 0c-69.59 0-126 56.41-126 126 0 56.26 82.35 158.8 113.9 196.02 6.39 7.54 17.82 7.54 24.2 0C331.65 284.8 414 182.26 414 126 414 56.41 357.59 0 288 0zm0 168c-23.2 0-42-18.8-42-42s18.8-42 42-42 42 18.8 42 42-18.8 42-42 42zM20.12 215.95A32.006 32.006 0 0 0 0 245.66v250.32c0 11.32 11.43 19.06 21.94 14.86L160 448V214.92c-8.84-15.98-16.07-31.54-21.25-46.42L20.12 215.95zM288 359.67c-14.07 0-27.38-6.18-36.51-16.96-19.66-23.2-40.57-49.62-59.49-76.72v182l192 64V266c-18.92 27.09-39.82 53.52-59.49 76.72-9.13 10.77-22.44 16.95-36.51 16.95zm266.06-198.51L416 224v288l139.88-55.95A31.996 31.996 0 0 0 576 426.34V176.02c0-11.32-11.43-19.06-21.94-14.86z"></path></svg>
+                <div class="equipasWarning__text-wrapper">
+                    <h2 class="equipasWarning__text">Não existem localidades registadas.</h2>
+                    <p class="equipasWarning__subText">Deve adicionar localidades para poder adicionar equipas.</p>
+                </div>
+                <a href="/admin/localidades" class="btn btn-secondary">Adicionar localidades</a>
+            </div>
         </div>
     <% } else { %>
 
-    <div class="table_sidebar__wrapper">
-        <div class="table__content">
-            <div class="buttons_bar">
-                <div class="search_bar">
-
-                    <div class="localidadesSearchWrapper">
-                        <ul>
-                            <li class="topDropMenu">
-                                <% if(typeof filtro != 'undefined'){ %>
-                                    <% if(typeof filtro.localidadeId != 'undefined'){ %>
-                                        <div class="dropMenuTitle dropMenuTitleSelected">
-                                            <%= filtro.localidade %> <a href="/equipas<% if(typeof filtro.escalaoId != 'undefined'){ %>/filtro/escalao/<%= filtro.escalaoId %><% } %>"><i class="fas fa-times-circle"></a></i>
-                                        </div>
-                                    <% } else { %>
-                                        <div class="dropMenuTitle">Localidades</div>
-                                    <% } %>
-                                <% } else { %>
-                                    <div class="dropMenuTitle">Localidades</div>
-                                <% } %>
-                                <div class="dropMenuListItems">
-                                    <ul>
-                                        <% localidades.forEach(function(localidade){ %>
-                                            <li class="dropItem">
-                                                <% if(typeof filtro != 'undefined'){ %>
-                                                    <% if(typeof filtro.localidadeId != 'undefined' && localidade.localidadeId == filtro.localidadeId){ %>
-                                                        <i class="fas fa-check"></i>
-                                                    <% } %>
-
-                                                    <a href="/equipas/filtro/localidade/<%= localidade.localidadeId %><% if(typeof filtro.escalaoId != 'undefined'){ %>/escalao/<%= filtro.escalaoId %><% } %>"><%= localidade.nome %></a>   
-                                                <% } else { %>
-                                                    <a href="/equipas/filtro/localidade/<%= localidade.localidadeId %>"><%= localidade.nome %></a>
-                                                <% } %> 
-                                            </li>
-                                        <% }); %>
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="escaloesSearchWrapper">
-                        <ul>
-                            <li class="topDropMenu">
-                                <% if(typeof filtro != 'undefined'){ %>
-                                    <% if(typeof filtro.escalaoId != 'undefined'){ %>
-                                        <div class="dropMenuTitle dropMenuTitleSelected">
-                                            <%= filtro.escalao %> <small>(<%= filtro.sexo %>)</small> <a href="/equipas<% if(typeof filtro.localidadeId != 'undefined'){ %>/filtro/localidade/<%= filtro.localidadeId %><% } %>"><i class="fas fa-times-circle"></a></i>
-                                        </div>
-                                    <% } else { %>
-                                        <div class="dropMenuTitle">Escalão</div>
-                                    <% } %>
-                                <% } else { %>
-                                    <div class="dropMenuTitle">Escalão</div>
-                                <% } %>
-                                <div class="dropMenuListItems">
-                                    <ul>
-                                        <li class="dropSubMenu">
-                                            <div class="dropSubMenuTitle">
-                                                Masculino
-                                            </div>
-                                            <ul>
-                                                <% escaloes.forEach(function(escalao){ %>
-                                                    <% if(escalao.sexo == 1){ %>
-                                                        <li class="dropItem">
-                                                            <% if(typeof filtro != 'undefined'){ %>
-                                                                <% if(typeof filtro.escalaoId != 'undefined' && escalao.escalaoId == filtro.escalaoId){ %>
-                                                                    <i class="fas fa-check"></i>
-                                                                <% } %>
-            
-                                                                <a href="/equipas/filtro<% if(typeof filtro.localidadeId != 'undefined'){ %>/localidade/<%= filtro.localidadeId %><% } %>/escalao/<%= escalao.escalaoId %>"><%= escalao.designacao %></a>   
-                                                            <% } else { %>
-                                                                <a href="/equipas/filtro/escalao/<%= escalao.escalaoId %>"><%= escalao.designacao %></a>
-                                                            <% } %>
-                                                        </li>
-                                                    <% } %>
-                                                <% }); %>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                    <ul>
-                                        <li class="dropSubMenu">
-                                            <div class="dropSubMenuTitle">
-                                                Feminino
-                                            </div>
-                                            <ul>
-                                                <% escaloes.forEach(function(escalao){ %>
-                                                    <% if(escalao.sexo == 0){ %>
-                                                        <li class="dropItem">
-                                                            <% if(typeof filtro != 'undefined'){ %>
-                                                                <% if(typeof filtro.escalaoId != 'undefined' && escalao.escalaoId == filtro.escalaoId){ %>
-                                                                    <i class="fas fa-check"></i>
-                                                                <% } %>
-                
-                                                                <a href="/equipas/filtro<% if(typeof filtro.localidadeId != 'undefined'){ %>/localidade/<%= filtro.localidadeId %><% } %>/escalao/<%= escalao.escalaoId %>"><%= escalao.designacao %></a>   
-                                                            <% } else { %>
-                                                                <a href="/equipas/filtro/escalao/<%= escalao.escalaoId %>"><%= escalao.designacao %></a>
-                                                            <% } %>
-                                                        </li>
-                                                    <% } %>
-                                                <% }); %>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <% if(typeof filtro != 'undefined' && typeof filtro.escalaoId != 'undefined'){ %>
-                        <% if(typeof equipaId != 'undefined'){ %>
-                            <div class="search_equipaID">
-                                <%= equipaId %>
-                                <a href="/equipas/filtro/escalao/<%= filtro.escalaoId %>"><i class="fas fa-times-circle"></i></a>
-                            </div>
+    <div class="container_wrapper">
+        <div class="actionBar__wrapper">
+            <h2 class="actionBar__title">Equipas</h2>
+            <div class="actionBar__buttons">
+                <div class="customSelect">
+                    <div class="customSelect__header">
+                        <% if(typeof filtro != 'undefined'){ %>
+                            <% if(typeof filtro.localidadeId != 'undefined'){ %>
+                                    <a class="customSelect__header-dismiss" href="/equipas<% if(typeof filtro.escalaoId != 'undefined'){ %>/filtro/escalao/<%= filtro.escalaoId %><% } %>"><i class="fas fa-times-circle"></i></a><%= filtro.localidade %> 
+                            <% } else { %>
+                                Localidades
+                            <% } %>
                         <% } else { %>
-                            <form action="/equipas/pesquisa/<%= filtro.escalaoId %>" method="post" class="searchBox">
-                                <input type="text" name="pesquisaEquipaId" class="searchBox__input" pattern="^[0-9]+$" placeholder="Nº Equipa" required/>
-                                <button class="searchBox__btn"><i class="fa fa-search no-margin"></i></button>
-                            </form>
+                            Localidades
                         <% } %>
+                    </div>
+                    <div class="customSelect__list">
+                        <% localidades.forEach(function(localidade){ %>
+                            <% if(typeof filtro != 'undefined'){ %>
+                                <a class="customSelect__links<%= (typeof filtro.localidadeId != 'undefined' && localidade.localidadeId == filtro.localidadeId) ? ' customSelect__links-selected': '' %>" href="/equipas/filtro/localidade/<%= localidade.localidadeId %><% if(typeof filtro.escalaoId != 'undefined'){ %>/escalao/<%= filtro.escalaoId %><% } %>"><%= localidade.nome %></a>
+                            <% } else { %>
+                                <a class="customSelect__links" href="/equipas/filtro/localidade/<%= localidade.localidadeId %>"><%= localidade.nome %></a>
+                            <% } %>     
+                        <% }); %>
+                    </div>
+                </div>
+                <div class="customSelect">
+                    <div class="customSelect__header">
+                        <% if(typeof filtro != 'undefined'){ %>
+                            <% if(typeof filtro.escalaoId != 'undefined'){ %>
+                                    <a class="customSelect__header-dismiss" href="/equipas<% if(typeof filtro.localidadeId != 'undefined'){ %>/filtro/localidade/<%= filtro.localidadeId %><% } %>"><i class="fas fa-times-circle"></i></a><%= filtro.escalao %> <small>(<%= filtro.sexo %>)</small> 
+                            <% } else { %>
+                                Escalão
+                            <% } %>
+                        <% } else { %>
+                            Escalão
+                        <% } %>
+                    </div>
+                    <div class="customSelect__list">
+                        <%
+                            const masculinos = escaloes.filter(el => el.sexo == 1);
+                            if(masculinos.length > 0){
+                        %>
+                            <div class="customSelect__groupTitle">Masculinos</div>
+                            <% escaloes.forEach(function(escalao){ %>
+                                <% if(escalao.sexo == 1){ %>
+                                    <% if(typeof filtro != 'undefined'){ %>
+                                        <a class="customSelect__links<%= (typeof filtro.escalaoId != 'undefined' && escalao.escalaoId == filtro.escalaoId) ? ' customSelect__links-selected': '' %>" href="/equipas/filtro<% if(typeof filtro.localidadeId != 'undefined'){ %>/localidade/<%= filtro.localidadeId %><% } %>/escalao/<%= escalao.escalaoId %>"><%= escalao.designacao %></a>   
+                                    <% } else { %>
+                                        <a class="customSelect__links" href="/equipas/filtro/escalao/<%= escalao.escalaoId %>"><%= escalao.designacao %></a>
+                                    <% } %>
+                                <% } %>
+                            <% }); %>
+                        <% } %>
+                        <%
+                            const femininos = escaloes.filter(el => el.sexo == 0);
+                            if(femininos.length > 0){
+                        %>
+                            <div class="customSelect__groupTitle">Femininos</div>
+                            <% escaloes.forEach(function(escalao){ %>
+                                <% if(escalao.sexo == 0){ %>
+                                    <% if(typeof filtro != 'undefined'){ %>
+                                        <a class="customSelect__links<%= (typeof filtro.escalaoId != 'undefined' && escalao.escalaoId == filtro.escalaoId) ? ' customSelect__links-selected': '' %>" href="/equipas/filtro<% if(typeof filtro.localidadeId != 'undefined'){ %>/localidade/<%= filtro.localidadeId %><% } %>/escalao/<%= escalao.escalaoId %>"><%= escalao.designacao %></a>   
+                                    <% } else { %>
+                                        <a class="customSelect__links" href="/equipas/filtro/escalao/<%= escalao.escalaoId %>"><%= escalao.designacao %></a>
+                                    <% } %>
+                                <% } %>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                </div>
+                <% if(typeof filtro != 'undefined' && typeof filtro.escalaoId != 'undefined'){ %>
+                    <% if(typeof equipaId != 'undefined'){ %>
+                        <div class="searchedEquipaId__wrapper">
+                            <a class="searchedEquipaId-dismiss" href="/equipas/filtro/escalao/<%= filtro.escalaoId %>"><i class="fas fa-times-circle"></i></a>
+                            <%= equipaId %>
+                        </div>
+                    <% } else { %>
+                        <form action="/equipas/pesquisa/<%= filtro.escalaoId %>" method="post" class="searchBox">
+                            <input type="text" name="pesquisaEquipaId" class="searchBox__input" pattern="^[0-9]+$" placeholder="Equipa" required/>
+                            <button class="searchBox__btn"><i class="fa fa-search no-margin"></i></button>
+                        </form>
                     <% } %>
-                </div>
-                <div class="action_btns a-right">
-                        <a href="/equipas/adicionarEquipa" class="btn primary_btn"><i class="fa fa-plus"></i>Adicionar Equipa</a>
-                    <button class="btn print_btn"><i class="fas fa-print"></i>Imprimir</button>
-                </div>
+                <% } %>
+                
             </div>
-            <% if(typeof numEquipas != 'undefined'){ %>
-                <p>Número de Equipas: <%= numEquipas %></p>
-            <% } %>
-            <table class="listTable equipasTable">
+        </div>
+
+        <div class="table__wrapper equipasTable_wrapper">
+            <table class="mainTable">
                 <thead>
                     <tr>
-                        <th>Equipa</th>
-                        <th align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Elementos</th>
+                        <th class="equipas__column">Equipa</th>
+                        <th class="mainTable-headerElement-left">Elementos</th>
                         <th>Localidade</th>
                         <th>Escalão</th>
                         <th></th>
@@ -157,31 +141,39 @@
                     </tr>
                 </thead>
                 <tbody>
-                <% if(typeof equipas != 'undefined' && equipas.length > 0){ %>
-                    <% equipas.forEach(function(equipa){ %>
+                    <% if(typeof equipas != 'undefined' && equipas.length > 0){ %>
+                        <% equipas.forEach(function(equipa){ %>
+                            <tr>
+                                <td align="center"><%= equipa.equipaId %></td>
+                                <td class="equipasElementos"><%= equipa.primeiroElemento %><br><%= equipa.segundoElemento %></td>
+                                <td align="center"><%= equipa.localidade %></td>
+                                <td class="escalao__column" align="center"><%= equipa.escalao %><br><small>(<%= equipa.sexo == 0 ? 'Feminino': 'Masculino' %>)</small></td>
+                                <td class="detalhesBtn__column"><a href="/equipas/editarEquipa/<%= equipa.escalaoId %>/<%= equipa.equipaId %>" class="btn btn-secondary">Detalhes</a></td>
+                                <td class="deleteBtn__column">
+                                    <% if(equipa.eliminavel) {%>
+                                        <a href="" class="btn btn-delete" data-equipa="<%= equipa.equipaId %>" data-escalao="<%= equipa.escalaoId %>"><i class="fa fa-trash-alt"></i></a>
+                                    <% } else { %>
+                                        <p class="btn-disabled"><i class="fas fa-trash-alt"></i></p>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
                         <tr>
-                            <td class="w5 equipasEquipaId"><%= equipa.equipaId %></td>
-                            <!--<td class="w5"><a href="/equipas/percurso/<%= equipa.equipaId %>" class="classificacoes_icon"><i class="fas fa-clipboard-list"></i></a></td>-->
-                            <td class="equipasElementos"><%= equipa.primeiroElemento %><br><%= equipa.segundoElemento %></td>
-                            <td class="w20 table_cell_center equipasLocalidade"><%= equipa.localidade %></td>
-                            <td class="w20 table_cell_center equipasEscalao"><%= equipa.escalao %><br>(<%= equipa.sexo == 0 ? 'Feminino': 'Masculino' %>)</td>
-                            <td class="w5"><a href="/equipas/editarEquipa/<%= equipa.escalaoId %>/<%= equipa.equipaId %>" class="btn edit_btn"><i class="fa fa-edit"></i>Editar</a></td>
-                            <% if(equipa.eliminavel) {%>
-                                <td class="w10"><a href="" class="btn delete_btn" data-equipa="<%= equipa.equipaId %>" data-escalao="<%= equipa.escalaoId %>"><i class="fa fa-trash"></i>Eliminar</a></td>
-                            <% } else { %>
-                                <td class="w10">&nbsp;</td>
-                            <% } %>
+                            <td colspan="7">Não foram encontradas equipas registadas.</td>
                         </tr>
-                    <% }); %>
-                <% } else { %>
-                    <tr>
-                        <td colspan="7">Não foram encontradas equipas registadas.</td>
-                    </tr>
-                <% } %>
+                    <% } %>
                 </tbody>
             </table>
+        </div>
+
+        <div class="info__wrapper">
+            <% if(typeof numEquipas != 'undefined'){ %>
+                <p><%= numEquipas %> Equipas</p>
+            <% } %>
+
             <% if(typeof perPage != 'undefined'){ %>
-                <% 
+                <%
                     let path = '';
                     if(typeof filtro != 'undefined'){
                         path = (typeof filtro.localidadeId != 'undefined' || typeof filtro.escalaoId != 'undefined') ? '/filtro' : '' 
@@ -189,24 +181,29 @@
                         path += (typeof filtro.escalaoId != 'undefined') ? '/escalao/' + filtro.escalaoId : '';
                     }
                 %>
-                <div class="pagination__wrapper">
-                    <select name="perPage" class="perPage">
-                        <option value="/equipas<%= path %>" <%= (perPage == 15) ? 'selected' : '' %>>15</option>
-                        <option value="/equipas<%= path %>/25" <%= (perPage == 25) ? 'selected' : '' %>>25</option>
-                        <option value="/equipas<%= path %>/50" <%= (perPage == 50) ? 'selected' : '' %>>50</option>
-                        <option value="/equipas<%= path %>/75" <%= (perPage == 75) ? 'selected' : '' %>>75</option>
-                        <option value="/equipas<%= path %>/100" <%= (perPage == 100) ? 'selected' : '' %>>100</option>
-                    </select>
-                    <div class="pagination">
-                        <a href="/equipas<%= path %>/<%= perPage %>/1" class="pagination__item"><i class="fas fa-angle-double-left"></i></a>
-                        <% paginas.forEach(function(pagina){ %>
-                            <a href="/equipas<%= path %>/<%= perPage %>/<%= pagina %>" class="pagination__item <%= (pagina == page) ? 'pagination__selected' : '' %>"><%= pagina %></a>
-                        <% }); %>
-                        <a href="/equipas<%= path %>/<%= perPage %>/<%= numPages %>" class="pagination__item"><i class="fas fa-angle-double-right"></i></a>
+                <div class="paginacao">
+                    <a href="/equipas<%= path %>/<%= perPage %>/1" class="paginacao__item"><i class="fas fa-angle-double-left"></i></a>
+                    <% paginas.forEach(function(pagina){ %>
+                        <a href="/equipas<%= path %>/<%= perPage %>/<%= pagina %>" class="paginacao__item <%= (pagina == page) ? 'paginacao__selected' : '' %>"><%= pagina %></a>
+                    <% }); %>
+                    <a href="/equipas<%= path %>/<%= perPage %>/<%= numPages %>" class="paginacao__item"><i class="fas fa-angle-double-right"></i></a>
+                </div>
+
+                <div class="customSelect perPageSelect">
+                    <div class="customSelect__header">
+                        <%= perPage %>
+                    </div>
+                    <div class="customSelect__list perPageSelect__list">
+                        <a class="customSelect__links perPageSelect__link<%= (perPage == 15) ? ' customSelect__links-selected' : '' %>" href="/equipas<%= path %>">15</a>
+                        <a class="customSelect__links perPageSelect__link<%= (perPage == 25) ? ' customSelect__links-selected' : '' %>" href="/equipas<%= path %>/25">25</a>
+                        <a class="customSelect__links perPageSelect__link<%= (perPage == 50) ? ' customSelect__links-selected' : '' %>" href="/equipas<%= path %>/50">50</a>
+                        <a class="customSelect__links perPageSelect__link<%= (perPage == 75) ? ' customSelect__links-selected' : '' %>" href="/equipas<%= path %>/75">75</a>
+                        <a class="customSelect__links perPageSelect__link<%= (perPage == 100) ? ' customSelect__links-selected' : '' %>" href="/equipas<%= path %>/100">100</a>
                     </div>
                 </div>
             <% } %>
         </div>
+    </div>
     <% } %>
 
 <% } else { %>

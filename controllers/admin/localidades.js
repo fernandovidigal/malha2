@@ -38,7 +38,7 @@ exports.getLocalidade = async (req, res, next) => {
             res.render('admin/editarLocalidade', {localidade: localidade, breadcrumbs: req.breadcrumbs()});
         } else {
             req.flash('error', 'Localidade não existe.');
-            res.redirect('/admin/localidades.');
+            res.redirect('/admin/localidades');
         }
     } catch(err) {
         console.log(err);
@@ -114,8 +114,10 @@ exports.updateLocalidade = (req, res, next) => {
                 .catch(err => {
                     if(err.errors[0].validatorKey == 'not_unique'){
                         const uniqueError = [{
-                                msg: err.errors[0].message
+                                msg: err.errors[0].message,
+                                param: 'localidade'
                             }];
+                            req.breadcrumbs('Editar Localidade', '/admin/editarLocalidade');
                         res.render('admin/editarLocalidade', {validationErrors: uniqueError, localidade: localidade, breadcrumbs: req.breadcrumbs()});
                     } else {
                         req.flash('error', "Ocurreu um erro ao adicionar a localidade.");

@@ -5,9 +5,7 @@ function avancaRodada(rodizio){
     
     const numEquipasPorLinha = rodizio[0].length;
     const ultimoLinhaSuperior = rodizio[0][rodizio[0].length-1];
-    //console.log(ultimoLinhaSuperior);
     const primeiroLinhaInferior = rodizio[1][0];
-    //console.log(primeiroLinhaInferior);
 
     // Processa Linha Superior
     // Processamento por ordem inversa, ou seja, começa do fim do array para o principio
@@ -210,7 +208,6 @@ exports.distribuiEquipasPorCampos = async function(torneioId, escalao = 0){
 
                 if(numEquipasPorLocalidade > 0){
                     const listaEquipasPorLocalidade = await dbFunctions.getEquipasIDByLocalidadeAndEscalao(torneioId, localidade.localidadeId, escalaoId);
-
                     // Adiciona a equipa à lista de campos
                     for(const equipa of listaEquipasPorLocalidade){
                         if(k >= numCampos){

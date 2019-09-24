@@ -1,6 +1,5 @@
 // Delete Buttons
-const deleteBtns = document.querySelectorAll('.delete_btn');
-
+const deleteBtns = document.querySelectorAll('.btn-delete');
 deleteBtns.forEach(function(item, index){
     item.addEventListener('click', function(e){
         e.preventDefault();
@@ -62,7 +61,6 @@ deleteBtns.forEach(function(item, index){
 
 // RESET BUTTONS
 const resetButtons = document.querySelectorAll('.faseReset__erase-btn');
-
 resetButtons.forEach(btn => {
     btn.addEventListener('click', function(e){
         e.preventDefault();
@@ -121,5 +119,24 @@ resetButtons.forEach(btn => {
                 });
             }
         });
+    });
+});
+
+
+// TAB CONTROLLER
+function closeAllTabs(tabItems, tabContainers){
+    tabItems.forEach((item, index) => {
+        item.classList.remove('tabbedMenu__item-selected');
+        tabContainers[index].classList.remove('tabbedContainer-open');
+    });
+}
+const tabItems = document.querySelectorAll('.tabbedMenu__item');
+const tabContainers = document.querySelectorAll('.tabbedContainer');
+
+tabItems.forEach((item, index) => {
+    item.addEventListener('click', function(){
+        closeAllTabs(tabItems, tabContainers);
+        item.classList.add('tabbedMenu__item-selected');
+        tabContainers[index].classList.add('tabbedContainer-open');
     });
 });

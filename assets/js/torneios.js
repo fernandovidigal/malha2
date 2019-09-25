@@ -60,7 +60,7 @@ deleteBtns.forEach(function(item, index){
 });
 
 // RESET BUTTONS
-const resetButtons = document.querySelectorAll('.faseReset__erase-btn');
+const resetButtons = document.querySelectorAll('.btn-faseReset');
 resetButtons.forEach(btn => {
     btn.addEventListener('click', function(e){
         e.preventDefault();

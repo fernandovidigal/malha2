@@ -1,0 +1,92 @@
+<% if(typeof escaloes != 'undefined'){ %>
+    <% if(escaloes.length > 0) { %>
+        <% 
+            const escalaoMasculino = escaloes.find(el => el.sexo == 1); 
+            if(escalaoMasculino){
+        %>
+        <div class="escalaoCampos__wrapper">
+            <h4>Masculinos</h4>
+            <table class="mainTable">
+                <thead>
+                    <tr>
+                        <th class="mainTable-headerElement-left">Escalão</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% escaloes.forEach(escalao => { 
+                        if(escalao.sexo == 1) { %>
+                        <tr>
+                            <td><%= escalao.designacao %></td>
+                            <% if(escalao.editavel) { %>
+                                <td align="right">
+                                    <% for(let i = 0; i < 8; i++){ %>
+                                        <input type="radio" class="escalaoNumCampos" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
+                                        <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
+                                            <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %>
+                                        <% } else { %>
+                                            <%= (i == 0) ? 'checked' : '' %>
+                                        <% } %>
+                                        >
+                                        <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
+                                    <% } %>
+                                </td>
+                            <% } else { %>
+                                <td align="right"><%= escalao.campos %> Campos</td>
+                            <% } %>
+                        </tr>
+                        <% } %>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+        <%  } %>
+
+        <% 
+            const escalaoFeminino = escaloes.find(el => el.sexo == 0); 
+            if(escalaoFeminino){
+        %>
+        <div class="escalaoCampos__wrapper">
+            <h4>Femininos</h4>
+            <table class="mainTable">
+                <thead>
+                    <tr>
+                        <th class="mainTable-headerElement-left">Escalão</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% escaloes.forEach(escalao => { 
+                        if(escalao.sexo == 0) { %>
+                        <tr>
+                            <td><%= escalao.designacao %></td>
+                            <% if(escalao.editavel) { %>
+                                <td align="right">
+                                    <% for(let i = 0; i < 8; i++){ %>
+                                        <input type="radio" class="escalaoNumCampos" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" 
+                                        <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
+                                            <%= (escalao.campos == Math.pow(2,i)) ? 'checked' : '' %>
+                                        <% } else { %>
+                                            <%= (i == 0) ? 'checked' : '' %>
+                                        <% } %>
+                                        >
+                                        <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
+                                    <% } %>
+                                </td>
+                            <% } else { %>
+                                <td align="right"><%= escalao.campos %> Campos</td>
+                            <% } %>
+                        </tr>
+                        <% } %>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+        <%  } %>
+
+    <% } else { %>
+        <p>Não existem escalões registados!</p>
+    <% }%>
+<% } else { %>
+    <p>Não foi possível obter os escalões.</p>
+<% } %>

@@ -92,6 +92,9 @@ exports.getTorneio = async (req, res, next) => {
 exports.adicionarTorneio = async (req, res, next) => {
   try {
     const escaloes = await dbFunctions.getAllEscaloes();
+    escaloes.forEach(escalao => {
+      escalao.editavel = true
+    });
     req.breadcrumbs("Adicionar Torneio", "/admin/adicionarTorneio");
     res.render("admin/adicionarTorneio", {
       torneio: {},
@@ -100,10 +103,7 @@ exports.adicionarTorneio = async (req, res, next) => {
     });
   } catch (err) {
     console.log(err);
-    req.flash(
-      "error",
-      "Não foi possivel adicionar torneio. Não foi possível aceder à lista de escalões."
-    );
+    req.flash("error", "Não foi possivel adicionar torneio. Não foi possível aceder à lista de escalões.");
     res.redirect("/admin/torneios");
   }
 };
@@ -128,6 +128,7 @@ exports.createTorneio = async (req, res, next) => {
     const designacao = req.body.designacao.trim();
     const localidade = req.body.localidade.trim();
     const ano = parseInt(req.body.ano.trim());
+    const oldAno = req.body.ano.trim();
     const errors = validationResult(req).array({ onlyFirstError: true });
 
     // Processa todos os escalões
@@ -142,11 +143,20 @@ exports.createTorneio = async (req, res, next) => {
       }
     }
 
+    if(isNaN(ano)){
+      errors.push({
+        location: 'body',
+        param: 'ano',
+        value: '',
+        msg: 'Ano do torneio inválido'
+      });
+    }
+
     if (errors.length > 0) {
       const oldData = {
         designacao: designacao,
         localidade: localidade,
-        ano: ano
+        ano: isNaN(ano) ? oldAno : ano
       };
       req.breadcrumbs("Adicionar Torneio", "/admin/adicionarTorneio");
       res.render("admin/adicionarTorneio", {

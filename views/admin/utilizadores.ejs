@@ -1,52 +1,65 @@
 <%- include('../includes/header.ejs') %>
-<%- include('../includes/breadcrumbs.ejs') %>
 
-<div class="buttons_bar">
-    <div class="action_btns a-right">
-        <a href="/admin/utilizadores/adicionarUtilizador" class="btn primary_btn"><i class="fa fa-plus"></i>Adicionar Utilizador</a>
+<div class="barraTorneio">
+    <div class="barraTorneio__buttons">
+        <a href="/admin/utilizadores/adicionarUtilizador" class="btn btn-primary">Adicionar Utilizador</a>
     </div>
 </div>
-<table  class="listTable">
-    <thead>
-        <tr>
-            <th></th>
-            <th></th>
-            <th>Username</th>
-            <th></th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    <% if(users.length > 0) { %>
-        <% users.forEach(function(user){ %>
-            <tr>
-                <td class="w5"><i class="fas fa-ellipsis-v level_change_switch">
-                    <div class="level_change_wrapper">
-                        <a href="/admin/utilizadores/changeLevel/<%= user.userId %>/level/0" class="level_change_item"><% if(user.level == 0) { %><i class="fas fa-check"></i><% } %>Utilizador</a>
-                        <a href="/admin/utilizadores/changeLevel/<%= user.userId %>/level/5" class="level_change_item"><% if(user.level == 5) { %><i class="fas fa-check"></i><% } %>Gestor</a>
-                        <a href="/admin/utilizadores/changeLevel/<%= user.userId %>/level/10" class="level_change_item"><% if(user.level == 10) { %><i class="fas fa-check"></i><% } %>Administrador</a>
-                    </div>
-                </i></td>
-                <td class="w5">
-                    <% if(user.level === 10) { %>
-                        <i class="fas fa-key"></i>
-                    <% } else if(user.level === 5) { %>
-                        <i class="fas fa-user-cog"></i>
-                    <% } else { %>
-                        <i class="fas fa-user"></i>
-                    <% } %>
-                </td>
-                <td class="utilizadores_username"><%= user.username %></td>
-                <td class="w15"><a href="/admin/utilizadores/alterarPasswordUtilizador/<%= user.userId %>" class="btn change_btn"><i class="fas fa-key"></i>Alterar Password</a></td>
-                <td class="w10"><a href="" class="btn delete_btn" data-user="<%= user.userId %>"><i class="fa fa-trash"></i>Eliminar</a></td>
-            </tr>
-        <% }); %>
-    <% } else { %>
-        <tr>
-            <td colspan="4">Não existem utilizadores registados</td>
-        </tr>
-    <% } %>
-    </tbody>
-</table>
+
+<%- include('../includes/breadcrumbs.ejs') %>
+
+<div class="container_wrapper">
+    <div class="actionBar__wrapper">
+        <h2 class="actionBar__title">Utilizadores</h2>
+    </div>
+
+    <div class="table__wrapper">
+        <table class="mainTable">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="mainTable-headerElement-left">Nome de Utilizador</th>
+                    <th class="mainTable-headerElement-left">Nível</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if(users.length > 0) { %>
+                    <% users.forEach(function(user){ %>
+                        <tr>
+                            <td>
+                                <% if(user.level === 10) { %>
+                                    <i class="fas fa-key"></i>
+                                <% } else if(user.level === 5) { %>
+                                    <i class="fas fa-user-cog"></i>
+                                <% } else { %>
+                                    <i class="fas fa-user"></i>
+                                <% } %>
+                            </td>
+                            <td class="utilizadores_username"><%= user.username %></td>
+                            <td>
+                                <p class="userLevel"><%= (user.level === 10) ? 'Administrador' : (user.level === 5) ? 'Gestor' : 'Utilizador' %></p>
+                                <ul class="userLevelChange">
+                                    <li class="userLevelChange__item"><a href="/admin/utilizadores/changeLevel/<%= user.userId %>/level/0" class="userLevelChange__link<%= (user.level == 0) ? ' userLevelChange__link-selected' : '' %>">Utilizador</a></li>
+                                    <li class="userLevelChange__item"><a href="/admin/utilizadores/changeLevel/<%= user.userId %>/level/5" class="userLevelChange__link<%= (user.level == 5) ? ' userLevelChange__link-selected' : '' %>">Gestor</a></li></li>
+                                    <li class="userLevelChange__item"><a href="/admin/utilizadores/changeLevel/<%= user.userId %>/level/10" class="userLevelChange__link<%= (user.level == 10) ? ' userLevelChange__link-selected' : '' %>">Administrador</a></li></li>
+                                </ul>
+                                
+                            </td>
+                            <td class="detalhesBtn__column"><a href="/admin/utilizadores/alterarPasswordUtilizador/<%= user.userId %>" class="btn btn-secondary">Alterar Password</a></td>
+                            <td class="deleteBtn__column"><a class="btn btn-delete" data-user="<%= user.userId %>"><i class="fa fa-trash-alt"></i></a></td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="5">Não existem utilizadores registados</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <script src="/js/utilizadores.js"></script>
 <%- include('../includes/footer.ejs') %>

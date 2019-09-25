@@ -1,5 +1,5 @@
 // Delete Buttons
-const deleteBtns = document.querySelectorAll('.delete_btn');
+const deleteBtns = document.querySelectorAll('.btn-delete');
 
 deleteBtns.forEach(function(item, index){
     item.addEventListener('click', function(e){
@@ -51,4 +51,29 @@ deleteBtns.forEach(function(item, index){
         });
 
     });
+});
+
+function closeAllUserLevelChangers(userLevelChange){
+    userLevelChange.forEach(el => {
+        el.classList.remove('userLevelChange-open');
+    });
+}
+
+// LEVEL TOOGLE
+const userLevel = document.querySelectorAll('.userLevel');
+const userLevelChange = document.querySelectorAll('.userLevelChange');
+userLevel.forEach((level, index) => {
+    level.addEventListener('click', function(e){
+        e.stopPropagation();
+        if(!userLevelChange[index].classList.contains('userLevelChange-open')){
+            closeAllUserLevelChangers(userLevelChange);
+            userLevelChange[index].classList.add('userLevelChange-open');
+        } else {
+            userLevelChange[index].classList.remove('userLevelChange-open');
+        }
+    });
+});
+
+document.addEventListener('click', function(){
+    closeAllUserLevelChangers(userLevelChange);
 });

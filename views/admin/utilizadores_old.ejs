@@ -1,0 +1,52 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/breadcrumbs.ejs') %>
+
+<div class="buttons_bar">
+    <div class="action_btns a-right">
+        <a href="/admin/utilizadores/adicionarUtilizador" class="btn primary_btn"><i class="fa fa-plus"></i>Adicionar Utilizador</a>
+    </div>
+</div>
+<table  class="listTable">
+    <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            <th>Username</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    <% if(users.length > 0) { %>
+        <% users.forEach(function(user){ %>
+            <tr>
+                <td class="w5"><i class="fas fa-ellipsis-v level_change_switch">
+                    <div class="level_change_wrapper">
+                        <a href="/admin/utilizadores/changeLevel/<%= user.userId %>/level/0" class="level_change_item"><% if(user.level == 0) { %><i class="fas fa-check"></i><% } %>Utilizador</a>
+                        <a href="/admin/utilizadores/changeLevel/<%= user.userId %>/level/5" class="level_change_item"><% if(user.level == 5) { %><i class="fas fa-check"></i><% } %>Gestor</a>
+                        <a href="/admin/utilizadores/changeLevel/<%= user.userId %>/level/10" class="level_change_item"><% if(user.level == 10) { %><i class="fas fa-check"></i><% } %>Administrador</a>
+                    </div>
+                </i></td>
+                <td class="w5">
+                    <% if(user.level === 10) { %>
+                        <i class="fas fa-key"></i>
+                    <% } else if(user.level === 5) { %>
+                        <i class="fas fa-user-cog"></i>
+                    <% } else { %>
+                        <i class="fas fa-user"></i>
+                    <% } %>
+                </td>
+                <td class="utilizadores_username"><%= user.username %></td>
+                <td class="w15"><a href="/admin/utilizadores/alterarPasswordUtilizador/<%= user.userId %>" class="btn change_btn"><i class="fas fa-key"></i>Alterar Password</a></td>
+                <td class="w10"><a href="" class="btn delete_btn" data-user="<%= user.userId %>"><i class="fa fa-trash"></i>Eliminar</a></td>
+            </tr>
+        <% }); %>
+    <% } else { %>
+        <tr>
+            <td colspan="4">Não existem utilizadores registados</td>
+        </tr>
+    <% } %>
+    </tbody>
+</table>
+<script src="/js/utilizadores.js"></script>
+<%- include('../includes/footer.ejs') %>

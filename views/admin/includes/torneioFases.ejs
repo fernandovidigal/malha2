@@ -1,0 +1,66 @@
+<% if(typeof resetFase != 'undefined'){ %>
+    <% if(resetFase.length > 0 && loggedUser.level === 10){ %>
+        <% 
+            const escalaoMasculino = resetFase.find(el => el.sexo == 1); 
+            if(escalaoMasculino){
+        %>
+        <div class="escalaoCampos__wrapper">
+            <h4>Masculinos</h4>
+            <table class="mainTable">
+                <thead>
+                    <tr>
+                        <th class="mainTable-headerElement-left">Escalão</th>
+                        <th>Fase Actual</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% resetFase.forEach(escalao => { 
+                        if(escalao.sexo == 1) { %>
+                        <tr>
+                            <td><%= escalao.designacao %></td>
+                            <td align="center"><%= escalao.fase != 100 ? escalao.fase : 'Final' %></td>
+                            <td class="deleteBtn__column"><a class="btn btn-secondary btn-faseReset" data-escalao="<%= escalao.escalaoId %>" data-fase="<%= escalao.fase %>" data-designacao="<%= escalao.designacao %> (<%= escalao.sexo == 1? 'Masculino': 'Feminino' %>)">Remover Fase</a></td>
+                        </tr>
+                        <% } %>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+        <%  } %>
+
+        <% 
+            const escalaoFeminino = resetFase.find(el => el.sexo == 0); 
+            if(escalaoFeminino){
+        %>
+        <div class="escalaoCampos__wrapper">
+            <h4>Femininos</h4>
+            <table class="mainTable">
+                <thead>
+                    <tr>
+                        <th class="mainTable-headerElement-left">Escalão</th>
+                        <th>Fase Actual</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% resetFase.forEach(escalao => { 
+                        if(escalao.sexo == 0) { %>
+                        <tr>
+                            <td><%= escalao.designacao %></td>
+                            <td align="center"><%= escalao.fase != 100 ? escalao.fase : 'Final' %></td>
+                            <td class="deleteBtn__column"><a class="btn btn-secondary btn-faseReset" data-escalao="<%= escalao.escalaoId %>" data-fase="<%= escalao.fase %>" data-designacao="<%= escalao.designacao %> (<%= escalao.sexo == 1? 'Masculino': 'Feminino' %>)">Remover Fase</a></td>
+                        </tr>
+                        <% } %>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+        <%  } %>
+
+    <% } else { %>
+        <p>Não existem fases disputadas!</p>
+    <% }%>
+<% } else { %>
+    <p>Não foi possível obter as Fases disputadas.</p>
+<% } %>

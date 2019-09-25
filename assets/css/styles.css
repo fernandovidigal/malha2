@@ -34,7 +34,13 @@ h2 {
 
 h3 {
     color: #9B96B3;
-    font-size: 18px;
+    font-size: 22px;
+}
+
+h4 {
+    color: #576575;
+    font-size: 24px;
+    margin-bottom: 20px;
 }
 
 li {
@@ -44,6 +50,16 @@ li {
 .swal2-actions > *:focus {
     outline: none !important;
     box-shadow: none !important;
+}
+
+.smallWarningText {
+    margin: 0;
+    padding: 0;
+    margin-top: 10px;
+    color: red;
+    font-size: 80%;
+    font-weight: bold;
+    letter-spacing: 0.4px;
 }
 
 /************************************
@@ -113,7 +129,7 @@ li {
 
 .dummyTopSpacer {
     width: 100%;
-    height: 70px;
+    height: 40px;
     display: block;
 }
 
@@ -158,6 +174,7 @@ li {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    margin-bottom: 18px;
 }
 
 .inputError {
@@ -177,6 +194,10 @@ input[type=text] {
 
 input[type=text]:focus {
     box-shadow: 0px 0px 0px 1px rgba(87,101,117,.7);
+}
+
+input::placeholder {
+    color: #CECECE;
 }
 
 .inputErrorMsg {
@@ -824,8 +845,13 @@ input[type=text]:focus {
     padding-left: 20px;
 }
 
+.mainTable tbody tr {
+    border-top: solid 1px #D8DDE7;
+    border-bottom: solid 1px #D8DDE7;
+}
+
 .mainTable tbody tr:nth-child(odd) {
-    background-color: #f8f9ff;
+    background-color: #f8f9fc;
 }
 
 .mainTable tbody tr td {
@@ -887,7 +913,6 @@ input[type=text]:focus {
 
 .radioButtons__wrapper {
     display: flex;
-    margin-top: 18px;
 }
 
 .inputRadioContainer {
@@ -967,36 +992,35 @@ input[type=text]:focus {
 
 .tabbedMenu__wrapper {
     width: 100%;
-    border-bottom: solid 2px #E5E5E7;
+    background-color: #F4F5F8;
+    border-top: solid 1px #DBE0EB;
+    border-bottom: solid 1px #DBE0EB;
     margin-top: 42px;
 }
 
 .tabbedMenu {
     display: flex;
     align-items: baseline;
-    margin-left: 40px; 
+    margin-left: 80px; 
 }
 
 .tabbedMenu__item {
-    width: 10%;
+    font-size: 18px;
     padding: 12px 20px;
-    border-top: solid 1px #E5E5E7;
-    border-left: solid 1px #E5E5E7;
-    overflow: hidden;
     cursor: pointer;
 }
 
-.tabbedMenu__item:first-child {
-    border-top-left-radius: 8px;
+.tabbedMenu__item:not(:first-child){
+    margin-left: 100px;
 }
 
-.tabbedMenu__item:last-child {
-    border-right: solid 1px #E5E5E7;
-    border-top-right-radius: 8px;
+.tabbedMenu__item:hover {
+    border-bottom: solid 4px #ffbdb2;
 }
 
-.tabbedMenu__item-selected {
-    background-color: #E7EEF3;
+.tabbedMenu__item-selected,
+.tabbedMenu__item-selected:hover {
+    border-bottom: solid 4px #D05744;
     font-weight: 700;
 }
 
@@ -1007,8 +1031,105 @@ input[type=text]:focus {
 .tabbedContainer {
     display: none;
     width: 100%;
+    margin-bottom: 54px;
 }
 
 .tabbedContainer-open {
     display: block;
+}
+
+.escalaoCampos__wrapper {
+    margin-bottom: 60px;
+}
+
+.escalaoNumCampos + label{
+    display: inline-block;
+    position: relative;
+    margin-left: 10px;
+    cursor: pointer;
+    background-color: white;
+    color: #858ca8;
+    padding: 8px;
+    text-align: center;
+    min-width: 42px;
+    border: solid 1px #eaebf1;
+    border-radius: 8px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    transition: all .2s;
+}
+
+.escalaoNumCampos{
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.escalaoNumCampos + label:hover {
+    color: #2c3641;
+    background-color: #ffffff;
+    border: solid 1px #dddfe8;
+    box-shadow: 0 2px 16px rgba(69, 92, 199, .2);
+}
+
+.escalaoNumCampos:checked + label {
+    color: #2c3641;
+    background-color: #E7EEF3;
+    border: solid 1px #acadb1;
+    box-shadow: 0 2px 16px rgba(69, 92, 199, .2);
+}
+
+.userLevel {
+    width: 160px;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.userLevel::after {
+    position: absolute;
+    content: "";
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 8px 5px 0 5px;
+    border-color: #8B93A6 transparent transparent transparent;
+}
+
+.userLevelChange {
+    width: 160px;
+    margin-top: 8px;
+    position: absolute;
+    display: none;
+    flex-direction: column;
+    background-color: white;
+    border: solid 1px #333F4D;
+    border-radius: 4px;
+    box-shadow: 0px 6px 26px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    z-index: 100;
+}
+
+.userLevelChange-open {
+    display: flex;
+}
+
+.userLevelChange__link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 12px 20px;
+}
+
+.userLevelChange__link-selected {
+    background-color: #EEEFF3;
+}
+
+.userLevelChange__item:hover {
+    background-color: #F8F9FC;
 }

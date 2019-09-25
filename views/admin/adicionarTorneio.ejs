@@ -11,20 +11,23 @@
         <ul class="tabbedMenu">
             <li class="tabbedMenu__item tabbedMenu__item-selected">Torneio</li>
             <li class="tabbedMenu__item">Campos</li>
-            <li class="tabbedMenu__item">Fases</li>
         </ul>
     </div>
 
     <div class="tabbedContent__wrapper">
+        <form action="/admin/torneios/adicionarTorneio" method="post">
         <div id="torneio" class="tabbedContainer tabbedContainer-open">
-            Torneio
+            <%- include('includes/torneioInfo.ejs') %>
         </div>
         <div id="campos" class="tabbedContainer">
-            Campos
+                <%- include('includes/torneioCampos.ejs') %>
         </div>
-        <div id="fases" class="tabbedContainer">
-            Fases
+        <div class="inputBtnBar">
+            <input type="submit" name="adicionar" value="Adicionar" class="btn btn-primary">
+            <input type="submit" name="adicionar_activar" value="Adicionar e Activar" class="btn btn-primary">
+            <a href="/admin/torneios" class="btn-cancel">Cancelar</a>
         </div>
+        </form>
     </div>
 </div>
 

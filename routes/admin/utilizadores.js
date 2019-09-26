@@ -20,14 +20,16 @@ router.get('/adicionarUtilizador', (req, res) => {
 
 router.post('/adicionarUtilizador', [
     check('username').trim().escape().not().isEmpty().withMessage('Deve indicar o nome de utilizador'),
-    check('password').not().isEmpty().withMessage('Deve inidicar a password'),
+    check('password').not().isEmpty().withMessage('Deve indicar a password'),
     check('confirmPassword').custom((value, { req }) => {
-            if(value !== req.body.password){
-                throw new Error('As passwords deve ser iguais');
-            }
+        if(value.trim() == ''){
+            throw new Error('Deve confirmar a password');
+        } else if(value.trim() !== req.body.password.trim()){
+            throw new Error('As passwords devem ser iguais');
+        }
 
-            return true;
-        })
+        return true;
+    })
 ], UsersController.createUser);
 
 // EDITAR UTILIZADOR
@@ -36,12 +38,14 @@ router.get('/alterarPasswordUtilizador/:id', UsersController.getUser);
 router.put('/alterarPasswordUtilizador/:id', [
     check('password').not().isEmpty().withMessage('Deve inidicar a password'),
     check('confirmPassword').custom((value, { req }) => {
-            if(value !== req.body.password){
-                throw new Error('As passwords deve ser iguais');
-            }
+        if(value.trim() == ''){
+            throw new Error('Deve confirmar a password');
+        } else if(value.trim() !== req.body.password.trim()){
+            throw new Error('As passwords devem ser iguais');
+        }
 
-            return true;
-        })
+        return true;
+    })
 ], UsersController.updateUserPassword);
 
 // APAGAR UTILIZADOR

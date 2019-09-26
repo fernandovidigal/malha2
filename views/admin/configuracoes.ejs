@@ -1,6 +1,35 @@
 <%- include('../includes/header.ejs') %>
+<div class="dummyTopSpacer"></div>
 <%- include('../includes/breadcrumbs.ejs') %>
-<%- include('../includes/validationErrors.ejs') %>
+
+<div class="container_wrapper">
+    <div class="actionBar__wrapper">
+        <h2 class="actionBar__title">Configurações</h2>
+    </div>
+
+    <div class="table__wrapper">
+        <p class="table__title">Servidor</p>
+        <table class="mainTable">
+            <tbody>
+                <tr>
+                    <td>Porta</td>
+                    <td class="detalhesBtn__column"><input type="text" name="porta" id="porta" value="<%= server.port %>" size="12"></td>
+                    <td class="detalhesBtn__column"><a class="btn btn-secondary">Guardar</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<%- include('../includes/footer.ejs') %>
+
+
+
+
+
+
+
+<!--
 
 <div class="configWrapper">
     <div class="configGroup">
@@ -14,5 +43,4 @@
         </form>
     </div>
 </div>
-
-<%- include('../includes/footer.ejs') %>
+-->

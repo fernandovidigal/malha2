@@ -48,7 +48,7 @@ exports.createUser = (req, res, next) => {
 
     if (!errors.isEmpty()) {
         req.breadcrumbs('Adicionar Utilizador', '/admin/adicionarUtilizador');
-        res.render('admin/adicionarUtilizador', {validationErrors: errors.array(), utilizador: oldData, breadcrumbs: req.breadcrumbs()});
+        res.render('admin/adicionarUtilizador', {validationErrors: errors.array({ onlyFirstError: true }), utilizador: oldData, breadcrumbs: req.breadcrumbs()});
     } else {
         User.findOrCreate({
             where: { username: username },
@@ -63,7 +63,8 @@ exports.createUser = (req, res, next) => {
                 res.redirect('/admin/utilizadores');
             } else {
                 const errors = [{
-                    msg: 'Nome de utilizador já existe.'
+                    msg: 'Nome de utilizador já está a ser utilizado',
+                    param: 'username'
                 }]
                 res.render('admin/adicionarUtilizador', {validationErrors: errors, utilizador: oldData, breadcrumbs: req.breadcrumbs()});
             }

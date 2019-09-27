@@ -13,28 +13,22 @@ exports.getConfig = (req, res, next) => {
     });
 }
 
-exports.writeConfigServerPorta = (req, res, next) => {
-    const porta = req.body.porta.trim();
-    const errors = validationResult(req);
+exports.writeConfigServerPorta = async (req, res, next) => {
+    try {
+        const server = {
+            server: {
+                port: req.body.serverPort
+            }  
+        }
 
-    const _server = {
-        server: {
-            port: porta
-        }  
-    }
+        const result = await configFunctions.writeConfigFile(server);
+        res.status(200).json({
+            success: true
+        });
 
-    if(!errors.isEmpty()){
-        res.render('admin/configuracoes', {validationErrors: errors.array({onlyFirstError: true}), server: _server, breadcrumbs: req.breadcrumbs()});
-    } else {
-        configFunctions.writeConfigFile(_server)
-        .then(()=> {
-            req.flash('success', 'Configuração gravada com sucesso.')
-            res.redirect('/admin/configuracoes');
-        })
-        .catch(err => {
-            console.log(err);
-            req.flash('error', 'Não foi possível gravar a configuração!')
-            res.redirect('/admin/configuracoes');
-        })
+    } catch (err) {
+        res.status(404).json({
+            success: false
+        });
     }
 }

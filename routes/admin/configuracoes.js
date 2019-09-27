@@ -12,9 +12,6 @@ router.all('/*', [userAuthenticated, checkAdminStatus], (req, res, next) => {
 
 router.get('/', ConfiguracoesController.getConfig);
 
-router.post('/definirPorta', [
-    check('porta').trim().escape().not().isEmpty().withMessage('Servidor: Deve indicar o número da Porta'),
-    check('porta').trim().escape().matches(/^[0-9]+$/).withMessage('Servidor: Número da porta inválido')
-], ConfiguracoesController.writeConfigServerPorta);
+router.put('/definirPorta', ConfiguracoesController.writeConfigServerPorta);
 
 module.exports = router;

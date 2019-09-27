@@ -13,34 +13,13 @@
             <tbody>
                 <tr>
                     <td>Porta</td>
-                    <td class="detalhesBtn__column"><input type="text" name="porta" id="porta" value="<%= server.port %>" size="12"></td>
-                    <td class="detalhesBtn__column"><a class="btn btn-secondary">Guardar</a></td>
+                    <td class="detalhesBtn__column"><input type="text" name="serverPort" id="serverPort" value="<%= server.port %>" size="12"></td>
+                    <td class="detalhesBtn__column"><a class="btn btn-secondary changeServerPort-btn">Guardar</a></td>
                 </tr>
             </tbody>
         </table>
     </div>
 </div>
 
+<script src="/js/configuracoes.js"></script>
 <%- include('../includes/footer.ejs') %>
-
-
-
-
-
-
-
-<!--
-
-<div class="configWrapper">
-    <div class="configGroup">
-        <div class="configGroup__title">
-            <h2>Servidor</h2>
-        </div>
-        <form action="/admin/configuracoes/definirPorta" class="configItem" method="post">
-            <p class="configItem__title">Porta</p>
-            <input type="text" name="porta" value="<%= server.port %>" size="6">
-            <button type="submit" class="btn primary_btn"><i class="fas fa-save"></i>Guardar</button>
-        </form>
-    </div>
-</div>
--->

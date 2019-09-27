@@ -50,10 +50,10 @@
                             <% if(typeof filtro.localidadeId != 'undefined'){ %>
                                     <a class="customSelect__header-dismiss" href="/equipas<% if(typeof filtro.escalaoId != 'undefined'){ %>/filtro/escalao/<%= filtro.escalaoId %><% } %>"><i class="fas fa-times-circle"></i></a><%= filtro.localidade %> 
                             <% } else { %>
-                                Localidades
+                                <span class="placeholder">Localidades</span>
                             <% } %>
                         <% } else { %>
-                            Localidades
+                            <span class="placeholder">Localidades</span>
                         <% } %>
                     </div>
                     <div class="customSelect__list">
@@ -72,10 +72,10 @@
                             <% if(typeof filtro.escalaoId != 'undefined'){ %>
                                     <a class="customSelect__header-dismiss" href="/equipas<% if(typeof filtro.localidadeId != 'undefined'){ %>/filtro/localidade/<%= filtro.localidadeId %><% } %>"><i class="fas fa-times-circle"></i></a><%= filtro.escalao %> <small>(<%= filtro.sexo %>)</small> 
                             <% } else { %>
-                                Escalão
+                                <span class="placeholder">Escalão</span>
                             <% } %>
                         <% } else { %>
-                            Escalão
+                            <span class="placeholder">Escalão</span>
                         <% } %>
                     </div>
                     <div class="customSelect__list">
@@ -215,4 +215,5 @@
 <script src="/js/vfs_fonts.js"></script>
 <script src="/js/printFunctions.js"></script>
 <script src="/js/equipas.js"></script>
+<script src="/js/customSelect.js"></script>
 <%- include('../includes/footer.ejs') %>

@@ -136,31 +136,3 @@ printBtn.addEventListener('click', function(e){
 
     imprimeListaEquipas(localidadeIndex, escalaoIndex);
 });
-
-//Mudança da selecção de resultados por página
-/*const perPage = document.querySelector('.perPage');
-perPage.addEventListener('change', function(e){
-    window.location = this.options[this.selectedIndex].value;
-    return false;
-});*/
-
-function closeAllCheckboxes(selectBoxesDropList){
-    for(let i = 0; i < selectBoxesDropList.length; i++){
-        selectBoxesDropList[i].classList.remove("customSelect__list-open");
-    }
-}
-
-// CHECKBOXES
-const selectBoxes = document.querySelectorAll('.customSelect__header');
-const selectBoxesDropList = document.querySelectorAll('.customSelect__list');
-selectBoxes.forEach((selectBox, index) => {
-    selectBox.addEventListener('click', function(e){
-        e.stopPropagation();
-        closeAllCheckboxes(selectBoxesDropList);
-        selectBoxesDropList[index].classList.toggle('customSelect__list-open');
-    });
-});
-
-document.addEventListener('click', function(){
-    closeAllCheckboxes(selectBoxesDropList);
-});

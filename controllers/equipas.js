@@ -11,12 +11,14 @@ faker.locale = "pt_BR";
 function showValidationErrors(req, res, errors, page, oldData){
     const localidadesInfo = dbFunctions.getLocalidadesInfo();
     const escaloesInfo = dbFunctions.getEscaloesInfo();
+    const torneioInfo = dbFunctions.getTorneioInfo();
 
-    Promise.all([localidadesInfo, escaloesInfo])
-    .then(([localidades, escaloes]) => {
+    Promise.all([localidadesInfo, escaloesInfo, torneioInfo])
+    .then(async ([localidades, escaloes, torneio]) => {
         if(localidades.length > 0 && escaloes.length > 0){
             util.sort(localidades);
-            res.render('equipas/' + page, {validationErrors: errors.array({ onlyFirstError: true }), localidades: localidades, escaloes: escaloes, equipa: oldData, breadcrumbs: req.breadcrumbs()});
+            const listaEscaloes = await processaListaEscaloes(escaloes, torneio.torneioId);
+            res.render('equipas/' + page, {validationErrors: errors.array({ onlyFirstError: true }), localidades: localidades, escaloes: listaEscaloes, equipa: oldData, torneio: torneio, breadcrumbs: req.breadcrumbs()});
         } else {
             console.log(err);
             req.flash('error', 'Não foi possível obter dados dos escalões e/ou localidades.')
@@ -229,7 +231,7 @@ exports.adicionarEquipa = async (req, res, next) => {
                 res.redirect('/equipas');
             } else {
                 req.breadcrumbs('Adicionar Equipa', '/equipas/adicionarEquipa');
-                res.render('equipas/adicionarEquipa', {localidades: localidades, escaloes: listaEscaloes, breadcrumbs: req.breadcrumbs()});
+                res.render('equipas/adicionarEquipa', {localidades: localidades, escaloes: listaEscaloes, torneio: torneio, breadcrumbs: req.breadcrumbs()});
             }
         } else {
             console.log(err);
@@ -244,11 +246,12 @@ exports.adicionarEquipa = async (req, res, next) => {
 }
 
 exports.createEquipa = async (req, res, next) => {
-    const primeiroElemento = req.body.primeiro_elemento.trim();
-    const segundoElemento = req.body.segundo_elemento.trim();
+    const primeiroElemento = req.body.primeiroElemento.trim();
+    const segundoElemento = req.body.segundoElemento.trim();
     const localidadeId = parseInt(req.body.localidade);
     const escalaoId = parseInt(req.body.escalao);
     const errors = validationResult(req);
+
     req.breadcrumbs('Adicionar Equipa', '/equipas/adicionarEquipa');
     
     const oldData = {

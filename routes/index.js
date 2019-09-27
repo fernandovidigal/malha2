@@ -38,4 +38,9 @@ router.get('/logout', (req, res) => {
     res.redirect('/login');
 });
 
+/*router.get('/alterarPassword/:userId', (req, res) => {
+    req.breadcrumbs('Alterar Password', '');
+    res.render('alterarPassword', { breadcrumbs: req.breadcrumbs()});
+});*/
+
 module.exports = router;

@@ -555,6 +555,20 @@ exports.getJogoPorEquipasID = (torneioId, escalaoId, fase, campo, equipa1Id, equ
     });
 }
 
+exports.getAllJogos = (torneioId, equipaId, escalaoId) => {
+    return Jogos.findAll({
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId,
+            [Op.or]: [
+                {equipa1Id: equipaId},
+                {equipa2Id: equipaId}
+            ]
+        },
+        raw: true
+    });
+}
+
 exports.getAllJogosEscalaoFase = (torneioId, escalaoId, fase) => {
     return Jogos.findAll({
         where: {

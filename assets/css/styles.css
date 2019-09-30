@@ -163,6 +163,34 @@ li {
     color: #D05744;
 }
 
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+}
+
+.overlay-show {
+    display: block;
+}
+
+.overlayContainer {
+    background-color: white;
+    border-radius: 8px;
+    min-width: 70%;
+    height: 75vh;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow-y: auto;
+    padding: 24px 12px;
+}
+
 /************************************
     INPUTS
 ************************************/
@@ -860,6 +888,10 @@ input::placeholder {
     cursor: pointer;
 }
 
+.escaloesDefinidos {
+    color: #29323D;
+}
+
 .info__wrapper {
     position: fixed;
     bottom: 0;
@@ -1200,4 +1232,50 @@ input::placeholder {
 
 .userLevelChange__item:hover {
     background-color: #EEEFF3;
+}
+
+.mainTable-noBorder tbody tr{
+    border: none;
+}
+
+.tw5 {
+    width: 5%;
+}
+
+.tw6{
+    width: 6%;
+}
+
+.tw10 {
+    width: 10%;
+}
+
+.percursoTorneio_wrapper {
+    width: 60%;
+    margin-bottom: 60px;
+}
+
+.percursoJogos_wrapper {
+    width: 100%;
+    display: none;
+}
+
+.percursoJogos_wrapper-open {
+    display: block;
+}
+
+.percursoJogosTable,
+.percursoJogosTable__innerTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.percursoJogosTable__innerTable {
+    border-bottom: solid 1px black;
+}
+
+.percursoJogosTable__innerTable-equipas {
+    padding-top: 4px;
+    padding-bottom: 4px;
 }

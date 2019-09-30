@@ -1,70 +1,103 @@
 <%- include('../includes/header.ejs') %>
-<%- include('../includes/breadcrumbs.ejs') %>
-<%- include('../includes/validationErrors.ejs') %>
 
-<% if(typeof equipa !== 'undefined'){ %>
+<% if(torneio != null){ %>
+    <div class="barraTorneio">
+        <div class="barraTorneio__title">
+            <h1><%= torneio.designacao %></h1>
+            <h3><%= torneio.localidade %>, <%= torneio.ano %></h3>
+        </div>
+    </div>
 
-<form action="/equipas/editarEquipa/<%= equipa.oldEscalaoId %>/<%= equipa.equipaId %>?_method=PUT" method="post">
-    <p>Equipa: <%= equipa.equipaId %></p>
-    <label for="primeiro_elemento">Nome do Primeiro Elemento</label>
-    <input type="text" name="primeiro_elemento" pattern="^[^0-9]+$" required value="<%= equipa.primeiroElemento %>"><br>
-    <label for="segundo_elemento">Nome do Segundo Elemento</label>
-    <input type="text" name="segundo_elemento" pattern="^[^0-9]+$" required value="<%= equipa.segundoElemento %>"><br>
-    <label for="Localidade">Localidade</label>
-    <% if(typeof localidades != 'undefined' && localidades.length > 0){ %>
-        <select name="localidade" id="localidade" required>
-            <option value=""></option>
-                <% localidades.forEach(function(localidade){ %>
-                    <option value="<%= localidade.localidadeId %>" 
-                        <% if(equipa.localidadeId == localidade.localidadeId){ %>
-                            selected
-                        <% } %>
-                    ><%= localidade.nome %></option>
-                <% }); %>
-        </select>
-    <% } else { %>
-        Não existem localidades registadas.
-    <% } %>
+    <%- include('../includes/breadcrumbs.ejs') %>
+    <div class="container_wrapper">
+        <div class="actionBar__wrapper">
+            <h2 class="actionBar__title">Editar Equipa</h2>
+        </div>
+    </div>
 
-    <% if(equipa.escaloesEditaveis){ %>
-        <p>Escalões</p>
-        <% if(typeof escaloes != 'undefined' && escaloes.length > 0){ %>
-            <p>Masculino</p>
-            <% escaloes.forEach(function(escalao){ %>
-                <% if(escalao.sexo == 1){ %>
-                    <label></label><input type="radio" name="escalao" required value="<%= escalao.escalaoId %>"  
-                        <% if(equipa.escalaoId == escalao.escalaoId){ %>
-                            checked
-                        <% } %>
-                    ><%= escalao.designacao %></label>
-                <% } %>
-            <% }); %>
-            <p>Feminino</p>
-            <% escaloes.forEach(function(escalao){ %>
-                <% if(escalao.sexo == 0){ %>
-                    <label></label><input type="radio" name="escalao" required value="<%= escalao.escalaoId %>"  
-                        <% if(equipa.escalaoId == escalao.escalaoId){ %>
-                            checked
-                        <% } %>
-                    ><%= escalao.designacao %></label>
-                <% } %>
-            <% }); %>
-        <% } else { %>
-            Não existem escalões registadas.
-        <% } %>
-    <% } else { %>
-        <p>Escalão: <%= equipa.escalao.designacao %> (<%= (equipa.escalao.sexo == 1) ? 'Masculino' : 'Feminino' %>)</p>
-        <input type="hidden" name="escalao" value="<%= equipa.escalaoId %>">
-    <% } %>
+    <div class="tabbedMenu__wrapper">
+        <ul class="tabbedMenu">
+            <li class="tabbedMenu__item tabbedMenu__item-selected">Equipa</li>
+            <li class="tabbedMenu__item">Percurso no Torneio</li>
+        </ul>
+    </div>
 
-    <br>
-    <input type="submit" value="Actualizar">
-    <a href="/equipas">Cancelar</a>
-</form>
+    <div class="tabbedContent__wrapper">
+        <form action="/equipas/editarEquipa/<%= equipa.oldEscalaoId %>/<%= equipa.equipaId %>?_method=PUT" method="post">
+        <div id="equipa" class="tabbedContainer tabbedContainer-open">
+            <%- include('includes/equipaInfo.ejs') %>
+        </div>
+        <div id="percurso" class="tabbedContainer">
+            <%- include('includes/equipaPercurso.ejs') %>
+        </div>
+        <div class="inputBtnBar">
+            <input type="submit" name="actualizar" value="Actualizar" class="btn btn-primary">
+            <a href="/equipas" class="btn-cancel">Cancelar</a>
+        </div>
+        </form>
+    </div>
 
-<% } else { %>
-    <h1>Oops...Algo correu mal!</h1>
-    <a href="/equipas">Voltar</a>
+    <div class="overlay">
+        <div class="overlayContainer">
+
+        </div>
+    </div>
+
+<% } else { %>
+    <h2>Oops.. Algo correu mal!</h2>
+    <p>Verifique se existem torneios registados ou activados.</p>
 <% } %>
 
+<script src="/js/customSelect.js"></script>
+<script>
+    // TAB CONTROLLER
+    function closeAllTabs(tabItems, tabContainers){
+        tabItems.forEach((item, index) => {
+            item.classList.remove('tabbedMenu__item-selected');
+            tabContainers[index].classList.remove('tabbedContainer-open');
+        });
+    }
+    const tabItems = document.querySelectorAll('.tabbedMenu__item');
+    const tabContainers = document.querySelectorAll('.tabbedContainer');
+
+    tabItems.forEach((item, index) => {
+        item.addEventListener('click', function(){
+            closeAllTabs(tabItems, tabContainers);
+            item.classList.add('tabbedMenu__item-selected');
+            tabContainers[index].classList.add('tabbedContainer-open');
+        });
+    });
+
+    // LOCALIDADES DROP BOX
+    const listaLocalidades = document.querySelectorAll('.adicionarEquipaLocalidadesSelect__list > a');
+    const localidadeInput = document.getElementsByName('localidade');
+    const localidadesSelectHeader = document.querySelector('.adicionarEquipaLocalidadesSelect__header');
+    listaLocalidades.forEach(localidade => {
+        localidade.addEventListener('click', function(e){
+            const localidadeId = parseInt(localidade.dataset.localidade);
+            const nomeLocalidade = localidade.textContent;
+            localidadeInput[0].value = localidadeId;
+            localidadesSelectHeader.textContent = nomeLocalidade;
+        });
+    });
+
+    // SHOW OVERLAY
+    const eyeBtn = document.querySelectorAll('.loginForm__showPassword--btn');
+    const percursoJogosFase = document.querySelectorAll('.percursoJogos_wrapper');
+
+    const overlay = document.querySelector('.overlay');
+    const overlayContainer = document.querySelector('.overlayContainer');
+    eyeBtn.forEach((el, index) => {
+        el.addEventListener('click', function(e){
+            const content = percursoJogosFase[index].innerHTML;
+            overlayContainer.innerHTML = '';
+            overlayContainer.innerHTML = content;
+            overlay.classList.toggle('overlay-show');
+        });
+    });
+
+    overlay.addEventListener('click', function(e){
+        this.classList.remove('overlay-show');
+    });
+</script>
 <%- include('../includes/footer.ejs') %>

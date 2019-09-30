@@ -1,0 +1,70 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/breadcrumbs.ejs') %>
+<%- include('../includes/validationErrors.ejs') %>
+
+<% if(typeof equipa !== 'undefined'){ %>
+
+<form action="/equipas/editarEquipa/<%= equipa.oldEscalaoId %>/<%= equipa.equipaId %>?_method=PUT" method="post">
+    <p>Equipa: <%= equipa.equipaId %></p>
+    <label for="primeiro_elemento">Nome do Primeiro Elemento</label>
+    <input type="text" name="primeiro_elemento" pattern="^[^0-9]+$" required value="<%= equipa.primeiroElemento %>"><br>
+    <label for="segundo_elemento">Nome do Segundo Elemento</label>
+    <input type="text" name="segundo_elemento" pattern="^[^0-9]+$" required value="<%= equipa.segundoElemento %>"><br>
+    <label for="Localidade">Localidade</label>
+    <% if(typeof localidades != 'undefined' && localidades.length > 0){ %>
+        <select name="localidade" id="localidade" required>
+            <option value=""></option>
+                <% localidades.forEach(function(localidade){ %>
+                    <option value="<%= localidade.localidadeId %>" 
+                        <% if(equipa.localidadeId == localidade.localidadeId){ %>
+                            selected
+                        <% } %>
+                    ><%= localidade.nome %></option>
+                <% }); %>
+        </select>
+    <% } else { %>
+        Não existem localidades registadas.
+    <% } %>
+
+    <% if(equipa.escaloesEditaveis){ %>
+        <p>Escalões</p>
+        <% if(typeof escaloes != 'undefined' && escaloes.length > 0){ %>
+            <p>Masculino</p>
+            <% escaloes.forEach(function(escalao){ %>
+                <% if(escalao.sexo == 1){ %>
+                    <label></label><input type="radio" name="escalao" required value="<%= escalao.escalaoId %>"  
+                        <% if(equipa.escalaoId == escalao.escalaoId){ %>
+                            checked
+                        <% } %>
+                    ><%= escalao.designacao %></label>
+                <% } %>
+            <% }); %>
+            <p>Feminino</p>
+            <% escaloes.forEach(function(escalao){ %>
+                <% if(escalao.sexo == 0){ %>
+                    <label></label><input type="radio" name="escalao" required value="<%= escalao.escalaoId %>"  
+                        <% if(equipa.escalaoId == escalao.escalaoId){ %>
+                            checked
+                        <% } %>
+                    ><%= escalao.designacao %></label>
+                <% } %>
+            <% }); %>
+        <% } else { %>
+            Não existem escalões registados.
+        <% } %>
+    <% } else { %>
+        <p>Escalão: <%= equipa.escalao.designacao %> (<%= (equipa.escalao.sexo == 1) ? 'Masculino' : 'Feminino' %>)</p>
+        <input type="hidden" name="escalao" value="<%= equipa.escalaoId %>">
+    <% } %>
+
+    <br>
+    <input type="submit" value="Actualizar">
+    <a href="/equipas">Cancelar</a>
+</form>
+
+<% } else { %>
+    <h1>Oops...Algo correu mal!</h1>
+    <a href="/equipas">Voltar</a>
+<% } %>
+
+<%- include('../includes/footer.ejs') %>

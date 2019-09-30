@@ -1,9 +1,9 @@
-
 const Equipas = require('../models/Equipas');
 const dbFunctions = require('../helpers/DBFunctions');
 const sequelize = require('../helpers/database');
 const { validationResult } = require('express-validator/check');
 const util = require('../helpers/util');
+const torneioHelpers = require('../helpers/torneioHelperFunctions');
 
 const faker = require('faker');
 faker.locale = "pt_BR";
@@ -100,6 +100,69 @@ async function processaListaEscaloes(escaloes, torneioId){
     return listaEscaloes;
 }
 
+async function processaPercurso(torneioId, equipaId, escalaoId){
+    const _jogos = dbFunctions.getAllJogos(torneioId, equipaId, escalaoId);
+    const _equipas = dbFunctions.getAllEquipas(torneioId, escalaoId);
+
+    const [jogos, equipas] = await Promise.all([_jogos, _equipas]);
+
+    const _jogosId = new Set(jogos.map(el => el.jogoId));
+    const jogosId = [..._jogosId];
+    const _fases = new Set(jogos.map(el => el.fase));
+    const fases = [..._fases];
+    const _campos = new Set(jogos.map(el => el.campo));
+    const campos = [..._campos];
+
+    const listaFases = [];
+    //fases.forEach(async (fase,index) => {
+    for(const [index, fase] of fases.entries()){
+        const faseActual = {
+            fase: fase,
+            campo: campos[index],
+            jogos: []
+        };
+
+        // PROCESSA A CLASSIFICAÇÃO
+        const _classificacao = await torneioHelpers.processaClassificacao(torneioId, escalaoId, fase, campos[index]);
+        const posicao = _classificacao[0].classificacao.map(el => el.equipaId).indexOf(equipaId);
+        const classificacao = {
+            posicao: posicao + 1,
+            vitorias: _classificacao[0].classificacao[posicao].vitorias,
+            pontos: _classificacao[0].classificacao[posicao].pontos
+        }
+        faseActual.classificacao = classificacao;
+
+        // PROCESSA JOGOS
+        const parciais = await dbFunctions.getAllParciais(jogosId);
+
+        //const parciais = await
+        for(const jogo of jogos){
+            if(jogo.fase == fase){
+                // Equipas
+                const equipa1 = equipas.find(el => el.equipaId == jogo.equipa1Id);
+                const equipa2 = equipas.find(el => el.equipaId == jogo.equipa2Id);
+                const _jogo = {
+                    equipas: [equipa1, equipa2]
+                }
+
+                // Parciais
+                const parciaisEquipa1 = parciais.find(el => (el.jogoId == jogo.jogoId && el.equipaId == equipa1.equipaId));
+                const parciaisEquipa2 = parciais.find(el => (el.jogoId == jogo.jogoId && el.equipaId == equipa2.equipaId));
+                _jogo.parciais = [parciaisEquipa1, parciaisEquipa2];
+
+                // Pontuação
+                _jogo.pontos = [jogo.equipa1Pontos, jogo.equipa2Pontos];
+
+                faseActual.jogos.push(_jogo);
+            }
+        }
+
+        listaFases.push(faseActual);
+    }
+
+    return listaFases;
+}
+
 exports.getAllEquipas = async (req, res, next) => {
     try{
         const torneioInfo = dbFunctions.getTorneioInfo();
@@ -192,11 +255,23 @@ exports.getEquipaToEdit = async (req, res, next) => {
             // Exclui da lista de esclões os escalões que já tenham jogos distribuídos
             // Se já existe jogos distribuídos não é possível adicionar mais equipas
             const listaEscaloesDisponiveis = await processaListaEscaloes(escaloes, torneio.torneioId);
+            // Adicionar o escalão actual
+            listaEscaloesDisponiveis.push({
+                escalaoId: equipa.escalao.escalaoId,
+                designacao: equipa.escalao.designacao,
+                sexo: equipa.escalao.sexo
+            });
+
+            listaEscaloesDisponiveis.sort((a,b) => (a.escalaoId > b.escalaoId) ? 1 : -1);
+
+            const percursoTorneio = await processaPercurso(torneio.torneioId, equipaId, escalaoId);
 
             res.render('equipas/editarEquipa', {
                 localidades: localidades,
                 escaloes: listaEscaloesDisponiveis,
+                torneio: torneio,
                 equipa: equipa,
+                percurso: percursoTorneio,
                 breadcrumbs: req.breadcrumbs()
             });
         } else {
@@ -351,8 +426,8 @@ exports.createEquipa = async (req, res, next) => {
 
 exports.updateEquipa = async (req, res, next) => {
     const equipaId = parseInt(req.params.id);
-    const primeiroElemento = req.body.primeiro_elemento.trim();
-    const segundoElemento = req.body.segundo_elemento.trim();
+    const primeiroElemento = req.body.primeiroElemento.trim();
+    const segundoElemento = req.body.segundoElemento.trim();
     const localidadeId = parseInt(req.body.localidade);
     const oldEscalaoId = parseInt(req.params.escalao);
     const escalaoId = parseInt(req.body.escalao);

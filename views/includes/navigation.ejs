@@ -43,7 +43,7 @@
         <div class="userMenu"> 
             <svg xmlns="http://www.w3.org/2000/svg" width="4.645" height="16" viewBox="0 0 4.645 16"><path d="M26.323,13.677A2.323,2.323,0,1,1,24,16,2.321,2.321,0,0,1,26.323,13.677ZM24,10.323A2.323,2.323,0,1,0,26.323,8,2.321,2.321,0,0,0,24,10.323Zm0,11.355a2.323,2.323,0,1,0,2.323-2.323A2.321,2.321,0,0,0,24,21.677Z" transform="translate(-24 -8)" fill="#fff"/></svg>
             <ul class="user__navigation">
-                <li class="user__navigation-item"><a href="/logout" class="user__navigation-link"><i class="fas fa-key"></i>Alterar Password</a></li>
+                <li class="user__navigation-item"><a href="/alterarPassword/<%= loggedUser.userId %>" class="user__navigation-link"><i class="fas fa-key"></i>Alterar Password</a></li>
                 <li class="user__navigation-item"><a href="/logout" class="user__navigation-link"><i class="fas fa-sign-out-alt"></i>Logout</a></li>
             </ul>
         </div>

@@ -38,8 +38,9 @@
     </div>
 
     <div class="overlay">
-        <div class="overlayContainer">
-
+        <div class="overlayContainer__wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" class="overlayContainer__close" viewBox="0 0 36 36"><g transform="translate(-1126 -126)"><circle cx="16" cy="16" r="16" transform="translate(1128 128)" fill="#fff"/><path d="M26,8A18,18,0,1,0,44,26,18,18,0,0,0,26,8Zm8.826,22.725a.872.872,0,0,1,0,1.234l-2.874,2.867a.872.872,0,0,1-1.234,0L26,30.065l-4.725,4.761a.872.872,0,0,1-1.234,0l-2.867-2.874a.872.872,0,0,1,0-1.234L21.935,26l-4.761-4.725a.872.872,0,0,1,0-1.234l2.874-2.874a.872.872,0,0,1,1.234,0L26,21.935l4.725-4.761a.872.872,0,0,1,1.234,0l2.874,2.874a.872.872,0,0,1,0,1.234L30.065,26Z" transform="translate(1118 118)"/></g></svg>
+            <div class="overlayContent"></div>
         </div>
     </div>
 
@@ -83,21 +84,30 @@
 
     // SHOW OVERLAY
     const eyeBtn = document.querySelectorAll('.loginForm__showPassword--btn');
-    const percursoJogosFase = document.querySelectorAll('.percursoJogos_wrapper');
+    const percursoJogos = document.querySelectorAll('.percursoJogos');
 
     const overlay = document.querySelector('.overlay');
-    const overlayContainer = document.querySelector('.overlayContainer');
+    const overlayWrapper = document.querySelector('.overlayContainer__wrapper');
+    const overlayContent = document.querySelector('.overlayContent');
+    const overlayCloseBtn = document.querySelector('.overlayContainer__close');
     eyeBtn.forEach((el, index) => {
         el.addEventListener('click', function(e){
-            const content = percursoJogosFase[index].innerHTML;
-            overlayContainer.innerHTML = '';
-            overlayContainer.innerHTML = content;
+            const content = percursoJogos[index].innerHTML;
+            overlayContent.innerHTML = '';
+            overlayContent.innerHTML = content;
             overlay.classList.toggle('overlay-show');
         });
     });
 
-    overlay.addEventListener('click', function(e){
-        this.classList.remove('overlay-show');
+    overlayWrapper.addEventListener('click', function(e){
+        e.stopPropagation();
     });
+
+    overlay.addEventListener('click', closeOverlay);
+    overlayCloseBtn.addEventListener('click', closeOverlay);
+
+    function closeOverlay(){
+        overlay.classList.remove('overlay-show');
+    }
 </script>
 <%- include('../includes/footer.ejs') %>

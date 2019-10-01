@@ -255,13 +255,16 @@ exports.getEquipaToEdit = async (req, res, next) => {
             // Exclui da lista de esclões os escalões que já tenham jogos distribuídos
             // Se já existe jogos distribuídos não é possível adicionar mais equipas
             const listaEscaloesDisponiveis = await processaListaEscaloes(escaloes, torneio.torneioId);
-            // Adicionar o escalão actual
-            listaEscaloesDisponiveis.push({
-                escalaoId: equipa.escalao.escalaoId,
-                designacao: equipa.escalao.designacao,
-                sexo: equipa.escalao.sexo
-            });
-
+            // Adicionar o escalão actual caso não exista já na lista de escalões disponíveis
+            const found = listaEscaloesDisponiveis.find(el => el.escalaoId == equipa.escalaoId);
+            if(!found){
+                listaEscaloesDisponiveis.push({
+                    escalaoId: equipa.escalao.escalaoId,
+                    designacao: equipa.escalao.designacao,
+                    sexo: equipa.escalao.sexo
+                });
+            }
+            
             listaEscaloesDisponiveis.sort((a,b) => (a.escalaoId > b.escalaoId) ? 1 : -1);
 
             const percursoTorneio = await processaPercurso(torneio.torneioId, equipaId, escalaoId);

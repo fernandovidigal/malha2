@@ -1,3 +1,4 @@
+<% if(percurso.length > 0){ %>
 <% percurso.forEach(fase => { %>
     <h3><%= (fase != 100) ? fase.fase + 'ª Fase' : 'Fase Final' %></h3>
     <div class="table__wrapper percursoTorneio_wrapper">
@@ -19,35 +20,40 @@
                 </tr>
             </tbody>
         </table>
-        <div class="percursoJogos_wrapper percursoJogos_wrapper-open">
-            <table class="percursoJogosTable">
-                <tbody>
-                    <% fase.jogos.forEach(jogo => { %>
+        <div class="percursoJogos">
+            <h2>Jogo<%= (fase.fase == 1) ? 's' : '' %> da <%= (fase.fase != 100) ? fase.fase + 'ª Fase' : 'Fase Final' %></h2>
+            <div class="percursoJogosContainer">
+                <table class="mainTable jogosTable">
+                    <thead>
                         <tr>
-                            <td>
-                                <table class="percursoJogosTable__innerTable">
-                                    <tr>
-                                        <td class="tw6" align="center"><%= jogo.equipas[0].equipaId %></td>
-                                        <td class="percursoJogosTable__innerTable-equipas"><%= jogo.equipas[0].primeiroElemento %><br><%= jogo.equipas[0].segundoElemento %></td>
-                                        <td class="tw5" align="center"><%= jogo.parciais[0].parcial1 %></td>
-                                        <td class="tw5" align="center"><%= jogo.parciais[0].parcial2 %></td>
-                                        <td class="tw5" align="center"><%= jogo.parciais[0].parcial3 %></td>
-                                        <td class="tw10" align="center"><%= jogo.pontos[0] %></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="tw6" align="center"><%= jogo.equipas[1].equipaId %></td>
-                                        <td class="percursoJogosTable__innerTable-equipas"><%= jogo.equipas[1].primeiroElemento %><br><%= jogo.equipas[1].segundoElemento %></td>
-                                        <td class="tw5" align="center"><%= jogo.parciais[1].parcial1 %></td>
-                                        <td class="tw5" align="center"><%= jogo.parciais[1].parcial2 %></td>
-                                        <td class="tw5" align="center"><%= jogo.parciais[1].parcial3 %></td>
-                                        <td class="tw10" align="center"><%= jogo.pontos[1] %></td>
-                                    </tr>
-                                </table>
-                            </td>
+                            <th>Equipa</th>
+                            <th class="mainTable-headerElement-left" colspan="2">Elementos</th>
+                            <th class="mainTable-headerElement-left">Localidade</th>
+                            <th>Parcial 1</th>
+                            <th>Parcial 2</th>
+                            <th>Parcial 3</th>
+                            <th>Pontos</th>
                         </tr>
-                    <% }); %>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <% fase.jogos.forEach(jogo => { %>
+                            <tr>
+                                <td align="center"><%= jogo.equipas[0].equipaId %><span class="jogosTableBrSeparator"><%= jogo.equipas[1].equipaId %></span></td>
+                                <td><%= jogo.equipas[0].primeiroElemento %><span class="jogosTableBrSeparator"><%= jogo.equipas[1].primeiroElemento %></span></td>
+                                <td><%= jogo.equipas[0].segundoElemento %><span class="jogosTableBrSeparator"><%= jogo.equipas[1].segundoElemento %></span></td>
+                                <td><%= jogo.equipas[0].localidade.nome %><span class="jogosTableBrSeparator"><%= jogo.equipas[1].localidade.nome %></span></td>
+                                <td align="center"><%= jogo.parciais[0].parcial1 %><span class="jogosTableBrSeparator"><%= jogo.parciais[1].parcial1 %></span></td>
+                                <td align="center"><%= jogo.parciais[0].parcial2 %><span class="jogosTableBrSeparator"><%= jogo.parciais[1].parcial2 %></span></td>
+                                <td align="center"><%= jogo.parciais[0].parcial3 %><span class="jogosTableBrSeparator"><%= jogo.parciais[1].parcial3 %></span></td>
+                                <td align="center"><%= jogo.pontos[0] %><span class="jogosTableBrSeparator"><%= jogo.pontos[1] %></span></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 <% }); %>
+<% } else { %>
+    <p>A equipa ainda não iniciou a competição!</p>
+<% } %>

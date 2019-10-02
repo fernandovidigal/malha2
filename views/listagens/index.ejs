@@ -17,9 +17,25 @@
 
     <div class="listagens__wrapper">
         <div class="listagem__item">
-            <p>Número de Equipas por Localidade</p>
+            <p class="listagem__item-title">Número de Equipas por Localidade</p>
             <div class="listagem__item-content">
-                <div class="listagems__item-inputs"></div>
+                <div class="listagems__item-inputs">
+                    <%- include('componentes/escaloes.ejs', {escaloes: escaloes, errMsg: 'Não existem equipas registadas!'}) %>
+                    <%- include('componentes/fase.ejs') %>
+                </div>
+                <div class="listagem__item-printBtn">
+                    <a class="btn btn-secondary numEquipasPorConcelho_btn">Imprimir</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="listagem__item">
+            <p class="listagem__item-title">Equipas Agrupadas por Campos</p>
+            <div class="listagem__item-content">
+                <div class="listagems__item-inputs">
+                    <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos, errMsg: 'Não existem equipas registadas!'}) %>
+                    <%- include('componentes/fase.ejs') %>
+                </div>
                 <div class="listagem__item-printBtn">
                     <a class="btn btn-secondary numEquipasPorConcelho_btn">Imprimir</a>
                 </div>
@@ -35,5 +51,7 @@
 <script src="/js/pdfmake.min.js"></script>
 <script src="/js/vfs_fonts.js"></script>
 <script src="/js/printFunctions.js"></script>
+<script src="/js/customSelect.js"></script>
 <script src="/js/print.js"></script>
+
 <%- include('../includes/footer.ejs') %>

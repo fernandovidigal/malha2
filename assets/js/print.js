@@ -30,7 +30,7 @@ function getControllersValues(parent) {
   };
 }
 
-async function mostraFaseSelect(escalaoId, parent) {
+async function mostraFaseSelect_old(escalaoId, parent) {
   const data = await getData(`/listagens/getFases/${escalaoId}`);
   const faseSelectExists = parent.querySelector(".faseSelect");
 
@@ -50,6 +50,46 @@ async function mostraFaseSelect(escalaoId, parent) {
     selectBox.appendChild(option);
   });
   parent.appendChild(selectBox);
+}
+
+function removeAllChilds(node){
+  while(node.firstChild){
+    node.removeChild(node.firstChild);
+  }
+}
+
+async function mostraFaseSelect(escalaoId, parent) {
+  const data = await getData(`/listagens/getFases/${escalaoId}`);
+  const faseSelect = parent.querySelector(".faseEscalaoSelect");
+  const itemsList = faseSelect.querySelector('.customSelect__list');
+  const faseHeader = faseSelect.querySelector('.customSelect__header');
+  const faseInput = faseSelect.getElementsByClassName('faseInput');
+
+  // Reset ao cabeçalho da select box
+  removeAllChilds(faseHeader);
+  const placeholder = document.createElement('SPAN');
+  placeholder.classList.add('placeholder');
+  placeholder.textContent = 'Fase';
+  faseHeader.appendChild(placeholder);
+  faseHeader.classList.remove('customSelect__header-selected');
+
+  // Reset fase input
+  faseInput[0].value = 0;
+
+  // Limpa a lista
+  removeAllChilds(itemsList);
+
+  // Constroi os items da fase
+  data.listaFases.forEach(fase => {
+    const item = document.createElement('P');
+    item.classList.add("customSelect__links", "fase__link");
+    item.dataset.fase = fase;
+    item.textContent = (fase != 100) ? `${fase}ª Fase` : "Fase Final";
+    itemsList.appendChild(item);
+  });
+
+  // Mostra Select das Fases
+  faseSelect.classList.add('faseEscalaoSelect-show');
 }
 
 async function mostraCamposSelect(escalaoId, fase, parent) {
@@ -312,6 +352,41 @@ async function imprimeResultados(escalaoId, fase, campo) {
   }
 }
 
+
+const itemsListagem = document.querySelectorAll('.listagem__item');
+itemsListagem.forEach((itemListagem, index) => {
+  itemListagem.addEventListener('click', async function(e){
+
+    if(e.target.classList.contains('escalao__link')){
+      const elemento = e.target;
+      const parentSelectBox = elemento.closest('.customSelect');
+      const selectBoxHeader = parentSelectBox.querySelector('.customSelect__header');
+      const selectBoxInput = parentSelectBox.getElementsByClassName('escalaoInput');
+      const escalaoId = parseInt(elemento.dataset.escalao);
+
+      selectBoxInput[0].value = escalaoId;
+      selectBoxHeader.innerHTML = elemento.textContent;
+      selectBoxHeader.classList.add('customSelect__header-selected');
+
+      if(index > 0) {
+        await mostraFaseSelect(escalaoId, elemento.closest('.listagems__item-inputs'));
+      }
+
+    } else if(e.target.classList.contains('fase__link')){
+      const elemento = e.target;
+      const parentSelectBox = elemento.closest('.customSelect');
+      const selectBoxHeader = parentSelectBox.querySelector('.customSelect__header');
+      const selectBoxInput = parentSelectBox.getElementsByClassName('faseInput');
+      const faseId = parseInt(elemento.dataset.fase);
+
+      selectBoxInput[0].value = faseId;
+      selectBoxHeader.innerHTML = elemento.textContent;
+      selectBoxHeader.classList.add('customSelect__header-selected');
+    }
+
+  });
+});
+
 // Processa alterações na escolha do escalão
 const escalaoSelect = document.getElementsByName("escalao");
 escalaoSelect.forEach(function(escalao, index) {
@@ -341,7 +416,7 @@ escalaoSelect.forEach(function(escalao, index) {
   });
 });
 
-// Processa as alterações na escalho da fase
+// Processa as alterações na escolha da fase
 const cardsControllers = document.querySelectorAll(".listagemCard__controllers");
 cardsControllers.forEach(controller => {
   controller.addEventListener("change", async function(e) {
@@ -371,7 +446,7 @@ cardsControllers.forEach(controller => {
   });
 });
 
-const numEquipasPorConcelhoBtn = document.querySelector(".numEquipasPorConcelho_btn");
+/*const numEquipasPorConcelhoBtn = document.querySelector(".numEquipasPorConcelho_btn");
 numEquipasPorConcelhoBtn.addEventListener("click", function(e) {
   e.preventDefault();
   const ctrlData = getControllersValues(this.parentNode);
@@ -445,7 +520,7 @@ resultadosBtn.addEventListener("click", function(e) {
       text: "Deve selecionar o Escalão."
     });
   }
-});
+});*/
 
 // Abre o pdf noutra janela
 //pdfMake.createPdf(docDefinition).print();

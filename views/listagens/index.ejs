@@ -21,7 +21,6 @@
             <div class="listagem__item-content">
                 <div class="listagems__item-inputs">
                     <%- include('componentes/escaloes.ejs', {escaloes: escaloes, errMsg: 'Não existem equipas registadas!'}) %>
-                    <%- include('componentes/fase.ejs') %>
                 </div>
                 <div class="listagem__item-printBtn">
                     <a class="btn btn-secondary numEquipasPorConcelho_btn">Imprimir</a>
@@ -33,11 +32,44 @@
             <p class="listagem__item-title">Equipas Agrupadas por Campos</p>
             <div class="listagem__item-content">
                 <div class="listagems__item-inputs">
-                    <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos, errMsg: 'Não existem equipas registadas!'}) %>
+                    <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos, errMsg: 'Não existem jogos registadas!'}) %>
                     <%- include('componentes/fase.ejs') %>
+                    <%- include('componentes/campos.ejs') %>
                 </div>
                 <div class="listagem__item-printBtn">
-                    <a class="btn btn-secondary numEquipasPorConcelho_btn">Imprimir</a>
+                    <a class="btn btn-secondary equipasAgrupadasPorCampos_btn">Imprimir</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="listagem__item">
+            <p class="listagem__item-title">Fichas de Jogo</p>
+            <div class="listagem__item-content">
+                <div class="listagems__item-inputs">
+                    <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos, errMsg: 'Não existem jogos registadas!'}) %>
+                    <%- include('componentes/fase.ejs') %>
+                    <%- include('componentes/campos.ejs') %>
+                    <label class="soFolhaRostoContainer" for="soFolhaRosto">Só Folha de Rosto
+                        <input type="checkbox" name="soFolhaRosto" id="soFolhaRosto" class="soFolhaRostoInput">
+                        <span class="soFolhaRostoCheckmark"></span>
+                    </label>
+                </div>
+                <div class="listagem__item-printBtn">
+                    <a class="btn btn-secondary fichasJogo_btn">Imprimir</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="listagem__item">
+            <p class="listagem__item-title">Resultados</p>
+            <div class="listagem__item-content">
+                <div class="listagems__item-inputs">
+                    <%- include('componentes/escaloes.ejs', {escaloes: escaloesComJogos, errMsg: 'Não existem jogos registadas!'}) %>
+                    <%- include('componentes/fase.ejs') %>
+                    <%- include('componentes/campos.ejs') %>
+                </div>
+                <div class="listagem__item-printBtn">
+                    <a class="btn btn-secondary resultados_btn">Imprimir</a>
                 </div>
             </div>
         </div>

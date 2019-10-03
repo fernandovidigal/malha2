@@ -11,17 +11,27 @@ async function getData(url) {
   }
 }
 
-function getControllersValues(parent) {
-  const escalaoSelect = parent.querySelector(".escalaoSelect");
-  const escalaoId = escalaoSelect[escalaoSelect.selectedIndex].value || 0;
+function removeAllChilds(node){
+  while(node.firstChild){
+    node.removeChild(node.firstChild);
+  }
+}
 
-  const faseSelect = parent.querySelector(".faseSelect");
-  const fase = faseSelect ? faseSelect[faseSelect.selectedIndex].value : 0;
+function getSelectedValues(parent) {
+  const escalaoSelect = parent.querySelector(".escalaoInput");
+  const escalaoId = escalaoSelect.value || 0;
+  let fase = 0;
+  let campo = 0;
 
-  const camposSelect = parent.querySelector(".camposSelect");
-  const campo = camposSelect
-    ? camposSelect[camposSelect.selectedIndex].value
-    : 0;
+  const faseSelect = parent.querySelector(".faseInput");
+  if(faseSelect){
+    fase = faseSelect.value;
+  }
+
+  const campoSelect = parent.querySelector(".campoInput");
+  if(campoSelect){
+    campo = campoSelect.value;
+  }
 
   return {
     escalaoId: parseInt(escalaoId),
@@ -30,37 +40,9 @@ function getControllersValues(parent) {
   };
 }
 
-async function mostraFaseSelect_old(escalaoId, parent) {
-  const data = await getData(`/listagens/getFases/${escalaoId}`);
-  const faseSelectExists = parent.querySelector(".faseSelect");
-
-  if (faseSelectExists) {
-    parent.removeChild(faseSelectExists);
-  }
-
-  const selectBox = document.createElement("select");
-  selectBox.name = "fase";
-  selectBox.id = "fase";
-  selectBox.classList.add("faseSelect");
-
-  data.listaFases.forEach(function(fase) {
-    const option = document.createElement("option");
-    option.value = fase;
-    option.text = fase != 100 ? `Fase ${fase}` : "Fase Final";
-    selectBox.appendChild(option);
-  });
-  parent.appendChild(selectBox);
-}
-
-function removeAllChilds(node){
-  while(node.firstChild){
-    node.removeChild(node.firstChild);
-  }
-}
-
 async function mostraFaseSelect(escalaoId, parent) {
   const data = await getData(`/listagens/getFases/${escalaoId}`);
-  const faseSelect = parent.querySelector(".faseEscalaoSelect");
+  const faseSelect = parent.querySelector(".listagemFaseSelect");
   const itemsList = faseSelect.querySelector('.customSelect__list');
   const faseHeader = faseSelect.querySelector('.customSelect__header');
   const faseInput = faseSelect.getElementsByClassName('faseInput');
@@ -89,80 +71,65 @@ async function mostraFaseSelect(escalaoId, parent) {
   });
 
   // Mostra Select das Fases
-  faseSelect.classList.add('faseEscalaoSelect-show');
+  faseSelect.classList.add('select-show');
 }
 
 async function mostraCamposSelect(escalaoId, fase, parent) {
   const data = await getData(`/listagens/getCampos/${escalaoId}/${fase}`);
-  const campoSelectExists = parent.querySelector(".camposSelect");
+  const campoSelect = parent.querySelector(".listagemCampoSelect");
+  const itemsList = campoSelect.querySelector('.customSelect__list');
+  const campoHeader = campoSelect.querySelector('.customSelect__header');
+  const campoInput = campoSelect.getElementsByClassName('campoInput');
 
-  if (campoSelectExists) {
-    parent.removeChild(campoSelectExists);
-  }
+  // Reset ao cabeçalho da select box
+  removeAllChilds(campoHeader);
+  const placeholder = document.createElement('SPAN');
+  placeholder.classList.add('placeholder');
+  placeholder.textContent = 'Campos';
+  campoHeader.appendChild(placeholder);
+  campoHeader.classList.remove('customSelect__header-selected');
 
-  const selectBox = document.createElement("select");
-  selectBox.name = "campos";
-  selectBox.id = "campos";
-  selectBox.classList.add("camposSelect");
+  // Reset fase input
+  campoInput[0].value = 0;
 
-  const todasOption = document.createElement("option");
-  todasOption.value = 0;
-  todasOption.text = "Todos os Campos";
-  selectBox.appendChild(todasOption);
+  // Limpa a lista
+  removeAllChilds(itemsList);
 
-  data.listaCampos.forEach(function(campo) {
-    const option = document.createElement("option");
-    option.value = `${campo.campo}`;
-    option.text = `Campo ${campo.campo}${(campo.designacao != undefined) ? ' - ' + campo.designacao : ''}`;
-    selectBox.appendChild(option);
+  // Constroi os items da fase
+  data.listaCampos.forEach(campo => {
+    const item = document.createElement('P');
+    item.classList.add("customSelect__links", "campo__link");
+    item.dataset.campo = campo.campo;
+    item.textContent = `Campo ${campo.campo}${(campo.designacao != undefined) ? ' - ' + campo.designacao : ''}`;
+    itemsList.appendChild(item);
   });
-  parent.appendChild(selectBox);
+
+  // Mostra Select das Fases
+  campoSelect.classList.add('select-show');
 }
 
-function mostraSoFolhaRostoCheckBox(parent) {
-  const soFolhaRostoExists = parent.querySelector(".soFolhaRostoWrapper");
-
-  if (soFolhaRostoExists) {
-    parent.removeChild(soFolhaRostoExists);
+function resetFaseCamposSelect(parent){
+  const faseSelect = parent.querySelector(".listagemFaseSelect");
+  const campoSelect = parent.querySelector(".listagemCampoSelect");
+  
+  if(faseSelect){
+    const faseInput = faseSelect.getElementsByClassName('faseInput');
+    faseInput[0].value = 0;
+    faseSelect.classList.remove('select-show');
   }
-
-  const soFolhaRostoWrapper = document.createElement("div");
-  soFolhaRostoWrapper.classList.add("soFolhaRostoWrapper");
-
-  const checkBox = document.createElement("input");
-  checkBox.type = "checkbox";
-  checkBox.name = "soFolhaRosto";
-  checkBox.id = "soFolhaRosto";
-  checkBox.classList.add("soFolhaRosto");
-
-  const checkLabel = document.createElement("label");
-  checkLabel.setAttribute("for", "soFolhaRosto");
-  checkLabel.textContent = "Só Folha de Rosto";
-  checkLabel.classList.add("soFolhaRostoLabel");
-
-  soFolhaRostoWrapper.appendChild(checkBox);
-  soFolhaRostoWrapper.appendChild(checkLabel);
-
-  parent.appendChild(soFolhaRostoWrapper);
+  
+  if(campoSelect){
+    const campoInput = campoSelect.getElementsByClassName('campoInput');
+    campoInput[0].value = 0;
+    campoSelect.classList.remove('select-show');
+  }
 }
 
-function removeSelectBoxes(parent) {
-  // Fase selectbox
-  const faseSelectExists = parent.querySelector(".faseSelect");
-  if (faseSelectExists) {
-    parent.removeChild(faseSelectExists);
-  }
-
-  // Campos selectbox
-  const campoSelectExists = parent.querySelector(".camposSelect");
-  if (campoSelectExists) {
-    parent.removeChild(campoSelectExists);
-  }
-
-  // So Folha Rosto checkbox
-  const soFolhaRostoExists = parent.querySelector(".soFolhaRostoWrapper");
-  if (soFolhaRostoExists) {
-    parent.removeChild(soFolhaRostoExists);
+function resetSoFolhaRosto(parent){
+  const soFolhaRosto = parent.querySelector('.soFolhaRostoContainer');
+  if(soFolhaRosto){
+    soFolhaRosto.classList.remove('soFolhaRostoContainer-show');
+    soFolhaRosto.querySelector('.soFolhaRostoInput').checked = false;
   }
 }
 
@@ -279,7 +246,7 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent) {
         }
 
         if (fase == 1) {
-          const soFolhaRosto = parent.querySelector(".soFolhaRosto");
+          const soFolhaRosto = parent.querySelector(".soFolhaRostoInput");
           makeFolhaRostoJogosPrimeiraFase(docDefinition, campo, equipas.listaEquipas, fase);
 
           // Verifica se só se pretende imprimir a folha de rosto
@@ -352,59 +319,58 @@ async function imprimeResultados(escalaoId, fase, campo) {
   }
 }
 
+function setSelectHeader(elemento, value, input){
+  const parentSelectBox = elemento.closest('.customSelect');
+  const selectBoxHeader = parentSelectBox.querySelector('.customSelect__header');
+  const selectBoxInput = parentSelectBox.getElementsByClassName(input);
+
+  selectBoxInput[0].value = value;
+  selectBoxHeader.innerHTML = elemento.textContent;
+  selectBoxHeader.classList.add('customSelect__header-selected');
+}
 
 const itemsListagem = document.querySelectorAll('.listagem__item');
 itemsListagem.forEach((itemListagem, index) => {
   itemListagem.addEventListener('click', async function(e){
 
-    if(e.target.classList.contains('escalao__link')){
-      const elemento = e.target;
-      const parentSelectBox = elemento.closest('.customSelect');
-      const selectBoxHeader = parentSelectBox.querySelector('.customSelect__header');
-      const selectBoxInput = parentSelectBox.getElementsByClassName('escalaoInput');
-      const escalaoId = parseInt(elemento.dataset.escalao);
-
-      selectBoxInput[0].value = escalaoId;
-      selectBoxHeader.innerHTML = elemento.textContent;
-      selectBoxHeader.classList.add('customSelect__header-selected');
-
-      if(index > 0) {
-        await mostraFaseSelect(escalaoId, elemento.closest('.listagems__item-inputs'));
-      }
-
-    } else if(e.target.classList.contains('fase__link')){
-      const elemento = e.target;
-      const parentSelectBox = elemento.closest('.customSelect');
-      const selectBoxHeader = parentSelectBox.querySelector('.customSelect__header');
-      const selectBoxInput = parentSelectBox.getElementsByClassName('faseInput');
-      const faseId = parseInt(elemento.dataset.fase);
-
-      selectBoxInput[0].value = faseId;
-      selectBoxHeader.innerHTML = elemento.textContent;
-      selectBoxHeader.classList.add('customSelect__header-selected');
-    }
-
-  });
-});
-
-// Processa alterações na escolha do escalão
-const escalaoSelect = document.getElementsByName("escalao");
-escalaoSelect.forEach(function(escalao, index) {
-  escalao.addEventListener("change", async function(e) {
     try {
-      const escalaoId = this[this.selectedIndex].value;
+      if(e.target.classList.contains('escalao__link')){
+        const elemento = e.target;
+        const escalaoId = parseInt(elemento.dataset.escalao);
+        setSelectHeader(elemento, escalaoId, 'escalaoInput');
+        resetFaseCamposSelect(elemento.closest('.listagems__item-inputs'));
 
-      if (escalaoId != 0) {
-        if (index == 1 || index == 2 || index == 3) {
-          await mostraFaseSelect(escalaoId, this.parentNode, false);
-          const data = getControllersValues(this.parentNode);
-          await mostraCamposSelect(escalaoId, data.fase, this.parentNode);
+        if(index == 2){
+          resetSoFolhaRosto(elemento.closest('.listagems__item-inputs'));
         }
-        if (index == 2) {
-          mostraSoFolhaRostoCheckBox(this.parentNode);
+  
+        if(index > 0) {
+          await mostraFaseSelect(escalaoId, elemento.closest('.listagems__item-inputs'));
         }
-      } else {
-        removeSelectBoxes(this.parentNode);
+      } else if(e.target.classList.contains('fase__link')){
+        const elemento = e.target;
+        const fase = parseInt(elemento.dataset.fase);
+        setSelectHeader(elemento, fase, 'faseInput');
+  
+        if(index > 0) {
+          const { escalaoId } = getSelectedValues(elemento.closest('.listagems__item-inputs'));
+          await mostraCamposSelect(escalaoId, fase, elemento.closest('.listagems__item-inputs'));
+        }
+
+        if(index == 2){
+          const { fase } = getSelectedValues(elemento.closest('.listagems__item-inputs'));
+          const soFolhaRosto = elemento.closest('.listagems__item-inputs').querySelector('.soFolhaRostoContainer');
+          if(fase != 0 && fase == 1){
+            soFolhaRosto.classList.add('soFolhaRostoContainer-show');
+          } else {
+            resetSoFolhaRosto(elemento.closest('.listagems__item-inputs'));
+          }
+        }
+  
+      } else if(e.target.classList.contains('campo__link')){
+        const elemento = e.target;
+        const campo = parseInt(elemento.dataset.campo);
+        setSelectHeader(elemento, campo, 'campoInput');
       }
     } catch (err) {
       Swal.fire({
@@ -416,42 +382,13 @@ escalaoSelect.forEach(function(escalao, index) {
   });
 });
 
-// Processa as alterações na escolha da fase
-const cardsControllers = document.querySelectorAll(".listagemCard__controllers");
-cardsControllers.forEach(controller => {
-  controller.addEventListener("change", async function(e) {
-    if (e.target.name == "fase") {
-      try {
-        // Obtem os dados das select boxes
-        const ctrlData = getControllersValues(controller);
-        await mostraCamposSelect(ctrlData.escalaoId, ctrlData.fase, this);
-
-        if (this.classList.contains("fichasJogo") && ctrlData.fase == 1) {
-          mostraSoFolhaRostoCheckBox(this);
-        } else {
-          const soFolhaRostoExists = this.querySelector(".soFolhaRostoWrapper");
-
-          if (soFolhaRostoExists) {
-            this.removeChild(soFolhaRostoExists);
-          }
-        }
-      } catch (err) {
-        Swal.fire({
-          type: "error",
-          title: "Oops...",
-          text: "Não foi possível obter os dados!"
-        });
-      }
-    }
-  });
-});
-
-/*const numEquipasPorConcelhoBtn = document.querySelector(".numEquipasPorConcelho_btn");
+const numEquipasPorConcelhoBtn = document.querySelector(".numEquipasPorConcelho_btn");
 numEquipasPorConcelhoBtn.addEventListener("click", function(e) {
   e.preventDefault();
-  const ctrlData = getControllersValues(this.parentNode);
-  if (ctrlData.escalaoId != 0) {
-    imprimeNumEquipasPorConcelho(ctrlData.escalaoId);
+  const inputs = this.closest('.listagem__item-content').querySelector('.listagems__item-inputs');
+  const { escalaoId } = getSelectedValues(inputs);
+  if (escalaoId != 0) {
+    imprimeNumEquipasPorConcelho(escalaoId);
   } else {
     Swal.fire({
       type: "warning",
@@ -464,18 +401,24 @@ numEquipasPorConcelhoBtn.addEventListener("click", function(e) {
 const equipasAgrupadasPorCamposBtn = document.querySelector(".equipasAgrupadasPorCampos_btn");
 equipasAgrupadasPorCamposBtn.addEventListener("click", function(e) {
   e.preventDefault();
-  const ctrlData = getControllersValues(this.parentNode);
-  if (ctrlData.escalaoId != 0) {
+  try {
+    const inputs = this.closest('.listagem__item-content').querySelector('.listagems__item-inputs');
+    const ctrlData = getSelectedValues(inputs);
+
+    if (ctrlData.escalaoId == 0) throw 'Deve selecionar o Escalão';
+    if (ctrlData.fase == 0) throw 'Deve selecionar a Fase';
+
     imprimeEquipasAgrupadasPorCampos(
       ctrlData.escalaoId,
       ctrlData.fase,
       ctrlData.campo
     );
-  } else {
+
+  } catch (err) {
     Swal.fire({
       type: "warning",
       title: "Oops...",
-      text: "Deve selecionar o Escalão."
+      text: err
     });
   }
 });
@@ -484,19 +427,24 @@ equipasAgrupadasPorCamposBtn.addEventListener("click", function(e) {
 const fichasJogoBtn = document.querySelector(".fichasJogo_btn");
 fichasJogoBtn.addEventListener("click", function(e) {
   e.preventDefault();
-  const ctrlData = getControllersValues(this.parentNode);
-  if (ctrlData.escalaoId != 0) {
+  try {
+    const inputs = this.closest('.listagem__item-content').querySelector('.listagems__item-inputs');
+    const ctrlData = getSelectedValues(inputs);
+
+    if (ctrlData.escalaoId == 0) throw 'Deve selecionar o Escalão';
+    if (ctrlData.fase == 0) throw 'Deve selecionar a Fase';
+
     imprimeFichasJogo(
       ctrlData.escalaoId,
       ctrlData.fase,
       ctrlData.campo,
-      this.parentNode
+      inputs
     );
-  } else {
+  } catch (err) {
     Swal.fire({
       type: "warning",
       title: "Oops...",
-      text: "Deve selecionar o Escalão."
+      text: err
     });
   }
 });
@@ -505,22 +453,27 @@ fichasJogoBtn.addEventListener("click", function(e) {
 const resultadosBtn = document.querySelector(".resultados_btn");
 resultadosBtn.addEventListener("click", function(e) {
   e.preventDefault();
-  const ctrlData = getControllersValues(this.parentNode);
-  if (ctrlData.escalaoId != 0) {
+  try {
+    const inputs = this.closest('.listagem__item-content').querySelector('.listagems__item-inputs');
+    const ctrlData = getSelectedValues(inputs);
+
+    if (ctrlData.escalaoId == 0) throw 'Deve selecionar o Escalão';
+    if (ctrlData.fase == 0) throw 'Deve selecionar a Fase';
+
     imprimeResultados(
       ctrlData.escalaoId,
       ctrlData.fase,
-      ctrlData.campo,
-      ctrlData.fase
+      ctrlData.campo
     );
-  } else {
+
+  } catch (err) {
     Swal.fire({
       type: "warning",
       title: "Oops...",
-      text: "Deve selecionar o Escalão."
+      text: err
     });
   }
-});*/
+});
 
 // Abre o pdf noutra janela
 //pdfMake.createPdf(docDefinition).print();

@@ -18,7 +18,14 @@ selectBoxes.forEach((selectBox, index) => {
         } else {
             closeAllCheckboxes(selectBoxesDropList, selectBoxes);
             this.classList.add("customSelect__header-open");
+            const headerSelectDimensions = this.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
             selectBoxesDropList[index].classList.add('customSelect__list-open');
+            const listSelectDimensions = selectBoxesDropList[index].getBoundingClientRect();
+
+            if(windowHeight - listSelectDimensions.top < listSelectDimensions.height){
+                selectBoxesDropList[index].style.top = ((listSelectDimensions.height + 7) * -1) + 'px';
+            }
         }
     });
 });

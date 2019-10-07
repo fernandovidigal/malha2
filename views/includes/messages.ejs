@@ -1,27 +1,43 @@
 <% if(success.length > 0){ %>
-<div class="success_msg">
-    <p class="msg_text"><%= success %></p>
-    <a href="#" class="msg_close"><i class="fas fa-times-circle"></i></a>
+<div class="floatMessage success_msg">
+    <svg class="floatMessage-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M24,8A16,16,0,1,0,40,24,16,16,0,0,0,24,8Zm0,3.1A12.9,12.9,0,1,1,11.1,24,12.9,12.9,0,0,1,24,11.1m9.045,8.4-1.454-1.466a.774.774,0,0,0-1.095,0l-9.119,9.046L17.52,23.188a.774.774,0,0,0-1.095,0l-1.466,1.454a.774.774,0,0,0,0,1.095l5.857,5.9a.774.774,0,0,0,1.095,0L33.041,20.6a.774.774,0,0,0,0-1.095Z" transform="translate(-8 -8)"/></svg>
+    <div class="floatMessage__content">
+        <p class="floatMessage-title">Sucesso</p>
+        <p class="floatMessage-msg"><%= success %></p>
+    </div>
+    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11 floatMessage-closeBtn" role="img" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>
 </div>
 <% } %>
 
 <% if(error.length > 0){ %>
-<div class="error_msg">
-    <p class="msg_text"><%= error %></p>
-    <a href="#" class="msg_close"><i class="fas fa-times-circle"></i></a>
+<div class="floatMessage error_msg">
+    <svg class="floatMessage-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M24,8A16,16,0,1,0,40,24,16,16,0,0,0,24,8Zm8.394,7.606a11.872,11.872,0,0,1,1.334,15.2L17.192,14.272A11.872,11.872,0,0,1,32.394,15.606ZM15.606,32.394a11.872,11.872,0,0,1-1.334-15.2L30.808,33.728A11.872,11.872,0,0,1,15.606,32.394Z" transform="translate(-8 -8)"/></svg>
+    <div class="floatMessage__content">
+        <p class="floatMessage-title">Erro</p>
+        <p class="floatMessage-msg"><%= error %></p>
+    </div>
+    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11 floatMessage-closeBtn" role="img" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>
 </div>
 <% } %>
 
 <% if(info.length > 0){ %>
-<div class="info_msg">
-    <p class="msg_text"><%= info %></p>
-    <a href="#" class="msg_close"><i class="fas fa-times-circle"></i></a>
+<div class="floatMessage info_msg">
+    <svg class="floatMessage-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g transform="translate(-387 -588)"><path d="M24,8A16,16,0,1,0,40,24,16,16,0,0,0,24,8Zm0,3.1A12.9,12.9,0,1,1,11.1,24,12.9,12.9,0,0,1,24,11.1" transform="translate(379 580)"/><path d="M-93.749,36.1A2.794,2.794,0,0,1-90.955,38.9a2.794,2.794,0,0,1-2.794,2.794A2.794,2.794,0,0,1-96.544,38.9,2.794,2.794,0,0,1-93.749,36.1ZM-90.024,53a.8.8,0,0,1-.8.8h-5.855a.8.8,0,0,1-.8-.8V51.4a.8.8,0,0,1,.8-.8h.8V46.348h-.8a.8.8,0,0,1-.8-.8v-1.6a.8.8,0,0,1,.8-.8h4.258a.8.8,0,0,1,.8.8v6.653h.8a.8.8,0,0,1,.8.8Z" transform="translate(496.975 558.897)"/></g></svg>
+    <div class="floatMessage__content">
+        <p class="floatMessage-title">Informação</p>
+        <p class="floatMessage-msg"><%= info %></p>
+    </div>
+    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11 floatMessage-closeBtn" role="img" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>
 </div>
 <% } %>
 
 <% if(warning.length > 0){ %>
-<div class="warning_msg">
-    <p class="msg_text"><%= warning %></p>
-    <a href="#" class="msg_close"><i class="fas fa-times-circle"></i></a>
+<div class="floatMessage warning_msg">
+    <svg class="floatMessage-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g transform="translate(-435 -588)"><path d="M24,8A16,16,0,1,0,40,24,16,16,0,0,0,24,8Zm0,3.1A12.9,12.9,0,1,1,11.1,24,12.9,12.9,0,0,1,24,11.1" transform="translate(427 580)"/><path d="M-125.806,48.52a2.8,2.8,0,0,0-2.8,2.8,2.8,2.8,0,0,0,2.8,2.8,2.8,2.8,0,0,0,2.8-2.8A2.8,2.8,0,0,0-125.806,48.52Zm-2.661-10.076.452,8.288a.731.731,0,0,0,.73.691h2.958a.731.731,0,0,0,.73-.691l.452-8.288a.731.731,0,0,0-.73-.771h-3.863A.731.731,0,0,0-128.467,38.444Z" transform="translate(576.609 558.327)"/></g></svg>    
+    <div class="floatMessage__content">
+        <p class="floatMessage-title">Aviso</p>
+        <p class="floatMessage-msg"><%= warning %></p>
+    </div>
+    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" class="svg-inline--fa fa-times fa-w-11 floatMessage-closeBtn" role="img" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>
 </div>
 <% } %>

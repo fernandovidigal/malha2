@@ -134,7 +134,7 @@
                     <tr>
                         <th class="equipas__column">Equipa</th>
                         <th class="mainTable-headerElement-left">Elementos</th>
-                        <th>Localidade</th>
+                        <th class="mainTable-headerElement-left">Localidade</th>
                         <th>Escalão</th>
                         <th></th>
                         <th></th>
@@ -146,7 +146,7 @@
                             <tr>
                                 <td align="center"><%= equipa.equipaId %></td>
                                 <td class="equipasElementos"><%= equipa.primeiroElemento %><br><%= equipa.segundoElemento %></td>
-                                <td align="center"><%= equipa.localidade %></td>
+                                <td align="left"><%= equipa.localidade %></td>
                                 <td class="escalao__column" align="center"><%= equipa.escalao %><br><small>(<%= equipa.sexo == 0 ? 'Feminino': 'Masculino' %>)</small></td>
                                 <td class="detalhesBtn__column"><a href="/equipas/editarEquipa/<%= equipa.escalaoId %>/<%= equipa.equipaId %>" class="btn btn-secondary">Detalhes</a></td>
                                 <td class="deleteBtn__column">

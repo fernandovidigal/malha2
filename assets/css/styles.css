@@ -163,6 +163,107 @@ li {
     color: #D05744;
 }
 
+.floatMessage {
+    position: fixed;
+    bottom: 10vh;
+    left: 67%;
+    transform: translateX(-83%);
+    border-radius: 8px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    min-width: 360px;
+    border-radius: 4px;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.floatMessage-icon,
+.floatMessage-closeBtn {
+    margin: 20px;
+}
+
+.floatMessage-closeBtn {
+    margin-left: 80px;
+}
+
+.floatMessage__content {
+    margin-right: auto;
+}
+
+.floatMessage-title {
+    margin-bottom: 3px;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.floatMessage-msg {
+    font-weight: 300;
+}
+
+.floatMessage-closeBtn {
+    color: #ACC6A4;
+    cursor: pointer;
+}
+
+.success_msg {
+    background-color: #DDF3D5;
+    border: solid 1px #AFCDA4;
+}
+
+.success_msg > .floatMessage-icon {
+    fill: #597151;
+}
+
+.success_msg > .floatMessage__content {
+    color: #597151;
+}
+
+.error_msg {
+    background-color: #EDC8C5;
+    border: solid 1px #BE8180;
+}
+
+.error_msg > .floatMessage-icon,
+.error_msg > .floatMessage__content {
+    fill: #B4302B;
+    color: #B4302B;
+}
+
+.error_msg > .floatMessage-closeBtn {
+    color: #C89994;
+}
+
+.info_msg {
+    background-color: #CDE8F5;
+    border: solid 1px #7DBCE0;
+}
+
+.info_msg > .floatMessage-icon,
+.info_msg > .floatMessage__content {
+    fill: #447EAF;
+    color: #447EAF;
+}
+
+.info_msg > .floatMessage-closeBtn {
+    color: #A5C6D9;
+}
+
+.warning_msg {
+    background-color: #F8F4D5;
+    border: solid 1px #D8CF82;
+}
+
+.warning_msg > .floatMessage-icon,
+.warning_msg > .floatMessage__content {
+    fill: #96722E;
+    color: #96722E;
+}
+
+.warning_msg > .floatMessage-closeBtn {
+    color: #DCD5A0;
+}
+
 .overlay {
     display: none;
     position: fixed;
@@ -828,6 +929,8 @@ input::placeholder {
     background-color: white;
     box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.3);
     margin-bottom: 20px;
+    max-height: 312px;
+    overflow-y: auto;
 }
 
 .perPageSelect__list {
@@ -1184,11 +1287,11 @@ input::placeholder {
     margin-left: 10px;
     cursor: pointer;
     background-color: white;
-    color: #858ca8;
+    color: #333f4d;
     padding: 8px;
     text-align: center;
     min-width: 42px;
-    border: solid 1px #eaebf1;
+    border: solid 1px #D8DDE7;
     border-radius: 8px;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -1204,17 +1307,17 @@ input::placeholder {
 }
 
 .escalaoNumCampos + label:hover {
-    color: #2c3641;
-    background-color: #ffffff;
-    border: solid 1px #dddfe8;
-    box-shadow: 0 2px 16px rgba(69, 92, 199, .2);
+    color: #333f4d;
+    background-color: #ffbdb2;
+    border: solid 1px #ea8b7c;
+    /*box-shadow: 0 2px 16px rgba(69, 92, 199, .2);*/
 }
 
 .escalaoNumCampos:checked + label {
-    color: #2c3641;
-    background-color: #E7EEF3;
-    border: solid 1px #acadb1;
-    box-shadow: 0 2px 16px rgba(69, 92, 199, .2);
+    color: white;
+    background-color: #D05744;
+    /*border: solid 1px #acadb1;
+    box-shadow: 0 2px 16px rgba(69, 92, 199, .2);*/
 }
 
 .userLevel {
@@ -1421,4 +1524,77 @@ input::placeholder {
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
 }
+
+.noTorneio__wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.noTorneio {
+    text-align: center;
+}
+
+.noTorneio svg {
+    color: #eeeeee;
+    width: 256px;
+    margin-bottom: 40px;
+}
+
+.noTorneio__title {
+    font-size: 32px;
+    color: #d9534f;
+}
+
+.noTorneio__subTitle {
+    font-size: 20px;
+    margin-top: 20px;
+}
+
+.choice__wrapper {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 100px 40px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.lessMargin {
+    padding: 32px 40px;
+}
+
+.choice__item {
+    width: 20%;
+    height: 30vh;
+    background-color: #f8f9fc;
+    border: solid 1px #D8DDE7;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-direction: column;
+    text-decoration: none;
+    color: #333F4D;
+    box-shadow: none;
+    transition: all .3s;
+    min-width: 180px;
+    max-width: 260px;
+    margin: 16px;
+}
+
+.choice__item-icon {
+    font-size: 450%;
+}
   
+.choice__item-title {
+    font-size: 150%;
+}
+
+.choice__item:hover {
+    background-color: white;
+    box-shadow: 0px 6px 22px rgba(0, 0, 0, 0.15);
+}

@@ -19,7 +19,7 @@ if (!Element.prototype.closest) {
 	};
 }
 
-var msgCloseBtn = document.querySelector('.msg_close');
+var msgCloseBtn = document.querySelector('.floatMessage-closeBtn');
 
 if(msgCloseBtn){
     var msgBlock = msgCloseBtn.parentNode;

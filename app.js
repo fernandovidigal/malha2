@@ -159,6 +159,10 @@ app.use('/equipas', equipas);
 app.use('/torneio', torneio);
 app.use('/listagens', listagens);
 
+app.all('*', (req, res) => {
+    res.render('404');
+});
+
 sequelize
     .sync()
     .then(async (result) => {

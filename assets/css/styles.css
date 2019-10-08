@@ -80,6 +80,16 @@ li {
     margin-top: 30px;
 }
 
+.errMsg {
+    background-color: #EDC8C5;
+    border: solid 1px #BE8180;
+    color: #B4302B;
+    padding: 6px 20px;
+    margin-left: 20px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
 /************************************
     PSEUDO-ELEMENTS
 ************************************/
@@ -163,19 +173,25 @@ li {
     color: #D05744;
 }
 
+@keyframes floatMessageAnimation {
+    from {right: -100%;}
+    to {right: 5%;}
+  }
+
 .floatMessage {
     position: fixed;
     bottom: 10vh;
-    left: 67%;
-    transform: translateX(-83%);
     border-radius: 8px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
     min-width: 360px;
     border-radius: 4px;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
+    box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.15);
+    animation-name: floatMessageAnimation;
+    animation-duration: .4s;
+    animation-fill-mode: forwards;
+    animation-timing-function: ease-out;
 }
 
 .floatMessage-icon,
@@ -198,7 +214,7 @@ li {
 }
 
 .floatMessage-msg {
-    font-weight: 300;
+    font-weight: 400;
 }
 
 .floatMessage-closeBtn {
@@ -726,12 +742,13 @@ input::placeholder {
 
 .barraTorneio {
     min-height: 70px;
-    background-color: #E7EEF3;
+    /*background-color: #E7EEF3;*/
     padding: 16px 40px;
     margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: solid 1px #D8DDE7;
 }
 
 .barraTorneio__buttons {
@@ -1277,6 +1294,11 @@ input::placeholder {
     display: block;
 }
 
+.camposColumn {
+    width: 1%;
+    white-space: nowrap;
+}
+
 .escalaoCampos__wrapper {
     margin-bottom: 60px;
 }
@@ -1300,13 +1322,17 @@ input::placeholder {
     transition: all .2s;
 }
 
+.escalaoNumCampos + label:first-of-type {
+    margin-left: 0;
+}
+
 .escalaoNumCampos{
     position: absolute;
     opacity: 0;
     cursor: pointer;
 }
 
-.escalaoNumCampos + label:hover {
+.escalaoNumCampos:not(:disabled) + label:hover {
     color: #333f4d;
     background-color: #ffbdb2;
     border: solid 1px #ea8b7c;
@@ -1316,8 +1342,29 @@ input::placeholder {
 .escalaoNumCampos:checked + label {
     color: white;
     background-color: #D05744;
+    border: none;
     /*border: solid 1px #acadb1;
     box-shadow: 0 2px 16px rgba(69, 92, 199, .2);*/
+}
+
+.escalaoNumCamposMaxRecomendado + label {
+    border: solid 1px #ea8b7c;
+}
+
+.escalaoExcessoCampos + label {
+    background-color: #eeeeee;
+    color: #cccccc;
+}
+
+.escalaoExcessoCampos:checked + label {
+    background-color: #ecaea4;
+    color: #efefef;
+}
+
+.camposErrorMsg {
+    color: red;
+    font-size: 14px;
+    padding-right: 0 !important;
 }
 
 .userLevel {
@@ -1525,7 +1572,8 @@ input::placeholder {
     transform: rotate(45deg);
 }
 
-.noTorneio__wrapper {
+.noTorneio__wrapper,
+.noPage__wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1543,14 +1591,22 @@ input::placeholder {
     margin-bottom: 40px;
 }
 
-.noTorneio__title {
+.noTorneio__title,
+.noPage__title {
     font-size: 32px;
     color: #d9534f;
 }
 
-.noTorneio__subTitle {
+.noTorneio__subTitle,
+.noPage__message {
     font-size: 20px;
     margin-top: 20px;
+}
+
+.noPage__404 {
+    color: #eeeeee;
+    font-size: 220px;
+    margin-bottom: 40px;
 }
 
 .choice__wrapper {
@@ -1597,4 +1653,8 @@ input::placeholder {
 .choice__item:hover {
     background-color: white;
     box-shadow: 0px 6px 22px rgba(0, 0, 0, 0.15);
+}
+
+.definirCampos__wrapper {
+    margin: 32px 40px 0 40px;
 }

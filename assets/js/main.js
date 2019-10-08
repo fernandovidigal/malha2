@@ -27,7 +27,7 @@ if(msgCloseBtn){
 
     showTimer = setTimeout(() => {
         msgBlock.remove();
-    }, 5000);
+    }, 4000);
 
     msgCloseBtn.addEventListener('click', function(e){
         e.preventDefault();

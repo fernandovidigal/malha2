@@ -233,7 +233,7 @@ exports.ActivaTorneio = async (req, res, next) => {
       await dbFunctions.setTorneioActivo(torneio.torneioId);
       req.flash(
         "success",
-        `Torneio, ${torneio.designacao}, activado com sucesso.`
+        `${torneio.designacao}, activado com sucesso.`
       );
       res.redirect("/admin/torneios");
     } else {

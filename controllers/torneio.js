@@ -214,17 +214,20 @@ exports.setNumeroCampos = async (req, res, next) => {
                     // Verifica se existem equipas suficientes para o número de campos
                     if(numCampos * 3 > escalao.numEquipas){
                         errors.push({
-                            msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Equipas insuficientes para o número de campos selecionado.'
+                            escalaoId: escalao.escalaoId,
+                            msg: 'Equipas insuficientes para o número de campos selecionado'
                         });
                     }
                 } else {
                     if(numCampos == 0){
                         errors.push({
-                            msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Número de campos deve ser superior a 0.'
+                            escalaoId: escalao.escalaoId,
+                            msg: 'Número de campos deve ser superior a 0'
                         });
                     } else {
                         errors.push({
-                            msg: 'Escalão: <strong>' + escalao.designacao + ' (' + ((escalao.sexo == 1) ? 'Masculino' : 'Feminino') + ')</strong> - Número de campos inválido.'
+                            escalaoId: escalao.escalaoId,
+                            msg: 'Número de campos inválido'
                         });
                     }
                 }
@@ -272,7 +275,7 @@ exports.setNumeroCampos = async (req, res, next) => {
         }
     } catch(err) {
         console.log(err);
-        req.flash('error', 'Ocorreu um erro! Não foi possível definir o número de campos para o torneio.');
+        req.flash('error', 'Não foi possível definir o número de campos para o torneio.');
         res.redirect('/torneio');
     }
 }

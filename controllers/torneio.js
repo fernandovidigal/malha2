@@ -420,7 +420,7 @@ exports.mostraResultados = async (req, res, next) => {
             }
         }
 
-        req.breadcrumbs('Resultados', '/torneio/index');
+        req.breadcrumbs('Registo de Parciais', '/torneio/index');
         res.render('torneio/index', {torneio: torneio, info: info, campos: campos, listaCampos: listaCampos, breadcrumbs: req.breadcrumbs()});
     } catch(err){
         console.log(err);

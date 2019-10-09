@@ -413,7 +413,7 @@ async function imprimeFichaParciais(escalao, fase, campo){
     }
 }
 
-const printBtn = document.querySelector('.print_btn');
+const printBtn = document.querySelector('.btn-print');
 printBtn.addEventListener('click', function(e){
     e.preventDefault();
     const path = window.location.pathname;

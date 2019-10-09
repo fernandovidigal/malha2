@@ -1,26 +1,166 @@
 <%- include('../includes/header.ejs') %>
+<%- include('../includes/breadcrumbs.ejs') %>
 
 <% if(torneio != null){ %>
-    <div class="barraTorneio">
-        <div class="barraTorneio__title">
-            <h1><%= torneio.designacao %></h1>
-            <h3><%= torneio.localidade %>, <%= torneio.ano %></h3>
-        </div>
+    <div class="title__bar">
+        <h1><%= torneio.designacao %> - <%= torneio.localidade %></h1>
+        <h3><%= torneio.ano %></h3>
+    </div>
+
+    <div class="selecionaEquipasWrapper">
         <% if(numTotalJogos == 0){ %>
-            <div class="barraTorneio__buttons">
-                <a href="/torneio/distribuirTodasEquipas" class="btn btn-primary">Distribuir Todos os Escalões</a>
+            <div class="distribuirTodas_btn">
+                <a href="/torneio/distribuirTodasEquipas" class="btn primary_btn">Distribuir todas as equipas de todos os escalões</a>
             </div>
         <% } %>
+
+        <div class="escaloesSelect__wrapper">
+                <% if(escaloesMasculinos.length > 0){ %>
+                <div class="escalao__wrapper">
+                    <div class="escalao__title">
+                        Masculinos
+                    </div>
+                    <div class="escalaoSelect_wrapper">
+                        <% escaloesMasculinos.forEach(function(escalao){ %>
+                            <div class="escalaoSelect__item">
+                                <div class="escalaoSelect__info">
+                                    <div class="escalaoSelect__item-title"><%= escalao.designacao %></div>
+                                    <% if(escalao.existeVencedor == true){ %>
+                                        <div class="escalaoSelect__fase">
+                                            <div class="escalaoSelect__fase-info">
+                                                <p>Equipa Vencedora</p>
+                                                <p><%= escalao.equipaVencedora.primeiroElemento %></p>
+                                                <p><%= escalao.equipaVencedora.segundoElemento %></p>
+                                            </div>
+                                            <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/0" class="escalaoSelect__btn">Todos os Campos</a>
+                                        </div>
+                                    <% } else { %>
+                                        <% if(escalao.fase != 0){ %>
+                                            <div class="escalaoSelect__fase">
+                                                <div class="escalaoSelect__fase-info">
+                                                    <p>Fase</p>
+                                                    <p><%= (escalao.fase != 100) ? escalao.fase : 'Final' %></p>
+                                                </div>
+                                            </div>
+    
+                                            <% if(escalao.todosCamposCompletos){ %>
+                                                <a href="/torneio/interditarCampos/escalao/<%= escalao.escalaoId %>" class="interditaCampos__btn"><i class="fas fa-ban"></i> Interditar<br>Campos</a>
+                                                <a href="/torneio/processaProximaFase/escalao/<%= escalao.escalaoId %>" class="escalaoSelect__btn">Processa<br>Próxima Fase</a>
+                                            <% } else { %>
+                                                <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/0" class="escalaoSelect__btn">Todos os Campos</a>
+                                            <% } %>
+                                        <% } else { %>
+                                            <% if(escalao.numTotalCampos * 3 > escalao.numEquipas){ %>
+                                                <p class="escalao_err_msg">Não existem equipas suficientes</p>
+                                            <% } else if(escalao.numTotalCampos == 0) { %>
+                                                <p class="escalao_err_msg">Não foi definido o número de campos</p>
+                                                <a href="/equipas"><i class="fas fa-user-friends"></i></a>
+                                                    <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
+                                            <% } else { %>
+                                                <div class="escalaoSelect__fase">
+                                                    <div class="escalaoSelect__fase-info">
+                                                        <p>Nº Campos</p>
+                                                        <p><%= escalao.numTotalCampos %></p>
+                                                    </div>
+                                                </div>
+                                                <a href="/torneio/distribuirEquipasPorEscalao/escalao/<%= escalao.escalaoId %>" class="escalaoSelect__btn">Iniciar<br>Competição</a>
+                                            <% } %>
+                                        <% } %>
+                                    <% } %>
+                                </div>
+                                <% if(!escalao.existeVencedor){ %>
+                                    <% if(typeof escalao.campos != 'undefined'){ %>
+                                        <div class="escalaoSelect__campos">
+                                            <% escalao.campos.forEach((campo, index) => { %>
+                                                <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/<%= campo.campo %>" class="campo <%= campo.completo ? 'campo_completed' : '' %>">
+                                                    <%= (escalao.fase != 100) ? campo.campo : (index == 0) ? 'Final' : '3º e 4º Lugar' %>
+                                                </a>
+                                            <% }); %>
+                                        </div>
+                                    <% } %>
+                                <% } %>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+                <% } %>
+
+                <% if(escaloesFemininos.length > 0){ %>
+                    <div class="escalao__wrapper">
+                        <div class="escalao__title">
+                            Femininos
+                        </div>
+                        <div class="escalaoSelect_wrapper">
+                            <% escaloesFemininos.forEach(function(escalao){ %>
+                                <div class="escalaoSelect__item">
+                                    <div class="escalaoSelect__info">
+                                        <div class="escalaoSelect__item-title"><%= escalao.designacao %></div>
+                                        <% if(escalao.existeVencedor == true){ %>
+                                            <div class="escalaoSelect__fase">
+                                                <div class="escalaoSelect__fase-info">
+                                                    <p>Equipa Vencedora</p>
+                                                    <p><%= escalao.equipaVencedora.primeiroElemento %></p>
+                                                    <p><%= escalao.equipaVencedora.segundoElemento %></p>
+                                                </div>
+                                                <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/0" class="escalaoSelect__btn">Todos os Campos</a>
+                                            </div>
+                                        <% } else { %>
+                                            <% if(escalao.fase != 0){ %>
+                                                <div class="escalaoSelect__fase">
+                                                    <div class="escalaoSelect__fase-info">
+                                                        <p>Fase</p>
+                                                        <p><%= (escalao.fase != 100) ? escalao.fase : 'Final' %></p>
+                                                    </div>
+                                                </div>
+        
+                                                <% if(escalao.todosCamposCompletos){ %>
+                                                    <a href="/torneio/interditarCampos/escalao/<%= escalao.escalaoId %>" class="interditaCampos__btn"><i class="fas fa-ban"></i> Interditar<br>Campos</a>
+                                                    <a href="/torneio/processaProximaFase/escalao/<%= escalao.escalaoId %>" class="escalaoSelect__btn">Processa<br>Próxima Fase</a>
+                                                <% } else { %>
+                                                    <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/0" class="escalaoSelect__btn">Todos os Campos</a>
+                                                <% } %>
+                                            <% } else { %>
+                                                <% if(escalao.numTotalCampos * 3 > escalao.numEquipas){ %>
+                                                    <p class="escalao_err_msg">Não existem equipas suficientes</p>
+                                                <% } else if(escalao.numTotalCampos == 0) { %>
+                                                    <p class="escalao_err_msg">Não foi definido o número de campos</p>
+                                                    <a href="/equipas"><i class="fas fa-user-friends"></i></a>
+                                                        <a href="" class="alteraNumCampos_btn" data-escalao="<%= escalao.escalaoId %>"><i class="fas fa-location-arrow"></i></a>
+                                                <% } else { %>
+                                                    <div class="escalaoSelect__fase">
+                                                        <div class="escalaoSelect__fase-info">
+                                                            <p>Nº Campos</p>
+                                                            <p><%= escalao.numTotalCampos %></p>
+                                                        </div>
+                                                    </div>
+                                                    <a href="/torneio/distribuirEquipasPorEscalao/escalao/<%= escalao.escalaoId %>" class="escalaoSelect__btn">Iniciar<br>Competição</a>
+                                                <% } %>
+                                            <% } %>
+                                        <% } %>
+                                    </div>
+                                    <% if(!escalao.existeVencedor){ %>
+                                        <% if(typeof escalao.campos != 'undefined'){ %>
+                                            <div class="escalaoSelect__campos">
+                                                <% escalao.campos.forEach((campo, index) => { %>
+                                                    <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>/fase/<%= escalao.fase %>/campo/<%= campo.campo %>" class="campo <%= campo.completo ? 'campo_completed' : '' %>">
+                                                        <%= (escalao.fase != 100) ? campo.campo : (index == 0) ? 'Final' : '3º e 4º Lugar' %>
+                                                    </a>
+                                                <% }); %>
+                                            </div>
+                                        <% } %>
+                                    <% } %>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                <% } %>
+            </div> 
     </div>
 
-    <%- include('../includes/breadcrumbs.ejs') %>
-    <div class="container_wrapper">
-        <div class="actionBar__wrapper">
-            <h2 class="actionBar__title">Competição</h2>
-        </div>
-    </div>
 <% } else { %>
-    <%- include('../includes/noTorneio.ejs') %>
+    <h2>Oops.. Algo correu mal!</h2>
+    <p>Verifique se existem torneios registados ou activados.</p>
 <% } %>
 
+<script src="/js/torneioEscalao.js"></script>
 <%- include('../includes/footer.ejs') %>

@@ -1,0 +1,60 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/breadcrumbs.ejs') %>
+
+<% if(torneio != null){ %>
+    <div class="title__bar">
+        <h1><%= torneio.designacao %> - <%= torneio.localidade %></h1>
+        <h3><%= torneio.ano %></h3>
+    </div>
+
+    <div class="escalaoInfo">
+        <h2><%= escalao.designacao %> (<%= (escalao.sexo == 1) ? 'Masculino' : 'Feminino' %>) - <%= (fase != 100) ? fase + 'ª Fase' : 'Fase Final' %></h2>
+    </div>
+
+    <% if(listaCampos.length > 0) { %>
+        <% listaCampos.forEach(function(campo){ %>
+            <% let posicao = (fase != 100)? 1 : campo.inicioClassificacao %>
+            <div class="campo__title">Campo <%= campo.campo %><%= (fase == 100) ? ' - ' + campo.designacao : '' %></div>
+            <table class="listTable">
+                <thead>
+                    <tr>
+                        <th>Classif.</th>
+                        <th>Equipa</th>
+                        <th colspan="2">Jogadores</th>
+                        <th>Localidade</th>
+                        <th>Jogos Ganhos</th>
+                        <th>Pontos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <% if(campo.classificacao.length > 0) { %>
+                    <% campo.classificacao.forEach(function(equipa){ %>
+                        <tr>
+                            <td align="center"><%= posicao++ %>º</td>
+                            <td align="center"><%= equipa.equipaId %></td>
+                            <td><%= equipa.primeiroElemento %></td>
+                            <td><%= equipa.segundoElemento %></td>
+                            <td align="center"><%= equipa.localidade %></td>
+                            <td align="center"><%= equipa.vitorias %></td>
+                            <td align="center"><%= equipa.pontos %></td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="3">Não existem classificações.</td>
+                    </tr>
+                <% } %>
+                </tbody>
+            </table>
+        <% }); %>
+    <% } else { %>
+
+    <% } %>
+
+
+<% } else { %>
+    <h2>Oops.. Algo correu mal!</h2>
+    <p>Verifique se existem torneios registados ou activados.</p>
+<% } %>
+
+<%- include('../includes/footer.ejs') %>

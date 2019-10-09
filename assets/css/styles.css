@@ -124,6 +124,7 @@ li {
     position: relative;
     overflow: hidden;
     user-select: none;
+    letter-spacing: .2px;
 }
 
 .btn:hover {
@@ -142,6 +143,10 @@ li {
 
 .btn-secondary {
     background-color: #398ad0;
+}
+
+.btn-tertiary {
+    background-color: #f0ad4e;
 }
 
 .btn-print {
@@ -786,6 +791,7 @@ input::placeholder {
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 12px;
 }
 
 .breadcrumbs__item:not(:first-child){
@@ -794,7 +800,7 @@ input::placeholder {
 
 .breadcrumbs__separator {
     width: 10px;
-    height: 33px;
+    height: 29px;
     position: absolute;
     top: -2px;
     left: -6px;
@@ -998,6 +1004,54 @@ input::placeholder {
     background-color: #E7EEF3;
 }
 
+.customSelect__campos__list {
+    left: auto;
+    padding: 16px 10px 6px 10px;
+    min-width: 100%;
+    max-height: none;
+}
+
+.customSelect__campos-all-link {
+    margin: 0 8px;
+}
+
+.customSelect__campos__table {
+    width: 100%;
+    margin: 0 auto;
+    border-spacing: 8px;
+}
+
+.customSelect__campos-link {
+    text-align: center;
+    display: block;
+    padding: 6px;
+    text-decoration: none;
+    border: solid 1px #D8DDE7;
+    background-color: #f8f9fc;
+    border-radius: 4px;
+    color: #333f4d;
+    min-width: 47px;
+}
+
+.customSelect__campos-link:hover,
+.customSelect__campos-link-selected {
+    background-color: white;
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.15);
+}
+
+.customSelect__campos-link-selected {
+    border: solid 1px #D05744;
+}
+
+.customSelect__campos-link-completed {
+    background-color: #DDF3D5;
+}
+
+.customSelect__campos-link-complete:hover {
+    background-color: #DDF3D5;
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.15);
+}
+
 .searchBox,
 .searchedEquipaId__wrapper {
     position: relative;
@@ -1093,14 +1147,10 @@ input::placeholder {
     padding-left: 20px;
 }
 
-/*.mainTable tbody tr {
-    border-top: solid 1px #D8DDE7;
-    border-bottom: solid 1px #D8DDE7;
-}*/
-
 .mainTable tbody tr:nth-child(odd) {
     background-color: #f8f9fc;
 }
+
 
 .mainTable tbody tr:hover {
     background-color: #EEEFF3;
@@ -1440,6 +1490,8 @@ input::placeholder {
 .percursoTorneio_wrapper {
     width: 60%;
     margin-bottom: 60px;
+    margin-top: 25px;
+    padding-left: 0;
 }
 
 .percursoJogosContainer {
@@ -1657,4 +1709,32 @@ input::placeholder {
 
 .definirCampos__wrapper {
     margin: 32px 40px 0 40px;
+}
+
+.registoParciais__wrapper {
+    margin: 0 40px 100px 40px;
+}
+
+.registoParciais__campoTitle {
+    margin: 42px 0 15px 0;
+}
+
+.primeiroElemento {
+    width: 1%;
+    white-space: nowrap;
+}
+
+.equipasSeparador {
+    margin-top: 22px;
+}
+
+.mainTable_parcial {
+    width: 1%;
+    white-space: nowrap;
+    padding: 0 10px;
+}
+
+.classificacao__wrapper {
+    margin: 0 40px;
+    margin-bottom: 100px;
 }

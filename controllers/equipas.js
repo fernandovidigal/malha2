@@ -114,7 +114,7 @@ async function processaPercurso(torneioId, equipaId, escalaoId){
     const campos = [..._campos];
 
     const listaFases = [];
-    //fases.forEach(async (fase,index) => {
+
     for(const [index, fase] of fases.entries()){
         const faseActual = {
             fase: fase,
@@ -153,7 +153,9 @@ async function processaPercurso(torneioId, equipaId, escalaoId){
                 // Pontuação
                 _jogo.pontos = [jogo.equipa1Pontos, jogo.equipa2Pontos];
 
-                faseActual.jogos.push(_jogo);
+                if(parciaisEquipa1 && parciaisEquipa2){
+                    faseActual.jogos.push(_jogo);
+                }
             }
         }
 

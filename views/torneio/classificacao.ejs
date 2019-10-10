@@ -25,11 +25,11 @@
                 <table class="mainTable">
                     <thead>
                         <tr>
-                            <th width="1%">Classificação</th>
-                            <th>Equipa</th>
+                            <th class="mainTable__smallHeader">Classificação</th>
+                            <th class="mainTable__smallHeader">Equipa</th>
                             <th class="mainTable-headerElement-left" colspan="2">Elementos</th>
                             <th class="mainTable-headerElement-left" width="15%">Localidade</th>
-                            <th width="10%">Acumulado Parciais</th>
+                            <th width="10%">Parciais Acumulados</th>
                             <th width="10%">Jogos Ganhos</th>
                             <th width="10%">Pontuação</th>
                         </tr>
@@ -43,7 +43,7 @@
                                     <td class="primeiroElemento"><%= equipa.primeiroElemento %></td>
                                     <td><%= equipa.segundoElemento %></td>
                                     <td><%= equipa.localidade %></td>
-                                    <td></td>
+                                    <td align="center"><%= equipa.parciaisAcumulados %></td>
                                     <td align="center"><%= equipa.vitorias %></td>
                                     <td align="center"><%= equipa.pontos %></td>
                                 </tr>

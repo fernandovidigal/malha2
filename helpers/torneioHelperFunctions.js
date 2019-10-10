@@ -403,6 +403,22 @@ exports.ordenaClassificacao = function(classificacao, listaJogos){
             return 1;
         }
     });
+
+    // Ordena caso o número de ponto e vitórias seja o mesmo
+    // Critério de ordenação: Mais pontos acumulados tem precendencia
+    classificacao.sort((a,b) => {
+        if(a.pontos === b.pontos && a.vitorias === b.vitorias){
+            if(a.parciaisAcumulados > b.parciaisAcumulados){
+                return -1
+            } else if(a.parciaisAcumulados < b.parciaisAcumulados){
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    });
 }
 
 exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo = 0){
@@ -436,6 +452,9 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
 
             // 1. Obter a lista de Jogos para cada campo
             const listaJogos = await dbFunctions.getAllGamesPorCampo(torneioId, escalaoId, fase, numCampo);
+            const listaJogosParaParciais = listaJogos.map(el => el.jogoId);
+            const parciaisAcumulados = await dbFunctions.getParciaisAcumulados(listaJogosParaParciais);
+
             campo.classificacao = [];
             const classificacao = campo.classificacao;
 
@@ -443,6 +462,8 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
             for(const jogo of listaJogos){
                 const equipa1 = procuraEquipa(listaCompletaEquipas, jogo.equipa1Id);
                 const equipa2 = procuraEquipa(listaCompletaEquipas, jogo.equipa2Id);
+                const parciaisEquipa1 = parciaisAcumulados.find(el => el.equipaId == jogo.equipa1Id);
+                const parciaisEquipa2 = parciaisAcumulados.find(el => el.equipaId == jogo.equipa2Id);
 
                 const posicaoEquipa1 = procuraEquipaIndex(classificacao, jogo.equipa1Id);
                 if(posicaoEquipa1 != -1){
@@ -455,6 +476,7 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
                         segundoElemento: equipa1.segundoElemento,
                         localidadeId: equipa1.localidade.localidadeId,
                         localidade: equipa1.localidade.nome,
+                        parciaisAcumulados: (parciaisEquipa1) ? parciaisEquipa1.parciaisAcumulados : 0,
                         pontos: jogo.equipa1Pontos
                     }
 
@@ -477,6 +499,7 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
                         segundoElemento: equipa2.segundoElemento,
                         localidadeId: equipa2.localidade.localidadeId,
                         localidade: equipa2.localidade.nome,
+                        parciaisAcumulados: (parciaisEquipa2) ? parciaisEquipa2.parciaisAcumulados : 0,
                         pontos: jogo.equipa2Pontos
                     }
 

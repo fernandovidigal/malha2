@@ -1,0 +1,82 @@
+<div class="escalao__item">
+    <p class="escalao__item-title"><%= escalao.designacao %></p>
+
+    <% if(escalao.existeVencedor == true){ %>
+    <div class="escalao__item-equipaVencedora">
+        <p class="escalao__item-equipaVencedora-title">Equipa Vencedora</p>
+        <p class="escalao__item-equipaVencedora-elemento"><%= escalao.equipaVencedora.primeiroElemento %></p>
+        <p class="escalao__item-equipaVencedora-elemento"><%= escalao.equipaVencedora.segundoElemento %></p>
+        <p class="escalao__item-equipaVencedora-localidade"><%= escalao.equipaVencedora.localidade %></p>
+    </div>
+    <% } %>
+
+    <% if(escalao.fase == 0){ %>
+    <div class="escalao__item-numCampos">
+        <p class="escalao__item-numCampos-title">Número de Campos</p>
+        <p class="escalao__item-numCampos-numCampos"><%= escalao.numTotalCampos %></p>
+    </div>
+    <% } else { %>
+    <!-- SELECT BOXES -->
+    <div class="escalao__item-checkboxes">
+        <p class="escalao__item-checkboxes-title">Fase</p>
+        <div class="customSelect escalao__item-select">
+            <div class="customSelect__header">
+                <%= (escalao.fase != 100) ? escalao.fase + 'ª Fase' : 'Fase Final' %>
+            </div>
+            <div class="customSelect__list">
+                <% escalao.listaFases.forEach(function(fase){ %>
+                    <a class="customSelect__links<%= fase.fase == escalao.fase ? ' customSelect__links-selected': '' %>"><%= (fase.fase != 100) ? fase.fase + 'ª Fase' : ' Fase Final' %></a>
+                <% }); %>
+            </div>
+            <input type="hidden" name="fases">
+        </div>
+        <p class="escalao__item-checkboxes-title">Campos</p>
+        <div class="customSelect escalao__item-select">
+            <div class="customSelect__header customSelect__camposHeader">
+                Todos os Campos
+            </div>
+            <div class="customSelect__list customSelect__campos__list">
+                <a class="customSelect__campos-link customSelect__campos-all-link <%= (typeof escalao.campo == 'undefined') ? 'customSelect__campos-link-selected' : '' %>">Todos os Campos</a>
+                <table class="customSelect__campos__table">
+                    <tbody>
+                        <% while(escalao.campos.length > 0) {
+                            const _listaCampos = escalao.campos.splice(0,5);
+                        %>
+                            <tr>
+                                <% _listaCampos.forEach(campo => { %>
+                                    <td>
+                                        <a class="customSelect__campos-link customSelect__links-campos<%= campo.completo ? 'customSelect__campos-link-completed' : '' %>" data-campo="<%= campo.campo %>">
+                                            <%= (escalao.fase != 100) ? campo.campo : campo.designacao %>
+                                        </a>
+                                    </td>
+                                <% }); %>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <input type="hidden" name="campos" value="0">
+        </div>
+    </div>
+    <!-- /SELECT BOXES -->
+    <% } %>
+
+    <div class="escalao__item-actionBtnBar">
+        <div class="escalao__item-actionBtnBar-sideActions"></div>
+        <% if(escalao.fase == 0){ %>
+            <% if(escalao.numTotalCampos * 3 > escalao.numEquipas){ %>
+                <p class="errMsg escalao__item-errMsg">Não existem equipas suficientes</p>
+            <% } else if(escalao.numTotalCampos == 0) { %>
+                <p class="errMsg escalao__item-errMsg">O número de campos não foi definido</p>
+            <% } else { %>
+                <a href="/torneio/distribuirEquipasPorEscalao/escalao/<%= escalao.escalaoId %>" class="btn btn-secondary btn-smaller">Iniciar Competição</a>
+            <% } %>
+        <% } else { %>
+            <% if(escalao.todosCamposCompletos){ %>
+                <a href="" class="btn btn-secondary btn-smaller">Processa Próxima Fase</a>
+            <% } else { %>
+                <a href="" class="btn btn-secondary btn-smaller">Registar Parciais</a>
+            <% } %>
+        <% } %>
+    </div>
+</div>

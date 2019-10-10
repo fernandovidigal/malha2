@@ -50,7 +50,7 @@
                     </div>
                     <div class="customSelect__list">
                         <% info.listaFases.forEach(function(fase){ %>
-                            <a class="customSelect__links<%= fase == info.fase ? ' customSelect__links-selected': '' %>" href="/torneio/resultados/escalao/<%= info.escalaoId %>/fase/<%= fase %>/campo/<%= info.campo %>"><%= (fase != 100) ? fase + 'ª Fase' : ' Fase Final' %></a>
+                            <a class="customSelect__links<%= fase == info.fase ? ' customSelect__links-selected': '' %>" href="/torneio/resultados/escalao/<%= info.escalaoId %>/fase/<%= fase %>/campo/0"><%= (fase != 100) ? fase + 'ª Fase' : ' Fase Final' %></a>
                         <% }); %>
                     </div>
                 </div>  

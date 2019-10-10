@@ -106,9 +106,12 @@ exports.getStarting = async (req, res, next) => {
                 // Verifica em que fase do torneio se encontra o escalão
                 const _fase = dbFunctions.getFaseTorneioPorEscalao(torneioId, escalao.escalaoId);
 
-                const [numEquipas, fase] = await Promise.all([_numEquipas, _fase]);
+                const _listaFases = dbFunctions.getAllFasesPorEscalao(torneioId, escalao.escalaoId);
+
+                const [numEquipas, fase, listaFases] = await Promise.all([_numEquipas, _fase, _listaFases]);
                 _escalao.numEquipas = numEquipas;
                 _escalao.fase = (fase == null) ? 0 : fase.fase;
+                _escalao.listaFases = listaFases.reverse();
 
                 // Verifica o número de jogos que determinada fase já tem distribuidos
                 const numJogos = await dbFunctions.getNumeroJogosPorFase(torneioId, _escalao.escalaoId, _escalao.fase);
@@ -164,10 +167,15 @@ exports.getStarting = async (req, res, next) => {
                     _escalao.todosCamposCompletos = (_escalao.numCamposFase == _escalao.numCamposCompletos) ? true : false;
 
                     // Verifica se já existe vencedor
-                    if(_escalao.fase == 100 && _escalao.todosCamposCompletos){
-                        const vencedor = await torneioHelpers.processaClassificacao(torneioId, _escalao.escalaoId, _escalao.fase, listaCampos[0].num);
-                        _escalao.existeVencedor = true;
-                        _escalao.equipaVencedora = vencedor[0].classificacao[0];
+                    if(_escalao.fase == 100){
+                        _escalao.campos[0].designacao = 'Final';
+                        _escalao.campos[1].designacao = '3º e 4º Lugar';
+                        
+                        if(_escalao.todosCamposCompletos){
+                            const vencedor = await torneioHelpers.processaClassificacao(torneioId, _escalao.escalaoId, _escalao.fase, listaCampos[0].num);
+                            _escalao.existeVencedor = true;
+                            _escalao.equipaVencedora = vencedor[0].classificacao[0];
+                        }
                     }
                 }
                 
@@ -526,7 +534,7 @@ exports.mostraClassificacao = async (req, res, next) => {
     try {
         const escalaoId = parseInt(req.params.escalao);
         const fase = parseInt(req.params.fase);
-        const campo = parseInt(req.params.campo);
+        const campo = parseInt(req.params.campo) || 0;
 
         const _torneio = dbFunctions.getTorneioInfo();
         const _escalaoInfo = dbFunctions.getEscalaoInfo(escalaoId);

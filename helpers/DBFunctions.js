@@ -958,3 +958,16 @@ exports.updateParciais = async (jogoId, data) => {
         return Promise.reject(err);
     }
 }
+
+exports.getParciaisAcumulados = (listaJogos) => {
+    return Parciais.findAll({
+        attributes: ['equipaId', [sequelize.literal('SUM(parcial1 + parcial2 + parcial3)'), 'parciaisAcumulados']],
+        where: {
+            jogoId: {
+                [Op.in]: listaJogos
+            }
+        },
+        group: ['equipaId'],
+        raw: true
+    });
+}

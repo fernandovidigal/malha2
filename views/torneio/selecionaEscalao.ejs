@@ -18,7 +18,7 @@
         <div class="actionBar__wrapper">
             <h2 class="actionBar__title">Competição</h2>
         </div>
-        <%- JSON.stringify(escaloesMasculinos[2]) %>
+        <%- //JSON.stringify(escaloesMasculinos[2]) %>
         <div class="competicao__wrapper">
             <% if(escaloesMasculinos.length > 0){ %>
                 <h3>Masculinos</h3>
@@ -51,25 +51,145 @@ function removeAllSelectedClasses(campos, allCampos){
     allCampos.classList.remove('customSelect__campos-link-selected');
 }
 
-const campos = document.querySelectorAll('.customSelect__links-campos');
-const camposInput = document.getElementsByName('campos');
-const camposHeader = document.querySelector('.customSelect__camposHeader');
-const camposAllSelect = document.querySelector('.customSelect__campos-all-link');
-campos.forEach(campo => {
-    campo.addEventListener('click', function(e){
-        e.preventDefault();
-        const numCampo = this.dataset.campo;
-        camposInput[0].value = numCampo;
-        camposHeader.textContent = 'Campo ' + numCampo;
-        removeAllSelectedClasses(campos, camposAllSelect);
-        this.classList.add('customSelect__campos-link-selected');
+function removeAllSelectedFases(fases){
+    fases.forEach(fase => fase.classList.remove('customSelect__links-selected'));
+}
+
+function removeAllElements(parent){
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
+}
+
+function showLoading(element){
+    const loadingDiv = document.createElement('div');
+    loadingDiv.classList.add('loading', 'campos__loading');
+    const bounce1 = document.createElement('div');
+    bounce1.classList.add('bounce1');
+    const bounce2 = document.createElement('div');
+    bounce2.classList.add('bounce2');
+    const bounce3 = document.createElement('div');
+    bounce3.classList.add('bounce3');
+
+    loadingDiv.appendChild(bounce1);
+    loadingDiv.appendChild(bounce2);
+    loadingDiv.appendChild(bounce3);
+
+    element.appendChild(loadingDiv);
+}
+
+function geraCamposLink(tableElement, listaCampos){
+    // Limpa todos os elementos da tabela
+    removeAllElements(tableElement);
+
+    // Gera todos os campos
+    while(listaCampos.length > 0) {
+        const camposRowItem = listaCampos.splice(0,5);
+        const row = document.createElement('tr');
+        camposRowItem.forEach(campo => {
+            const cell = document.createElement('td');
+            const campoLink = document.createElement('a');
+            campoLink.classList.add('customSelect__campos-link', 'customSelect__links-campos');
+            if(campo.completo){
+                campoLink.classList.add('customSelect__campos-link-completed');
+            }
+            campoLink.dataset.campo = campo.campo;
+            campoLink.textContent = (campo.fase != 100) ? campo.campo : campo.designacao;
+
+            cell.appendChild(campoLink);
+            row.appendChild(cell);
+        });
+        tableElement.appendChild(row);
+    }
+}
+
+const competicaoSelectBoxes = document.querySelectorAll('.escalao__item');
+competicaoSelectBoxes.forEach(escalaoBox => {
+    const fasesSelect = escalaoBox.querySelector('.customSelect__fases');
+    const camposSelect = escalaoBox.querySelector('.customSelect_campos');
+
+    escalaoBox.addEventListener('click', async function(e){
+        
+        const faseActual = fasesSelect.querySelector('.fasesInput').value;
+        const camposHeader = camposSelect.querySelector('.customSelect__camposHeader');
+        
+        // Seleciona a Fase
+        if(e.target.classList.contains('customSelect__links-fases') && faseActual != e.target.dataset.fase){
+            // Remove todos os elementos do header da selectBox
+            removeAllElements(camposHeader);
+            // Adiciona o loading
+            showLoading(camposHeader);
+            
+            // Fetch campos da Base de Dados
+            const response = await fetch(`/torneio/getAllCamposPorFase/${e.target.dataset.escalao}/${e.target.dataset.fase}`);
+
+            const data = await response.json();
+            if(data.success){
+                // Cria os os campos
+                const tableElement = escalaoBox.querySelector('.customSelect__campos__table tbody');
+                geraCamposLink(tableElement, data.listaCampos);
+                camposHeader.textContent = 'Todos os Campos';
+                const allCampos = camposSelect.querySelector('.customSelect__campos-all-link');
+                allCampos.classList.add('customSelect__campos-link-selected');
+                // Altera a SelectBox da Fase em conformidade com o selecionado
+                const faseSelecionada = e.target.dataset.fase;
+                const fasesInput = fasesSelect.querySelector('.fasesInput');
+                const fasesHeader = fasesSelect.querySelector('.customSelect__fasesHeader');
+                const faseSelectLinks = fasesSelect.querySelectorAll('.customSelect__links-fases');
+                fasesInput.value = faseSelecionada;
+                fasesHeader.textContent = (parseInt(faseSelecionada) != 100) ? faseSelecionada + 'ª Fase' : 'Fase Final';
+                removeAllSelectedFases(faseSelectLinks);
+                e.target.classList.add('customSelect__links-selected');
+            }
+        }
+    });
+
+    const btns = escalaoBox.querySelector('.escalao__item-actionBtnBar');
+    btns.addEventListener('click', function(e){
+        if(e.target.classList.contains('btn-registaParciais')){
+            //e.preventDefault();
+            let url = e.target.getAttribute("href");
+            const fase = escalaoBox.querySelector('.fasesInput').value;
+            const campo = escalaoBox.querySelector('.camposInput').value;
+            url = url + `/fase/${fase}/campo/${campo}`;
+            window.location.href = url;
+        }
     });
 });
 
-camposAllSelect.addEventListener('click', function(e){
-    camposInput[0].value = 0;
-    removeAllSelectedClasses(campos, camposAllSelect);
-    this.classList.add('customSelect__campos-link-selected');
+const camposSelectList = document.querySelectorAll('.customSelect_campos');
+camposSelectList.forEach(campoSelect => {
+    campoSelect.addEventListener('click', function(e){
+        if(e.target.classList.contains('customSelect__links-campos')){
+            const camposInput = campoSelect.querySelector('.camposInput');
+            const camposHeader = campoSelect.querySelector('.customSelect__camposHeader');
+            const campoSelectLinks = campoSelect.querySelectorAll('.customSelect__links-campos');
+            const campoSelecionado = e.target.dataset.campo;
+            const allCampos = campoSelect.querySelector('.customSelect__campos-all-link');
+            const faseSelecionada = 
+            camposInput.value = campoSelecionado;
+            camposHeader.textContent = 'Campo ' + campoSelecionado;
+            removeAllSelectedClasses(campoSelectLinks, allCampos);
+            e.target.classList.add('customSelect__campos-link-selected');
+        } else if(e.target.classList.contains('customSelect__campos-all-link')){
+            const camposInput = campoSelect.querySelector('.camposInput');
+            const campoSelectLinks = campoSelect.querySelectorAll('.customSelect__links-campos');
+            const camposHeader = campoSelect.querySelector('.customSelect__camposHeader');
+            camposInput.value = 0;
+            camposHeader.textContent = 'Todos os Campos';
+            removeAllSelectedClasses(campoSelectLinks, e.target);
+            e.target.classList.add('customSelect__campos-link-selected');
+        }
+    });
+});
+
+const btns = document.querySelector('.escalao__item-actionBtnBar');
+btns.addEventListener('click', function(e){
+    if(e.target.classList.contains('btn-registaParciais')){
+        e.preventDefault();
+        const url = e.target.getAttribute("href");
+        const ancestor = 33;
+    }
 });
 
 </script>

@@ -19,24 +19,24 @@
     <!-- SELECT BOXES -->
     <div class="escalao__item-checkboxes">
         <p class="escalao__item-checkboxes-title">Fase</p>
-        <div class="customSelect escalao__item-select">
-            <div class="customSelect__header">
+        <div class="customSelect escalao__item-select customSelect__fases">
+            <div class="customSelect__header customSelect__fasesHeader">
                 <%= (escalao.fase != 100) ? escalao.fase + 'ª Fase' : 'Fase Final' %>
             </div>
             <div class="customSelect__list">
                 <% escalao.listaFases.forEach(function(fase){ %>
-                    <a class="customSelect__links<%= fase.fase == escalao.fase ? ' customSelect__links-selected': '' %>"><%= (fase.fase != 100) ? fase.fase + 'ª Fase' : ' Fase Final' %></a>
+                    <a class="customSelect__links customSelect__links-fases<%= fase.fase == escalao.fase ? ' customSelect__links-selected': '' %>" data-fase="<%= fase.fase %>" data-escalao="<%= escalao.escalaoId %>"><%= (fase.fase != 100) ? fase.fase + 'ª Fase' : ' Fase Final' %></a>
                 <% }); %>
             </div>
-            <input type="hidden" name="fases">
+            <input type="hidden" name="fases" class="fasesInput" value="<%= escalao.fase %>">
         </div>
         <p class="escalao__item-checkboxes-title">Campos</p>
-        <div class="customSelect escalao__item-select">
+        <div class="customSelect escalao__item-select customSelect_campos">
             <div class="customSelect__header customSelect__camposHeader">
                 Todos os Campos
             </div>
             <div class="customSelect__list customSelect__campos__list">
-                <a class="customSelect__campos-link customSelect__campos-all-link <%= (typeof escalao.campo == 'undefined') ? 'customSelect__campos-link-selected' : '' %>">Todos os Campos</a>
+                <a class="customSelect__campos-link customSelect__campos-all-link<%= (typeof escalao.campo == 'undefined') ? ' customSelect__campos-link-selected' : '' %>">Todos os Campos</a>
                 <table class="customSelect__campos__table">
                     <tbody>
                         <% while(escalao.campos.length > 0) {
@@ -45,7 +45,7 @@
                             <tr>
                                 <% _listaCampos.forEach(campo => { %>
                                     <td>
-                                        <a class="customSelect__campos-link customSelect__links-campos<%= campo.completo ? 'customSelect__campos-link-completed' : '' %>" data-campo="<%= campo.campo %>">
+                                        <a class="customSelect__campos-link customSelect__links-campos<%= campo.completo ? ' customSelect__campos-link-completed' : '' %>" data-campo="<%= campo.campo %>">
                                             <%= (escalao.fase != 100) ? campo.campo : campo.designacao %>
                                         </a>
                                     </td>
@@ -55,7 +55,7 @@
                     </tbody>
                 </table>
             </div>
-            <input type="hidden" name="campos" value="0">
+            <input type="hidden" name="campos" class="camposInput" value="0">
         </div>
     </div>
     <!-- /SELECT BOXES -->
@@ -73,9 +73,14 @@
             <% } %>
         <% } else { %>
             <% if(escalao.todosCamposCompletos){ %>
-                <a href="" class="btn btn-secondary btn-smaller">Processa Próxima Fase</a>
+                <% if(escalao.existeVencedor){ %>
+                    <a href="" class="btn btn-secondary btn-smaller">Ver Parciais</a>
+                <% } else { %>
+                    <a href="/torneio/processaProximaFase/escalao/<%= escalao.escalaoId %>" class="btn btn-secondary btn-smaller">Processa Próxima Fase</a>
+                <% } %>
+                
             <% } else { %>
-                <a href="" class="btn btn-secondary btn-smaller">Registar Parciais</a>
+                <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>" class="btn btn-secondary btn-smaller btn-registaParciais">Registar Parciais</a>
             <% } %>
         <% } %>
     </div>

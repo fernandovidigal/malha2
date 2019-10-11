@@ -848,3 +848,41 @@ exports.fichasParciais = async (req, res, next) => {
         });
     }
 }
+
+exports.getAllCamposPorFase = async (req, res, next) => {
+    try {
+        const escalaoId = parseInt(req.params.escalaoId);
+        const fase = parseInt(req.params.fase);
+        const torneio = await dbFunctions.getTorneioInfo();
+
+        const listaCampos = await dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
+        
+        if(fase == 100){
+            listaCampos[0].designacao = 'Final';
+            listaCampos[1].designacao = '3º e 4º Lugar';
+        }
+
+        for(const campo of listaCampos){
+            // Determina para determinado escalão e fase, o número de jogos total para o campo e
+            // o número de jogos já jogados
+            const _numJogosParaJogar = await dbFunctions.getNumGamesPorCampo(torneio.torneioId, escalaoId, fase, campo.campo);
+            const _numJogosJogados = await dbFunctions.getNumGamesPlayed(torneio.torneioId, escalaoId, fase, campo.campo);
+
+            const [numJogosParaJogar, numJogosJogados] = await Promise.all([_numJogosParaJogar, _numJogosJogados]);
+
+            campo.completo = ((numJogosParaJogar - numJogosJogados[0].count) > 0) ? false: true;
+            campo.fase = fase;
+        }
+
+        res.status(200).json({
+            success: true,
+            listaCampos: listaCampos
+        });
+    } catch(err) {
+        console.log(err);
+        res.status(200).json({
+            success: false,
+            errMsg: 'Ocorreu um erro. Por favor tente novamente.'
+        });
+    }
+}

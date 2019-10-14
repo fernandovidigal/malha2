@@ -80,7 +80,7 @@ function verificaVencedor(parcialEquipa1Value, parcialEquipa2Value){
     }
 }
 
-const equipaParciais = document.querySelectorAll('.equipa_parciais');
+const equipaParciais = document.querySelectorAll('.jogoInfo');
 equipaParciais.forEach(parciais => {
     const parciaisInput = parciais.querySelectorAll('.parcial');
     parciaisInput.forEach((parcial, index) => {
@@ -97,41 +97,41 @@ equipaParciais.forEach(parciais => {
             }
         });
 
-
+        
         parcial.addEventListener('change', function(e){
-            const parcial1 = validaParesDeParciais(parciaisInput[0], parciaisInput[3]);
-            const parcial2 = validaParesDeParciais(parciaisInput[1], parciaisInput[4]);
-            const parcial3 = validaParesDeParciais(parciaisInput[2], parciaisInput[5]);
+            const parcial1 = validaParesDeParciais(parciaisInput[0], parciaisInput[1]);
+            const parcial2 = validaParesDeParciais(parciaisInput[2], parciaisInput[3]);
+            const parcial3 = validaParesDeParciais(parciaisInput[4], parciaisInput[5]);
 
             if(parcial1){
                 parciaisInput[0].classList.remove('parcial_error');
-                parciaisInput[3].classList.remove('parcial_error');
+                parciaisInput[1].classList.remove('parcial_error');
             }
 
             if(parcial2){
-                parciaisInput[1].classList.remove('parcial_error');
-                parciaisInput[4].classList.remove('parcial_error');
+                parciaisInput[2].classList.remove('parcial_error');
+                parciaisInput[3].classList.remove('parcial_error');
             }
 
             if(parcial3){
-                parciaisInput[2].classList.remove('parcial_error');
+                parciaisInput[4].classList.remove('parcial_error');
                 parciaisInput[5].classList.remove('parcial_error');
             }
 
             // Desactiva os inputs para o parcial 3 se já houver dois jogos ganhos pela mesma equipa
             if(parcial1 && parcial2){
-                const vencedorParcial1 = verificaVencedor(parseInt(parciaisInput[0].value), parseInt(parciaisInput[3].value));
-                const vencedorParcial2 = verificaVencedor(parseInt(parciaisInput[1].value), parseInt(parciaisInput[4].value));
+                const vencedorParcial1 = verificaVencedor(parseInt(parciaisInput[0].value), parseInt(parciaisInput[1].value));
+                const vencedorParcial2 = verificaVencedor(parseInt(parciaisInput[2].value), parseInt(parciaisInput[3].value));
 
                 if(vencedorParcial1 == vencedorParcial2 && vencedorParcial1 != -1 && vencedorParcial2 != -1){
-                    parciaisInput[2].value = '';
-                    parciaisInput[2].disabled = true;
+                    parciaisInput[4].value = '';
+                    parciaisInput[4].disabled = true;
                     parciaisInput[5].value = '';
                     parciaisInput[5].disabled = true;
-                    parciaisInput[2].classList.remove('parcial_error');
+                    parciaisInput[4].classList.remove('parcial_error');
                     parciaisInput[5].classList.remove('parcial_error');
                 } else {
-                    parciaisInput[2].disabled = false;
+                    parciaisInput[4].disabled = false;
                     parciaisInput[5].disabled = false;
                 }
             }
@@ -140,17 +140,17 @@ equipaParciais.forEach(parciais => {
 });
 
 
-function getEquipasInputValues(form){
+function getEquipasInputValues(jogosInfoRow){
     return {
         equipa1: {
-            parcial1: parseInt(form.elements['equipa1_parcial1'].value),
-            parcial2: parseInt(form.elements['equipa1_parcial2'].value),
-            parcial3: (isNaN(parseInt(form.elements['equipa1_parcial3'].value))) ? 0 : parseInt(form.elements['equipa1_parcial3'].value)
+            parcial1: parseInt(jogosInfoRow.querySelector('.equipa1_parcial1').value),
+            parcial2: parseInt(jogosInfoRow.querySelector('.equipa1_parcial2').value),
+            parcial3: (isNaN(parseInt(jogosInfoRow.querySelector('.equipa1_parcial3').value))) ? 0 : parseInt(jogosInfoRow.querySelector('.equipa1_parcial3').value)
         },
         equipa2: {
-            parcial1: parseInt(form.elements['equipa2_parcial1'].value),
-            parcial2: parseInt(form.elements['equipa2_parcial2'].value),
-            parcial3: (isNaN(parseInt(form.elements['equipa2_parcial3'].value))) ? 0 : parseInt(form.elements['equipa2_parcial3'].value)
+            parcial1: parseInt(jogosInfoRow.querySelector('.equipa2_parcial1').value),
+            parcial2: parseInt(jogosInfoRow.querySelector('.equipa2_parcial2').value),
+            parcial3: (isNaN(parseInt(jogosInfoRow.querySelector('.equipa2_parcial3').value))) ? 0 : parseInt(jogosInfoRow.querySelector('.equipa2_parcial3').value)
         }
     }
 }
@@ -188,14 +188,10 @@ function validaPontosEquipas(equipa1, equipa2){
 }
 
 async function handleParciais(btn, url, moveToEnd, actualizar = 0){
-    const campoWrapper = btn.closest('.campo__wrapper');
-    const currentForm = btn.closest('.resultados__form');
-    const currentEquipasInfowrapper = currentForm.querySelector(".equipasInfo__wrapper");
+    const jogosInfoRow = btn.closest('.jogoInfo');
     const jogoID = btn.dataset.jogoid;
-    let equipa1_pontos_text = currentForm.querySelector('.equipa1_pontos');
-    let equipa2_pontos_text = currentForm.querySelector('.equipa2_pontos');
 
-    const equipasInputValues = getEquipasInputValues(currentForm);
+    const equipasInputValues = getEquipasInputValues(jogosInfoRow);
     const valido = validaPontosEquipas(equipasInputValues.equipa1, equipasInputValues.equipa2);
 
     if(valido){
@@ -235,24 +231,25 @@ async function handleParciais(btn, url, moveToEnd, actualizar = 0){
                 timer: 1000
             });
 
-            equipa1_pontos_text.appendChild(document.createTextNode(data.equipa1_pontos));
-            equipa2_pontos_text.appendChild(document.createTextNode(data.equipa2_pontos));
+            // Mostra as pontuações
+            jogosInfoRow.querySelector('.equipa1_pontos').textContent = data.equipa1_pontos;
+            jogosInfoRow.querySelector('.equipa2_pontos').textContent = data.equipa2_pontos;
 
             if(moveToEnd){
-                campoWrapper.removeChild(currentForm);
-                campoWrapper.appendChild(currentForm);
+                const parent = jogosInfoRow.closest('tbody');
+                parent.removeChild(jogosInfoRow);
+                parent.appendChild(jogosInfoRow);
             }
             
-            const parciaisInput = currentForm.querySelectorAll("input[type=text]");
-            parciaisInput.forEach(inputsParaTexto);
+            const parciaisInput = jogosInfoRow.querySelectorAll(".parcial");
+            parciaisInput.forEach(parcial => {
+                parcial.disabled = true;
+            });
 
-            
+            // Cria o botão EDITAR
             const editBtn = createEditButton(jogoID);
-
             removeAllChilds(currentBtnWrapper);
             currentBtnWrapper.appendChild(editBtn);
-
-            currentEquipasInfowrapper.classList.add('resultados_finalizados');
         } catch(err) {
             Swal.fire({
                 type: 'error',
@@ -281,84 +278,52 @@ function createLoading(){
     return loadingDiv;
 }
 
-function createEditButton(jogo_id){
+function createEditButton(jogoId){
     const editButton = document.createElement("A");
-    editButton.setAttribute("href", "");
-    editButton.classList.add("btn__edit-resultados");
+    editButton.classList.add("btn", "btn-tertiary", "btn__edit-resultados");
     editButton.setAttribute("name", "editarResultados");
-    editButton.setAttribute("data-jogoid", jogo_id);
-    editButton.innerHTML = "Editar";
+    editButton.dataset.jogoid = jogoId;
+    editButton.textContent = "Editar";
 
     return editButton;
 }
 
-function createUdpateButton(jogo_id){
+function createUdpateButton(jogoId){
     const deleteButton = document.createElement("A");
-    deleteButton.setAttribute("href", "");
-    deleteButton.classList.add("btn__update-resultados");
+    deleteButton.classList.add("btn", "btn-tertiary", "btn__update-resultados");
     deleteButton.setAttribute("name", "updateResultados");
-    deleteButton.setAttribute("data-jogoid", jogo_id);
-    deleteButton.innerHTML = "Actualizar";
+    deleteButton.dataset.jogoid = jogoId;
+    deleteButton.textContent = "Actualizar";
 
     return deleteButton;
 }
 
-function inputsParaTexto(item, index){
-    const parentNode = item.parentNode;
-    const inputValue = item.value;
-    parentNode.innerHTML = inputValue;
-}
-
 const editResultadosBtns = document.querySelectorAll('.btn_wrapper');
-editResultadosBtns.forEach((item, index)=>{
-    item.addEventListener('click', function(event){
-        event.preventDefault();
-        const btn = event.target;
-        const jogoID = btn.dataset.jogoid;
+editResultadosBtns.forEach((btn, index)=>{
+    btn.addEventListener('click', function(e){
+        e.preventDefault();
+        const editBtn = e.target;
+        const jogoId = editBtn.dataset.jogoid;
 
-        if(btn.tagName == 'A' && btn.getAttribute('name') == "editarResultados"){
-            const equipasWrapper = this.previousElementSibling;
-            activaEdicaoResultados(equipasWrapper);
+        if(editBtn.tagName == 'A' && editBtn.getAttribute('name') == "editarResultados"){
+            const jogoInfoRow = this.parentNode;
+            activaEdicaoResultados(jogoInfoRow);
             removeAllChilds(this);
-            removeAllChilds(equipasWrapper.querySelector('.equipa1_pontos'));
-            removeAllChilds(equipasWrapper.querySelector('.equipa2_pontos'));
-            this.appendChild(createUdpateButton(jogoID));
-        } else if(btn.tagName == 'A' && btn.getAttribute('name') == "updateResultados"){
-            handleParciais(btn, "/torneio/actualizaParciais", false, 1);
+            removeAllChilds(jogoInfoRow.querySelector('.equipa1_pontos'));
+            removeAllChilds(jogoInfoRow.querySelector('.equipa2_pontos'));
+            this.appendChild(createUdpateButton(jogoId));
+        } else if(editBtn.tagName == 'A' && editBtn.getAttribute('name') == "updateResultados"){
+            handleParciais(editBtn, "/torneio/actualizaParciais", false, 1);
         }
     });
 });
 
 function activaEdicaoResultados(element){
-    const equipaParcial = element.querySelectorAll('.equipa_parcial');
-    const count = equipaParcial.length;
-    const division = Math.ceil(count / 2);
-    let equipaCount = 1;
-    let parcialCount = 1;
+    const equipaParcial = element.querySelectorAll('.parcial');
 
     equipaParcial.forEach((parcial, index) => {
-        if(parcialCount > 3){
-            equipaCount++;
-            parcialCount = 1;
-        }
-
-        const parcialValue = parcial.childNodes[0].nodeValue;
-        removeAllChilds(parcial);
-        let inputName = 'equipa'+equipaCount+'_parcial'+parcialCount;
-        parcial.appendChild(createInputTextField(inputName, 8, parcialValue));
-
-        parcialCount++;
+        parcial.disabled = false;
     }); 
-}
-
-function createInputTextField(name, size, value){
-    const inputField = document.createElement('INPUT');
-    inputField.setAttribute('type', 'text');
-    inputField.setAttribute('name', name);
-    inputField.setAttribute('size', size);
-    inputField.setAttribute('value', value);
-
-    return inputField;
 }
 
 function removeAllChilds(element){

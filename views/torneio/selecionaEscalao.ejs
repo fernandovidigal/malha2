@@ -103,10 +103,30 @@ function geraCamposLink(tableElement, listaCampos){
     }
 }
 
+function createVerRegistarParciaisBtn(element, escalaoId, label){
+    const link = document.createElement('a');
+    link.classList.add("btn", "btn-secondary", "btn-smaller", "btn-verRegistaParciais");
+    link.setAttribute("href", `/torneio/resultados/escalao/${escalaoId}`);
+    link.textContent = label;
+    element.appendChild(link);
+}
+
+function createProcessarProximaFaseBtn(element, escalaoId) {
+    const link = document.createElement('a');
+    link.classList.add("btn", "btn-secondary", "btn-smaller");
+    link.setAttribute("href", `/torneio/processaProximaFase/escalao/${escalaoId}`);
+    link.textContent = 'Processa Próxima Fase';
+    element.appendChild(link);
+}
+
 const competicaoSelectBoxes = document.querySelectorAll('.escalao__item');
 competicaoSelectBoxes.forEach(escalaoBox => {
     const fasesSelect = escalaoBox.querySelector('.customSelect__fases');
     const camposSelect = escalaoBox.querySelector('.customSelect_campos');
+    const actionBtns = escalaoBox.querySelector('.escalao__item-actionBtnBar');
+    const escalaoId = escalaoBox.dataset.escalao;
+    const escalaoCompleto = escalaoBox.dataset.completo;
+    const faseActualTorneio = escalaoBox.dataset.fase;
 
     escalaoBox.addEventListener('click', async function(e){
         
@@ -121,7 +141,7 @@ competicaoSelectBoxes.forEach(escalaoBox => {
             showLoading(camposHeader);
             
             // Fetch campos da Base de Dados
-            const response = await fetch(`/torneio/getAllCamposPorFase/${e.target.dataset.escalao}/${e.target.dataset.fase}`);
+            const response = await fetch(`/torneio/getAllCamposPorFase/${escalaoId}/${e.target.dataset.fase}`);
 
             const data = await response.json();
             if(data.success){
@@ -140,19 +160,38 @@ competicaoSelectBoxes.forEach(escalaoBox => {
                 fasesHeader.textContent = (parseInt(faseSelecionada) != 100) ? faseSelecionada + 'ª Fase' : 'Fase Final';
                 removeAllSelectedFases(faseSelectLinks);
                 e.target.classList.add('customSelect__links-selected');
+                
+                // Altera o action button
+                const mainActionBtnPlaceholder = actionBtns.querySelector('.escalao__item-actionBtnBar-mainAction');
+                if(parseInt(faseSelecionada) < parseInt(faseActualTorneio)){
+                    mainActionBtnPlaceholder.querySelector('.btn-verRegistaParciais').textContent = 'Ver Parciais';
+                } else {
+                    if(escalaoCompleto === 'true'){
+                        removeAllElements(mainActionBtnPlaceholder);
+                        createProcessarProximaFaseBtn(mainActionBtnPlaceholder, escalaoId);
+                    } else {
+                        // Verifica se o botão registar paraciais ou ver parciais já existe
+                        const verRegistarParciaisBtn = mainActionBtnPlaceholder.querySelector('.btn-verRegistaParciais');
+                        if(verRegistarParciaisBtn){
+                            mainActionBtnPlaceholder.querySelector('.btn-verRegistaParciais').textContent = 'Registar Parciais';
+                        } else {
+                            removeAllElements(mainActionBtnPlaceholder);
+                            createVerRegistarParciaisBtn(mainActionBtnPlaceholder, escalaoId, 'Registar Parciais');
+                        }
+                    }
+                }
             }
         }
     });
 
-    const btns = escalaoBox.querySelector('.escalao__item-actionBtnBar');
-    btns.addEventListener('click', function(e){
-        if(e.target.classList.contains('btn-registaParciais')){
-            //e.preventDefault();
+    actionBtns.addEventListener('click', function(e){
+        if(e.target.classList.contains('btn-verRegistaParciais')){
             let url = e.target.getAttribute("href");
             const fase = escalaoBox.querySelector('.fasesInput').value;
             const campo = escalaoBox.querySelector('.camposInput').value;
             url = url + `/fase/${fase}/campo/${campo}`;
-            window.location.href = url;
+            e.target.setAttribute("href", url);
+            //window.location.href = url;
         }
     });
 });
@@ -183,14 +222,14 @@ camposSelectList.forEach(campoSelect => {
     });
 });
 
-const btns = document.querySelector('.escalao__item-actionBtnBar');
+/*const btns = document.querySelector('.escalao__item-actionBtnBar');
 btns.addEventListener('click', function(e){
     if(e.target.classList.contains('btn-registaParciais')){
         e.preventDefault();
         const url = e.target.getAttribute("href");
         const ancestor = 33;
     }
-});
+});*/
 
 </script>
 <%- include('../includes/footer.ejs') %>

@@ -1,28 +1,29 @@
-<div class="escalao__item" data-escalao="<%= escalao.escalaoId %>" data-fase="<%= escalao.fase %>" data-completo="<%= escalao.todosCamposCompletos %>">
+<div class="escalao__item" data-escalao="<%= escalao.escalaoId %>" data-fase="<%= escalao.fase %>" data-completo="<%= escalao.todosCamposCompletos %>" data-vencedor="<%= escalao.existeVencedor %>">
     <p class="escalao__item-title"><%= escalao.designacao %></p>
 
     <% if(escalao.existeVencedor == true){ %>
     <div class="escalao__item-equipaVencedora">
         <p class="escalao__item-equipaVencedora-title">Equipa Vencedora</p>
-        <div class="equipaVencedora__wrapper">
-            <div class="equipaVencedora__elementos">
-                <p class="escalao__item-equipaVencedora-elemento"><%= escalao.equipaVencedora.primeiroElemento %></p>
-                <p class="escalao__item-equipaVencedora-elemento"><%= escalao.equipaVencedora.segundoElemento %></p>
-            </div>
-            <div class="equipaVencedora__localidade">
-                <p class="escalao__item-equipaVencedora-localidade"><%= escalao.equipaVencedora.localidade %></p>
-            </div>
-        </div>
+        <p class="escalao__item-equipaVencedora-elemento"><%= escalao.equipaVencedora.primeiroElemento %></p>
+        <p class="escalao__item-equipaVencedora-elemento"><%= escalao.equipaVencedora.segundoElemento %></p>
+        <p class="escalao__item-equipaVencedora-localidade"><%= escalao.equipaVencedora.localidade %></p>
     </div>
     <% } %>
 
     <% if(escalao.fase == 0){ %>
-    <div class="escalao__item-numCampos">
-        <p class="escalao__item-numCampos-title">Número de Campos</p>
-        <p class="escalao__item-numCampos-numCampos"><%= escalao.numTotalCampos %></p>
+    <div class="escalao__item-escalaoStats">
+        <div class="escalao__item-escalaoStats-numCampos">
+            <p class="escalao__item-escalaoStats-num"><%= escalao.numTotalCampos %></p>
+            <p class="escalao__item-escalaoStats-title">Campos</p>
+        </div>
+        <div class="escalao__item-escalaoStats-numEquipas">
+            <p class="escalao__item-escalaoStats-num"><%= escalao.numEquipas %></p>
+            <p class="escalao__item-escalaoStats-title">Equipas</p>
+        </div>
     </div>
     <% } else { %>
     <!-- SELECT BOXES -->
+    <% if(!escalao.existeVencedor){ %>
     <div class="escalao__item-checkboxes">
         <p class="escalao__item-checkboxes-title">Fase</p>
         <div class="customSelect escalao__item-select customSelect__fases">
@@ -64,11 +65,18 @@
             <input type="hidden" name="campos" class="camposInput" value="0">
         </div>
     </div>
+    <% } %>
     <!-- /SELECT BOXES -->
     <% } %>
 
     <div class="escalao__item-actionBtnBar">
-        <div class="escalao__item-actionBtnBar-sideActions"></div>
+        <div class="escalao__item-actionBtnBar-sideActions">
+            <% if(escalao.todosCamposCompletos && !escalao.existeVencedor){ %>
+                <a href="">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 18 18"><path fill="#596278" d="M17,8a9,9,0,1,0,9,9A9,9,0,0,0,17,8Zm4.722,4.278a6.678,6.678,0,0,1,.75,8.551l-9.3-9.3A6.678,6.678,0,0,1,21.722,12.278Zm-9.443,9.443a6.678,6.678,0,0,1-.75-8.551l9.3,9.3A6.678,6.678,0,0,1,12.278,21.722Z" transform="translate(-8 -8)"/></svg>
+                </a>
+            <% } %>
+        </div>
         <div class="escalao__item-actionBtnBar-mainAction">
             <% if(escalao.fase == 0){ %>
                 <% if(escalao.numTotalCampos * 3 > escalao.numEquipas){ %>
@@ -76,16 +84,16 @@
                 <% } else if(escalao.numTotalCampos == 0) { %>
                     <p class="errMsg escalao__item-errMsg">O número de campos não foi definido</p>
                 <% } else { %>
-                    <a href="/torneio/distribuirEquipasPorEscalao/escalao/<%= escalao.escalaoId %>" class="btn btn-secondary btn-smaller">Iniciar Competição</a>
+                    <a href="/torneio/distribuirEquipasPorEscalao/escalao/<%= escalao.escalaoId %>" class="btn-competicao">Iniciar Competição</a>
                 <% } %>
             <% } else { %>
                 <% if(escalao.existeVencedor){ %>
-                    <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>" class="btn btn-secondary btn-smaller btn-verRegistaParciais">Ver Parciais</a>
+                    <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>" class="btn-competicao btn-verRegistaParciais">Ver Parciais</a>
                 <% } else { %>
                     <% if(escalao.todosCamposCompletos){ %>
-                        <a href="/torneio/processaProximaFase/escalao/<%= escalao.escalaoId %>" class="btn btn-secondary btn-smaller">Processa Próxima Fase</a>
+                        <a href="/torneio/processaProximaFase/escalao/<%= escalao.escalaoId %>" class="btn-competicao">Processa Próxima Fase</a>
                     <% } else { %>
-                        <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>" class="btn btn-secondary btn-smaller btn-verRegistaParciais">Registar Parciais</a>
+                        <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>" class="btn-competicao btn-verRegistaParciais">Registar Parciais</a>
                     <% } %>
                 <% } %>
             <% } %>

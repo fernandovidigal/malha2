@@ -18,26 +18,39 @@
         <div class="actionBar__wrapper">
             <h2 class="actionBar__title">Competição</h2>
         </div>
-        <%- //JSON.stringify(escaloesMasculinos[2]) %>
-        <div class="competicao__wrapper">
-            <% if(escaloesMasculinos.length > 0){ %>
-                <h3>Masculinos</h3>
+
+        <div class="tabbedMenu__wrapper">
+            <ul class="tabbedMenu">
+                <% if(escaloesMasculinos.length > 0){ %>
+                    <li class="tabbedMenu__item tabbedMenu__item-selected">Masculinos</li>
+                    <% if(escaloesFemininos.length > 0){ %>
+                        <li class="tabbedMenu__item">Femininos</li>
+                    <% } %>
+                <% } else { %>
+                    <% if(escaloesFemininos.length > 0){ %>
+                        <li class="tabbedMenu__item tabbedMenu__item-selected">Femininos</li>
+                    <% } %>
+                <% } %>
+            </ul>
+        </div>
+
+        <div class="tabbedContent__wrapper">
+            <div id="masculinos" class="tabbedContainer tabbedContainer-open">
                 <div class="competicaoEscalao_wrapper">
                     <% escaloesMasculinos.forEach(function(escalao){ %>
                         <%- include('includes/escalao.ejs', {escalao: escalao}) %>
                     <% }); %>
                 </div>
-            <% } %>
-
-            <% if(escaloesFemininos.length > 0){ %>
-                <h3>Femininos</h3>
+            </div>
+            <div id="femininos" class="tabbedContainer">
                 <div class="competicaoEscalao_wrapper">
                     <% escaloesFemininos.forEach(function(escalao){ %>
                         <%- include('includes/escalao.ejs', {escalao: escalao}) %>
                     <% }); %>
                 </div>
-            <% } %>
+            </div>
         </div>
+        
     </div>
 <% } else { %>
     <%- include('../includes/noTorneio.ejs') %>
@@ -125,8 +138,9 @@ competicaoSelectBoxes.forEach(escalaoBox => {
     const camposSelect = escalaoBox.querySelector('.customSelect_campos');
     const actionBtns = escalaoBox.querySelector('.escalao__item-actionBtnBar');
     const escalaoId = escalaoBox.dataset.escalao;
-    const escalaoCompleto = escalaoBox.dataset.completo;
+    const escalaoCompleto = (escalaoBox.dataset.completo === 'true') ? true : false;
     const faseActualTorneio = escalaoBox.dataset.fase;
+    const vencedor = (escalaoBox.dataset.vencedor === 'true') ? true : false;
 
     escalaoBox.addEventListener('click', async function(e){
         
@@ -166,7 +180,7 @@ competicaoSelectBoxes.forEach(escalaoBox => {
                 if(parseInt(faseSelecionada) < parseInt(faseActualTorneio)){
                     mainActionBtnPlaceholder.querySelector('.btn-verRegistaParciais').textContent = 'Ver Parciais';
                 } else {
-                    if(escalaoCompleto === 'true'){
+                    if(escalaoCompleto){
                         removeAllElements(mainActionBtnPlaceholder);
                         createProcessarProximaFaseBtn(mainActionBtnPlaceholder, escalaoId);
                     } else {
@@ -187,8 +201,15 @@ competicaoSelectBoxes.forEach(escalaoBox => {
     actionBtns.addEventListener('click', function(e){
         if(e.target.classList.contains('btn-verRegistaParciais')){
             let url = e.target.getAttribute("href");
-            const fase = escalaoBox.querySelector('.fasesInput').value;
-            const campo = escalaoBox.querySelector('.camposInput').value;
+            let fase = 0;
+            let campo = 0;
+            if(!vencedor){
+                fase = escalaoBox.querySelector('.fasesInput').value;
+                campo = escalaoBox.querySelector('.camposInput').value;
+            } else {
+                fase = faseActualTorneio;
+            }
+            
             url = url + `/fase/${fase}/campo/${campo}`;
             e.target.setAttribute("href", url);
             //window.location.href = url;
@@ -222,14 +243,23 @@ camposSelectList.forEach(campoSelect => {
     });
 });
 
-/*const btns = document.querySelector('.escalao__item-actionBtnBar');
-btns.addEventListener('click', function(e){
-    if(e.target.classList.contains('btn-registaParciais')){
-        e.preventDefault();
-        const url = e.target.getAttribute("href");
-        const ancestor = 33;
-    }
-});*/
+// TAB CONTROLLER
+function closeAllTabs(tabItems, tabContainers){
+    tabItems.forEach((item, index) => {
+        item.classList.remove('tabbedMenu__item-selected');
+        tabContainers[index].classList.remove('tabbedContainer-open');
+    });
+}
+const tabItems = document.querySelectorAll('.tabbedMenu__item');
+const tabContainers = document.querySelectorAll('.tabbedContainer');
+
+tabItems.forEach((item, index) => {
+    item.addEventListener('click', function(){
+        closeAllTabs(tabItems, tabContainers);
+        item.classList.add('tabbedMenu__item-selected');
+        tabContainers[index].classList.add('tabbedContainer-open');
+    });
+});
 
 </script>
 <%- include('../includes/footer.ejs') %>

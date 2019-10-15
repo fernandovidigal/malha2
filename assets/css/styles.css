@@ -28,13 +28,20 @@ body {
     font-family: 'Lato', sans-serif;
 }
 
+h1 {
+    color: #2A2C33;
+    font-size: 32px;
+}
+
 h2 {
     color: #4F4E4E;
+    font-size: 26px;
 }
 
 h3 {
-    color: #9B96B3;
+    color: #8A92A5;
     font-size: 18px;
+    font-weight: 400;
 }
 
 h4 {
@@ -174,6 +181,24 @@ li {
     color: inherit;
 }
 
+.btn-competicao {
+    display: block;
+    color: white;
+    background-color: #CD5543;
+    border-radius: 4px;
+    text-decoration: none;
+    padding: 6px 15px;
+    transition: all .2s;
+    position: relative;
+    user-select: none;
+    letter-spacing: .2px;
+}
+
+.btn-competicao:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.3);
+}
+
 .dummyTopSpacer {
     width: 100%;
     height: 40px;
@@ -289,6 +314,19 @@ li {
 
 .warning_msg > .floatMessage-closeBtn {
     color: #DCD5A0;
+}
+
+.numEquipas__Badge {
+    font-size: 10px;
+    background-color: #CBD3DC;
+    border-radius: 12px;
+    padding: 3px 9px;
+    color: white;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: .2px;
+    margin-top: 4px;
+    margin-left: 20px;
 }
 
 .overlay {
@@ -762,13 +800,12 @@ input::placeholder {
 
 .barraTorneio {
     min-height: 70px;
-    /*background-color: #E7EEF3;*/
-    padding: 16px 40px;
-    margin-bottom: 20px;
+    padding: 10px 40px;
+    margin-bottom: 14px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: solid 1px #D8DDE7;
+    border-bottom: solid 1px #E1E5EE;
 }
 
 .barraTorneio__buttons {
@@ -815,9 +852,9 @@ input::placeholder {
 
 .breadcrumbs__separator {
     width: 10px;
-    height: 29px;
+    height: 27px;
     position: absolute;
-    top: -2px;
+    top: -1px;
     left: -6px;
 }
 
@@ -876,6 +913,9 @@ input::placeholder {
 
 .actionBar__title {
     margin-left: 40px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .actionBar__buttons {
@@ -908,10 +948,10 @@ input::placeholder {
 
 .customSelect__header,
 .perPageSelect__header {
-    border: solid 1px #DBE0EB;
+    border: solid 1px #c2cada;
     padding: 6px 40px 6px 20px;
     border-radius: 8px;
-    color: #576575;
+    color: #19243B;
     cursor: pointer;
     font-size: 15px;
     background-color: white;
@@ -1165,7 +1205,8 @@ input::placeholder {
 }
 
 .mainTable tbody tr:nth-child(odd) {
-    background-color: #f8f9fc;
+    /*background-color: #f8f9fc;*/
+    background-color: #F8F8F8;
 }
 
 
@@ -1323,7 +1364,7 @@ input::placeholder {
     background-color: #F4F5F8;
     border-top: solid 1px #DBE0EB;
     border-bottom: solid 1px #DBE0EB;
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
 .tabbedMenu {
@@ -1333,9 +1374,11 @@ input::placeholder {
 }
 
 .tabbedMenu__item {
-    font-size: 18px;
-    padding: 12px 20px;
+    font-size: 16px;
+    padding: 13px;
     cursor: pointer;
+    font-weight: 400;
+    letter-spacing: .2px;
 }
 
 .tabbedMenu__item:not(:first-child){
@@ -1738,7 +1781,19 @@ input::placeholder {
 }
 
 .registoParciais__campoTitle {
-    margin: 42px 0 15px 0;
+    margin-top: 42px;
+    color: #596278;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.registoParciais__campoTitle-spacer {
+    margin-bottom: 26px;
+}
+
+.registoParciais__campoSubTitle {
+    margin-bottom: 26px;
+    color: #8A92A5;
 }
 
 .primeiroElemento {
@@ -1773,35 +1828,55 @@ input::placeholder {
 }
 
 .escalao__item {
-    width: 25%;
+    width: 300px;
     min-height: 25vh;
     border-radius: 8px;
     margin: 20px;
     padding: 16px 24px;
     display: flex;
     flex-direction: column;
-    min-width: 240px;
-    border: solid 1px #D8DDE7;
-    background-color: #f8f9fc;
+    border: solid 1px #EDEDED;
+    background-color: #F8F8F8;
 }
 
 .escalao__item-title {
     font-size: 26px;
     font-weight: 700;
-    color: #d9534f;
+    color: #333F4D;
+    border-bottom: solid 1px #DDDDDD;
+    padding-bottom: 5px;
     margin-bottom: 20px;
 }
 
 .escalao__item-equipaVencedora {
-    margin-bottom: 20px;
+    margin-bottom: auto;
 }
 
 .escalao__item-checkboxes {
     margin-top: auto;
 }
 
-.escalao__item-numCampos {
+.escalao__item-escalaoStats {
     margin-bottom: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-right: 60px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+.escalao__item-escalaoStats-num,
+.escalao__item-escalaoStats-num {
+    font-size: 36px;
+    color: #596278;
+    font-weight: 700;
+}
+
+.escalao__item-escalaoStats-title {
+    font-size: 16px;
+    font-weight: 300;
+    color: #8A92A5;
 }
 
 .escalao__item-select {
@@ -1812,13 +1887,31 @@ input::placeholder {
     margin-bottom: 10px;
 }
 
-.escalao__item-checkboxes-title,
-.escalao__item-equipaVencedora-title,
-.escalao__item-numCampos-title {
-    font-size: 14px;
+.escalao__item-checkboxes-title {
+    font-size: 13px;
+    color: #8A92A5;
     margin-bottom: 5px;
-    color: #999FA6;
 }
+
+.escalao__item-equipaVencedora-title {
+    font-size: 16px;
+    font-weight: 300;
+    margin-bottom: 5px;
+    color: #8A92A5;
+}
+.escalao__item-equipaVencedora-elemento {
+    font-size: 22px;
+    color: #596278;
+    letter-spacing: .2px;
+}
+
+.escalao__item-equipaVencedora-localidade {
+    font-size: 14px;
+    color: #596278;
+    letter-spacing: .2px;
+    margin-top: 5px;
+}
+
 .escalao__item-actionBtnBar {
     margin-top: 40px;
     display: flex;

@@ -60,7 +60,10 @@
         <div class="registoParciais__wrapper">
             <% if(typeof campos != 'undefined' && campos.length > 0) { %>
                 <% campos.forEach(campo => { %>
-                    <h3 class="registoParciais__campoTitle">Campo <%= (info.fase != 100) ? campo.campo : campo.campo + ' - ' + campo.designacao %></h3>
+                    <p class="registoParciais__campoTitle <%= (info.fase != 100) ? 'registoParciais__campoTitle-spacer' : ''%>">Campo <%= campo.campo %></p>
+                    <% if(info.fase == 100){ %>
+                        <p class="registoParciais__campoSubTitle"><%= campo.designacao %></p>
+                    <% } %>
                     <table class="mainTable">
                         <thead>
                             <tr>

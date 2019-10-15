@@ -290,7 +290,7 @@ function createEditButton(jogoId){
 
 function createUdpateButton(jogoId){
     const deleteButton = document.createElement("A");
-    deleteButton.classList.add("btn", "btn-tertiary", "btn__update-resultados");
+    deleteButton.classList.add("btn", "btn-secondary", "btn__update-resultados");
     deleteButton.setAttribute("name", "updateResultados");
     deleteButton.dataset.jogoid = jogoId;
     deleteButton.textContent = "Actualizar";

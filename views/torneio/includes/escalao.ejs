@@ -72,8 +72,9 @@
     <div class="escalao__item-actionBtnBar">
         <div class="escalao__item-actionBtnBar-sideActions">
             <% if(escalao.todosCamposCompletos && !escalao.existeVencedor){ %>
-                <a href="">
+                <a href="/torneio/interditarCampos/escalao/<%= escalao.escalaoId %>" class="interditarCampos__btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 18 18"><path fill="#596278" d="M17,8a9,9,0,1,0,9,9A9,9,0,0,0,17,8Zm4.722,4.278a6.678,6.678,0,0,1,.75,8.551l-9.3-9.3A6.678,6.678,0,0,1,21.722,12.278Zm-9.443,9.443a6.678,6.678,0,0,1-.75-8.551l9.3,9.3A6.678,6.678,0,0,1,12.278,21.722Z" transform="translate(-8 -8)"/></svg>
+                    <span class="tooltip">Interditar Campos</span>
                 </a>
             <% } %>
         </div>

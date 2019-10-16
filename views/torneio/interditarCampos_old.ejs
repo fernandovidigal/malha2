@@ -1,0 +1,36 @@
+<%- include('../includes/header.ejs') %>
+<%- include('../includes/breadcrumbs.ejs') %>
+
+<% if(torneio != null){ %>
+    <div class="title__bar">
+        <h1><%= torneio.designacao %> - <%= torneio.localidade %></h1>
+        <h3><%= torneio.ano %></h3>
+    </div>
+
+    <div class="interditarCampos__Wrapper">
+        <h2>Interditar Campos</h2>
+        <div class="escalaoInfo">
+            <p><%= escalao.designacao %> (<%= (escalao.sexo == 1) ? 'Masculino' : 'Feminino' %>)</p>
+        </div>
+        <form action="/torneio/interditarCampos/escalao/<%= escalao.escalaoId %>" method="post">
+            <p>Campos</p>
+            <div class="interditarCampos_listaCampos_Wrapper">
+                <% for(let i = 0; i < listaCampos.length; i++){ %>
+                    <div class="interditarCampos_listaCampos-campo">
+                        <input type="checkbox" name="campo[]" id="<%= listaCampos[i].campo %>" value="<%= listaCampos[i].campo %>" <%= (listaCampos[i].interdito) ? 'checked' : '' %> class="escalaoNumCampos campoInterdito">
+                        <label for="<%= listaCampos[i].campo %>"><%= listaCampos[i].campo %></label>
+                    </div>
+                <% } %>
+            </div>
+            <br>
+            <input type="submit" value="Interditar">
+            <a href="/torneio">Cancelar</a>
+        </form>
+    </div>
+
+<% } else { %>
+    <h2>Oops.. Algo correu mal!</h2>
+    <p>Verifique se existem torneios registados ou activados.</p>
+<% } %>
+
+<%- include('../includes/footer.ejs') %>

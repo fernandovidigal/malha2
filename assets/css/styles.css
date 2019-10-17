@@ -546,7 +546,8 @@ input::placeholder {
 
 .loginForm input[type=text]:focus,
 .loginForm input[type=password]:focus {
-    box-shadow: 0px 0px 0px 1px rgba(87,101,117,.7);
+    /*box-shadow: 0px 0px 0px 1px rgba(87,101,117,.7);*/
+    border: solid 1px #919498;
 }
 
 .loginForm__passwordField {
@@ -1205,14 +1206,23 @@ input::placeholder {
     padding-left: 20px;
 }
 
-.mainTable tbody tr:nth-child(odd) {
+/*.mainTable tbody tr:nth-child(odd) {
     /*background-color: #f8f9fc;*/
-    background-color: #F8F8F8;
+    /*background-color: #fbfbfb;*/
+    /*border-top: solid 1px #ececec;
+    border-bottom: solid 1px #ececec;
+}*/
+
+.mainTable tbody tr {
+    border-top: solid 1px #ececec;
 }
 
+.mainTable tbody tr:last-of-type {
+    border-bottom: solid 1px #ececec;
+}
 
 .mainTable tbody tr:hover {
-    background-color: #EEEFF3;
+    background-color: #F3F5F7;
 }
 
 .mainTable tbody tr td {

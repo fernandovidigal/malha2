@@ -751,7 +751,8 @@ exports.listagemEquipas = async (req, res, next) => {
         } else {
             response.torneio = {
                 designacao: torneio.designacao,
-                localidade: torneio.localidade
+                localidade: torneio.localidade,
+                ano: torneio.ano
             };
         }
 

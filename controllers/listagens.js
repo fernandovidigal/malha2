@@ -194,6 +194,7 @@ exports.getNumEquipasPorConcelho = async (req, res, next) => {
                 designacao: torneio.designacao,
                 localidade: torneio.localidade,
                 escalao: escalao.designacao,
+                ano: torneio.ano,
                 sexo: (escalao.sexo == 1) ? 'Masculino' : 'Feminino'
             }
 

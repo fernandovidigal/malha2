@@ -77,9 +77,10 @@ function showDeleteMessage(equipa){
 async function imprimeListaEquipas(localidade, escalao){
     try {
         const data = await getData(`/equipas/listagem/${localidade}/${escalao}`);
+
         docDefinition.content = [];
         delete docDefinition.pageBreakBefore;
-        docDefinition.pageMargins = [15, 105, 15, 25]
+        docDefinition.pageMargins = [15, 80, 15, 25]
 
         if(data.success){
             makeHeaderOnlyTorneioInfo(docDefinition, data.torneio);

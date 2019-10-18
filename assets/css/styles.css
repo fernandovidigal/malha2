@@ -966,7 +966,7 @@ input::placeholder {
 }
 
 .customSelect__header-selected {
-    border: solid 1px rgba(87,101,117,.5);
+    border: solid 1px #919498;
 }
 
 .adicionarEquipaLocalidadesSelect__header {

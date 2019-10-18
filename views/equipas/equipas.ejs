@@ -42,10 +42,10 @@
 
     <div class="container_wrapper">
         <div class="actionBar__wrapper">
-            <h2 class="actionBar__title">Equipas <span class="numEquipas__Badge"><%= numEquipas %></span></h2>
+            <h2 class="actionBar__title">Equipas <span class="numEquipas__Badge"><%= (typeof numEquipas != 'undefined') ? numEquipas : '' %></span></h2>
             <div class="actionBar__buttons">
                 <div class="customSelect">
-                    <div class="customSelect__header">
+                    <div class="customSelect__header <%= (typeof filtro != 'undefined' && typeof filtro.localidadeId != 'undefined') ? 'customSelect__header-selected' : '' %>">
                         <% if(typeof filtro != 'undefined'){ %>
                             <% if(typeof filtro.localidadeId != 'undefined'){ %>
                                     <a class="customSelect__header-dismiss" href="/equipas<% if(typeof filtro.escalaoId != 'undefined'){ %>/filtro/escalao/<%= filtro.escalaoId %><% } %>"><i class="fas fa-times-circle"></i></a><%= filtro.localidade %> 
@@ -67,7 +67,7 @@
                     </div>
                 </div>
                 <div class="customSelect">
-                    <div class="customSelect__header">
+                    <div class="customSelect__header <%= (typeof filtro != 'undefined' && typeof filtro.escalaoId != 'undefined') ? 'customSelect__header-selected' : '' %>">
                         <% if(typeof filtro != 'undefined'){ %>
                             <% if(typeof filtro.escalaoId != 'undefined'){ %>
                                     <a class="customSelect__header-dismiss" href="/equipas<% if(typeof filtro.localidadeId != 'undefined'){ %>/filtro/localidade/<%= filtro.localidadeId %><% } %>"><i class="fas fa-times-circle"></i></a><%= filtro.escalao %> <small>(<%= filtro.sexo %>)</small> 

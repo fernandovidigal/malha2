@@ -39,13 +39,16 @@
                             </td>
                             <td class="utilizadores_username"><%= user.username %></td>
                             <td>
-                                <p class="userLevel"><%= (user.level === 10) ? 'Administrador' : (user.level === 5) ? 'Gestor' : 'Utilizador' %></p>
-                                <ul class="userLevelChange">
-                                    <li class="userLevelChange__item"><a href="/admin/utilizadores/changeLevel/<%= user.userId %>/level/0" class="userLevelChange__link<%= (user.level == 0) ? ' userLevelChange__link-selected' : '' %>">Utilizador</a></li>
-                                    <li class="userLevelChange__item"><a href="/admin/utilizadores/changeLevel/<%= user.userId %>/level/5" class="userLevelChange__link<%= (user.level == 5) ? ' userLevelChange__link-selected' : '' %>">Gestor</a></li></li>
-                                    <li class="userLevelChange__item"><a href="/admin/utilizadores/changeLevel/<%= user.userId %>/level/10" class="userLevelChange__link<%= (user.level == 10) ? ' userLevelChange__link-selected' : '' %>">Administrador</a></li></li>
-                                </ul>
-                                
+                                <div class="customSelect userLevelChangeSelect">
+                                    <div class="customSelect__header">
+                                            <%= (user.level === 10) ? 'Administrador' : (user.level === 5) ? 'Gestor' : 'Utilizador' %>
+                                    </div>
+                                    <div class="customSelect__list">
+                                        <a class="customSelect__links<%= user.level == 0 ? ' customSelect__links-selected': '' %>" href="/admin/utilizadores/changeLevel/<%= user.userId %>/level/0">Utilizador</a>
+                                        <a class="customSelect__links<%= user.level == 5 ? ' customSelect__links-selected': '' %>" href="/admin/utilizadores/changeLevel/<%= user.userId %>/level/5">Gestor</a>
+                                        <a class="customSelect__links<%= user.level == 10 ? ' customSelect__links-selected': '' %>" href="/admin/utilizadores/changeLevel/<%= user.userId %>/level/10">Administrador</a>
+                                    </div>
+                                </div>
                             </td>
                             <td class="detalhesBtn__column"><a href="/admin/utilizadores/alterarPasswordUtilizador/<%= user.userId %>" class="btn btn-secondary">Alterar Password</a></td>
                             <td class="deleteBtn__column"><a class="btn btn-delete" data-user="<%= user.userId %>"><i class="fa fa-trash-alt"></i></a></td>
@@ -62,4 +65,5 @@
 </div>
 
 <script src="/js/utilizadores.js"></script>
+<script src="/js/customSelect.js"></script>
 <%- include('../includes/footer.ejs') %>

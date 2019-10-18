@@ -14,15 +14,54 @@
     <%- include('../includes/breadcrumbs.ejs') %>
     <div class="container_wrapper">
         <div class="actionBar__wrapper">
-            <h2 class="actionBar__title">Classificação</h2>
+            <h2 class="actionBar__title">Classificação <span class="numEquipas__Badge"><%= escalao.designacao %></span></h2>
+
+            <div class="actionBar__buttons">
+                <div class="customSelect">
+                    <div class="customSelect__header">
+                        <%= (campo == 0) ? 'Todos os Campos' : 'Campo ' + campo %>
+                    </div>
+                    <div class="customSelect__list customSelect__campos__list">
+                        <a href="/torneio/classificacao/escalao/<%= escalao.escalaoId %>/fase/<%= fase %>/campo/0" class="customSelect__campos-link customSelect__campos-all-link <%= (campo == 0) ? 'customSelect__campos-link-selected' : '' %>">Todos os Campos</a>
+                        <table class="customSelect__campos__table">
+                            <tbody>
+                                <% 
+                                    while(listaCampos.length > 0) {
+                                    const _listaCampos = listaCampos.splice(0,5);
+                                %>
+                                    <tr>
+                                        <% _listaCampos.forEach(el => { %>
+                                            <td>
+                                                <a href="/torneio/classificacao/escalao/<%= escalao.escalaoId %>/fase/<%= fase %>/campo/<%= el.campo %>" class="customSelect__campos-link <%= (campo != 0 && campo == el.campo) ? 'customSelect__campos-link-selected' : '' %> <%= el.campoCompleto ? 'customSelect__campos-link-completed' : '' %>">
+                                                    <%= (fase != 100) ? el.campo : el.designacao %>
+                                                </a>
+                                            </td>
+                                        <% }); %>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div> 
+                <div class="customSelect">
+                    <div class="customSelect__header">
+                        <%= (fase != 100) ? fase + 'ª Fase' : 'Fase Final' %>
+                    </div>
+                    <div class="customSelect__list">
+                        <% listaFases.forEach(function(el){ %>
+                            <a class="customSelect__links<%= el.fase == fase ? ' customSelect__links-selected': '' %>" href="/torneio/classificacao/escalao/<%= escalao.escalaoId %>/fase/<%= el.fase %>/campo/0"><%= (el.fase != 100) ? el.fase + 'ª Fase' : ' Fase Final' %></a>
+                        <% }); %>
+                    </div>
+                </div>  
+            </div>
         </div>
 
         <div class="classificacao__wrapper">
-        <% if(listaCampos.length > 0) { %>
-            <% listaCampos.forEach(function(campo){ %>
+        <% if(classificacao.length > 0) { %>
+            <% classificacao.forEach(function(campo){ %>
                 <% let posicao = (fase != 100)? 1 : campo.inicioClassificacao %>
-                <p class="registoParciais__campoTitle <%= (info.fase != 100) ? 'registoParciais__campoTitle-spacer' : ''%>">Campo <%= campo.campo %></p>
-                <% if(info.fase == 100){ %>
+                <p class="registoParciais__campoTitle <%= (fase != 100) ? 'registoParciais__campoTitle-spacer' : ''%>">Campo <%= campo.campo %></p>
+                <% if(fase == 100){ %>
                     <p class="registoParciais__campoSubTitle"><%= campo.designacao %></p>
                 <% } %>
                 <table class="mainTable">
@@ -40,7 +79,7 @@
                     <tbody>
                         <% if(campo.classificacao.length > 0) { %>
                             <% campo.classificacao.forEach(function(equipa){ %>
-                                <tr>
+                                <tr <%= (posicao == 1 || (fase == 1 && posicao == 2)) ? 'class=classificacao__Apurados' : ''  %>>
                                     <td align="center"><%= posicao++ %>º</td>
                                     <td align="center"><%= equipa.equipaId %></td>
                                     <td class="primeiroElemento"><%= equipa.primeiroElemento %></td>
@@ -67,5 +106,5 @@
 <% } else { %>
     <%- include('../includes/noTorneio.ejs') %>
 <% } %>
-
+<script src="/js/customSelect.js"></script>
 <%- include('../includes/footer.ejs') %>

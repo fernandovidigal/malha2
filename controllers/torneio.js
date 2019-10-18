@@ -540,12 +540,32 @@ exports.mostraClassificacao = async (req, res, next) => {
         const _escalaoInfo = dbFunctions.getEscalaoInfo(escalaoId);
 
         const [torneio, escalaoInfo] = await Promise.all([_torneio,_escalaoInfo]);
-        
-        const listaCampos = await torneioHelpers.processaClassificacao(torneio.torneioId, escalaoId, fase, campo);
 
+        const _listaFases = dbFunctions.getAllFasesPorEscalao(torneio.torneioId, escalaoId);
+        const _listaCampos = dbFunctions.getAllCamposPorEscalaoFase(torneio.torneioId, escalaoId, fase);
+        const _classificacao = torneioHelpers.processaClassificacao(torneio.torneioId, escalaoId, fase, campo);
+        let [listaFases, listaCampos, classificacao] = await Promise.all([_listaFases, _listaCampos, _classificacao]);
+
+        listaCampos = await torneioHelpers.verificaCamposCompletos(listaCampos, torneio.torneioId, escalaoId, fase);
+
+        if(fase == 100 && listaCampos.length == 2){
+            listaCampos[0].designacao = 'Final';
+            listaCampos[1].designacao = '3º e 4º Lugar';
+        }
+        
         req.breadcrumbs('Resultados', `/torneio/resultados/escalao/${escalaoId}/fase/${fase}/campo/${campo}`);
         req.breadcrumbs('Classificação', '/torneio/classificacao');
-        res.render('torneio/classificacao', {torneio: torneio, listaCampos: listaCampos, escalao: escalaoInfo, fase: fase, breadcrumbs: req.breadcrumbs()});
+
+        res.render('torneio/classificacao', {
+            torneio: torneio,
+            classificacao: classificacao,
+            listaCampos: listaCampos,
+            escalao: escalaoInfo,
+            campo: campo,
+            fase: fase,
+            listaFases: listaFases.reverse(),
+            breadcrumbs: req.breadcrumbs()
+        });
     } catch(err){
         console.log(err);
         req.flash('error', 'Não foi possível mostrar a classificação.');

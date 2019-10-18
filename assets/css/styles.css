@@ -326,7 +326,7 @@ li {
     color: white;
     text-align: center;
     font-weight: 700;
-    letter-spacing: .2px;
+    letter-spacing: .5px;
     margin-top: 4px;
     margin-left: 20px;
 }
@@ -576,7 +576,7 @@ input::placeholder {
     align-self: flex-start;
     background-color: #D05744;
     border: none;
-    border-radius: 100px;
+    border-radius: 6px;
     color: white;
     font-size: 16px;
     line-height: 2;
@@ -979,7 +979,7 @@ input::placeholder {
 .customSelect__header-open,
 .perPageSelect__header-open,
 .customSelect__header-selected {
-    border: solid 1px rgba(87,101,117,.5);
+    border: solid 1px #919498;
 }
 
 
@@ -1009,13 +1009,14 @@ input::placeholder {
     left: 0;
     right: 0;
     z-index: 100;
-    border: solid 1px rgba(87,101,117,.5);
+    border: solid 1px #919498;
     border-radius: 6px;
     overflow: hidden;
     background-color: white;
     box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.3);
     margin-bottom: 20px;
-    max-height: 312px;
+    min-width: 100%;
+    max-height: 400px;
     overflow-y: auto;
 }
 
@@ -1027,6 +1028,7 @@ input::placeholder {
 
 .customSelect__list-open {
     display: block;
+    right: auto;
 }
 
 .customSelect__links,
@@ -1037,6 +1039,7 @@ input::placeholder {
     padding: 10.5px 20px;
     color: #4A4949;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .perPageSelect__link {
@@ -1126,7 +1129,7 @@ input::placeholder {
 .searchedEquipaId__wrapper {
     border: solid 1px #DBE0EB !important;
     padding: 6px 35px 6px 20px;
-    border-radius: 8px !important;
+    border-radius: 6px !important;
     color: #576575;
     cursor: pointer;
     font-size: 15px;
@@ -1279,11 +1282,11 @@ input::placeholder {
 }
 
 .paginacao__item:hover {
-    background-color: #F9F9F9;
+    background-color: #F3F5F7;
 }
 
 .paginacao__selected {
-    background-color: #F3F5F7;
+    background-color: #E7EEF3;
 }
 
 .escalaoSelect {
@@ -1511,7 +1514,7 @@ input::placeholder {
     padding-right: 0 !important;
 }
 
-.userLevel {
+/*.userLevel {
     width: 160px;
     position: relative;
     cursor: pointer;
@@ -1557,12 +1560,16 @@ input::placeholder {
 }
 
 .userLevelChange__link-selected {
-    background-color: #333F4D;
-    color: white;
+    background-color: #E7EEF3;
 }
 
 .userLevelChange__item:hover {
-    background-color: #EEEFF3;
+    background-color: #F3F5F7;
+}*/
+
+.userLevelChangeSelect {
+    width: 40%;
+    margin-left: 0;
 }
 
 .mainTable-noBorder tbody tr{
@@ -1849,6 +1856,11 @@ input::placeholder {
 .classificacao__wrapper {
     margin: 0 40px;
     margin-bottom: 100px;
+}
+
+.classificacao__Apurados {
+    background-color: #EEEFF3;
+    border-top: solid 1px #dedede !important;
 }
 
 .competicao__wrapper {

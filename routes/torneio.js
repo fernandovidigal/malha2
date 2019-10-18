@@ -12,8 +12,6 @@ router.all('/*', userAuthenticated, (req, res, next) => {
 
 router.get('/', TorneiosController.getStarting);
 
-//router.post('/definirNumeroCampos');
-
 router.post('/definirNumeroCampos', TorneiosController.setNumeroCampos);
 
 // Distribuição de todas as equipas de todos os escalões

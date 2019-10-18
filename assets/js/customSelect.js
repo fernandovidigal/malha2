@@ -5,7 +5,7 @@ function closeAllCheckboxes(selectBoxesDropList, selectBoxes){
     }
 }
 
-// CHECKBOXES
+// SELECTBOXES
 const selectBoxes = document.querySelectorAll('.customSelect__header');
 const selectBoxesDropList = document.querySelectorAll('.customSelect__list');
 selectBoxes.forEach((selectBox, index) => {

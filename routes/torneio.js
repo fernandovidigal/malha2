@@ -10,7 +10,7 @@ router.all('/*', userAuthenticated, (req, res, next) => {
     next();
 });
 
-router.get('/', TorneiosController.getStarting);
+router.get('/', TorneiosController.checkCampos, TorneiosController.getStarting);
 
 router.post('/definirNumeroCampos', TorneiosController.setNumeroCampos);
 

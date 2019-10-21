@@ -199,7 +199,8 @@ competicaoSelectBoxes.forEach(escalaoBox => {
     });
 
     actionBtns.addEventListener('click', function(e){
-        if(e.target.classList.contains('btn-verRegistaParciais')){
+        e.stopPropagation();
+        if(e.target.classList.contains('btn-verRegistaParciais') || e.target.classList.contains('editarParciais__btn')){
             let url = e.target.getAttribute("href");
             let fase = 0;
             let campo = 0;
@@ -212,7 +213,6 @@ competicaoSelectBoxes.forEach(escalaoBox => {
             
             url = url + `/fase/${fase}/campo/${campo}`;
             e.target.setAttribute("href", url);
-            //window.location.href = url;
         }
     });
 });
@@ -261,10 +261,24 @@ tabItems.forEach((item, index) => {
     });
 });
 
-// INTERDITAR CAMPOS BTN
-const interditarBtn = document.querySelector('.interditarCampos__btn');
-if(interditarBtn){
+// PROCESSAR PROXIMA FASE MENU TRIGGER
+const competicaoOptions = document.querySelector('.competicaoOptions');
+if(competicaoOptions){
+    const competicaoOptionsMenu = competicaoOptions.querySelector('.competicaoOptions-menu');
+    const competicaoOptionsTrigger = competicaoOptions.querySelector('.competicaoOptions-trigger');
 
+    competicaoOptions.addEventListener('click', function(e){
+        competicaoOptionsMenu.classList.toggle('competicaoOptions-menu-show');
+        competicaoOptionsTrigger.classList.toggle('competicaoOptions-trigger-open');
+    });
+
+    // Fecha o menu quando se clica fora
+    document.addEventListener('click', function(){
+        if(competicaoOptionsMenu.classList.contains('competicaoOptions-menu-show')){
+            competicaoOptionsMenu.classList.remove('competicaoOptions-menu-show');
+            competicaoOptionsTrigger.classList.remove('competicaoOptions-trigger-open');
+        }
+    });
 }
 
 </script>

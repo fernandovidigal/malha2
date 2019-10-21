@@ -70,14 +70,6 @@
     <% } %>
 
     <div class="escalao__item-actionBtnBar">
-        <div class="escalao__item-actionBtnBar-sideActions">
-            <% if(escalao.todosCamposCompletos && !escalao.existeVencedor && escalao.fase >= 3){ %>
-                <a href="/torneio/interditarCampos/escalao/<%= escalao.escalaoId %>" class="interditarCampos__btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 18 18"><path fill="#596278" d="M17,8a9,9,0,1,0,9,9A9,9,0,0,0,17,8Zm4.722,4.278a6.678,6.678,0,0,1,.75,8.551l-9.3-9.3A6.678,6.678,0,0,1,21.722,12.278Zm-9.443,9.443a6.678,6.678,0,0,1-.75-8.551l9.3,9.3A6.678,6.678,0,0,1,12.278,21.722Z" transform="translate(-8 -8)"/></svg>
-                    <span class="tooltip">Interditar Campos</span>
-                </a>
-            <% } %>
-        </div>
         <div class="escalao__item-actionBtnBar-mainAction">
             <% if(escalao.fase == 0){ %>
                 <% if(escalao.numTotalCampos * 3 > escalao.numEquipas){ %>
@@ -92,7 +84,22 @@
                     <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>" class="btn-competicao btn-verRegistaParciais">Ver Parciais</a>
                 <% } else { %>
                     <% if(escalao.todosCamposCompletos){ %>
-                        <a href="/torneio/processaProximaFase/escalao/<%= escalao.escalaoId %>" class="btn-competicao">Processa Próxima Fase</a>
+                    <div class="processaProximaFase__wrapper">
+                        <a href="/torneio/processaProximaFase/escalao/<%= escalao.escalaoId %>" class="btn-competicao btn-proximaFase">Processa Próxima Fase</a>
+                        <% if(escalao.todosCamposCompletos && !escalao.existeVencedor){ %>
+                            <div class="competicaoOptions">
+                                <div class="competicaoOptions-trigger">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="4.129" height="16" viewBox="0 0 4.129 16"><path d="M26.065,12.935A2.065,2.065,0,1,1,24,15,2.063,2.063,0,0,1,26.065,12.935ZM24,9.065A2.065,2.065,0,1,0,26.065,7,2.063,2.063,0,0,0,24,9.065Zm0,11.871a2.065,2.065,0,1,0,2.065-2.065A2.063,2.063,0,0,0,24,20.935Z" transform="translate(-24 -7)" fill="#fff"/></svg>
+                                </div>
+                                <div class="competicaoOptions-menu">
+                                    <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>" class="competicaoOptions-menu-item editarParciais__btn">Editar Parciais</a>
+                                    <% if(escalao.fase > 1){ %>
+                                        <a href="/torneio/interditarCampos/escalao/<%= escalao.escalaoId %>" class="competicaoOptions-menu-item interditarCampos__btn">Interditar Campos</a>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
                     <% } else { %>
                         <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>" class="btn-competicao btn-verRegistaParciais">Registar Parciais</a>
                     <% } %>
@@ -101,3 +108,10 @@
         </div>
     </div>
 </div>
+
+<% //if(escalao.todosCamposCompletos && !escalao.existeVencedor && escalao.fase >= 3){ %>
+    <!--<a href="/torneio/interditarCampos/escalao/<%= escalao.escalaoId %>" class="interditarCampos__btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 18 18"><path fill="#596278" d="M17,8a9,9,0,1,0,9,9A9,9,0,0,0,17,8Zm4.722,4.278a6.678,6.678,0,0,1,.75,8.551l-9.3-9.3A6.678,6.678,0,0,1,21.722,12.278Zm-9.443,9.443a6.678,6.678,0,0,1-.75-8.551l9.3,9.3A6.678,6.678,0,0,1,12.278,21.722Z" transform="translate(-8 -8)"/></svg>
+        <span class="tooltip">Interditar Campos</span>
+    </a>-->
+<% //} %>

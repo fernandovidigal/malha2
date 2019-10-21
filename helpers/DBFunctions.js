@@ -541,6 +541,10 @@ exports.createJogo = (torneioId, escalaoId, fase, campo, equipa1Id, equipa2Id) =
     });
 }
 
+exports.createJogosBulk = (listaJogos) => {
+    return Jogos.bulkCreate(listaJogos);
+}
+
 exports.getJogoPorEquipasID = (torneioId, escalaoId, fase, campo, equipa1Id, equipa2Id) => {
     return Jogos.findOne({
         where: {

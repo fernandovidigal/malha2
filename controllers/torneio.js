@@ -3,7 +3,7 @@ const { validationResult } = require('express-validator/check');
 const torneioHelpers = require('../helpers/torneioHelperFunctions');
 const dbFunctions = require('../helpers/DBFunctions');
 
-exports.getStarting = async (req, res, next) => {
+exports.checkCampos = async (req, res, next) => {
     try {
         const torneio = await dbFunctions.getTorneioInfo();
 
@@ -81,113 +81,125 @@ exports.getStarting = async (req, res, next) => {
         if(existemNumCamposNaoDefinidos){
             req.breadcrumbs('Definir Número de Campos', '/torneio/definirNumeroCampos');
             return res.render('torneio/definirNumeroCampos', {torneio: torneio, escaloes: listaEscaloesEditaveis, breadcrumbs: req.breadcrumbs()});
+        } else {
+            res.locals.torneio = torneio;
+            res.locals.listaEscaloes = listaEscaloes;
+            next();
         }
+    } catch(err) {
+        console.log(err);
+        req.flash('error', 'Ocorreu um erro! Não foi possível aceder à página do torneio.');
+        res.redirect('../');
+    }
+}
 
-        if(numEquipas > 0 && !existemNumCamposNaoDefinidos){
-            const escaloesMasculinos = [];
-            const escaloesFemininos = [];
-            let numTotalJogos = 0;
+exports.getStarting = async (req, res, next) => {
+    try {
+        const escaloesMasculinos = [];
+        const escaloesFemininos = [];
+        let numTotalJogos = 0;
+        const torneio = res.locals.torneio;
+        const listaEscaloes = res.locals.listaEscaloes;
 
-            // Percorre todos os escalões
-            for(const escalao of listaEscaloes){
-                // Informações sobre o escalão
-                const _escalao = {
-                    escalaoId: escalao.escalaoId,
-                    designacao: escalao.designacao,
-                    sexo: escalao.sexo,
-                    numTotalCampos: escalao.campos,
-                    existeVencedor: false
-                }
-
-                // Verificar se o escalão tem mais de 2 equipas
-                // Se não tiver, mostrar alerta
-                const _numEquipas = dbFunctions.getNumEquipasPorEscalao(torneioId, escalao.escalaoId);
-                
-                // Verifica em que fase do torneio se encontra o escalão
-                const _fase = dbFunctions.getFaseTorneioPorEscalao(torneioId, escalao.escalaoId);
-
-                const _listaFases = dbFunctions.getAllFasesPorEscalao(torneioId, escalao.escalaoId);
-
-                const [numEquipas, fase, listaFases] = await Promise.all([_numEquipas, _fase, _listaFases]);
-                _escalao.numEquipas = numEquipas;
-                _escalao.fase = (fase == null) ? 0 : fase.fase;
-                _escalao.listaFases = listaFases.reverse();
-
-                // Verifica o número de jogos que determinada fase já tem distribuidos
-                const numJogos = await dbFunctions.getNumeroJogosPorFase(torneioId, _escalao.escalaoId, _escalao.fase);
-                _escalao.numJogos = numJogos;
-
-                // Serve para verificar se já existem jogos distribuídos para algum escalão
-                // Se for 0, então nenhum escalão tem jogos distribuídos
-                numTotalJogos += numJogos;
-
-                // Se já existem jogos distribuídos para determinado escalão, então o número de jogos é maior que 0
-                // então obtem as informações sobre os jogos
-                if(numJogos > 0){
-
-                    // Array de cada campo individual
-                    _escalao.campos = [];
-
-                    // Mantem o registo do número de jogos completos
-                    // Se o número de campos completos for igual ao número de campos total do escalão então a fase está concluída
-                    let numCamposCompletos = 0;
-
-                    // Obtem a lista de campos para determinado escalão em determinada fase
-                    // [1,2,3,4,5,6,7,8,9,...]
-                    const listaCampos = await dbFunctions.getAllCampos(torneioId, _escalao.escalaoId, _escalao.fase);
-
-                    _escalao.numCamposFase = listaCampos.length;
-                    
-                    // Para cada campo da lista de campos
-                    for(const campo of listaCampos){
-                        // guarda o número do campo
-                        const numCampo = campo.num;
-
-                        // Determina para determinado escalão e fase, o número de jogos total para o campo e
-                        // o número de jogos já jogados
-                        const _numJogosParaJogar = await dbFunctions.getNumGamesPorCampo(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
-                        const _numJogosJogados = await dbFunctions.getNumGamesPlayed(torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
-
-                        const [numJogosParaJogar, numJogosJogados] = await Promise.all([_numJogosParaJogar, _numJogosJogados]);
-
-                        const campoData = {
-                            campo: numCampo,
-                            completo: ((numJogosParaJogar - numJogosJogados[0].count) > 0) ? false: true
-                        }
-                        _escalao.campos.push(campoData);
-
-                        // Verifica o número de campos completos
-                        if(numJogosParaJogar == numJogosJogados[0].count){
-                            numCamposCompletos++;
-                        }
-                    }
-
-                    // Guarda e veriffica se os jogos de todos os campos já foram jogados
-                    _escalao.numCamposCompletos = numCamposCompletos;
-                    _escalao.todosCamposCompletos = (_escalao.numCamposFase == _escalao.numCamposCompletos) ? true : false;
-
-                    // Verifica se já existe vencedor
-                    if(_escalao.fase == 100){
-                        _escalao.campos[0].designacao = 'Final';
-                        _escalao.campos[1].designacao = '3º e 4º Lugar';
-                        
-                        if(_escalao.todosCamposCompletos){
-                            const vencedor = await torneioHelpers.processaClassificacao(torneioId, _escalao.escalaoId, _escalao.fase, listaCampos[0].num);
-                            _escalao.existeVencedor = true;
-                            _escalao.equipaVencedora = vencedor[0].classificacao[0];
-                        }
-                    }
-                }
-                
-                if(_escalao.sexo == 0){
-                    escaloesFemininos.push(_escalao);
-                } else {
-                    escaloesMasculinos.push(_escalao);
-                }
+        // Percorre todos os escalões
+        for(const escalao of listaEscaloes){
+            // Informações sobre o escalão
+            const _escalao = {
+                escalaoId: escalao.escalaoId,
+                designacao: escalao.designacao,
+                sexo: escalao.sexo,
+                numTotalCampos: escalao.campos,
+                existeVencedor: false
             }
 
-            res.render('torneio/selecionaEscalao', {torneio: torneio, numTotalJogos: numTotalJogos, escaloesMasculinos: escaloesMasculinos, escaloesFemininos: escaloesFemininos, breadcrumbs: req.breadcrumbs()});
+            // Verificar se o escalão tem mais de 2 equipas
+            // Se não tiver, mostrar alerta
+            const _numEquipas = dbFunctions.getNumEquipasPorEscalao(torneio.torneioId, escalao.escalaoId);
+            
+            // Verifica em que fase do torneio se encontra o escalão
+            const _fase = dbFunctions.getFaseTorneioPorEscalao(torneio.torneioId, escalao.escalaoId);
+
+            const _listaFases = dbFunctions.getAllFasesPorEscalao(torneio.torneioId, escalao.escalaoId);
+
+            const [numEquipas, fase, listaFases] = await Promise.all([_numEquipas, _fase, _listaFases]);
+            _escalao.numEquipas = numEquipas;
+            _escalao.fase = (fase == null) ? 0 : fase.fase;
+            _escalao.listaFases = listaFases.reverse();
+
+            // Verifica o número de jogos que determinada fase já tem distribuidos
+            const numJogos = await dbFunctions.getNumeroJogosPorFase(torneio.torneioId, _escalao.escalaoId, _escalao.fase);
+            _escalao.numJogos = numJogos;
+
+            // Serve para verificar se já existem jogos distribuídos para algum escalão
+            // Se for 0, então nenhum escalão tem jogos distribuídos
+            numTotalJogos += numJogos;
+
+            // Se já existem jogos distribuídos para determinado escalão, então o número de jogos é maior que 0
+            // então obtem as informações sobre os jogos
+            if(numJogos > 0){
+
+                // Array de cada campo individual
+                _escalao.campos = [];
+
+                // Mantem o registo do número de jogos completos
+                // Se o número de campos completos for igual ao número de campos total do escalão então a fase está concluída
+                let numCamposCompletos = 0;
+
+                // Obtem a lista de campos para determinado escalão em determinada fase
+                // [1,2,3,4,5,6,7,8,9,...]
+                const listaCampos = await dbFunctions.getAllCampos(torneio.torneioId, _escalao.escalaoId, _escalao.fase);
+
+                _escalao.numCamposFase = listaCampos.length;
+                
+                // Para cada campo da lista de campos
+                for(const campo of listaCampos){
+                    // guarda o número do campo
+                    const numCampo = campo.num;
+
+                    // Determina para determinado escalão e fase, o número de jogos total para o campo e
+                    // o número de jogos já jogados
+                    const _numJogosParaJogar = await dbFunctions.getNumGamesPorCampo(torneio.torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
+                    const _numJogosJogados = await dbFunctions.getNumGamesPlayed(torneio.torneioId, _escalao.escalaoId, _escalao.fase, numCampo);
+
+                    const [numJogosParaJogar, numJogosJogados] = await Promise.all([_numJogosParaJogar, _numJogosJogados]);
+
+                    const campoData = {
+                        campo: numCampo,
+                        completo: ((numJogosParaJogar - numJogosJogados[0].count) > 0) ? false: true
+                    }
+                    _escalao.campos.push(campoData);
+
+                    // Verifica o número de campos completos
+                    if(numJogosParaJogar == numJogosJogados[0].count){
+                        numCamposCompletos++;
+                    }
+                }
+
+                // Guarda e veriffica se os jogos de todos os campos já foram jogados
+                _escalao.numCamposCompletos = numCamposCompletos;
+                _escalao.todosCamposCompletos = (_escalao.numCamposFase == _escalao.numCamposCompletos) ? true : false;
+
+                // Verifica se já existe vencedor
+                if(_escalao.fase == 100){
+                    _escalao.campos[0].designacao = 'Final';
+                    _escalao.campos[1].designacao = '3º e 4º Lugar';
+                    
+                    if(_escalao.todosCamposCompletos){
+                        const vencedor = await torneioHelpers.processaClassificacao(torneio.torneioId, _escalao.escalaoId, _escalao.fase, listaCampos[0].num);
+                        _escalao.existeVencedor = true;
+                        _escalao.equipaVencedora = vencedor[0].classificacao[0];
+                    }
+                }
+            }
+            
+            if(_escalao.sexo == 0){
+                escaloesFemininos.push(_escalao);
+            } else {
+                escaloesMasculinos.push(_escalao);
+            }
         }
+
+        res.render('torneio/selecionaEscalao', {torneio: torneio, numTotalJogos: numTotalJogos, escaloesMasculinos: escaloesMasculinos, escaloesFemininos: escaloesFemininos, breadcrumbs: req.breadcrumbs()});
     } catch(err) {
         console.log(err);
         req.flash('error', 'Ocorreu um erro! Não foi possível aceder à página do torneio.');
@@ -369,7 +381,7 @@ exports.mostraResultados = async (req, res, next) => {
         info.editavel = (ultimaFase == fase) ? true : false;
 
         // Adicionar a lista de fase a info para que se possa alternar de fase nos resultados
-        info.listaFases = listaFases;
+        info.listaFases = listaFases.reverse();
 
         // 2. Preencher um array com o mesmo número de campos que o escalão tem ocupados
         const campos = [];
@@ -452,7 +464,7 @@ exports.processaProximaFase = async (req, res, next) => {
 
         const camposInterditos = listaCamposInterditos.map(el => el.campo);
 
-        // Só existem 2 campos, então processa jogos 3ª e 4ª lugar e final
+        // Só existem 2 campos, então processa jogos da Final e 3ª e 4ª Lugar
         // verifica-se se só existem dois jogos porque pode haver competição só em 2 campos e depois não há fases de apuramento dos finalistas
         if(listaCampos.length == 2 && numJogosPorCampo == 2){
             let campoJogo = 1;
@@ -469,11 +481,60 @@ exports.processaProximaFase = async (req, res, next) => {
             // Adiciona jogo do 3º e 4º lugar
             await dbFunctions.createJogo(torneio.torneioId, escalaoId, 100, campoJogo, listaCampos[0].classificacao[1].equipaId, listaCampos[1].classificacao[1].equipaId);
             
-            req.flash('success', 'Próxima fase processada com sucesso');
+            req.flash('success', 'Fase Final processada com sucesso');
             res.redirect('/torneio');
         } else {
+            let listaJogos = [];
 
-            const listaEquipasApuradas = [];
+            const leftBracket = [];
+            const rightBracket = [];
+
+            while(listaCampos.length > 0){
+                const campos = listaCampos.splice(0,2);
+                if(proximaFase == 2){
+                    leftBracket.push({
+                        equipa1Id: campos[0].classificacao[0].equipaId,
+                        equipa2Id: campos[1].classificacao[1].equipaId,
+                    });
+                    rightBracket.push({
+                        equipa1Id: campos[1].classificacao[0].equipaId,
+                        equipa2Id: campos[0].classificacao[1].equipaId,
+                    });
+                } else {
+                    listaJogos.push({
+                        equipa1Id: campos[0].classificacao[0].equipaId,
+                        equipa2Id: campos[1].classificacao[0].equipaId
+                    });
+                }
+            }
+
+            // Juntas as duas arrays, necessário apenas para a 2ª fase
+            if(proximaFase == 2){
+                listaJogos = leftBracket.concat(rightBracket);
+            }
+
+            // Define o campo para cada jogo
+            let campoActual = 1;
+            for(const jogo of listaJogos){
+                while(camposInterditos.includes(campoActual)){
+                    campoActual++;
+                }
+
+                jogo.campo = campoActual;
+                campoActual++;
+
+                // Outras informções do Jogo
+                jogo.torneioId = torneio.torneioId;
+                jogo.escalaoId = escalaoId;
+                jogo.fase = proximaFase;
+            }
+
+            // Regista os Jogos na Base de Dados
+            await dbFunctions.createJogosBulk(listaJogos);
+
+            // APAGAR APAGAR APAGAR APAGAR APAGAR
+            // Apura as equipas classificadas em 1º lugar e 2º lugar (caso seja primeira fase)
+            /*const listaEquipasApuradas = [];
             for(const campo of listaCampos){
                 listaEquipasApuradas.push(campo.classificacao[0]);
 
@@ -482,6 +543,8 @@ exports.processaProximaFase = async (req, res, next) => {
                     listaEquipasApuradas.push(campo.classificacao[1]);
                 }
             }
+
+            console.log(listaEquipasApuradas);
 
             // Agrupa as equipas por localidade para não calharem equipas da mesma localidade no mesmo campo
             listaEquipasApuradas.sort((a, b) => {
@@ -517,9 +580,9 @@ exports.processaProximaFase = async (req, res, next) => {
                 }
                 await dbFunctions.createJogo(torneio.torneioId, escalaoId, proximaFase, campoActual, par[0].equipaId, par[1].equipaId);
                 campoActual++;
-            }
+            }*/
 
-            req.flash('success', 'Próxima fase processada com sucesso');
+            req.flash('success', 'Próxima Fase processada com sucesso');
             res.redirect('/torneio');
         }
     } catch(err){

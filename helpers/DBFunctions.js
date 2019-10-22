@@ -526,6 +526,21 @@ exports.getAllEscaloesComEquipas = () => {
     });
 }
 
+exports.getNumEquipasPorCadaEscalaoListagens = (torneioId) => {
+    return Equipas.findAll({
+        attributes: ['equipas.escalaoId', [sequelize.fn('count', sequelize.col('equipas.equipaId')), 'numEquipas']],
+        include: [
+            {
+                model: Escaloes
+            }
+        ],
+        where: {
+            torneioId: torneioId,
+        },
+        group: ['equipas.escalaoId']
+      });
+}
+
 ////////////////////////////////////////////////////////
 //                        JOGOS
 ////////////////////////////////////////////////////////

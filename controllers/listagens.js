@@ -185,7 +185,11 @@ exports.getNumEquipasPorConcelho = async (req, res, next) => {
             return res.status(200).json(response);
         }
 
-        const equipasPorConcelho = await dbFunctions.getNumEquipasPorConcelhoInfo(torneio.torneioId, escalaoId);
+        const _equipasPorConcelho = await dbFunctions.getNumEquipasPorConcelhoInfo(torneio.torneioId, escalaoId);
+        const _numEquipasPorEscalao = await dbFunctions.getNumEquipasPorCadaEscalaoListagens(torneio.torneioId);
+
+        const [equipasPorConcelho, numEquipasPorEscalao] = await Promise.all([_equipasPorConcelho, _numEquipasPorEscalao]);
+
         util.sort(equipasPorConcelho);
 
         if(equipasPorConcelho.length > 0){
@@ -199,10 +203,21 @@ exports.getNumEquipasPorConcelho = async (req, res, next) => {
             }
 
             response.numEquipas = equipasPorConcelho;
+            response.numEquipasPorEscalao = [];
+
+            numEquipasPorEscalao.forEach(el => {
+                response.numEquipasPorEscalao.push({
+                    designacao: el.escalao.designacao,
+                    sexo: el.escalao.sexo,
+                    numEquipas: el.dataValues.numEquipas
+                });
+            });
             
             let total = 0;
             equipasPorConcelho.forEach(equipa => total += equipa.numEquipas);
             response.total = total;
+
+            console.log(response);
 
         } else {
             response.errMsg = 'Não existem equipas registadas neste torneio';

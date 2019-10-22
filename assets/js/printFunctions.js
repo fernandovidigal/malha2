@@ -166,7 +166,7 @@ function makeFooter(dd, text = null) {
   };
 }
 
-function makeNumEquipaPorConcelho(dd, numEquipas, total) {
+function makeNumEquipaPorConcelho_old(dd, numEquipas, numEquipasPorEscalao, total) {
   const content = {
     table: {
       headerRows: 1,
@@ -213,6 +213,194 @@ function makeNumEquipaPorConcelho(dd, numEquipas, total) {
   content.table.body.push(totalRow);
 
   dd.content.push(content);
+}
+
+function makeNumEquipaPorConcelho(dd, data) {
+  const content = {
+    table: {
+      widths: ["*", "auto"],
+        headerRows: 2,
+        body: [
+          [
+            {
+              text: "Número de Equipas por Localidade",
+              alignment: "center",
+              colSpan: 2,
+              bold: true,
+              fontSize: 14,
+              margin: [0, 10]
+            },
+            {}
+          ],
+          [
+            { text: "Localidade", margin: [10, 5], bold: true, fontSize: 12 },
+            { text: "Nº Equipas", margin: [10, 5], bold: true, fontSize: 12 }
+          ]
+        ]
+    },
+    margin: [0, 0, 0, 20],
+    layout: {
+      hLineWidth: function(i, node) {
+        if (i === 0 || i === 1) {
+          return 0;
+        } else if (i === 2 || i === (node.table.body.length - 1)) {
+          return 1.5;
+        } else if(i === node.table.body.length) {
+          return 0;
+        } else {
+          return 0.5;
+        }
+      },
+      vLineWidth: function(i, node) {
+        return 0;
+      },
+      hLineColor: function(i, node) {
+        if(i < 3 || i === (node.table.body.length - 1)) {
+          return "black";
+        } else {
+          return "gray";
+        }
+      }
+    }
+  }
+
+  data.numEquipas.forEach(equipa => {
+    const row = [
+      {
+        text: equipa.nome,
+        margin: [20, 5]
+      },
+      {
+        text: equipa.numEquipas,
+        alignment: "center",
+        margin: [20, 5]
+      }
+    ];
+    content.table.body.push(row);
+  });
+
+  const totalRow = [
+    {
+      margin: [10, 5],
+      text: "Total",
+      fillColor: "#eeeeee",
+      bold: true
+    },
+    {
+      margin: [20, 5],
+      text: `${data.total}`,
+      fillColor: "#eeeeee",
+      alignment: "center",
+      bold: true
+    }
+  ];
+
+  content.table.body.push(totalRow);
+
+  dd.content.push(content);
+
+  makeNumEquipasPorEscalao(dd, data.numEquipasPorEscalao);
+}
+
+function makeNumEquipasPorEscalao(dd, numEquipasPorEscalao){
+  if(numEquipasPorEscalao.length > 0){
+    const escalaoMasculino = numEquipasPorEscalao.filter(el => el.sexo == 1);
+    const escalaoFeminino = numEquipasPorEscalao.filter(el => el.sexo == 0);
+    const content = {
+      table: {
+        widths: ["*", "auto"],
+          headerRows: 1,
+          body: [
+            [
+              {
+                text: "Número de Equipas por Escalão",
+                alignment: "center",
+                colSpan: 2,
+                bold: true,
+                fontSize: 14,
+                margin: [0, 10]
+              },
+              {}
+            ]
+          ]
+      },
+      margin: [0, 0, 0, 20],
+      unbreakable: true,
+      layout: {
+        hLineWidth: function(i, node) {
+          if (i === 0 || i === 1) {
+            return 0;
+          } else if (i === 2 || i === (node.table.body.length - 1)) {
+            return 1.5;
+          } else if(i === node.table.body.length) {
+            return 0;
+          } else {
+            return 0.5;
+          }
+        },
+        vLineWidth: function(i, node) {
+          return 0;
+        },
+        hLineColor: function(i, node) {
+          if(i < 3 || i === (node.table.body.length - 1)) {
+            return "black";
+          } else {
+            return "gray";
+          }
+        }
+      }
+    }
+
+    // Escalão Masculino
+    if(escalaoMasculino.length > 0){
+      content.table.body.push([{
+        text: 'Masculinos',
+        colSpan: 2,
+        bold: true
+      }, {}]);
+
+      escalaoMasculino.forEach(escalao => {
+        const row = [
+          {
+            text: escalao.designacao,
+            margin: [20, 5]
+          },
+          {
+            text: escalao.numEquipas,
+            alignment: "center",
+            margin: [20, 5]
+          }
+        ];
+        content.table.body.push(row);
+      });
+    }
+
+    // Escalão Feminino
+    if(escalaoFeminino.length > 0){
+      content.table.body.push([{
+        text: 'Femininos',
+        colSpan: 2,
+        bold: true,
+        margin: [0, 20, 0, 0]
+      }, {}]);
+      escalaoFeminino.forEach(escalao => {
+        const row = [
+          {
+            text: escalao.designacao,
+            margin: [20, 5]
+          },
+          {
+            text: escalao.numEquipas,
+            alignment: "center",
+            margin: [20, 5]
+          }
+        ];
+        content.table.body.push(row);
+      });
+    }
+
+    dd.content.push(content);
+  }
 }
 
 function makeEquipasAgrupadasPorCampos(ddContent, listaCampos, fase) {

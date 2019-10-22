@@ -532,56 +532,6 @@ exports.processaProximaFase = async (req, res, next) => {
             // Regista os Jogos na Base de Dados
             await dbFunctions.createJogosBulk(listaJogos);
 
-            // APAGAR APAGAR APAGAR APAGAR APAGAR
-            // Apura as equipas classificadas em 1º lugar e 2º lugar (caso seja primeira fase)
-            /*const listaEquipasApuradas = [];
-            for(const campo of listaCampos){
-                listaEquipasApuradas.push(campo.classificacao[0]);
-
-                // Na fase 3 e seguintes apenas o vencedor passa à próxima fase
-                if(ultimaFase < 2){
-                    listaEquipasApuradas.push(campo.classificacao[1]);
-                }
-            }
-
-            console.log(listaEquipasApuradas);
-
-            // Agrupa as equipas por localidade para não calharem equipas da mesma localidade no mesmo campo
-            listaEquipasApuradas.sort((a, b) => {
-                if(a.localidadeId < b.localidadeId){
-                    return -1;
-                } else {
-                    return 1;
-                }
-            });
-
-            const numCampos = listaEquipasApuradas.length / 2;
-            let campoActual = 0;
-            let k = 0;
-            // Cria uma array multidimensional com o número de campos para a próxima fase;
-            const listaEquipasPorCampo = [];
-            for(let i = 0; i < numCampos; i++){
-                listaEquipasPorCampo.push(new Array());
-            }
-
-            for(let k = 0; k < listaEquipasApuradas.length; k++){
-                if(campoActual >= numCampos){
-                    campoActual = 0;
-                }
-
-                listaEquipasPorCampo[campoActual].push(listaEquipasApuradas[k]);
-                campoActual++;
-            }
-
-            campoActual = 1;
-            for(const par of listaEquipasPorCampo){
-                while(camposInterditos.includes(campoActual)){
-                    campoActual++;
-                }
-                await dbFunctions.createJogo(torneio.torneioId, escalaoId, proximaFase, campoActual, par[0].equipaId, par[1].equipaId);
-                campoActual++;
-            }*/
-
             req.flash('success', 'Próxima Fase processada com sucesso');
             res.redirect('/torneio');
         }

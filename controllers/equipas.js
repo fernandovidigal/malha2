@@ -454,10 +454,11 @@ exports.updateEquipa = async (req, res, next) => {
 
         try {
             const torneio = await dbFunctions.getTorneioInfo();
-            let equipa = await dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId, oldEscalaoId, false);
+            const equipa = await dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId, oldEscalaoId, false);
 
             if(equipa){
-                let updateResult = false;
+                let createdEquipa = null;
+                let updatedEquipa = null;
 
                 if(escalaoId != oldEscalaoId){
                     const lastId = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId) || 0;
@@ -475,16 +476,26 @@ exports.updateEquipa = async (req, res, next) => {
                     try{
                         transaction = await sequelize.transaction();
 
-                        await equipa.destroy({transaction});
-                        [equipa, updateResult] = await Equipas.findOrCreate({
+                        // Verifica se a Equipas já existe no escalão selecionado
+                        const existeEquipa = await Equipas.findOne({
                             where: _equipa,
                             transaction
                         });
 
-                        if(updateResult) {
-                            await transaction.commit();
+                        if(existeEquipa) {
+                            throw 'A equipas já existe no escalão selecionado'
                         } else {
-                            throw "Não foi possível actualizar a equipa";
+                            // Elimina a equipa do escalão antigo
+                            await equipa.destroy({transaction});
+                            // Regista a equipa no novo escalão
+                            console.log(_equipa);
+                            createdEquipa = await Equipas.create(_equipa, {transaction});
+
+                            if(createdEquipa) {
+                                await transaction.commit();
+                            } else {
+                                throw "Não foi possível actualizar a equipa";
+                            }
                         }
                     } catch(err){
                         if(transaction) await transaction.rollback();
@@ -497,10 +508,10 @@ exports.updateEquipa = async (req, res, next) => {
                     equipa.localidadeId = localidadeId;
                     equipa.escalaoId = escalaoId;
 
-                    updateResult = await equipa.save();
+                    updatedEquipa = await equipa.save();
                 }
 
-                if(updateResult){
+                if(updatedEquipa || createdEquipa){
                     req.flash('success', 'Equipa actualizada com sucesso.')
                     res.redirect('/equipas');
                 } else {

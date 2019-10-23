@@ -144,14 +144,6 @@ async function imprimeNumEquipasPorConcelho(escalaoId) {
     if (data.success) {
       makeHeader(docDefinition, data.torneio);
 
-      /*docDefinition.content.push({
-        text: "Número de Equipas por Localidade",
-        alignment: "center",
-        bold: true,
-        fontSize: 14,
-        margin: [0, 10]
-      });*/
-      console.log(data);
       makeNumEquipaPorConcelho(docDefinition, data);
 
       makeFooter(
@@ -168,7 +160,6 @@ async function imprimeNumEquipasPorConcelho(escalaoId) {
       });
     }
   } catch (err) {
-    console.log(err);
     Swal.fire({
       type: "error",
       title: "Oops...",

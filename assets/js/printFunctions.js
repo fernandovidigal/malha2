@@ -228,7 +228,6 @@ function makeNumEquipaPorConcelho(dd, data) {
               colSpan: 2,
               bold: true,
               fontSize: 14,
-              margin: [0, 10]
             },
             {}
           ],
@@ -238,7 +237,7 @@ function makeNumEquipaPorConcelho(dd, data) {
           ]
         ]
     },
-    margin: [0, 0, 0, 20],
+    margin: [0, 0, 0, 30],
     layout: {
       hLineWidth: function(i, node) {
         if (i === 0 || i === 1) {
@@ -318,23 +317,25 @@ function makeNumEquipasPorEscalao(dd, numEquipasPorEscalao){
                 colSpan: 2,
                 bold: true,
                 fontSize: 14,
-                margin: [0, 10]
               },
               {}
             ]
           ]
       },
-      margin: [0, 0, 0, 20],
+      margin: [0, 0, 0, 10],
       unbreakable: true,
       layout: {
         hLineWidth: function(i, node) {
           if (i === 0 || i === 1) {
             return 0;
-          } else if (i === 2 || i === (node.table.body.length - 1)) {
+          } else if (i === 2) {
             return 1.5;
-          } else if(i === node.table.body.length) {
-            return 0;
           } else {
+            if(escalaoMasculino.length > 0 && escalaoFeminino.length > 0){
+                if(i === escalaoMasculino.length + 3){
+                  return 1.5;
+                }
+            }
             return 0.5;
           }
         },
@@ -342,9 +343,14 @@ function makeNumEquipasPorEscalao(dd, numEquipasPorEscalao){
           return 0;
         },
         hLineColor: function(i, node) {
-          if(i < 3 || i === (node.table.body.length - 1)) {
+          if(i < 3) {
             return "black";
           } else {
+            if(escalaoMasculino.length > 0 && escalaoFeminino.length > 0){
+              if(i === escalaoMasculino.length + 3){
+                return "black";
+              }
+            }
             return "gray";
           }
         }
@@ -1335,7 +1341,8 @@ function makeFolhaParciais(dd, fase, data, equipas, parciais) {
     table: {
       headerRows: 2,
       dontBreakRows: true,
-      widths: ["auto", "*", "*", "auto", 40, 40, 40, 40],
+      //widths: ["auto", "*", "*", "auto", 40, 40, 40, 40],
+      widths: ["auto", "auto", "*", "auto", 40, 40, 40],
       body: [
         [
           {
@@ -1343,10 +1350,9 @@ function makeFolhaParciais(dd, fase, data, equipas, parciais) {
             alignment: "center",
             bold: true,
             fontSize: 14,
-            colSpan: 8,
+            colSpan: 7,
             margin: [0, 0, 0, 2]
           },
-          {},
           {},
           {},
           {},
@@ -1395,14 +1401,14 @@ function makeFolhaParciais(dd, fase, data, equipas, parciais) {
             fontSize: 10,
             bold: true,
             border: [false, false, false, true]
-          },
-          {
+          }
+          /*{
             text: "Pontos",
             alignment: "center",
             fontSize: 10,
             bold: true,
             border: [false, false, false, true]
-          }
+          }*/
         ]
       ]
     },
@@ -1472,8 +1478,8 @@ function makeFolhaParciais(dd, fase, data, equipas, parciais) {
       },
       {
         stack: [
-          { text: `${equipa1.segundoElemento}`, fontSize: 10, margin: [0, 5] },
-          { text: `${equipa2.segundoElemento}`, fontSize: 10, margin: [0, 5] }
+          { text: `${equipa1.segundoElemento}`, fontSize: 10, margin: [10, 5] },
+          { text: `${equipa2.segundoElemento}`, fontSize: 10, margin: [10, 5] }
         ]
       },
       {
@@ -1529,8 +1535,8 @@ function makeFolhaParciais(dd, fase, data, equipas, parciais) {
             margin: [0, 2]
           }
         ]
-      },
-      {
+      }
+      /*{
         stack: [
           {
             text: `${equipa1parcial == null ? " " : jogo.equipa1Pontos}`,
@@ -1547,7 +1553,7 @@ function makeFolhaParciais(dd, fase, data, equipas, parciais) {
             margin: [0, 3]
           }
         ]
-      }
+      }*/
     ];
 
     _table.table.body.push(row);

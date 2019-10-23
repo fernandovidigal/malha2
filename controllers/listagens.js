@@ -216,9 +216,6 @@ exports.getNumEquipasPorConcelho = async (req, res, next) => {
             let total = 0;
             equipasPorConcelho.forEach(equipa => total += equipa.numEquipas);
             response.total = total;
-
-            console.log(response);
-
         } else {
             response.errMsg = 'Não existem equipas registadas neste torneio';
         }

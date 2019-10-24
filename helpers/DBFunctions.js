@@ -309,6 +309,15 @@ exports.getAllEquipas = (torneioId, escalaoId) => {
     });
 }
 
+exports.getAllEquipasTodasLocalidades = (torneioId, localidadeId) => {
+    return Equipas.findAll({
+        where: {
+            torneioId: torneioId,
+            localidadeId: localidadeId
+        }
+    });
+}
+
 exports.getNumTotalEquipas = (torneioId) => {
     return Equipas.count({
         where: {
@@ -510,6 +519,8 @@ exports.getNumEquipasPorConcelhoInfo = (torneioId, escalaoId) => {
     });
 }
 
+// Serve para verificar se existem equipas para determinada localidade
+// para prevenir a eliminação de localidades com equipas registadas
 exports.getLocalidadesComEquipas = () => {
     return Equipas.findAll({
         attributes: ['localidadeId'],
@@ -518,6 +529,25 @@ exports.getLocalidadesComEquipas = () => {
     });
 }
 
+exports.getAllLocalidadesComEquipas = (torneioId) => {
+    return Equipas.findAll({
+        attributes: [['localidadeId', 'idLocalidade']],
+        include: [
+            {
+                model: Localidades,
+                attributes: ['nome']
+            }
+        ],
+        where: {
+            torneioId: torneioId
+        },
+        group: ['equipas.localidadeId'],
+        raw: true
+    });
+}
+
+// Serve para verificar se existem equipas para determinado escalão
+// para prevenir a eliminação de escalões com equipas registadas
 exports.getAllEscaloesComEquipas = () => {
     return Equipas.findAll({
         attributes: ['escalaoId'],

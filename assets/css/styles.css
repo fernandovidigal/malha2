@@ -169,6 +169,11 @@ li {
     padding: 0 10px;
 }
 
+.btn-import {
+    background-color: #398ad0;
+    padding: 0 10px;
+}
+
 .btn-delete {
     background-color: #d9534f;
 }
@@ -1576,6 +1581,15 @@ input::placeholder {
     border: none;
 }
 
+.mainTable_percurso thead tr th:first-child {
+    padding-left: 20px;
+}
+
+.mainTable_percurso thead tr th:last-child {
+    padding-right: 20px;
+    white-space: nowrap;
+}
+
 .tw5 {
     width: 5%;
 }
@@ -1589,7 +1603,7 @@ input::placeholder {
 }
 
 .percursoTorneio_wrapper {
-    width: 60%;
+    width: 65%;
     margin-bottom: 60px;
     margin-top: 25px;
     padding-left: 0;

@@ -337,11 +337,11 @@ itemsListagem.forEach((itemListagem, index) => {
         setSelectHeader(elemento, escalaoId, 'escalaoInput');
         resetFaseCamposSelect(elemento.closest('.listagems__item-inputs'));
 
-        if(index == 2){
+        if(index == 3){
           resetSoFolhaRosto(elemento.closest('.listagems__item-inputs'));
         }
   
-        if(index > 0) {
+        if(index > 1) {
           await mostraFaseSelect(escalaoId, elemento.closest('.listagems__item-inputs'));
         }
       } else if(e.target.classList.contains('fase__link')){
@@ -349,12 +349,12 @@ itemsListagem.forEach((itemListagem, index) => {
         const fase = parseInt(elemento.dataset.fase);
         setSelectHeader(elemento, fase, 'faseInput');
   
-        if(index > 0) {
+        if(index > 1) {
           const { escalaoId } = getSelectedValues(elemento.closest('.listagems__item-inputs'));
           await mostraCamposSelect(escalaoId, fase, elemento.closest('.listagems__item-inputs'));
         }
 
-        if(index == 2){
+        if(index == 3){
           const { fase } = getSelectedValues(elemento.closest('.listagems__item-inputs'));
           const soFolhaRosto = elemento.closest('.listagems__item-inputs').querySelector('.soFolhaRostoContainer');
           if(fase != 0 && fase == 1){
@@ -368,6 +368,10 @@ itemsListagem.forEach((itemListagem, index) => {
         const elemento = e.target;
         const campo = parseInt(elemento.dataset.campo);
         setSelectHeader(elemento, campo, 'campoInput');
+      } else if(e.target.classList.contains('localidade__link')){
+        const elemento = e.target;
+        const localidadeId = parseInt(elemento.dataset.localidade);
+        setSelectHeader(elemento, localidadeId, 'localidadeInput');
       }
     } catch (err) {
       Swal.fire({

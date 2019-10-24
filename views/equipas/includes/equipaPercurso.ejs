@@ -2,14 +2,14 @@
 <% percurso.forEach(fase => { %>
     <h3><%= (fase != 100) ? fase.fase + 'ª Fase' : 'Fase Final' %></h3>
     <div class="table__wrapper percursoTorneio_wrapper">
-        <table class="mainTable mainTable-noBorder">
+        <table class="mainTable mainTable_percurso">
             <thead>
                 <tr>
                     <th align="left">Classificação</th>
                     <th>Vitórias</th>
                     <th>Pontuação</th>
                     <% if(fase.jogos.length > 0){ %>
-                        <th>Jogos</th>
+                        <th>Ver Jogos</th>
                     <% } %>
                 </tr>
             </thead>
@@ -37,7 +37,7 @@
                             <th>Parcial 1</th>
                             <th>Parcial 2</th>
                             <th>Parcial 3</th>
-                            <th>Pontos</th>
+                            <th>Pontuação</th>
                         </tr>
                     </thead>
                     <tbody>

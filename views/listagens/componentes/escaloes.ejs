@@ -11,10 +11,8 @@
                     if(masculinos.length > 0){
                 %>
                     <div class="customSelect__groupTitle">Masculinos</div>
-                    <% escaloes.forEach(function(escalao){ %>
-                        <% if(escalao.sexo == 1){ %>
-                            <p class="customSelect__links escalao__link" data-escalao="<%= escalao.escalaoId %>"><%= escalao.designacao %></p>
-                        <% } %>
+                    <% masculinos.forEach(function(escalao){ %>
+                        <p class="customSelect__links escalao__link" data-escalao="<%= escalao.escalaoId %>"><%= escalao.designacao %></p>
                     <% }); %>
                 <% } %>
                 <%
@@ -22,10 +20,8 @@
                     if(femininos.length > 0){
                 %>
                     <div class="customSelect__groupTitle">Femininos</div>
-                    <% escaloes.forEach(function(escalao){ %>
-                        <% if(escalao.sexo == 0){ %>
-                            <p class="customSelect__links escalao__link" data-escalao="<%= escalao.escalaoId %>"><%= escalao.designacao %></p>
-                        <% } %>
+                    <% femininos.forEach(function(escalao){ %>
+                        <p class="customSelect__links escalao__link" data-escalao="<%= escalao.escalaoId %>"><%= escalao.designacao %></p>
                     <% }); %>
                 <% } %>
             </div>

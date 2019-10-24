@@ -56,10 +56,19 @@ exports.mostraListagens = async (req, res, next) => {
         return res.redirect("../");
     }
 
-    const listaEscaloes = await dbFunctions.getEscaloesComEquipas(torneio.torneioId);
-    const listaEscaloesComJogos = await dbFunctions.getAllEscaloesComJogos(torneio.torneioId);
+    const _listaEscaloes = await dbFunctions.getEscaloesComEquipas(torneio.torneioId);
+    const _listaEscaloesComJogos = await dbFunctions.getAllEscaloesComJogos(torneio.torneioId);
+    const _listaLocalidadesComEquipas = await dbFunctions.getAllLocalidadesComEquipas(torneio.torneioId);
 
-    res.render('listagens/index', {torneio: torneio, escaloes: listaEscaloes, escaloesComJogos: listaEscaloesComJogos, breadcrumbs: req.breadcrumbs()});
+    const [listaEscaloes, listaEscaloesComJogos, listaLocalidadesComEquipas] = await Promise.all([_listaEscaloes, _listaEscaloesComJogos, _listaLocalidadesComEquipas]);
+
+    res.render('listagens/index', {
+        torneio: torneio,
+        escaloes: listaEscaloes,
+        escaloesComJogos: listaEscaloesComJogos,
+        localidades: listaLocalidadesComEquipas,
+        breadcrumbs: req.breadcrumbs()
+    });
 }
 
 // API
@@ -167,6 +176,22 @@ exports.getEquipas = async (req, res, next) => {
             errMsg: 'Ocorreu um erro. Por favor tente novamente.'
         });
     } 
+}
+
+exports.getListaEquipasPorConcelho = async (req, res, next) => {
+    try {
+        const localidadeId = parseInt(req.params.localidadeId);
+        const torneioInfo = await dbFunctions.getTorneioInfo();
+        const localidades = await dbFunctions.getAllEquipasTodasLocalidades(torneio.torneioId, localidadeId);
+
+        
+    } catch (err) {
+        console.log(err);
+        res.status(200).json({
+            success: false,
+            errMsg: 'Ocorreu um erro. Por favor tente novamente.'
+        });
+    }
 }
 
 exports.getNumEquipasPorConcelho = async (req, res, next) => {

@@ -16,6 +16,20 @@
 
         <div class="listagens__wrapper">
             <div class="listagem__item">
+                <p class="listagem__item-title">Lista de Equipas por Localidade</p>
+                <div class="listagem__item-content">
+                    <div class="listagems__item-inputs">
+                        <%- include('componentes/localidades.ejs', {localidades: localidades, errMsg: 'Não existem localidades com equipas registadas!'}) %>
+                    </div>
+                    <% if(typeof localidades != 'undefined' && localidades.length > 0){ %>
+                        <div class="listagem__item-printBtn">
+                            <a class="btn btn-secondary listaEquipasPorConcelho_btn">Imprimir</a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="listagem__item">
                 <p class="listagem__item-title">Número de Equipas por Localidade</p>
                 <div class="listagem__item-content">
                     <div class="listagems__item-inputs">

@@ -133,6 +133,38 @@ function resetSoFolhaRosto(parent){
   }
 }
 
+async function imprimeListaEquipasPorConcelho(localidadeId) {
+  try {
+    const response = await getData(`/listagens/getListaEquipasPorConcelho/${localidadeId}`);
+
+    docDefinition.content = [];
+    delete docDefinition.pageBreakBefore;
+
+    if (response.success) {
+      const data = response.data;
+      makeHeader(docDefinition, data.torneio);
+
+      makeListaEquipaPorConcelho(docDefinition, data);
+
+      makeFooter(docDefinition, `Lista de Equipas por Localidade - ${data.localidade.nome}`);
+
+      pdfMake.createPdf(docDefinition).print();
+    } else {
+      Swal.fire({
+        type: "error",
+        title: "Oops...",
+        text: response.errMsg
+      });
+    }
+  } catch(err) {
+    Swal.fire({
+      type: "error",
+      title: "Oops...",
+      text: "Não foi possível obter os dados!"
+    });
+  }
+}
+
 async function imprimeNumEquipasPorConcelho(escalaoId) {
   try {
     const data = await getData(
@@ -146,10 +178,7 @@ async function imprimeNumEquipasPorConcelho(escalaoId) {
 
       makeNumEquipaPorConcelho(docDefinition, data);
 
-      makeFooter(
-        docDefinition,
-        `Número de Equipas por Localidade e Escalão`
-      );
+      makeFooter(docDefinition,`Número de Equipas por Localidade`);
 
       pdfMake.createPdf(docDefinition).print();
     } else {
@@ -293,11 +322,11 @@ async function imprimeResultados(escalaoId, fase, campo) {
         margin: [0, 0, 0, 20]
       });
 
-      data.listaCampos.forEach((campo, index) => {
-        makeContentResultados(docDefinition, campo, fase, index, data.listaCampos.length);
+      data.listaCampos.forEach(campo => {
+        makeContentResultados(docDefinition, campo, fase, data.listaCampos.length);
       });
 
-      makeFooter(docDefinition, `Resultados da ${fase != 100 ? fase + "ª Fase" : "fase Final"}`);
+      makeFooter(docDefinition, `Resultados da ${fase != 100 ? fase + "ª Fase" : "fase Final"}${campo != 0 ? ' - Campo ' + campo : ''}`);
 
       pdfMake.createPdf(docDefinition).print();
     } else {
@@ -383,6 +412,23 @@ itemsListagem.forEach((itemListagem, index) => {
   });
 });
 
+const listaEquipasPorConcelhoBtn = document.querySelector('.listaEquipasPorConcelho_btn');
+listaEquipasPorConcelhoBtn.addEventListener('click', function(e){
+  e.preventDefault();
+  const input = this.closest('.listagem__item-content').querySelector('.listagems__item-inputs').querySelector('.localidadeInput');
+  const localidadeId = input.value;
+  if(localidadeId != 0){
+    imprimeListaEquipasPorConcelho(localidadeId)
+  } else {
+    Swal.fire({
+      type: "warning",
+      title: "Oops...",
+      text: "Deve selecionar a Localidade."
+    });
+  }
+});
+
+// Processa o click no botão do número de equipas por concelho
 const numEquipasPorConcelhoBtn = document.querySelector(".numEquipasPorConcelho_btn");
 numEquipasPorConcelhoBtn.addEventListener("click", function(e) {
   e.preventDefault();
@@ -399,6 +445,7 @@ numEquipasPorConcelhoBtn.addEventListener("click", function(e) {
   }
 });
 
+// Processa o click no botão da equipas agrupadas por campos
 const equipasAgrupadasPorCamposBtn = document.querySelector(".equipasAgrupadasPorCampos_btn");
 equipasAgrupadasPorCamposBtn.addEventListener("click", function(e) {
   e.preventDefault();

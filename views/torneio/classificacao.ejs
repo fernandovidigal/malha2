@@ -7,7 +7,7 @@
             <h3><%= torneio.localidade %>, <%= torneio.ano %></h3>
         </div>
         <div class="barraTorneio__buttons">
-            <button class="btn btn-print"><i class="fas fa-print"></i></button>
+            <button class="btn btn-print" data-escalao="<%= escalao.escalaoId %>" data-fase="<%= fase %>" data-campo="<%= campo %>"><i class="fas fa-print"></i></button>
         </div>
     </div>
 
@@ -106,5 +106,10 @@
 <% } else { %>
     <%- include('../includes/noTorneio.ejs') %>
 <% } %>
+
+<script src="/js/pdfmake.min.js"></script>
+<script src="/js/vfs_fonts.js"></script>
 <script src="/js/customSelect.js"></script>
+<script src="/js/printFunctions.js"></script>
+<script src="/js/classificacao.js"></script>
 <%- include('../includes/footer.ejs') %>

@@ -181,10 +181,38 @@ exports.getEquipas = async (req, res, next) => {
 exports.getListaEquipasPorConcelho = async (req, res, next) => {
     try {
         const localidadeId = parseInt(req.params.localidadeId);
-        const torneioInfo = await dbFunctions.getTorneioInfo();
-        const localidades = await dbFunctions.getAllEquipasTodasLocalidades(torneio.torneioId, localidadeId);
+        const torneio = await dbFunctions.getTorneioInfo();
 
+        const response = {
+            success: false
+        };
+
+        if(!torneio || !localidadeId){
+            response.errMsg = 'Não foi possível obter dados.';
+            return res.status(200).json(response);
+        }
+
+        const _localidade = dbFunctions.getLocalidade(localidadeId);
+        const _listaEquipas = dbFunctions.getAllEquipasTodasLocalidades(torneio.torneioId, localidadeId);
+        const _numEquipasPorEscalao = dbFunctions.getNumEquipasPorCadaEscalaoListagens(torneio.torneioId, localidadeId);
         
+        const [localidade, listaEquipas, numEquipasPorEscalao] = await Promise.all([_localidade, _listaEquipas, _numEquipasPorEscalao]);
+
+        if(listaEquipas.length > 0){
+            torneio.escalao = localidade.nome;
+
+            response.success = true;
+            response.data = {
+                torneio,
+                localidade,
+                listaEquipas,
+                numEquipasPorEscalao
+            }
+        } else {
+            response.errMsg = 'Não existem equipas registadas para a Localidade selecionada';
+        }
+
+        res.status(200).json(response);
     } catch (err) {
         console.log(err);
         res.status(200).json({
@@ -210,10 +238,7 @@ exports.getNumEquipasPorConcelho = async (req, res, next) => {
             return res.status(200).json(response);
         }
 
-        const _equipasPorConcelho = await dbFunctions.getNumEquipasPorConcelhoInfo(torneio.torneioId, escalaoId);
-        const _numEquipasPorEscalao = await dbFunctions.getNumEquipasPorCadaEscalaoListagens(torneio.torneioId);
-
-        const [equipasPorConcelho, numEquipasPorEscalao] = await Promise.all([_equipasPorConcelho, _numEquipasPorEscalao]);
+        const equipasPorConcelho = await dbFunctions.getNumEquipasPorConcelhoInfo(torneio.torneioId, escalaoId);
 
         util.sort(equipasPorConcelho);
 
@@ -228,15 +253,6 @@ exports.getNumEquipasPorConcelho = async (req, res, next) => {
             }
 
             response.numEquipas = equipasPorConcelho;
-            response.numEquipasPorEscalao = [];
-
-            numEquipasPorEscalao.forEach(el => {
-                response.numEquipasPorEscalao.push({
-                    designacao: el.escalao.designacao,
-                    sexo: el.escalao.sexo,
-                    numEquipas: el.dataValues.numEquipas
-                });
-            });
             
             let total = 0;
             equipasPorConcelho.forEach(equipa => total += equipa.numEquipas);

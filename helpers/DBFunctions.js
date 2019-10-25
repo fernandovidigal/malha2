@@ -314,7 +314,11 @@ exports.getAllEquipasTodasLocalidades = (torneioId, localidadeId) => {
         where: {
             torneioId: torneioId,
             localidadeId: localidadeId
-        }
+        },
+        include: {
+            model: Escaloes
+        },
+        order: ['escalaoId']
     });
 }
 
@@ -556,7 +560,7 @@ exports.getAllEscaloesComEquipas = () => {
     });
 }
 
-exports.getNumEquipasPorCadaEscalaoListagens = (torneioId) => {
+exports.getNumEquipasPorCadaEscalaoListagens = (torneioId, localidadeId) => {
     return Equipas.findAll({
         attributes: ['equipas.escalaoId', [sequelize.fn('count', sequelize.col('equipas.equipaId')), 'numEquipas']],
         include: [
@@ -566,6 +570,7 @@ exports.getNumEquipasPorCadaEscalaoListagens = (torneioId) => {
         ],
         where: {
             torneioId: torneioId,
+            localidadeId: localidadeId
         },
         group: ['equipas.escalaoId']
       });

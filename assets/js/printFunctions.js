@@ -166,6 +166,88 @@ function makeFooter(dd, text = null) {
   };
 }
 
+function makeListaEquipaPorConcelho(dd, data){
+  const content = {
+    table: {
+      widths: ["auto", "auto", "*", "auto", 'auto'],
+        headerRows: 2,
+        body: [
+          [
+            {
+              text: "Lista de Equipas por Localidade",
+              alignment: "center",
+              colSpan: 5,
+              bold: true,
+              fontSize: 14,
+              margin: [0,0,0,5]
+            },
+            {},{},{},{}
+          ],
+          [
+            { text: "Equipa", margin: [5, 5], bold: true, fontSize: 10 },
+            { text: "Elementos", margin: [10, 5], bold: true, fontSize: 10, colSpan: 2},
+            {},
+            { text: "Escalão", margin: [10, 5], bold: true, fontSize: 10 },
+            { text: "CC/Data Nasc.", margin: [10, 5], bold: true, fontSize: 10 }
+          ]
+        ]
+    },
+    margin: [0, 0, 0, 30],
+    layout: {
+      hLineWidth: function(i, node) {
+        if (i === 0 || i === 1) {
+          return 0;
+        } else if (i === 2) {
+          return 1.5;
+        } else {
+          return 0.5;
+        }
+      },
+      vLineWidth: function(i, node) {
+        return 0;
+      },
+      hLineColor: function(i, node) {
+        if(i < 3) {
+          return "black";
+        } else {
+          return "gray";
+        }
+      }
+    }
+  }
+
+  data.listaEquipas.forEach(equipa => {
+    const row = [
+      {
+        text: equipa.equipaId,
+        alignment: 'center',
+        margin: [0, 5]
+      },
+      {
+        text: equipa.primeiroElemento,
+        margin: [10, 5]
+      },
+      {
+        text: equipa.segundoElemento,
+        margin: [0, 5]
+      },
+      {
+        text: equipa.escalao.designacao,
+        margin: [10, 5]
+      },
+      {
+        text: ' ',
+        margin: [10, 5]
+      }
+    ];
+    content.table.body.push(row);
+  });
+
+  dd.content.push(content);
+
+  makeNumEquipasPorEscalao(dd, data.numEquipasPorEscalao);
+}
+
 function makeNumEquipaPorConcelho_old(dd, numEquipas, numEquipasPorEscalao, total) {
   const content = {
     table: {
@@ -297,14 +379,12 @@ function makeNumEquipaPorConcelho(dd, data) {
   content.table.body.push(totalRow);
 
   dd.content.push(content);
-
-  makeNumEquipasPorEscalao(dd, data.numEquipasPorEscalao);
 }
 
 function makeNumEquipasPorEscalao(dd, numEquipasPorEscalao){
   if(numEquipasPorEscalao.length > 0){
-    const escalaoMasculino = numEquipasPorEscalao.filter(el => el.sexo == 1);
-    const escalaoFeminino = numEquipasPorEscalao.filter(el => el.sexo == 0);
+    const escalaoMasculino = numEquipasPorEscalao.filter(el => el.escalao.sexo == 1);
+    const escalaoFeminino = numEquipasPorEscalao.filter(el => el.escalao.sexo == 0);
     const content = {
       table: {
         widths: ["*", "auto"],
@@ -317,6 +397,7 @@ function makeNumEquipasPorEscalao(dd, numEquipasPorEscalao){
                 colSpan: 2,
                 bold: true,
                 fontSize: 14,
+                margin: [0,0,0,5]
               },
               {}
             ]
@@ -362,13 +443,14 @@ function makeNumEquipasPorEscalao(dd, numEquipasPorEscalao){
       content.table.body.push([{
         text: 'Masculinos',
         colSpan: 2,
+        fontSize: 12,
         bold: true
       }, {}]);
 
       escalaoMasculino.forEach(escalao => {
         const row = [
           {
-            text: escalao.designacao,
+            text: escalao.escalao.designacao,
             margin: [20, 5]
           },
           {
@@ -386,13 +468,14 @@ function makeNumEquipasPorEscalao(dd, numEquipasPorEscalao){
       content.table.body.push([{
         text: 'Femininos',
         colSpan: 2,
+        fontSize: 12,
         bold: true,
         margin: [0, 20, 0, 0]
       }, {}]);
       escalaoFeminino.forEach(escalao => {
         const row = [
           {
-            text: escalao.designacao,
+            text: escalao.escalao.designacao,
             margin: [20, 5]
           },
           {
@@ -1087,7 +1170,7 @@ function makeFichasJogoFasesSeguintes(dd, data, equipas, fase) {
   });
 }
 
-function makeContentResultados(dd, data, fase, index, numCampos) {
+function makeContentResultados(dd, data, fase, numCampos) {
   // na primeira fase é 3 porque são duas equipas apuradas que ocupam a linha 2 e 3
   // nas fases seguintes é 2 porque só é apurada uma equipa na linha 2
   let k = 0;
@@ -1200,25 +1283,6 @@ function makeContentResultados(dd, data, fase, index, numCampos) {
     ];
     _table.table.body.push(classificacaoRow);
   });
-
-  if(index == (numCampos-1)){
-    _table.table.body.push([{
-        stack: [
-            {text: 'Critérios de classificação:', bold: true, fontSize: 8},
-            {
-                ol: [
-                    'Número de Pontos',
-                    'Número de jogos ganhos',
-                    'Confronto entre equipas empatadas'
-                ],
-                fontSize: 8
-            }
-        ],
-        colSpan: 7,
-        margin: [0,20,0,0],
-        border: [false, false, false, false]
-    }]);
-  }
 
   dd.content.push(_table);
 }
@@ -1441,7 +1505,7 @@ function makeFolhaParciais(dd, fase, data, equipas, parciais) {
     _table.table.dontBreakRows = true;
   }
 
-  data.listaJogos.forEach((jogo, index) => {
+  data.listaJogos.forEach((jogo) => {
     const equipa1 = equipas.find(equipa => equipa.equipaId == jogo.equipa1Id);
     const equipa2 = equipas.find(equipa => equipa.equipaId == jogo.equipa2Id);
     const equipa1parcial = parciais.find(

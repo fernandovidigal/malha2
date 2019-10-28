@@ -22,9 +22,9 @@
         <div class="tabbedMenu__wrapper">
             <ul class="tabbedMenu">
                 <% if(escaloesMasculinos.length > 0){ %>
-                    <li class="tabbedMenu__item tabbedMenu__item-selected">Masculinos</li>
+                    <li class="tabbedMenu__item<%= (selectedTab == 1) ? ' tabbedMenu__item-selected' : '' %>">Masculinos</li>
                     <% if(escaloesFemininos.length > 0){ %>
-                        <li class="tabbedMenu__item">Femininos</li>
+                        <li class="tabbedMenu__item<%= (selectedTab == 2) ? ' tabbedMenu__item-selected' : '' %>">Femininos</li>
                     <% } %>
                 <% } else { %>
                     <% if(escaloesFemininos.length > 0){ %>
@@ -35,14 +35,14 @@
         </div>
 
         <div class="tabbedContent__wrapper">
-            <div id="masculinos" class="tabbedContainer tabbedContainer-open">
+            <div id="masculinos" class="tabbedContainer<%= (selectedTab == 1) ? ' tabbedContainer-open' : '' %>">
                 <div class="competicaoEscalao_wrapper">
                     <% escaloesMasculinos.forEach(function(escalao){ %>
                         <%- include('includes/escalao.ejs', {escalao: escalao}) %>
                     <% }); %>
                 </div>
             </div>
-            <div id="femininos" class="tabbedContainer">
+            <div id="femininos" class="tabbedContainer<%= (selectedTab == 2) ? ' tabbedContainer-open' : '' %>">
                 <div class="competicaoEscalao_wrapper">
                     <% escaloesFemininos.forEach(function(escalao){ %>
                         <%- include('includes/escalao.ejs', {escalao: escalao}) %>
@@ -250,9 +250,9 @@ function closeAllTabs(tabItems, tabContainers){
         tabContainers[index].classList.remove('tabbedContainer-open');
     });
 }
+
 const tabItems = document.querySelectorAll('.tabbedMenu__item');
 const tabContainers = document.querySelectorAll('.tabbedContainer');
-
 tabItems.forEach((item, index) => {
     item.addEventListener('click', function(){
         closeAllTabs(tabItems, tabContainers);

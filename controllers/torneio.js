@@ -98,11 +98,31 @@ exports.getStarting = async (req, res, next) => {
         const escaloesMasculinos = [];
         const escaloesFemininos = [];
         let numTotalJogos = 0;
-        const torneio = res.locals.torneio;
-        const listaEscaloes = res.locals.listaEscaloes;
+        let torneio;
+        let listaEscaloes;
+        let tab = 1;
+
+        if(res.locals.torneio) {
+            torneio = res.locals.torneio;
+        } else {
+            torneio = await dbFunctions.getTorneioInfo();
+        }
+
+        if(res.locals.listaEscaloes) {
+            listaEscaloes = res.locals.listaEscaloes;
+        } else {
+            listaEscaloes = await dbFunctions.getEscaloesComEquipas(torneio.torneioId);
+        }
+
+        const listaCamposPorEscalao = await dbFunctions.getNumCamposEscaloes(torneio.torneioId);
 
         // Percorre todos os escalões
         for(const escalao of listaEscaloes){
+            if(!escalao.campos){
+                const checkedCampos = listaCamposPorEscalao.find(element => element.escalaoId == escalao.escalaoId);
+                escalao.campos = checkedCampos.numCampos;
+            }
+            
             // Informações sobre o escalão
             const _escalao = {
                 escalaoId: escalao.escalaoId,
@@ -112,6 +132,10 @@ exports.getStarting = async (req, res, next) => {
                 existeVencedor: false
             }
 
+            // Verifica qual a tab selecionada
+            if(res.locals.selectedTab && res.locals.selectedTab == escalao.escalaoId){
+                tab = (escalao.sexo == 1) ? 1 : 2;
+            }
             // Verificar se o escalão tem mais de 2 equipas
             // Se não tiver, mostrar alerta
             const _numEquipas = dbFunctions.getNumEquipasPorEscalao(torneio.torneioId, escalao.escalaoId);
@@ -199,7 +223,13 @@ exports.getStarting = async (req, res, next) => {
             }
         }
 
-        res.render('torneio/selecionaEscalao', {torneio: torneio, numTotalJogos: numTotalJogos, escaloesMasculinos: escaloesMasculinos, escaloesFemininos: escaloesFemininos, breadcrumbs: req.breadcrumbs()});
+        res.render('torneio/selecionaEscalao', {
+            torneio: torneio,
+            numTotalJogos: numTotalJogos,
+            escaloesMasculinos: escaloesMasculinos,
+            escaloesFemininos: escaloesFemininos,
+            selectedTab: tab,
+            breadcrumbs: req.breadcrumbs()});
     } catch(err) {
         console.log(err);
         req.flash('error', 'Ocorreu um erro! Não foi possível aceder à página do torneio.');
@@ -334,15 +364,20 @@ exports.distribuirEquipasPorEscalao = async (req, res, next) => {
         const torneio = await dbFunctions.getTorneioInfo();
         const escalaoId = parseInt(req.params.escalao);
 
-        const escaloesDistribuidos = await torneioHelpers.distribuiEquipasPorCampos(torneio.torneioId, escalaoId);
+        await torneioHelpers.distribuiEquipasPorCampos(torneio.torneioId, escalaoId);
 
-        if(escaloesDistribuidos[0].sucesso == false){
+        /*if(escaloesDistribuidos[0].sucesso == false){
             req.flash('error', 'Não foi possível distribuir as equipas do escalão.');
         } else {
             req.flash('success', 'Equipas distribuídas com sucesso.');
         }
 
-        res.redirect('/torneio');
+        res.redirect('/torneio');*/
+
+        // Passa-se o escalaoId como selected Tab porque no middleware seguinte vai-se percorrer
+        // todos os escalões e depois verifica-se consoante o escalaoId a que tab pertence
+        res.locals.selectedTab = escalaoId;
+        next();
     } catch(err) {
         console.log(err);
         req.flash('error', 'Ocorreu um erro na distribuíção das equipas pelos campos.');

@@ -17,7 +17,7 @@ router.post('/definirNumeroCampos', TorneiosController.setNumeroCampos);
 // Distribuição de todas as equipas de todos os escalões
 router.get('/distribuirTodasEquipas', TorneiosController.distribuirTodasEquipas);
 
-router.get('/distribuirEquipasPorEscalao/escalao/:escalao', TorneiosController.distribuirEquipasPorEscalao);
+router.get('/distribuirEquipasPorEscalao/escalao/:escalao', TorneiosController.distribuirEquipasPorEscalao, TorneiosController.getStarting);
 
 // Resultados
 router.get('/resultados/escalao/:escalao/fase/:fase/campo/:campo', TorneiosController.mostraResultados);

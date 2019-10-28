@@ -37,7 +37,7 @@ router.get('/eliminarEquipa/:equipaId/:escalaoId', EquipasController.getEquipaTo
 router.delete('/eliminarEquipa', EquipasController.deleteEquipa);
 
 // Pesquisa de equipas
-router.post('/pesquisa/:escalao', [
+router.post('/pesquisa/:escalao/:localidadeId?', [
     check('pesquisaEquipaId').trim().escape().not().isEmpty().withMessage('Deve indicar o Nº da Equipa a pesquisar.'),
     check('pesquisaEquipaId').trim().escape().matches(/^[0-9]+$/).withMessage('Nº da Equipa inválido.')
 ], EquipasController.searchEquipa);

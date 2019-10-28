@@ -316,6 +316,7 @@ exports.getEquipasAgrupadasPorCampos = async (req, res, next) => {
                 response.torneio = {
                     designacao: torneio.designacao,
                     localidade: torneio.localidade,
+                    ano: torneio.ano,
                     escalao: escalao.designacao,
                     sexo: (escalao.sexo == 1) ? 'Masculino' : 'Feminino'
                 }
@@ -384,6 +385,7 @@ exports.getFichasJogo = async (req, res, next) => {
             response.torneio = {
                 designacao: torneio.designacao,
                 localidade: torneio.localidade,
+                ano: torneio.ano,
                 escalao: escalao.designacao,
                 sexo: (escalao.sexo == 1) ? 'Masculino' : 'Feminino'
             };
@@ -435,6 +437,7 @@ exports.getClassificacao = async (req, res, next) => {
             response.torneio = {
                 designacao: torneio.designacao,
                 localidade: torneio.localidade,
+                ano: torneio.ano,
                 escalao: escalao.designacao,
                 sexo: (escalao.sexo == 1) ? 'Masculino' : 'Feminino'
             };

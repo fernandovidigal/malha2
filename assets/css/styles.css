@@ -1165,6 +1165,11 @@ input::placeholder {
 .searchedEquipaId__wrapper {
     width: auto;
     padding: 6px 20px 6px 10px;
+    border: solid 1px #919498;
+}
+
+.searchedEquipaId__selected {
+    border: solid 1px #919498 !important;
 }
 
 .searchedEquipaId-dismiss {

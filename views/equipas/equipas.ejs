@@ -114,12 +114,12 @@
                 </div>
                 <% if(typeof filtro != 'undefined' && typeof filtro.escalaoId != 'undefined'){ %>
                     <% if(typeof equipaId != 'undefined'){ %>
-                        <div class="searchedEquipaId__wrapper">
-                            <a class="searchedEquipaId-dismiss" href="/equipas/filtro/escalao/<%= filtro.escalaoId %>"><i class="fas fa-times-circle"></i></a>
+                        <div class="searchedEquipaId__wrapper searchedEquipaId__selected">
+                            <a class="searchedEquipaId-dismiss" href="/equipas/filtro/<%= (locals.filtro.localidadeId) ? 'localidade/' + locals.filtro.localidadeId + '/' : '' %>escalao/<%= filtro.escalaoId %>"><i class="fas fa-times-circle"></i></a>
                             <%= equipaId %>
                         </div>
                     <% } else { %>
-                        <form action="/equipas/pesquisa/<%= filtro.escalaoId %>" method="post" class="searchBox">
+                        <form action="/equipas/pesquisa/<%= filtro.escalaoId %><%= (locals.filtro.localidadeId) ? '/' + locals.filtro.localidadeId : '' %>" method="post" class="searchBox">
                             <input type="text" name="pesquisaEquipaId" class="searchBox__input" pattern="^[0-9]+$" placeholder="Equipa" required/>
                             <button class="searchBox__btn"><i class="fa fa-search no-margin"></i></button>
                         </form>
@@ -161,7 +161,7 @@
                         <% }); %>
                     <% } else { %>
                         <tr>
-                            <td colspan="7">Não foram encontradas equipas registadas.</td>
+                            <td colspan="7">Não foram encontradas equipas.</td>
                         </tr>
                     <% } %>
                 </tbody>

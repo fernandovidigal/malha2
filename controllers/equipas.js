@@ -590,6 +590,7 @@ exports.deleteEquipa = async (req, res, next) => {
 exports.searchEquipa = async (req, res, next) => {
     const equipaId = parseInt(req.body.pesquisaEquipaId);
     const escalaoId = parseInt(req.params.escalao);
+    const localidadeId = parseInt(req.params.localidadeId) || 0;
     const errors = validationResult(req);
 
     if(!errors.isEmpty()){
@@ -597,19 +598,23 @@ exports.searchEquipa = async (req, res, next) => {
         req.flash("error", error);
         res.redirect('/equipas');
     } else {
-
         try {
+            if(!escalaoId) throw new Error();
+
             const torneio = await dbFunctions.getTorneioInfo();
             const equipa = await dbFunctions.getEquipaFullDetails(torneio.torneioId, equipaId, escalaoId);
 
-            if(equipa){
-                const localidadesInfo = dbFunctions.getLocalidadesInfo();
-                const escaloesInfo = dbFunctions.getEscaloesInfo();
-                // Verifica se a equipa já está associada a jogos
-                const _numJogos = dbFunctions.getNumJogosEquipa(torneio.torneioId, escalaoId, equipaId);
+            const localidadesInfo = dbFunctions.getLocalidadesInfo();
+            const escaloesInfo = dbFunctions.getEscaloesInfo();
+            // Verifica se a equipa já está associada a jogos
+            const _numJogos = dbFunctions.getNumJogosEquipa(torneio.torneioId, escalaoId, equipaId);
 
-                const [localidades, escaloes, numJogos] = await Promise.all([localidadesInfo, escaloesInfo, _numJogos]);
-                const _equipa = [{
+            const [localidades, escaloes, numJogos] = await Promise.all([localidadesInfo, escaloesInfo, _numJogos]);
+
+            let searchedEquipa = [];
+
+            if(equipa){
+                searchedEquipa.push({
                     equipaId: equipa.equipaId,
                     primeiroElemento: equipa.primeiroElemento,
                     segundoElemento: equipa.segundoElemento,
@@ -617,31 +622,34 @@ exports.searchEquipa = async (req, res, next) => {
                     escalao: equipa.escalao.designacao,
                     sexo: equipa.escalao.sexo,
                     eliminavel: (numJogos == 0) ? true : false,
-                }];
-
-                util.sort(localidades);
-
-                let i = escaloes.map(escalao => escalao.escalaoId).indexOf(parseInt(escalaoId));
-                const filtro = {
-                    escalaoId: escalaoId,
-                    escalao: (i != -1) ? escaloes[i].designacao : '',
-                    sexo: (i != -1) ? (escaloes[i].sexo == 1) ? 'Masculino' : 'Feminino' : ''
-                }
-                
-
-                res.render("equipas/equipas", {
-                    equipaId: equipaId,
-                    equipas: _equipa,
-                    torneio: torneio,
-                    filtro: filtro,
-                    localidades: localidades,
-                    escaloes: escaloes,
-                    breadcrumbs: req.breadcrumbs()
                 });
-            } else {
-                req.flash("error", "Não exite equipa com o número indicado.");
-                res.redirect('/equipas');
             }
+
+            util.sort(localidades);
+
+            let i = escaloes.map(escalao => escalao.escalaoId).indexOf(parseInt(escalaoId));
+            const filtro = {
+                escalaoId: escalaoId,
+                escalao: (i != -1) ? escaloes[i].designacao : '',
+                sexo: (i != -1) ? (escaloes[i].sexo == 1) ? 'Masculino' : 'Feminino' : ''
+            }
+
+            if(localidadeId != 0){ 
+                filtro.localidadeId = localidadeId;
+                let i = localidades.map(localidade => localidade.localidadeId).indexOf(parseInt(localidadeId));
+                filtro.localidade = (i != -1) ? localidades[i].nome : '';
+            }
+
+            res.render("equipas/equipas", {
+                equipaId: equipaId,
+                equipas: searchedEquipa,
+                torneio: torneio,
+                filtro: filtro,
+                localidades: localidades,
+                escaloes: escaloes,
+                numEquipas: searchedEquipa.length,
+                breadcrumbs: req.breadcrumbs()
+            });
         } catch(err) {
             console.log(err);
             req.flash('error', 'Não foi possível pesquisar a equipa.');

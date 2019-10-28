@@ -220,23 +220,28 @@ function makeListaEquipaPorConcelho(dd, data){
     const row = [
       {
         text: equipa.equipaId,
+        fontSize: 10,
         alignment: 'center',
         margin: [0, 5]
       },
       {
         text: equipa.primeiroElemento,
+        fontSize: 10,
         margin: [10, 5]
       },
       {
         text: equipa.segundoElemento,
+        fontSize: 10,
         margin: [0, 5]
       },
       {
         text: equipa.escalao.designacao,
+        fontSize: 10,
         margin: [10, 5]
       },
       {
         text: ' ',
+        fontSize: 10,
         margin: [10, 5]
       }
     ];
@@ -246,55 +251,6 @@ function makeListaEquipaPorConcelho(dd, data){
   dd.content.push(content);
 
   makeNumEquipasPorEscalao(dd, data.numEquipasPorEscalao);
-}
-
-function makeNumEquipaPorConcelho_old(dd, numEquipas, numEquipasPorEscalao, total) {
-  const content = {
-    table: {
-      headerRows: 1,
-      widths: ["*", "*"],
-      body: [
-        [
-          { text: "Localidade", margin: [10, 5], bold: true },
-          { text: "Nº Equipas", margin: [10, 5], bold: true }
-        ]
-      ]
-    },
-    layout: "lightHorizontalLines"
-  };
-
-  numEquipas.forEach(equipa => {
-    const row = [
-      {
-        text: equipa.nome,
-        margin: [20, 5]
-      },
-      {
-        text: equipa.numEquipas,
-        margin: [20, 5]
-      }
-    ];
-    content.table.body.push(row);
-  });
-
-  const totalRow = [
-    {
-      margin: [10, 5],
-      text: "Total",
-      fillColor: "#eeeeee",
-      bold: true
-    },
-    {
-      margin: [20, 5],
-      text: `${total}`,
-      fillColor: "#eeeeee",
-      bold: true
-    }
-  ];
-
-  content.table.body.push(totalRow);
-
-  dd.content.push(content);
 }
 
 function makeNumEquipaPorConcelho(dd, data) {
@@ -443,7 +399,7 @@ function makeNumEquipasPorEscalao(dd, numEquipasPorEscalao){
       content.table.body.push([{
         text: 'Masculinos',
         colSpan: 2,
-        fontSize: 12,
+        fontSize: 10,
         bold: true
       }, {}]);
 
@@ -451,10 +407,12 @@ function makeNumEquipasPorEscalao(dd, numEquipasPorEscalao){
         const row = [
           {
             text: escalao.escalao.designacao,
+            fontSize: 10,
             margin: [20, 5]
           },
           {
             text: escalao.numEquipas,
+            fontSize: 10,
             alignment: "center",
             margin: [20, 5]
           }
@@ -468,7 +426,7 @@ function makeNumEquipasPorEscalao(dd, numEquipasPorEscalao){
       content.table.body.push([{
         text: 'Femininos',
         colSpan: 2,
-        fontSize: 12,
+        fontSize: 10,
         bold: true,
         margin: [0, 20, 0, 0]
       }, {}]);
@@ -476,10 +434,12 @@ function makeNumEquipasPorEscalao(dd, numEquipasPorEscalao){
         const row = [
           {
             text: escalao.escalao.designacao,
+            fontSize: 10,
             margin: [20, 5]
           },
           {
             text: escalao.numEquipas,
+            fontSize: 10,
             alignment: "center",
             margin: [20, 5]
           }
@@ -536,8 +496,7 @@ function makeEquipasAgrupadasPorCampos(ddContent, listaCampos, fase) {
             {
               text: "Localidade",
               bold: true,
-              fontSize: 10,
-              alignment: "center"
+              fontSize: 10
             }
           ]
         ]
@@ -571,20 +530,19 @@ function makeEquipasAgrupadasPorCampos(ddContent, listaCampos, fase) {
       const row = [
         {
           text: `${equipa.equipaId}`,
-          fontSize: 11,
+          fontSize: 10,
           alignment: "center",
           margin: [0, 5, 10, 0]
         },
         {
           text: `${equipa.primeiroElemento}`,
-          fontSize: 11,
+          fontSize: 10,
           margin: [0, 5, 20, 5]
         },
         { text: `${equipa.segundoElemento}`, fontSize: 11, margin: [0, 5] },
         {
           text: `${equipa.localidade}`,
-          fontSize: 11,
-          alignment: "center",
+          fontSize: 10,
           margin: [0, 5, 10, 5]
         }
       ];
@@ -754,7 +712,7 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase) {
   });
 
   dd.content.push({
-    text: `Campo Nº ${data.campo}`,
+    text: `Campo ${data.campo}`,
     alignment: "center",
     bold: true,
     fontSize: 12,
@@ -768,7 +726,7 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase) {
       table: {
         headerRows: 1,
         dontBreakRows: true,
-        widths: ["auto", "*", "*", "auto", 40, 40, 40, 40],
+        widths: ["auto", "auto", "*", "auto", 40, 40, 40, 40],
         body: [
           [
             { text: "Equipa", fontSize: 10, bold: true },
@@ -837,7 +795,8 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase) {
           stack: [
             { text: `${equipa1.segundoElemento}`, fontSize: 10, margin: [0, 7] },
             { text: `${equipa2.segundoElemento}`, fontSize: 10, margin: [0, 7] }
-          ]
+          ],
+          margin: [10, 0, 0, 0]
         },
         {
           stack: [
@@ -1194,7 +1153,7 @@ function makeContentResultados(dd, data, fase, numCampos) {
   const _table = {
     table: {
       headerRows: 2,
-      widths: ["auto", "auto", "*", "*", "auto", "auto", "auto"],
+      widths: ["auto", "auto", "auto", "*", "auto", "auto", "auto"],
       body: [
         [
           {
@@ -1217,7 +1176,7 @@ function makeContentResultados(dd, data, fase, numCampos) {
           { text: "Equipa", bold: true, fontSize: 10 },
           { text: "Jogadores", colSpan: 2, bold: true, fontSize: 10 },
           { text: "" },
-          { text: "Localidade", alignment: "center", bold: true, fontSize: 10 },
+          { text: "Localidade", bold: true, fontSize: 10 },
           { text: "Jogos Ganhos", bold: true, fontSize: 10 },
           { text: "Pontos", bold: true, fontSize: 10 }
         ]
@@ -1271,10 +1230,9 @@ function makeContentResultados(dd, data, fase, numCampos) {
         margin: [0, 6]
       },
       { text: `${equipa.primeiroElemento}`, fontSize: 10, margin: [0, 6] },
-      { text: `${equipa.segundoElemento}`, fontSize: 10, margin: [0, 6] },
+      { text: `${equipa.segundoElemento}`, fontSize: 10, margin: [10, 6, 0, 6] },
       {
         text: `${equipa.localidade}`,
-        alignment: "center",
         fontSize: 10,
         margin: [0, 6]
       },
@@ -1290,8 +1248,8 @@ function makeContentResultados(dd, data, fase, numCampos) {
 function makeEquipasContent(dd, data) {
   const widths = ["auto", "auto", "*"];
   const tableHeader = [
-    { text: "Equipa", bold: true },
-    { text: "Jogadores", bold: true, colSpan: 2 },
+    { text: "Equipa", bold: true, fontSize: 10  },
+    { text: "Jogadores", bold: true, colSpan: 2, fontSize: 10 },
     {}
   ];
 
@@ -1304,8 +1262,8 @@ function makeEquipasContent(dd, data) {
   });
 
   if (!data.hasOwnProperty("localidade")) {
-    widths.push("*");
-    tableHeader.push({ text: "Localidade", bold: true });
+    widths.push("auto");
+    tableHeader.push({ text: "Localidade", bold: true, fontSize: 10 });
   } else {
     dd.content.push({
       text: `${data.localidade.nome}`,
@@ -1316,17 +1274,13 @@ function makeEquipasContent(dd, data) {
   }
 
   if (!data.hasOwnProperty("escalao")) {
-    if (!data.hasOwnProperty("localidade")) {
-      widths.push("*");
-    } else {
-      widths.push("auto");
-    }
-    tableHeader.push({ text: "Escalão", bold: true, alignment: "center" });
+    widths.push("auto");
+    tableHeader.push({ text: "Escalão", bold: true, fontSize: 10 });
   } else {
     dd.content.push({
       text: `${data.escalao.designacao}`,
       alignment: "center",
-      fontSize: 14
+      fontSize: 12
     });
   }
 
@@ -1364,21 +1318,22 @@ function makeEquipasContent(dd, data) {
 
   data.listaEquipas.forEach(equipa => {
     const row = [
-      { text: `${equipa.equipaId}`, alignment: "center", margin: [0, 5] },
-      { text: `${equipa.primeiroElemento}`, margin: [0, 5, 7, 5] },
-      { text: `${equipa.segundoElemento}`, margin: [0, 5] }
+      { text: `${equipa.equipaId}`, alignment: "center", fontSize: 10, margin: [0, 5] },
+      { text: `${equipa.primeiroElemento}`, fontSize: 10, margin: [0, 5, 10, 5] },
+      { text: `${equipa.segundoElemento}`, fontSize: 10, margin: [0, 5] }
     ];
     if (!data.hasOwnProperty("localidade")) {
       row.push({
         text: `${equipa.localidade}`,
-        margin: [0, 5]
+        fontSize: 10,
+        margin: [0, 5, 10, 5]
       });
     }
 
     if (!data.hasOwnProperty("escalao")) {
       row.push({
         text: `${equipa.escalao}`,
-        alignment: "center",
+        fontSize: 10,
         margin: [0, 5]
       });
     }

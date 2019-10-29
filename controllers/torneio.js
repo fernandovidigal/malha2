@@ -334,7 +334,8 @@ exports.distribuirTodasEquipas = async (req, res, next) => {
     try{
         const torneio = await dbFunctions.getTorneioInfo();
 
-        const escaloesDistribuidos = await torneioHelpers.distribuiEquipasPorCampos(torneio.torneioId);
+        await torneioHelpers.distribuiEquipasPorCampos(torneio.torneioId);
+        /*const escaloesDistribuidos = await torneioHelpers.distribuiEquipasPorCampos(torneio.torneioId);
         
         let distribuidos = 0;
         let naoDistribuidos = 0;
@@ -348,12 +349,12 @@ exports.distribuirTodasEquipas = async (req, res, next) => {
             req.flash('warning', 'Existem escalões da qual não foi possível distribuir equipas.');
         } else {
             req.flash('success', 'Todos as equipas foram distribuídas, no respectivo escalão, com sucesso.');
-        }
+        }*/
         
         res.redirect('/torneio');
     } catch(err) {
         console.log(err);
-        req.flash('error', 'Ocorreu um erro na distribuíção das equipas pelos campos.');
+        req.flash('error', 'Não foi possível efectar a distribuição das equipas pelos campos');
         res.redirect('/torneio');
     }
     
@@ -366,21 +367,11 @@ exports.distribuirEquipasPorEscalao = async (req, res, next) => {
 
         await torneioHelpers.distribuiEquipasPorCampos(torneio.torneioId, escalaoId);
 
-        /*if(escaloesDistribuidos[0].sucesso == false){
-            req.flash('error', 'Não foi possível distribuir as equipas do escalão.');
-        } else {
-            req.flash('success', 'Equipas distribuídas com sucesso.');
-        }
-
-        res.redirect('/torneio');*/
-
-        // Passa-se o escalaoId como selected Tab porque no middleware seguinte vai-se percorrer
-        // todos os escalões e depois verifica-se consoante o escalaoId a que tab pertence
         res.locals.selectedTab = escalaoId;
         next();
     } catch(err) {
         console.log(err);
-        req.flash('error', 'Ocorreu um erro na distribuíção das equipas pelos campos.');
+        req.flash('error', 'Não foi possível efectar a distribuição das equipas pelos campos');
         res.redirect('/torneio');
     }
 }

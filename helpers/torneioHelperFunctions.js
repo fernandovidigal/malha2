@@ -129,6 +129,88 @@ function procuraEquipaIndex(listaEquipas, equipaId){
 }
 
 exports.distribuiEquipasPorCampos = async function(torneioId, escalao = 0){
+    try {
+        // Inicializa a lista de escalões
+        // Se o escalão estiver definido apenas esse escalão fica no array
+        let escaloes = [];
+        if(escalao == 0){
+            // Todos os escalões que têm equipas
+            const listaEscaloes = await dbFunctions.getEscaloesComEquipas(torneioId);
+            escaloes = listaEscaloes.map(escalao => escalao.escalaoId);
+        } else {
+            escaloes.push(parseInt(escalao));
+        }
+
+        const escaloesDistribuidos = [];
+        //for await (const escalaoId of escaloes){
+        for(const escalaoId of escaloes){
+
+            // 1. Obter a lista de equipas e respectivo número de equipas que corresponde ao tamanho do array da lista de equipas
+            const _equipas = await dbFunctions.getEquipasPorEscalao(torneioId, escalaoId);
+            //const numEquipasPorEscalao = equipas.length;
+            // Obtem o número de campos, mínimo de equipas e máximo de equipas para cada escalão
+            const _camposInfo = dbFunctions.getNumeroCamposPorEscalao(torneioId, escalaoId);
+            // 4. Por cada localidade distribuir as respectivas equipas pelos campos
+            const _listaLocalidadesComNumEquipas = dbFunctions.getNumEquipasPorLocalidade(torneioId, escalaoId);
+
+            let [equipas, { numCampos }, listaLocalidadesComNumEquipas] = await Promise.all([_equipas, _camposInfo, _listaLocalidadesComNumEquipas]);
+
+            //Baralha as localidades para não haver sempre a mesma ordenação das equipas
+            listaLocalidadesComNumEquipas = shuffleLocalidades(listaLocalidadesComNumEquipas);
+
+            // Inicia a Array de campos
+            let listaCampos = [];
+            for(let i = 0; i < numCampos; i++){
+                listaCampos.push(new Array());
+            }
+
+            // Atribui as equipas aos campos
+            let k = 0;
+            for(const localidade of listaLocalidadesComNumEquipas){
+                const listaEquipasPorLocalidade = equipas.filter(el => el.localidadeId == localidade.localidadeId);
+                for(const equipa of listaEquipasPorLocalidade){
+                    if(k >= numCampos){
+                        k = 0;
+                    }
+
+                    listaCampos[k].push(equipa);
+                    k++;
+                }
+            }
+
+            // Faz o emparelhamento das equipas por cada campo
+            const listaJogos = [];
+            for(i = 0; i < listaCampos.length; i++){
+                let emparelhamento = processaEmparelhamento(listaCampos[i].length);
+                emparelhamento.forEach(par => {
+                    listaJogos.push({
+                        torneioId: torneioId,
+                        escalaoId: escalaoId,
+                        fase: 1,
+                        campo: i+1,
+                        equipa1Id: listaCampos[i][par[0]].equipaId,
+                        equipa2Id: listaCampos[i][par[1]].equipaId
+                    })
+                });
+            }
+
+            let transaction;
+            try {
+                transaction = await sequelize.transaction();
+                await dbFunctions.createJogosBulkTransaction(listaJogos, transaction);
+                await transaction.commit();
+            } catch(err){
+                if (transaction) await transaction.rollback();
+                throw err;
+            }         
+        }
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+}
+
+exports.distribuiEquipasPorCampos_old = async function(torneioId, escalao = 0){
     // Inicializa a lista de escalões
     // Se o escalão estiver definido apenas esse escalão fica no array
     let escaloes = [];
@@ -142,7 +224,8 @@ exports.distribuiEquipasPorCampos = async function(torneioId, escalao = 0){
 
     const escaloesDistribuidos = [];
 
-    for await (const escalaoId of escaloes){
+    //for await (const escalaoId of escaloes){
+    for(const escalaoId of escaloes){
 
         // 1. Obter a lista de equipas e respectivo número de equipas que corresponde ao tamanho do array da lista de equipas
         const equipas = await dbFunctions.getEquipasPorEscalao(torneioId, escalaoId);
@@ -429,7 +512,7 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
         const listaCampos = [];
         if(campo == 0){
             for(let i = 0; i < _listaCampos.length; i++){
-                listaCampos.push(JSON.parse(JSON.stringify(_listaCampos[i])));
+                listaCampos.push({campo: _listaCampos[i].campo });
                 if(fase == 100 && _listaCampos.length == 2){
                     listaCampos[i].designacao = (i == 0) ? 'Final' : '3º e 4º Lugar';
                     listaCampos[i].inicioClassificacao = (i == 0) ? 1 : 3;

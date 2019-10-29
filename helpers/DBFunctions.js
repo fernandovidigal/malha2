@@ -406,7 +406,8 @@ exports.getEquipasPorEscalao = (torneioId, escalaoId) => {
         where: {
             torneioId: torneioId,
             escalaoId: escalaoId
-        }
+        },
+        raw: true
     });
 }
 
@@ -576,6 +577,18 @@ exports.getNumEquipasPorCadaEscalaoListagens = (torneioId, localidadeId) => {
       });
 }
 
+exports.getNumEquipasPorLocalidade = (torneioId, escalaoId) => {
+    return Equipas.findAll({
+        attributes: ['localidadeId', [sequelize.fn('count', sequelize.col('equipaId')), 'numEquipas']],
+        where: {
+            torneioId: torneioId,
+            escalaoId: escalaoId
+        },
+        group: ['localidadeId'],
+        raw: true
+    });
+}
+
 ////////////////////////////////////////////////////////
 //                        JOGOS
 ////////////////////////////////////////////////////////
@@ -593,6 +606,10 @@ exports.createJogo = (torneioId, escalaoId, fase, campo, equipa1Id, equipa2Id) =
 
 exports.createJogosBulk = (listaJogos) => {
     return Jogos.bulkCreate(listaJogos);
+}
+
+exports.createJogosBulkTransaction = (listaJogos, transaction) => {
+    return Jogos.bulkCreate(listaJogos, {transaction});
 }
 
 exports.getJogoPorEquipasID = (torneioId, escalaoId, fase, campo, equipa1Id, equipa2Id) => {

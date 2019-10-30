@@ -9,24 +9,24 @@
 
     <div class="tabbedMenu__wrapper">
         <ul class="tabbedMenu">
-            <li class="tabbedMenu__item tabbedMenu__item-selected">Torneio</li>
-            <li class="tabbedMenu__item">Campos</li>
+            <li class="tabbedMenu__item<%= (locals.selectedTab && selectedTab == 1) ? ' tabbedMenu__item-selected' : '' %>">Torneio</li>
+            <li class="tabbedMenu__item<%= (locals.selectedTab && selectedTab == 2) ? ' tabbedMenu__item-selected' : '' %>">Campos</li>
             <% if(loggedUser.level === 10){ %>
-                <li class="tabbedMenu__item">Remover Fases</li>
+                <li class="tabbedMenu__item<%= (locals.selectedTab && selectedTab == 3) ? ' tabbedMenu__item-selected' : '' %>">Remover Fases</li>
             <% } %>
         </ul>
     </div>
 
     <div class="tabbedContent__wrapper">
         <form action="/admin/torneios/editarTorneio/<%= torneio.torneioId %>?_method=PUT" method="post">
-        <div id="torneio" class="tabbedContainer tabbedContainer-open">
+        <div id="torneio" class="tabbedContainer<%= (locals.selectedTab && selectedTab == 1) ? ' tabbedContainer-open' : '' %>">
             <%- include('includes/torneioInfo.ejs') %>
         </div>
-        <div id="campos" class="tabbedContainer">
+        <div id="campos" class="tabbedContainer<%= (locals.selectedTab && selectedTab == 2) ? ' tabbedContainer-open' : '' %>">
             <%- include('includes/torneioCampos.ejs') %>
         </div>
         <% if(loggedUser.level === 10){ %>
-            <div id="fases" class="tabbedContainer">
+            <div id="fases" class="tabbedContainer<%= (locals.selectedTab && selectedTab == 3) ? ' tabbedContainer-open' : '' %>">
                 <%- include('includes/torneioFases.ejs') %>
             </div>
         <% } %>

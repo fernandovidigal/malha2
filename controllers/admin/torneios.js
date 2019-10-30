@@ -21,6 +21,11 @@ exports.getAllTorneios = async (req, res, next) => {
 exports.getTorneio = async (req, res, next) => {
   try {
     const torneioId = parseInt(req.params.id);
+    let tab = req.params.tab || 1;
+
+    if(tab < 1 || tab > 3){
+      tab = 1;
+    }
 
     const _listaEscaloes = dbFunctions.getAllEscaloesComCampos(torneioId);
     const _listaNumJogos = dbFunctions.getNumJogosAllEscaloes(torneioId);
@@ -80,6 +85,7 @@ exports.getTorneio = async (req, res, next) => {
       torneio: torneio,
       escaloes: escaloes,
       resetFase: listaUltimaFasePorEscalao,
+      selectedTab: tab,
       breadcrumbs: req.breadcrumbs()
     });
   } catch (err) {

@@ -20,7 +20,7 @@
                         <tr>
                             <td><%= escalao.designacao %></td>
                             <td align="center"><%= escalao.fase != 100 ? escalao.fase : 'Final' %></td>
-                            <td class="deleteBtn__column"><a class="btn btn-secondary btn-faseReset" data-escalao="<%= escalao.escalaoId %>" data-fase="<%= escalao.fase %>" data-designacao="<%= escalao.designacao %> (<%= escalao.sexo == 1? 'Masculino': 'Feminino' %>)">Remover Fase</a></td>
+                            <td class="deleteBtn__column"><a class="btn btn-secondary btn-faseReset" data-torneio="<%= torneio.torneioId %>" data-escalao="<%= escalao.escalaoId %>" data-fase="<%= escalao.fase %>" data-designacao="<%= escalao.designacao %> (<%= escalao.sexo == 1? 'Masculino': 'Feminino' %>)">Remover Fase</a></td>
                         </tr>
                         <% } %>
                     <% }); %>
@@ -49,7 +49,7 @@
                         <tr>
                             <td><%= escalao.designacao %></td>
                             <td align="center"><%= escalao.fase != 100 ? escalao.fase : 'Final' %></td>
-                            <td class="deleteBtn__column"><a class="btn btn-secondary btn-faseReset" data-escalao="<%= escalao.escalaoId %>" data-fase="<%= escalao.fase %>" data-designacao="<%= escalao.designacao %> (<%= escalao.sexo == 1? 'Masculino': 'Feminino' %>)">Remover Fase</a></td>
+                            <td class="deleteBtn__column"><a class="btn btn-secondary btn-faseReset" data-torneio="<%= torneio.torneioId %>" data-escalao="<%= escalao.escalaoId %>" data-fase="<%= escalao.fase %>" data-designacao="<%= escalao.designacao %> (<%= escalao.sexo == 1? 'Masculino': 'Feminino' %>)">Remover Fase</a></td>
                         </tr>
                         <% } %>
                     <% }); %>

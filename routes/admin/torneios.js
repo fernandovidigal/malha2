@@ -24,7 +24,7 @@ router.post('/adicionarTorneio', [
 
 router.get('/activaTorneio/:id', TorneiosController.ActivaTorneio);
 
-router.get('/editarTorneio/:id', TorneiosController.getTorneio);
+router.get('/editarTorneio/:id/:tab?', TorneiosController.getTorneio);
 
 router.put('/editarTorneio/:id', [
     check('designacao').not().isEmpty().withMessage('Deve indicar a designação do torneio.'),

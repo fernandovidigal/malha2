@@ -10,7 +10,6 @@
                 <thead>
                     <tr>
                         <th class="mainTable-headerElement-left">Escalão</th>
-                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,7 +31,11 @@
                                     <% } %>
                                 </td>
                             <% } else { %>
-                                <td align="right"><%= escalao.campos %> Campos</td>
+                                <td align="right">
+                                    <% for(let i = 0; i < 8; i++){ %>
+                                        <p class="escalaoNumCampos__Info<%= (escalao.campos == Math.pow(2,i)) ? ' escalaoNumCampos__Info-selected' : '' %>"><%= (i != 0) ? Math.pow(2,i): 0 %></p>
+                                    <% } %>
+                                </td>
                             <% } %>
                         </tr>
                         <% } %>
@@ -74,7 +77,11 @@
                                     <% } %>
                                 </td>
                             <% } else { %>
-                                <td align="right"><%= escalao.campos %> Campos</td>
+                                <td align="right">
+                                    <% for(let i = 0; i < 8; i++){ %>
+                                        <p class="escalaoNumCampos__Info<%= (escalao.campos == Math.pow(2,i)) ? ' escalaoNumCampos__Info-selected' : '' %>"><%= (i != 0) ? Math.pow(2,i): 0 %></p>
+                                    <% } %>
+                                </td>
                             <% } %>
                         </tr>
                         <% } %>

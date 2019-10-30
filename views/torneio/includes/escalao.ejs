@@ -92,9 +92,9 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" width="4.129" height="16" viewBox="0 0 4.129 16"><path d="M26.065,12.935A2.065,2.065,0,1,1,24,15,2.063,2.063,0,0,1,26.065,12.935ZM24,9.065A2.065,2.065,0,1,0,26.065,7,2.063,2.063,0,0,0,24,9.065Zm0,11.871a2.065,2.065,0,1,0,2.065-2.065A2.063,2.063,0,0,0,24,20.935Z" transform="translate(-24 -7)" fill="#fff"/></svg>
                                 </div>
                                 <div class="competicaoOptions-menu">
-                                    <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>" class="competicaoOptions-menu-item editarParciais__btn">Editar Parciais</a>
+                                    <a href="/torneio/resultados/escalao/<%= escalao.escalaoId %>" class="competicaoOptions-menu-item editarParciais__btn"><i class="fas fa-edit"></i>Editar Parciais</a>
                                     <% if(escalao.fase > 1){ %>
-                                        <a href="/torneio/interditarCampos/escalao/<%= escalao.escalaoId %>" class="competicaoOptions-menu-item interditarCampos__btn">Interditar Campos</a>
+                                        <a href="/torneio/interditarCampos/escalao/<%= escalao.escalaoId %>" class="competicaoOptions-menu-item interditarCampos__btn"><i class="fas fa-ban"></i>Interditar Campos</a>
                                     <% } %>
                                 </div>
                             </div>

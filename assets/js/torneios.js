@@ -68,6 +68,7 @@ resetButtons.forEach(btn => {
         const escalaoId = parseInt(this.dataset.escalao);
         const fase = parseInt(this.dataset.fase);
         const designacao = this.dataset.designacao;
+        const torneioId = this.dataset.torneio;
 
         swal.fire({
             title: 'Tem a certeza?',
@@ -103,7 +104,8 @@ resetButtons.forEach(btn => {
                             type: 'success',
                             title: `Fase ${((data.fase != 100) ? data.fase : 'Final')} eliminada com sucesso!`,
                             onClose: () => {
-                                location.reload();
+                                const url = `${window.location.protocol}//${window.location.hostname}:${window.location.port}/admin/torneios/editarTorneio/${torneioId}/3`;
+                                window.location.assign(url);
                             }
                         });
                     } else {

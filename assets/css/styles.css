@@ -571,7 +571,6 @@ input::placeholder {
 
 .loginForm input[type=text]:focus,
 .loginForm input[type=password]:focus {
-    /*box-shadow: 0px 0px 0px 1px rgba(87,101,117,.7);*/
     border: solid 1px #919498;
 }
 
@@ -1483,7 +1482,7 @@ input::placeholder {
     margin-bottom: 60px;
 }
 
-.escalaoNumCampos + label{
+.escalaoNumCampos + label {
     display: inline-block;
     position: relative;
     margin-left: 10px;
@@ -2075,7 +2074,7 @@ input::placeholder {
     }
 }
 
-.interditarCampos__btn {
+/*.interditarCampos__btn {
     position: relative;
 }
 
@@ -2114,7 +2113,7 @@ input::placeholder {
 
 .interditarCampos__btn:hover .tooltip {
     visibility: visible;
-}
+}*/
 
 .interditarCampos__wrapper {
     margin: 40px;
@@ -2208,9 +2207,14 @@ input::placeholder {
     font-size: 14px;
     line-height: 2.5;
     text-decoration: none;
-    color: #400808;
+    /*color: #400808;*/
+    color: white;
     padding: 0 16px;
     width: 200px;
+}
+
+.competicaoOptions-menu-item i {
+    margin-right: 10px;
 }
 
 .competicaoOptions-menu-item:first-child {
@@ -2229,4 +2233,27 @@ input::placeholder {
     background-color: #CD5543;
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
+}
+
+.escalaoNumCampos__Info {
+    display: inline-block;
+    position: relative;
+    margin-left: 10px;
+    background-color: #f9f9f9;
+    color: #333f4d;
+    padding: 8px;
+    text-align: center;
+    min-width: 42px;
+    border-radius: 8px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    transition: all .2s;
+}
+
+.escalaoNumCampos__Info-selected {
+    color: white !important;
+    background-color: #D05744 !important;
+    border: none;
 }

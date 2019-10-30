@@ -109,15 +109,6 @@ function shuffleLocalidades(listaLocalidades) {
     return localidades;
 }
 
-function procuraEquipa(listaEquipas, equipaId){
-    for(let i = 0; i < listaEquipas.length; i++){
-        if(listaEquipas[i].equipaId == equipaId){
-            return listaEquipas[i];
-        }
-    }
-    return null;
-}
-
 function procuraEquipaIndex(listaEquipas, equipaId){
     let k = -1;
     for(let i = 0; i < listaEquipas.length; i++){
@@ -353,20 +344,20 @@ exports.processaEquipas = async function(torneioId, escalaoId, listaJogos){
             const equipa1Id = jogo.equipa1Id;
             const equipa2Id = jogo.equipa2Id;
 
-            const _equipa1Info = await dbFunctions.getEquipa(torneioId, escalaoId, equipa1Id);
-            const _equipa2Info = await dbFunctions.getEquipa(torneioId, escalaoId, equipa2Id);
+            const _equipa1Info = dbFunctions.getEquipa(torneioId, escalaoId, equipa1Id);
+            const _equipa2Info = dbFunctions.getEquipa(torneioId, escalaoId, equipa2Id);
 
             const [equipa1Info, equipa2Info] = await Promise.all([_equipa1Info, _equipa2Info]);
             const equipas = {
                 jogoId: jogoId,
-                equipa1Id: _equipa1Info.equipaId,
-                equipa1PrimeiroElemento: _equipa1Info.primeiroElemento,
-                equipa1SegundoElemento: _equipa1Info.segundoElemento,
-                equipa1Localidade: _equipa1Info.localidade.nome,
-                equipa2Id: _equipa2Info.equipaId,
-                equipa2PrimeiroElemento: _equipa2Info.primeiroElemento,
-                equipa2SegundoElemento: _equipa2Info.segundoElemento,
-                equipa2Localidade: _equipa2Info.localidade.nome,
+                equipa1Id: equipa1Info.equipaId,
+                equipa1PrimeiroElemento: equipa1Info.primeiroElemento,
+                equipa1SegundoElemento: equipa1Info.segundoElemento,
+                equipa1Localidade: equipa1Info.localidade.nome,
+                equipa2Id: equipa2Info.equipaId,
+                equipa2PrimeiroElemento: equipa2Info.primeiroElemento,
+                equipa2SegundoElemento: equipa2Info.segundoElemento,
+                equipa2Localidade: equipa2Info.localidade.nome,
             }
             jogos.push(equipas);
         }
@@ -397,7 +388,7 @@ exports.verificaCamposCompletos = async function(listaCampos, torneioId, escalao
         return listaCampos;
     } catch(err){
         console.log(err);
-        return Promise.reject(err);
+        throw err;
     }
 }
 
@@ -451,7 +442,7 @@ exports.processaPontuacao = function(data){
     return data;
 }
 
-exports.ordenaClassificacao = function(classificacao, listaJogos){
+const ordenaClassificacao = (classificacao, listaJogos) => {
     classificacao.sort((a, b) => {
         // Diferença de Pontos
         if(a.pontos > b.pontos){
@@ -487,7 +478,7 @@ exports.ordenaClassificacao = function(classificacao, listaJogos){
         }
     });
 
-    // Ordena caso o número de ponto e vitórias seja o mesmo
+    // Ordena caso o número de pontos e vitórias seja o mesmo
     // Critério de ordenação: Mais pontos acumulados tem precendencia
     classificacao.sort((a,b) => {
         if(a.pontos === b.pontos && a.vitorias === b.vitorias){
@@ -502,6 +493,40 @@ exports.ordenaClassificacao = function(classificacao, listaJogos){
             return 0;
         }
     });
+}
+
+const processaEquipaNaClassificacao = (classificacao, index, equipa, jogo, parciais, fase) => {
+    if(index != -1){
+        classificacao[index].vitorias = (jogo.equipa1Pontos > jogo.equipa2Pontos) ? classificacao[index].vitorias = classificacao[index].vitorias + 1 : classificacao[index].vitorias;
+        classificacao[index].pontos = classificacao[index].pontos + jogo.equipa1Pontos;
+    } else {
+        const _equipa = {
+            equipaId: equipa.equipaId,
+            primeiroElemento: equipa.primeiroElemento,
+            segundoElemento: equipa.segundoElemento,
+            localidadeId: equipa.localidade.localidadeId,
+            localidade: equipa.localidade.nome,
+            parciaisAcumulados: (parciais) ? parciais.parciaisAcumulados : 0,
+            pontos: (jogo.equipa1Id == equipa.equipaId) ? jogo.equipa1Pontos : jogo.equipa2Pontos
+        }
+
+        if(fase > 1){
+            if(jogo.equipa1Id == equipa.equipaId){
+                // Quando se ganha um jogo por 3-0 obteve-se 2 vitórias, ou seja, ganhou-se dois jogos 
+                _equipa.vitorias = (jogo.equipa1Pontos != 3) ? jogo.equipa1Pontos : 2;
+            } else {
+                _equipa.vitorias = (jogo.equipa2Pontos != 3) ? jogo.equipa2Pontos : 2;
+            }
+        } else {
+            //_equipa.vitorias = (jogo.equipa1Pontos > jogo.equipa2Pontos) ? 1 : 0;
+            if(jogo.equipa1Id == equipa.equipaId){
+                _equipa.vitorias = (jogo.equipa1Pontos > jogo.equipa2Pontos) ? 1 : 0;
+            } else {
+                _equipa.vitorias = (jogo.equipa2Pontos > jogo.equipa1Pontos) ? 1 : 0;
+            }
+        }
+        classificacao.push(_equipa);
+    }
 }
 
 exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo = 0){
@@ -543,64 +568,26 @@ exports.processaClassificacao = async function(torneioId, escalaoId, fase, campo
 
             // 2. Percorre a lista de jogos e coloca as equipas na lista de classificação
             for(const jogo of listaJogos){
-                const equipa1 = procuraEquipa(listaCompletaEquipas, jogo.equipa1Id);
-                const equipa2 = procuraEquipa(listaCompletaEquipas, jogo.equipa2Id);
+                const equipa1 = listaCompletaEquipas.find(el => el.equipaId == jogo.equipa1Id);
+                const equipa2 = listaCompletaEquipas.find(el => el.equipaId == jogo.equipa2Id);
                 const parciaisEquipa1 = parciaisAcumulados.find(el => el.equipaId == jogo.equipa1Id);
                 const parciaisEquipa2 = parciaisAcumulados.find(el => el.equipaId == jogo.equipa2Id);
 
-                const posicaoEquipa1 = procuraEquipaIndex(classificacao, jogo.equipa1Id);
-                if(posicaoEquipa1 != -1){
-                    classificacao[posicaoEquipa1].vitorias = (jogo.equipa1Pontos > jogo.equipa2Pontos) ? classificacao[posicaoEquipa1].vitorias = classificacao[posicaoEquipa1].vitorias + 1 : classificacao[posicaoEquipa1].vitorias;
-                    classificacao[posicaoEquipa1].pontos = classificacao[posicaoEquipa1].pontos + jogo.equipa1Pontos;
-                } else {
-                    const equipa = {
-                        equipaId: jogo.equipa1Id,
-                        primeiroElemento: equipa1.primeiroElemento,
-                        segundoElemento: equipa1.segundoElemento,
-                        localidadeId: equipa1.localidade.localidadeId,
-                        localidade: equipa1.localidade.nome,
-                        parciaisAcumulados: (parciaisEquipa1) ? parciaisEquipa1.parciaisAcumulados : 0,
-                        pontos: jogo.equipa1Pontos
-                    }
+                //const posicaoEquipa1 = procuraEquipaIndex(classificacao, jogo.equipa1Id);
+                const posicaoEquipa1 = classificacao.findIndex(el => el.equipaId == jogo.equipa1Id);
+                processaEquipaNaClassificacao(classificacao, posicaoEquipa1, equipa1, jogo, parciaisEquipa1, fase);
 
-                    if(fase > 1){
-                        equipa.vitorias = (jogo.equipa1Pontos != 3) ? jogo.equipa1Pontos : 2;
-                    } else {
-                        equipa.vitorias = (jogo.equipa1Pontos > jogo.equipa2Pontos) ? 1 : 0;
-                    }
-                    classificacao.push(equipa);
-                }
-
-                const posicaoEquipa2 = procuraEquipaIndex(classificacao, jogo.equipa2Id);
-                if(posicaoEquipa2 != -1){
-                    classificacao[posicaoEquipa2].vitorias = (jogo.equipa2Pontos > jogo.equipa1Pontos) ? classificacao[posicaoEquipa2].vitorias = classificacao[posicaoEquipa2].vitorias + 1 : classificacao[posicaoEquipa2].vitorias;
-                    classificacao[posicaoEquipa2].pontos = classificacao[posicaoEquipa2].pontos + jogo.equipa2Pontos;
-                } else {
-                    const equipa = {
-                        equipaId: jogo.equipa2Id,
-                        primeiroElemento: equipa2.primeiroElemento,
-                        segundoElemento: equipa2.segundoElemento,
-                        localidadeId: equipa2.localidade.localidadeId,
-                        localidade: equipa2.localidade.nome,
-                        parciaisAcumulados: (parciaisEquipa2) ? parciaisEquipa2.parciaisAcumulados : 0,
-                        pontos: jogo.equipa2Pontos
-                    }
-
-                    if(fase > 1){
-                        equipa.vitorias = (jogo.equipa2Pontos != 3) ? jogo.equipa2Pontos : 2;
-                    } else {
-                        equipa.vitorias = (jogo.equipa2Pontos > jogo.equipa1Pontos) ? 1 : 0;
-                    }
-                    classificacao.push(equipa);
-                }
+                //const posicaoEquipa2 = procuraEquipaIndex(classificacao, jogo.equipa2Id);
+                const posicaoEquipa2 = classificacao.findIndex(el => el.equipaId == jogo.equipa2Id);
+                processaEquipaNaClassificacao(classificacao, posicaoEquipa2, equipa2, jogo, parciaisEquipa2, fase);
             }
             
             // 3. Ordena a Classificação
-            exports.ordenaClassificacao(classificacao, listaJogos);
+            ordenaClassificacao(classificacao, listaJogos);
         }
         return listaCampos;
     } catch(err) {
         console.log(err);
-        return Promise.reject(err);
+        throw err;
     }
 }

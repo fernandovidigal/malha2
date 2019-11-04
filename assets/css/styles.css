@@ -2257,3 +2257,39 @@ input::placeholder {
     background-color: #D05744 !important;
     border: none;
 }
+
+.deleteTeam {
+    width: 100%;
+    background-color: #f8f9ff;
+    border: solid 1px #eaebf1;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.deleteTeam p {
+    margin: 0 20px;
+    font-size: 16px;
+}
+
+.deleteTeam__elementos {
+    text-align: left;
+    margin-right: auto;
+}
+
+.deleteTeam__elementos p {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    margin-left: 0;
+}
+
+.deleteTeam p small {
+    color: #545454;
+}
+
+.swal-wide {
+    width: auto !important;
+    min-width: 32em;
+}

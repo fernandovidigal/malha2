@@ -1,4 +1,3 @@
-const { validationResult } = require('express-validator/check');
 const configFunctions = require('../../helpers/configFunctions'); 
 
 exports.getConfig = (req, res, next) => {
@@ -21,7 +20,7 @@ exports.writeConfigServerPorta = async (req, res, next) => {
             }  
         }
 
-        const result = await configFunctions.writeConfigFile(server);
+        await configFunctions.writeConfigFile(server);
         res.status(200).json({
             success: true
         });

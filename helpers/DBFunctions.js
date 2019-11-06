@@ -706,8 +706,7 @@ exports.getUltimaFasePorEscalao = (torneioId) => {
 }
 
 exports.getUltimaFase = (torneioId, escalaoId) => {
-    return Jogos.max(
-        'fase',
+    return Jogos.max('fase',
         {
             where: {
                 torneioId: torneioId,

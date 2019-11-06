@@ -384,13 +384,13 @@ exports.deleteTorneio = (req, res, next) => {
 exports.deleteFase = async (req, res, next) => {
   const escalaoId = parseInt(req.body.escalaoId);
   const fase = parseInt(req.body.fase);
+  const torneioId = parseInt(req.body.torneioId);
 
   try {
-    const torneio = await dbFunctions.getTorneioInfo();
-    const ultimaFase = await dbFunctions.getUltimaFase(torneio.torneioId, escalaoId);
+    const ultimaFase = await dbFunctions.getUltimaFase(torneioId, escalaoId);
 
     if(ultimaFase == fase){
-      await dbFunctions.deleteFase(torneio.torneioId, escalaoId, ultimaFase);
+      await dbFunctions.deleteFase(torneioId, escalaoId, ultimaFase);
       res.status(200).json({ 
         success: true ,
         fase: fase,

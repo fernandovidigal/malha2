@@ -67,3 +67,5 @@ typings/
 malha2-linux
 malha2-macos
 malha2-win.exe
+
+.cache

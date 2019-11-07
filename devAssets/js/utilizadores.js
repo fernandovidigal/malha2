@@ -32,7 +32,7 @@ deleteBtns.forEach(function(item, index){
                         id: userId
                     }
                 });
-                
+
                 if(response.data.success) {
                     Swal.fire({
                         icon: 'success',
@@ -44,7 +44,15 @@ deleteBtns.forEach(function(item, index){
                         }
                     });
                 } else {
-                    throw new Error();
+                    if(response.status == 204){
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Deve existir no mínimo um utilizador com privilégios de Administrador',
+                        });
+                    } else {
+                        throw new Error();
+                    }
                 }
             } catch(err) {
                 Swal.fire({

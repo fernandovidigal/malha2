@@ -118,7 +118,7 @@ exports.updateUserPassword = (req, res, next) => {
 }
 
 exports.changeUserLevel = (req, res, next) => {
-    const userId = req.params.userid;
+    const userId = req.params.userId;
     const level = req.params.level;
 
     if(req.user.level == 10) {
@@ -127,32 +127,42 @@ exports.changeUserLevel = (req, res, next) => {
             {where: {userId: userId}}
         )
         .then(result => {
-            req.flash('success', 'Nível de acesso do utilizador foi actualizado com sucesso.');
+            req.flash('success', 'Nível de acesso do utilizador foi actualizado com sucesso');
             res.redirect('/admin/utilizadores');
         })
         .catch(err => {
             console.log(err);
-            req.flash('error', 'Não foi possível alterar o nível de acesso do utilizador.');
+            req.flash('error', 'Não foi possível alterar o nível de acesso do utilizador');
             res.redirect('/admin/utilizadores');
         });
     } else {
-        req.flash('error', 'Não tem permissão para alterar o nível de acesso dos utilizadores.');
+        req.flash('error', 'Não tem permissão para alterar o nível de acesso dos utilizadores');
         es.redirect('/admin/utilizadores');
     }
 }
 
-exports.deleteUser = (req, res, next) => {
+exports.deleteUser = async (req, res, next) => {
     const userId = req.body.id;
 
-    User.destroy({where: {userId: userId}, limit: 1})
-        .then(result => {
-            if(result){
-                res.status(200).json({success: true});
-            } else {
-                res.status(200).json({success: false});
+    try{
+        const user = await User.findByPk(userId);
+
+        if(!user) throw new Error();
+
+        if(user.level == 10){
+            const numAdmins = await User.count({ 
+                where: { level: 10 }
+            });
+
+            if(numAdmins == 1){
+                return res.status(204).json({ success: false });
             }
-        })
-        .catch(err => { 
-            res.status(200).json({success: false});
-        });
+        }
+
+        await user.destroy();
+        res.status(200).json({success: true});
+
+    } catch(err){
+        res.status(200).json({success: false});
+    }
 }

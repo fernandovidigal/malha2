@@ -206,6 +206,16 @@ li {
 .btn-cancel {
     text-decoration: none;
     color: inherit;
+    padding: 6px 16px;
+    color: #D05744;
+    letter-spacing: .2px;
+    background-color: white;
+    transition: all .2s;
+}
+
+.btn-cancel:hover{
+    background-color: #ebd9d9;
+    border-radius: 6px;
 }
 
 .btn-competicao {
@@ -1366,7 +1376,7 @@ input::placeholder {
     left: 0;
     width: 20px;
     height: 20px;
-    border: solid 1px #E5E5E7;
+    border: solid 1px #c2cada;
     border-radius: 50%;
 }
 
@@ -1544,61 +1554,8 @@ input::placeholder {
     padding-right: 0 !important;
 }
 
-/*.userLevel {
-    width: 160px;
-    position: relative;
-    cursor: pointer;
-    user-select: none;
-}
-
-.userLevel::after {
-    position: absolute;
-    content: "";
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 8px 5px 0 5px;
-    border-color: #8B93A6 transparent transparent transparent;
-}
-
-.userLevelChange {
-    width: 160px;
-    margin-top: 8px;
-    position: absolute;
-    display: none;
-    flex-direction: column;
-    background-color: white;
-    border: solid 1px #333F4D;
-    border-radius: 4px;
-    box-shadow: 0px 6px 26px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
-    z-index: 100;
-}
-
-.userLevelChange-open {
-    display: flex;
-}
-
-.userLevelChange__link {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    padding: 12px 20px;
-}
-
-.userLevelChange__link-selected {
-    background-color: #E7EEF3;
-}
-
-.userLevelChange__item:hover {
-    background-color: #F3F5F7;
-}*/
-
 .userLevelChangeSelect {
-    width: 40%;
+    width: 180px;
     margin-left: 0;
 }
 

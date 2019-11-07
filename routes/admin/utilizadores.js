@@ -52,6 +52,6 @@ router.put('/alterarPasswordUtilizador/:id', [
 router.delete('/deleteUser', UsersController.deleteUser);
 
 // ALTERAR LEVEL
-router.get('/changeLevel/:userid/level/:level', UsersController.changeUserLevel);
+router.get('/changeLevel/:userId/level/:level', UsersController.changeUserLevel);
 
 module.exports = router;

@@ -4776,7 +4776,7 @@ deleteBtns.forEach(function (item, index) {
             result = _context.sent;
 
             if (!result.value) {
-              _context.next = 22;
+              _context.next = 26;
               break;
             }
 
@@ -4808,18 +4808,33 @@ deleteBtns.forEach(function (item, index) {
               }
             });
 
-            _context.next = 17;
+            _context.next = 21;
             break;
 
           case 16:
-            throw new Error();
+            if (!(response.status == 204)) {
+              _context.next = 20;
+              break;
+            }
 
-          case 17:
-            _context.next = 22;
+            _sweetalert.default.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'Deve existir no mínimo um utilizador com privilégios de Administrador'
+            });
+
+            _context.next = 21;
             break;
 
-          case 19:
-            _context.prev = 19;
+          case 20:
+            throw new Error();
+
+          case 21:
+            _context.next = 26;
+            break;
+
+          case 23:
+            _context.prev = 23;
             _context.t0 = _context["catch"](8);
 
             _sweetalert.default.fire({
@@ -4828,12 +4843,12 @@ deleteBtns.forEach(function (item, index) {
               text: 'Não foi possível eliminar o utilizador'
             });
 
-          case 22:
+          case 26:
           case "end":
             return _context.stop();
         }
       }
-    }, null, this, [[8, 19]]);
+    }, null, this, [[8, 23]]);
   });
 });
 

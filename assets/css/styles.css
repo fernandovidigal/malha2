@@ -174,26 +174,6 @@ li {
     padding: 0 10px;
 }
 
-/*.btn-import {
-    background-color: #398ad0;
-    padding: 0 10px;
-    width: 36.2px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-    transition: all .2s;
-}
-
-.btn-import span {
-    margin-left: 10px;
-    white-space: nowrap;
-}
-
-.btn-import:hover {
-    width: 173.2px;
-}*/
-
 .btn-delete {
     background-color: #d9534f;
 }

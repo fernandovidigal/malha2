@@ -1,8 +1,8 @@
 <% if(typeof escaloes != 'undefined'){ %>
     <% if(escaloes.length > 0) { %>
         <% 
-            const escalaoMasculino = escaloes.find(el => el.sexo == 1); 
-            if(escalaoMasculino){
+            const escalaoMasculino = escaloes.filter(el => el.sexo == 1); 
+            if(escalaoMasculino.length > 0){
         %>
         <div class="escalaoCampos__wrapper">
             <h4>Masculinos</h4>
@@ -13,8 +13,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% escaloes.forEach(escalao => { 
-                        if(escalao.sexo == 1) { %>
+                    <% escalaoMasculino.forEach(escalao => { %>
                         <tr>
                             <td><%= escalao.designacao %></td>
                             <% if(escalao.editavel) { %>
@@ -38,7 +37,6 @@
                                 </td>
                             <% } %>
                         </tr>
-                        <% } %>
                     <% }); %>
                 </tbody>
             </table>
@@ -46,8 +44,8 @@
         <%  } %>
 
         <% 
-            const escalaoFeminino = escaloes.find(el => el.sexo == 0); 
-            if(escalaoFeminino){
+            const escalaoFeminino = escaloes.filter(el => el.sexo == 0); 
+            if(escalaoFeminino.length > 0){
         %>
         <div class="escalaoCampos__wrapper">
             <h4>Femininos</h4>
@@ -59,8 +57,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% escaloes.forEach(escalao => { 
-                        if(escalao.sexo == 0) { %>
+                    <% escalaoFeminino.forEach(escalao => { %>
                         <tr>
                             <td><%= escalao.designacao %></td>
                             <% if(escalao.editavel) { %>
@@ -84,7 +81,6 @@
                                 </td>
                             <% } %>
                         </tr>
-                        <% } %>
                     <% }); %>
                 </tbody>
             </table>

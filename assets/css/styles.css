@@ -186,16 +186,12 @@ li {
 .btn-cancel {
     text-decoration: none;
     color: inherit;
-    padding: 6px 16px;
-    color: #D05744;
-    letter-spacing: .2px;
-    background-color: white;
+    margin-left: 40px !important;
     transition: all .2s;
 }
 
 .btn-cancel:hover{
-    background-color: #ebd9d9;
-    border-radius: 6px;
+    color: #D05744;
 }
 
 .btn-competicao {

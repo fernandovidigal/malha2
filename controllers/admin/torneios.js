@@ -26,65 +26,39 @@ exports.getTorneio = async (req, res, next) => {
     if(tab < 1 || tab > 3){
       tab = 1;
     }
-
-    const _listaEscaloes = dbFunctions.getAllEscaloesComCampos(torneioId);
+    
+    const _listaEscaloes = dbFunctions.getAllEscaloes(torneioId);
     const _listaNumJogos = dbFunctions.getNumJogosAllEscaloes(torneioId);
     const _torneio = dbFunctions.getTorneioById(torneioId);
     const _listaUltimaFasePorEscalao = dbFunctions.getUltimaFasePorEscalao(torneioId);
-    let escaloes = [];
-    const listaEscaloesComCampo = [];
+    const _listaNumCampos = dbFunctions.getNumCamposEscaloes(torneioId);
+    const _numEquipasPorEscalao = dbFunctions.getNumEquipasPorCadaEscalao(torneioId);
 
-    const [listaEscaloes, torneio, listaNumJogos, listaUltimaFasePorEscalao] = await Promise.all([
+    const [listaEscaloes, torneio, listaNumJogos, listaUltimaFasePorEscalao, listaNumCampos, numEquipasPorEscalao] = await Promise.all([
       _listaEscaloes,
       _torneio,
       _listaNumJogos,
-      _listaUltimaFasePorEscalao
+      _listaUltimaFasePorEscalao,
+      _listaNumCampos,
+      _numEquipasPorEscalao
     ]);
 
     for (const escalao of listaEscaloes) {
-      const jogos = listaNumJogos.find(_escalao => _escalao.escalaoId == escalao.escalaoId);
+      const jogos = listaNumJogos.find(el => el.escalaoId == escalao.escalaoId);
+      const numCampos = listaNumCampos.find(el => el.escalaoId == escalao.escalaoId);
+      const fase = listaUltimaFasePorEscalao.find(el => el.escalaoId == escalao.escalaoId);
+      const numEquipas = numEquipasPorEscalao.find(el => el.escalaoId == escalao.escalaoId);
 
-      const _escalao = {
-        escalaoId: escalao.escalaoId,
-        designacao: escalao.designacao,
-        sexo: escalao.sexo,
-        campos: escalao.campos[0].numCampos,
-        editavel: jogos == undefined ? true : false
-      };
-
-      escaloes.push(_escalao);
-      listaEscaloesComCampo.push(escalao.escalaoId);
-    }
-
-    const escaloesSemCampos = await dbFunctions.getAllEscaloesSemCampos(torneioId,listaEscaloesComCampo);
-
-    for (const escalao of escaloesSemCampos) {
-      escalao.editavel = true;
-    }
-
-    // Junta as duas Arrays (com e sem campos definidos)
-    escaloes = escaloes.concat(escaloesSemCampos);
-
-    // Ordena a lista de Escalões pelo escalão Id
-    escaloes.sort((a, b) => (a.escalaoId > b.escalaoId ? 1 : -1));
-
-
-    // Lista dos escalões já com fases definidas para ser possível eliminar a última fase
-    for(const faseEscalao of listaUltimaFasePorEscalao){
-      let escalao = listaEscaloes.find(el => el.escalaoId == faseEscalao.escalaoId);
-      if(!escalao){
-        escalao = escaloesSemCampos.find(el => el.escalaoId == faseEscalao.escalaoId);
-      }
-
-      faseEscalao.designacao = escalao.designacao
-      faseEscalao.sexo = escalao.sexo;
+      escalao.campos = numCampos != undefined ? numCampos.numCampos : 0;
+      escalao.editavel = jogos == undefined ? true : false;
+      escalao.fase = fase != undefined ? fase.fase : 0;
+      escalao.numEquipas = numEquipas != undefined ? numEquipas.numEquipas : 0;
     }
 
     req.breadcrumbs("Editar Torneio", "/admin/editarTorneio");
     res.render("admin/editarTorneio", {
       torneio: torneio,
-      escaloes: escaloes,
-      resetFase: listaUltimaFasePorEscalao,
+      escaloes: listaEscaloes,
       selectedTab: tab,
       breadcrumbs: req.breadcrumbs()
     });
@@ -93,7 +67,7 @@ exports.getTorneio = async (req, res, next) => {
     req.flash("error", "Não é possível editar o torneio.");
     res.redirect("/admin/torneios");
   }
-};
+}
 
 exports.adicionarTorneio = async (req, res, next) => {
   try {

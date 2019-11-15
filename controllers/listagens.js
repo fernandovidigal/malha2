@@ -52,8 +52,7 @@ exports.mostraListagens = async (req, res, next) => {
     const torneio = await dbFunctions.getTorneioInfo();
 
     if(!torneio){
-        req.flash('error', 'Não existem torneios activos.');
-        return res.redirect("../");
+        return res.render('includes/noTorneio', {breadcrumbs: req.breadcrumbs()});
     }
 
     const _listaEscaloes = await dbFunctions.getEscaloesComEquipas(torneio.torneioId);

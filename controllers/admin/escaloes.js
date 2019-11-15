@@ -25,34 +25,38 @@ exports.getAllEscaloes = async (req, res, next) => {
     }
 }
 
-exports.getEscalao = (req, res, next) => {
-    const escalaoId = req.params.id;
+exports.getEscalao = async (req, res, next) => {
+    try {
+        const escalaoId = parseInt(req.params.id);
 
-    Escaloes.findByPk(escalaoId)
-    .then(escalao => {
-        if(escalao){
-            req.breadcrumbs('Editar Escalão', '/admin/editarEscalao');
-            res.render('admin/editarEscalao', {escalao: escalao, breadcrumbs: req.breadcrumbs()});
-        } else {
+        const escalao = await Escaloes.findByPk(escalaoId);
+
+        if(!escalao){
             req.flash('error', 'Escalão não existe.');
-            res.redirect('/admin/escaloes');
+            return res.redirect('/admin/escaloes');
         }
-    })
-    .catch(err => {
+
+        req.breadcrumbs('Editar Escalão', '/admin/editarEscalao');
+        res.render('admin/editarEscalao', {escalao: escalao, breadcrumbs: req.breadcrumbs()});
+    } catch(err) {
         console.log(err);
         req.flash('error', 'Não foi possível aceder ao escalão.');
         res.redirect('/admin/escaloes');
-    })
+    }
 }
 
-exports.getEscalaoBySexo = (req, res, next) => {
-    const genero = req.params.sexo;
-    let sexo = 1;
-    if(genero == 'F'){
-        sexo = 0;
+exports.getEscalaoBySexo = async (req, res, next) => {
+    try {
+        const genero = req.params.sexo == 'F' ? 0 : 1;
+        
+    } catch(err) {
+        console.log(err);
+        req.flash('error', 'Não foi possível obter os dados dos escalões.');
+        res.redirect('/admin/escaloes');
     }
+    
 
-    Escaloes.findAll({
+    /*Escaloes.findAll({
         where: {sexo: sexo},
         raw: true
     })
@@ -68,50 +72,47 @@ exports.getEscalaoBySexo = (req, res, next) => {
         res.render('admin/escaloes', {escaloes: escaloes, filtro: sexo, breadcrumbs: req.breadcrumbs()});
     })
     .catch(err => {
-        console.log(err);
-        req.flash('error', 'Não foi possível obter os dados dos escalões.');
-        res.redirect('/admin/escaloes');
-    });
+        
+    });*/
 }
 
-exports.createEscalao = (req, res, next) => {
-    const designacao = req.body.designacao.trim();
-    const sexo = req.body.sexo;
-    const errors = validationResult(req);
-    
-    const oldData = {
-        designacao: designacao,
-        sexo: sexo
-    }
+exports.createEscalao = async (req, res, next) => {
+    try {
+        const designacao = req.body.designacao.trim();
+        const sexo = parseInt(req.body.sexo);
+        const errors = validationResult(req);
+        
+        const oldData = {
+            designacao: designacao,
+            sexo: sexo
+        }
 
-    if(!errors.isEmpty()){
-        req.breadcrumbs('Adicionar Escalão', '/admin/adicionarEscalao');
-        res.render('admin/adicionarEscalao', {validationErrors: errors.array(), escalao: oldData, breadcrumbs: req.breadcrumbs()});
-    } else {
-        Escaloes.findOrCreate({
-            where: {
-                designacao: designacao,
-                sexo: sexo
-            }
-        })
-        .then(([escalao, created]) => {
-            if(created){
-                req.flash('success', 'Escalão adicionado com sucesso.');
-                res.redirect('/admin/escaloes');
-            } else {
+        if(!errors.isEmpty()){
+            req.breadcrumbs('Adicionar Escalão', '/admin/adicionarEscalao');
+            res.render('admin/adicionarEscalao', {validationErrors: errors.array(), escalao: oldData, breadcrumbs: req.breadcrumbs()});
+        } else {
+            const [escalao, created] = await Escaloes.findOrCreate({
+                                                where: {
+                                                    designacao: designacao,
+                                                    sexo: sexo
+                                                }
+                                            });
+            if(!created){
                 const errors = [{
                     msg: 'Escalão já existe',
                     param: 'designacao'
                 }];
                 req.breadcrumbs('Adicionar Escalão', '/admin/adicionarEscalao');
-                res.render('admin/adicionarEscalao', {validationErrors: errors, escalao: oldData, breadcrumbs: req.breadcrumbs()});
+                return res.render('admin/adicionarEscalao', {validationErrors: errors, escalao: oldData, breadcrumbs: req.breadcrumbs()});
             }
-        })
-        .catch(err => {
-            console.log(err);
-            req.flash('error', 'Não foi possível adicionar o escalão.');
+
+            req.flash('success', `Escalão ${escalao.designacao} adicionado com sucesso.`);
             res.redirect('/admin/escaloes');
-        });
+        }
+    } catch(err) {
+        console.log(err);
+        req.flash('error', 'Não foi possível adicionar o escalão.');
+        res.redirect('/admin/escaloes');
     }
 }
 

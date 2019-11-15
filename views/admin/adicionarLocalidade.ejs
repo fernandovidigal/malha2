@@ -12,14 +12,14 @@
             <div class="formInput__wrapper">
                 <label for="localidade" class="inputLabel">Nome da localidade <span class="labelRequiredField">*</span></label>
                 <input type="text" name="localidade" pattern="^[^0-9]+$" size="60" required
-                    <% if(typeof localidade !== 'undefined'){ %>
+                    <% if(locals.localidade){ %>
                         value="<%= localidade.nome %>"
                     <% } %>
-                    <% if(typeof validationErrors != 'undefined' && validationErrors[0].param === 'localidade'){ %>
+                    <% if(locals.validationErrors && validationErrors[0].param === 'localidade'){ %>
                         class="inputError"
                     <% } %>
                 >
-                <% if(typeof validationErrors != 'undefined' && validationErrors[0].param === 'localidade'){ %>
+                <% if(locals.validationErrors && validationErrors[0].param === 'localidade'){ %>
                     <p class="inputErrorMsg">
                         <%= validationErrors[0].msg %>
                     </p>

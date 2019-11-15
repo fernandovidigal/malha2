@@ -59,11 +59,17 @@ exports.setTorneioActivo = async (torneioId) => {
 //                        ESCALÕES
 ////////////////////////////////////////////////////////
 
-exports.getAllEscaloes = () => {
-    return Escaloes.findAll({
+exports.getAllEscaloes = (filtro) => {
+    const query = {
         order: [['sexo', 'DESC']],
         raw: true
-    });
+    };
+
+    if(filtro){
+        query.where = {sexo: sexo}
+    }
+    
+    return Escaloes.findAll(query);
 }
 
 exports.getEscalaoInfo = (escalaoId) => {

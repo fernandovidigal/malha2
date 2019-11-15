@@ -21,7 +21,7 @@
             <thead>
                 <tr>
                     <th class="mainTable-headerElement-left">Escalão</th>
-                    <th>Sexo</th>
+                    <th class="mainTable-headerElement-left">Sexo</th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -31,7 +31,7 @@
                     <% escaloes.forEach(function(escalao){ %>
                         <tr>
                             <td class="escalao"><%= escalao.designacao %></td>
-                            <td align="center" class="sexo"><%= escalao.sexo == 0 ? 'Feminino' : 'Masculino' %></td>
+                            <td class="sexo"><%= escalao.sexo == 0 ? 'Feminino' : 'Masculino' %></td>
                             <td class="detalhesBtn__column"><a href="/admin/escaloes/editarEscalao/<%= escalao.escalaoId %>" class="btn btn-secondary">Editar</a></td>
                             <td class="deleteBtn__column">
                                 <% if(escalao.eliminavel){ %>

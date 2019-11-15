@@ -12,14 +12,14 @@
             <div class="formInput__wrapper">
                 <label for="designacao" class="inputLabel">Designação do escalão <span class="labelRequiredField">*</span></label>
                 <input type="text" name="designacao" size="60" required
-                    <% if(typeof escalao !== 'undefined'){ %>
+                    <% if(locals.escalao){ %>
                         value="<%= escalao.designacao %>"
                     <% } %>
-                    <% if(typeof validationErrors != 'undefined' && validationErrors[0].param === 'designacao'){ %>
+                    <% if(locals.validationErrors && validationErrors[0].param === 'designacao'){ %>
                         class="inputError"
                     <% } %>
                 >
-                <% if(typeof validationErrors != 'undefined' && validationErrors[0].param === 'designacao'){ %>
+                <% if(locals.validationErrors && validationErrors[0].param === 'designacao'){ %>
                     <p class="inputErrorMsg">
                         <%= validationErrors[0].msg %>
                     </p>
@@ -29,7 +29,7 @@
                 <div class="radioButtons__wrapper">
                     <label class="inputRadioContainer">Masculino
                         <input type="radio" name="sexo" value="1" required
-                            <%  if(typeof escalao != 'undefined' && escalao.sexo == 1){ %>
+                            <%  if(locals.escalao && escalao.sexo == 1){ %>
                                     checked
                             <% } %>
                         >
@@ -37,7 +37,7 @@
                     </label>
                     <label class="inputRadioContainer">Feminino
                         <input type="radio" name="sexo" value="0" required
-                            <%  if(typeof escalao != 'undefined' && escalao.sexo == 0){ %>
+                            <%  if(locals.escalao && escalao.sexo == 0){ %>
                                     checked
                             <% } %>
                         >

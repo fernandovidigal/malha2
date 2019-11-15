@@ -175,8 +175,7 @@ exports.getAllEquipas = async (req, res, next) => {
         const [torneio, localidades, escaloes] = await Promise.all([torneioInfo, localidadesInfo, escaloesInfo]);
         
         if(!torneio){
-            req.flash('error', 'Não existem torneios activos.');
-            return res.redirect("../");
+            return res.render('includes/noTorneio', {breadcrumbs: req.breadcrumbs()});
         }
 
         // Ordena correctamente as localidades

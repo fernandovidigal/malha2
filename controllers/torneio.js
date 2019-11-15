@@ -9,8 +9,7 @@ exports.checkCampos = async (req, res, next) => {
 
         // Não existe torneio registado ou activo
         if(!torneio){
-            req.flash('error', 'Não existem torneios activos.');
-            return res.redirect("../");
+            return res.render('includes/noTorneio', {breadcrumbs: req.breadcrumbs()});
         }
 
         const torneioId = torneio.torneioId;

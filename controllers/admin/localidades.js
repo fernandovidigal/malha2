@@ -132,15 +132,19 @@ exports.updateLocalidade = async (req, res, next) => {
 exports.deleteLocalidade = (req, res, next) => {
     const localidadeId = parseInt(req.body.id);
 
-    Localidade.destroy({where: {localidadeId: localidadeId}, limit: 1})
-    .then(result => {
-        if(result){
-            res.status(200).json({ success: true });
-        } else {
-            res.status(200).json({ uccess: false });
-        }
-    })
-    .catch(err => { 
+    if(req.user.level == 5 || req.user.level == 10){
+        Localidade.destroy({where: {localidadeId: localidadeId}, limit: 1})
+        .then(result => {
+            if(result){
+                res.status(200).json({ success: true });
+            } else {
+                res.status(200).json({ uccess: false });
+            }
+        })
+        .catch(err => { 
+            res.status(200).json({ success: false });
+        });
+    } else {
         res.status(200).json({ success: false });
-    });
+    }
 }

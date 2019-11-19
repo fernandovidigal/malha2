@@ -1,6 +1,6 @@
 <% if(locals.escaloes){ %>
     <% 
-        const escalaoMasculino = escaloes.filter(el => el.sexo == 1 && el.numEquipas > 0); 
+        const escalaoMasculino = escaloes.filter(el => el.sexo == 1); 
         if(escalaoMasculino.length > 0){
     %>
         <div class="escalaoCampos__wrapper">
@@ -17,7 +17,13 @@
                     <% escalaoMasculino.forEach(escalao => { %>
                         <tr>
                             <td><%= escalao.designacao %></td>
-                            <td align="center"><%= escalao.fase == 100 ? 'Final' : escalao.fase != 0 ? escalao.fase : 'Ainda não iniciou a competição' %></td>
+                            <td align="center">
+                                <% if(escalao.numEquipas == 0){ %>
+                                    Não têm equipas registadas
+                                <% } else { %>
+                                    <%= escalao.fase == 100 ? 'Final' : escalao.fase != 0 ? escalao.fase : 'Ainda não iniciou a competição' %>
+                                <% } %>
+                            </td>
                             <td class="deleteBtn__column">
                                 <% if(escalao.fase != 0){ %>
                                     <a class="btn btn-secondary btn-faseReset" data-torneio="<%= torneio.torneioId %>" data-escalao="<%= escalao.escalaoId %>" data-fase="<%= escalao.fase %>" data-designacao="<%= escalao.designacao %> (<%= escalao.sexo == 1? 'Masculino': 'Feminino' %>)">Remover Fase</a>
@@ -31,7 +37,7 @@
     <%  } %>
 
     <% 
-        const escalaoFeminino = escaloes.filter(el => el.sexo == 0 && el.numEquipas > 0); 
+        const escalaoFeminino = escaloes.filter(el => el.sexo == 0); 
         if(escalaoFeminino.length > 0){
     %>
         <div class="escalaoCampos__wrapper">
@@ -48,7 +54,13 @@
                     <% escalaoFeminino.forEach(escalao => { %>
                         <tr>
                             <td><%= escalao.designacao %></td>
-                            <td align="center"><%= escalao.fase == 100 ? 'Final' : escalao.fase != 0 ? escalao.fase : 'Ainda não iniciou a competição' %></td>
+                            <td align="center">
+                                <% if(escalao.numEquipas == 0){ %>
+                                    Não têm equipas registadas
+                                <% } else { %>
+                                    <%= escalao.fase == 100 ? 'Final' : escalao.fase != 0 ? escalao.fase : 'Ainda não iniciou a competição' %>
+                                <% } %>
+                            </td>
                             <td class="deleteBtn__column">
                                 <% if(escalao.fase != 0){ %>
                                     <a class="btn btn-secondary btn-faseReset" data-torneio="<%= torneio.torneioId %>" data-escalao="<%= escalao.escalaoId %>" data-fase="<%= escalao.fase %>" data-designacao="<%= escalao.designacao %> (<%= escalao.sexo == 1? 'Masculino': 'Feminino' %>)">Remover Fase</a>

@@ -1,5 +1,4 @@
 const Sequelize = require('sequelize');
-const path = require('path');
 const appPaths = require('./appPaths');
 
 const sequelize = new Sequelize({

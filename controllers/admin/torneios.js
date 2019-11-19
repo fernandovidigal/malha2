@@ -4,7 +4,7 @@ const Campos = require("../../models/Campos");
 const dbFunctions = require("../../helpers/DBFunctions");
 const { validationResult } = require("express-validator/check");
 
-exports.getAllTorneios = async (req, res, next) => {
+exports.getAllTorneios = async (req, res) => {
   try {
     const torneios = await dbFunctions.getAllTorneios();
     res.render("admin/torneios", {
@@ -13,12 +13,12 @@ exports.getAllTorneios = async (req, res, next) => {
     });
   } catch (err) {
     console.log(err);
-    req.flash("error", "Não foi possível obter os dados dos torneios!");
+    req.flash("error", "Não foi possível obter os torneios");
     res.redirect("/admin/torneios");
   }
 };
 
-exports.getTorneio = async (req, res, next) => {
+exports.getTorneio = async (req, res) => {
   try {
     const torneioId = parseInt(req.params.id);
     let tab = req.params.tab || 1;
@@ -27,7 +27,7 @@ exports.getTorneio = async (req, res, next) => {
       tab = 1;
     }
     
-    const _listaEscaloes = dbFunctions.getAllEscaloes(torneioId);
+    const _listaEscaloes = dbFunctions.getAllEscaloes();
     const _listaNumJogos = dbFunctions.getNumJogosAllEscaloes(torneioId);
     const _torneio = dbFunctions.getTorneioById(torneioId);
     const _listaUltimaFasePorEscalao = dbFunctions.getUltimaFasePorEscalao(torneioId);
@@ -56,54 +56,49 @@ exports.getTorneio = async (req, res, next) => {
     }
 
     req.breadcrumbs("Editar Torneio", "/admin/editarTorneio");
-    res.render("admin/editarTorneio", {
-      torneio: torneio,
-      escaloes: listaEscaloes,
-      selectedTab: tab,
-      breadcrumbs: req.breadcrumbs()
-    });
+    res.render("admin/editarTorneio", { torneio: torneio, escaloes: listaEscaloes, selectedTab: tab, breadcrumbs: req.breadcrumbs() });
   } catch (err) {
     console.log(err);
-    req.flash("error", "Não é possível editar o torneio.");
+    req.flash("error", "Não é possível editar o torneio");
     res.redirect("/admin/torneios");
   }
 }
 
-exports.adicionarTorneio = async (req, res, next) => {
+exports.adicionarTorneio = async (req, res) => {
   try {
     const escaloes = await dbFunctions.getAllEscaloes();
     escaloes.forEach(escalao => {
       escalao.editavel = true
     });
+
     req.breadcrumbs("Adicionar Torneio", "/admin/adicionarTorneio");
-    res.render("admin/adicionarTorneio", {
-      torneio: {},
-      escaloes: escaloes,
-      breadcrumbs: req.breadcrumbs()
-    });
+    res.render("admin/adicionarTorneio", { torneio: {}, escaloes: escaloes, breadcrumbs: req.breadcrumbs() });
+
   } catch (err) {
     console.log(err);
-    req.flash("error", "Não foi possivel adicionar torneio. Não foi possível aceder à lista de escalões.");
+    req.flash("error", "Não foi possivel adicionar torneio");
     res.redirect("/admin/torneios");
   }
 };
 
 async function processaCriacaoCampos(transaction, torneioId, listaEscaloes) {
-  for await (const escalao of listaEscaloes) {
-    if (escalao.campos > 0) {
-      await Campos.create(
-        {
-          torneioId: torneioId,
-          escalaoId: escalao.escalaoId,
-          numCampos: escalao.campos
-        },
-        { transaction }
-      );
+  const campos = [];
+
+  listaEscaloes.forEach(escalao => {
+    if(escalao.campos > 0){
+      const campo = {
+        torneioId: torneioId,
+        escalaoId: escalao.escalaoId,
+        numCampos: escalao.campos
+      }
+      campos.push(campo);
     }
-  }
+  });
+
+  await Campos.bulkCreate(campos, { transaction });
 }
 
-exports.createTorneio = async (req, res, next) => {
+exports.createTorneio = async (req, res) => {
   try {
     const designacao = req.body.designacao.trim();
     const localidade = req.body.localidade.trim();
@@ -113,15 +108,10 @@ exports.createTorneio = async (req, res, next) => {
 
     // Processa todos os escalões
     const listaEscaloes = await dbFunctions.getAllEscaloes();
-    for (const escalao of listaEscaloes) {
+    listaEscaloes.forEach(escalao => {
       const numCampos = parseInt(req.body[escalao.escalaoId]);
-      // Campos - Verifica se é potência de 2
-      if (Math.log2(numCampos) % 1 === 0) {
-        escalao.campos = numCampos;
-      } else {
-        escalao.campos = 0;
-      }
-    }
+      escalao.campos = (Math.log2(numCampos) % 1 === 0) ? numCampos : 0;
+    });
 
     if(isNaN(ano)){
       errors.push({
@@ -138,13 +128,10 @@ exports.createTorneio = async (req, res, next) => {
         localidade: localidade,
         ano: isNaN(ano) ? oldAno : ano
       };
+
       req.breadcrumbs("Adicionar Torneio", "/admin/adicionarTorneio");
-      res.render("admin/adicionarTorneio", {
-        validationErrors: errors,
-        escaloes: listaEscaloes,
-        torneio: oldData,
-        breadcrumbs: req.breadcrumbs()
-      });
+      res.render("admin/adicionarTorneio", { validationErrors: errors, escaloes: listaEscaloes, torneio: oldData, breadcrumbs: req.breadcrumbs() });
+
     } else {
       let novoTorneioId = 0;
       let transaction;
@@ -199,71 +186,57 @@ exports.createTorneio = async (req, res, next) => {
     }
   } catch (err) {
     console.log(err);
-    req.flash("error", "Não foi possivel adicionar torneio.");
+    req.flash("error", "Não foi possivel adicionar o torneio.");
     res.redirect("/admin/torneios");
   }
 };
 
-exports.ActivaTorneio = async (req, res, next) => {
+exports.ActivaTorneio = async (req, res) => {
   try {
     const torneioId = parseInt(req.params.id);
 
     const torneio = await dbFunctions.getTorneioById(torneioId);
     if (torneio) {
       await dbFunctions.setTorneioActivo(torneio.torneioId);
-      req.flash(
-        "success",
-        `${torneio.designacao}, activado com sucesso.`
-      );
+      req.flash("success", `${torneio.designacao}, activado com sucesso`);
       res.redirect("/admin/torneios");
     } else {
-      req.flash("error", "Torneio não existe.");
+      req.flash("error", "Torneio não existe");
       res.redirect("/admin/torneios");
     }
   } catch (err) {
     console.log(err);
-    req.flash("error", "Não foi possível activar o torneio.");
+    req.flash("error", "Não foi possível activar o torneio");
     res.redirect("/admin/torneios");
   }
 };
 
 async function processaUpdateCampos(transaction, torneioId, listaEscaloes) {
-  const listaCampos = await dbFunctions.getAllCamposTransaction(
-    torneioId,
-    transaction
-  );
-  for await (const escalao of listaEscaloes) {
-    const campoToUpdate = listaCampos.find(
-      _campo => _campo.escalaoId == escalao.escalaoId
-    );
+  const listaCampos = await dbFunctions.getAllCamposTransaction(torneioId, transaction);
 
-    if (campoToUpdate != undefined) {
+  for await (const escalao of listaEscaloes) {
+    const campoToUpdate = listaCampos.find(el => el.escalaoId == escalao.escalaoId);
+
+    if (campoToUpdate) {
       if (escalao.campos == 0) {
         await campoToUpdate.destroy({ transaction });
       } else {
-        await campoToUpdate.update(
-          {
-            numCampos: escalao.campos
-          },
-          { transaction }
-        );
+        await campoToUpdate.update({ numCampos: escalao.campos }, { transaction });
       }
     } else {
       if (escalao.campos > 0) {
-        await Campos.create(
-          {
+        await Campos.create({
             torneioId: torneioId,
             escalaoId: escalao.escalaoId,
             numCampos: escalao.campos
-          },
-          { transaction }
+          }, { transaction }
         );
       }
     }
   }
 }
 
-exports.updateTorneio = async (req, res, next) => {
+exports.updateTorneio = async (req, res) => {
   try {
     const torneioId = parseInt(req.params.id);
     const designacao = req.body.designacao.trim();
@@ -273,15 +246,10 @@ exports.updateTorneio = async (req, res, next) => {
 
     // Processa todos os escalões
     const listaEscaloes = await dbFunctions.getAllEscaloes();
-    for (const escalao of listaEscaloes) {
+    listaEscaloes.forEach(escalao => {
       const numCampos = parseInt(req.body[escalao.escalaoId]);
-      // Campos - Verifica se numCampos é potência de 2
-      if (Math.log2(numCampos) % 1 === 0) {
-        escalao.campos = numCampos;
-      } else {
-        escalao.campos = 0;
-      }
-    }
+      escalao.campos = (Math.log2(numCampos) % 1 === 0) ? numCampos : 0;
+    });
 
     if (errors.length > 0) {
       const oldData = {
@@ -291,12 +259,7 @@ exports.updateTorneio = async (req, res, next) => {
         ano: ano
       };
       req.breadcrumbs("Editar Torneio", "/admin/editarTorneio");
-      res.render("admin/editarTorneio", {
-        validationErrors: errors,
-        torneio: oldData,
-        escaloes: listaEscaloes,
-        breadcrumbs: req.breadcrumbs()
-      });
+      res.render("admin/editarTorneio", { validationErrors: errors, torneio: oldData, escaloes: listaEscaloes, breadcrumbs: req.breadcrumbs() });
     } else {
       let transaction;
       try {
@@ -325,42 +288,51 @@ exports.updateTorneio = async (req, res, next) => {
       }
 
       if (transaction.finished === "commit") {
-        req.flash("success", "Torneio actualizado com sucesso.");
+        req.flash("success", "Torneio actualizado com sucesso");
         res.redirect("/admin/torneios");
       } else {
-        req.flash("error", "Não foi possível actualizar o torneio.");
+        req.flash("error", "Não foi possível actualizar o torneio");
         res.redirect("/admin/torneios");
       }
     }
   } catch (err) {
     console.log(err);
-    req.flash("error", "Não foi possível actualizar o torneio.");
+    req.flash("error", "Não foi possível actualizar o torneio");
     res.redirect("/admin/torneios");
   }
 };
 
-exports.deleteTorneio = (req, res, next) => {
+exports.deleteTorneio = (req, res) => {
   const torneioId = parseInt(req.body.id);
 
-  Torneios.destroy({ where: { torneioId: torneioId }, limit: 1 })
-    .then(result => {
-      if (result) {
-        res.status(200).json({ success: true });
-      } else {
+  if(req.user.level == 5 || req.user.level == 10){
+    Torneios.destroy({ where: { torneioId: torneioId }, limit: 1 })
+      .then(result => {
+        if (result) {
+          res.status(200).json({ success: true });
+        } else {
+          res.status(200).json({ success: false });
+        }
+      })
+      .catch(err => {
         res.status(200).json({ success: false });
-      }
-    })
-    .catch(err => {
-      res.status(200).json({ success: false });
-    });
+      });
+  } else {
+    res.status(200).json({ success: false });
+  }
 };
 
 exports.deleteFase = async (req, res, next) => {
-  const escalaoId = parseInt(req.body.escalaoId);
   const fase = parseInt(req.body.fase);
-  const torneioId = parseInt(req.body.torneioId);
-
+  
   try {
+    const escalaoId = parseInt(req.body.escalaoId);
+    const torneioId = parseInt(req.body.torneioId);
+
+    if(req.user.level != 5 || req.user.level != 10){
+      throw new Error();
+    }
+
     const ultimaFase = await dbFunctions.getUltimaFase(torneioId, escalaoId);
 
     if(ultimaFase == fase){

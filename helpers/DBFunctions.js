@@ -66,7 +66,7 @@ exports.getAllEscaloes = (filtro) => {
     };
 
     if(filtro){
-        query.where = {sexo: sexo}
+        query.where = filtro
     }
     
     return Escaloes.findAll(query);

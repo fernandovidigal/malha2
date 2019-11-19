@@ -2,7 +2,7 @@ const Escaloes = require('../../models/Escaloes');
 const { validationResult } = require('express-validator/check');
 const dbFunctions = require('../../helpers/DBFunctions');
 
-exports.getAllEscaloes = async (req, res, next) => {
+exports.getAllEscaloes = async (req, res) => {
     try {
         const _escaloes = dbFunctions.getAllEscaloes();
         const _listaEquipasComEscalao = dbFunctions.getAllEscaloesComEquipas();
@@ -25,7 +25,7 @@ exports.getAllEscaloes = async (req, res, next) => {
     }
 }
 
-exports.getEscalao = async (req, res, next) => {
+exports.getEscalao = async (req, res) => {
     try {
         const escalaoId = parseInt(req.params.id);
 
@@ -45,38 +45,30 @@ exports.getEscalao = async (req, res, next) => {
     }
 }
 
-exports.getEscalaoBySexo = async (req, res, next) => {
+exports.getEscalaoBySexo = async (req, res) => {
     try {
         const genero = req.params.sexo == 'F' ? 0 : 1;
+
+        const _escaloes = dbFunctions.getAllEscaloes({sexo: genero});
+        const _listaEquipasComEscalao = dbFunctions.getAllEscaloesComEquipas();
+
+        const [escaloes, listaEquipasComEscalao] = await Promise.all([_escaloes, _listaEquipasComEscalao]);
         
+        escaloes.forEach(escalao => {
+            const escalaoIndex = listaEquipasComEscalao.find(el => el.escalaoId == escalao.escalaoId);
+            escalao.eliminavel = (!escalaoIndex) ? true : false;
+        });
+
+        res.render('admin/escaloes', {escaloes: escaloes, filtro: genero, breadcrumbs: req.breadcrumbs()});
+
     } catch(err) {
         console.log(err);
         req.flash('error', 'Não foi possível obter os dados dos escalões.');
         res.redirect('/admin/escaloes');
     }
-    
-
-    /*Escaloes.findAll({
-        where: {sexo: sexo},
-        raw: true
-    })
-    .then(async escaloes => {
-        if(escaloes.length > 0){
-            const listaEquipasComEscalao = await dbFunctions.getAllEscaloesComEquipas();
-            escaloes.forEach(escalao => {
-                const escalaoIndex = listaEquipasComEscalao.find(_escalao => _escalao.escalaoId == escalao.escalaoId);
-                escalao.eliminavel = (!escalaoIndex) ? true : false;
-            });
-        }
-    
-        res.render('admin/escaloes', {escaloes: escaloes, filtro: sexo, breadcrumbs: req.breadcrumbs()});
-    })
-    .catch(err => {
-        
-    });*/
 }
 
-exports.createEscalao = async (req, res, next) => {
+exports.createEscalao = async (req, res) => {
     try {
         const designacao = req.body.designacao.trim();
         const sexo = parseInt(req.body.sexo);
@@ -116,73 +108,66 @@ exports.createEscalao = async (req, res, next) => {
     }
 }
 
-exports.updateEscalao = (req, res, next) => {
-    const escalaoId = req.params.id;
-    const designacao = req.body.designacao.trim();
-    const sexo = req.body.sexo;
-    const errors = validationResult(req);
+exports.updateEscalao = async (req, res) => {
+    try {
+        const escalaoId = req.params.id;
+        const designacao = req.body.designacao.trim();
+        const sexo = req.body.sexo;
+        const errors = validationResult(req);
+        
+        const oldData = {
+            escalaoId: escalaoId,
+            designacao: designacao,
+            sexo: sexo
+        }
     
-    const escalao = {
-        escalaoId: escalaoId,
-        designacao: designacao,
-        sexo: sexo
-    }
+        if(!errors.isEmpty()){
+            req.breadcrumbs('Editar Escalão', '/admin/editarEscalao');
+            res.render('admin/editarEscalao', {validationErrors: errors.array(), escalao: oldData, breadcrumbs: req.breadcrumbs()});
+        } else {
+            const _escalao = Escaloes.findByPk(escalaoId);
+            const _existeEscalao = Escaloes.findOne({
+                                    where: {
+                                        designacao: designacao,
+                                        sexo: sexo
+                                    }, 
+                                    raw: true    
+                                });
+            const [escalao, existeEscalao] = await Promise.all([_escalao, _existeEscalao]);
 
-    if(!errors.isEmpty()){
-        req.breadcrumbs('Editar Escalão', '/admin/editarEscalao');
-        res.render('admin/editarEscalao', {validationErrors: errors.array(), escalao: escalao, breadcrumbs: req.breadcrumbs()});
-    } else {
-        Escaloes.findOne({
-            where: {
-                designacao: designacao,
-                sexo: sexo
-            }, raw: true    
-        }).then(escaloes => {
-            // Existe escalão com a mesma designação e sexo
-            if(escaloes != null){
+            if(existeEscalao){
                 const errors = [{
                     msg: 'Escalão já existe.',
                     param: 'designacao'
                 }];
+
                 req.breadcrumbs('Editar Escalão', '/admin/editarEscalao');
-                res.render('admin/editarEscalao', {validationErrors: errors, escalao: escalao, breadcrumbs: req.breadcrumbs()});
-            } else {
-                // Não existe escalão com a mesma designação e sexo
-                // Actualiza-se o escalão
-                Escaloes.findByPk(escalaoId)
-                .then(escalao => {
-                    escalao.designacao = designacao;
-                    escalao.sexo = sexo;
-                    escalao.save()
-                    .then(result => {
-                        if(result){
-                            req.flash('success', 'Escalão actualizado com sucesso.');
-                            res.redirect('/admin/escaloes');
-                        } else {
-                            req.flash('error', 'Não foi possível actualizar o escalão.');
-                            res.redirect('/admin/escaloes');
-                        }
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        req.flash('error', 'Não foi possível actualizar o escalão.');
-                        res.redirect('/admin/escaloes');
-                    });
-                })
-                .catch(err => {
-                    console.log(err);
-                    req.flash('error', 'Não foi possível obter dados do escalão.');
-                    res.redirect('/admin/escaloes');
-                });
+                return res.render('admin/editarEscalao', {validationErrors: errors, escalao: oldData, breadcrumbs: req.breadcrumbs()});
             }
-        });
+
+            escalao.designacao = designacao;
+            escalao.sexo = sexo;
+            const result = await escalao.save();
+
+            if(!result){
+                throw new Error();
+            }
+
+            req.flash('success', 'Escalão actualizado com sucesso.');
+            res.redirect('/admin/escaloes');
+        }
+    } catch(err) {
+        console.log(err);
+        req.flash('error', 'Não foi possível actualizar o escalão.');
+        res.redirect('/admin/escaloes');
     }
 }
 
-exports.deleteEscalao = (req, res, next) => {
+exports.deleteEscalao = (req, res) => {
     const escalaoId = parseInt(req.body.id);
 
-    Escaloes.destroy({where: {escalaoId: escalaoId}, limit: 1})
+    if(req.user.level == 5 || req.user.level == 10){
+        Escaloes.destroy({where: {escalaoId: escalaoId}, limit: 1})
         .then(result => {
             if(result){
                 res.status(200).json({success: true});
@@ -193,4 +178,8 @@ exports.deleteEscalao = (req, res, next) => {
         .catch(err => { 
             res.status(200).json({success: false});
         });
+    } else {
+        res.status(200).json({success: false});
+    }
+    
 }

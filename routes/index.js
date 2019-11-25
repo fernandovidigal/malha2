@@ -41,13 +41,15 @@ router.get('/logout', (req, res) => {
 });
 
 router.get('/alterarPassword/:userId', indexController.changeUserPassword);
+
 router.put('/alterarPassword/:userId', [
-    check('password').not().isEmpty().withMessage('Deve inidicar a password'),
-    check('confirmPassword').custom((value, { req }) => {
+    check('currentPassword').not().isEmpty().withMessage('Deve inidicar a password actual'),
+    check('newPassword').not().isEmpty().withMessage('Deve inidicar a nova password'),
+    check('confirmNewPassword').custom((value, { req }) => {
         if(value.trim() == ''){
-            throw new Error('Deve confirmar a password');
-        } else if(value.trim() !== req.body.password.trim()){
-            throw new Error('As passwords devem ser iguais');
+            throw new Error('Deve confirmar a nova password');
+        } else if(value.trim() !== req.body.newPassword.trim()){
+            throw new Error('Deve ser igual à nova password');
         }
 
         return true;

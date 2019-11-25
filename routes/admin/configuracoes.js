@@ -14,4 +14,6 @@ router.get('/', ConfiguracoesController.getConfig);
 
 router.put('/definirPorta', ConfiguracoesController.writeConfigServerPorta);
 
+router.put('/switchFaker', ConfiguracoesController.switchFaker);
+
 module.exports = router;

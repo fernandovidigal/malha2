@@ -322,38 +322,35 @@ exports.deleteTorneio = (req, res) => {
   }
 };
 
-exports.deleteFase = async (req, res, next) => {
-  const fase = parseInt(req.body.fase);
-  
+exports.deleteFase = async (req, res) => {
   try {
     const escalaoId = parseInt(req.body.escalaoId);
     const torneioId = parseInt(req.body.torneioId);
+    const fase = parseInt(req.body.fase);
 
     if(req.user.level != 5 || req.user.level != 10){
-      throw new Error();
+      throw new Error('Não tem permissões para eliminar a fase');
     }
 
     const ultimaFase = await dbFunctions.getUltimaFase(torneioId, escalaoId);
 
-    if(ultimaFase == fase){
-      await dbFunctions.deleteFase(torneioId, escalaoId, ultimaFase);
-      res.status(200).json({ 
-        success: true ,
-        fase: fase,
-        escalaoId: escalaoId
-      });
-    } else {
-      res.status(200).json({
-        success: false,
-        errMsg: `Fase Inválida!`
-      });
+    if(ultimaFase != fase){
+      throw new Error('Fase Inválida');
     }
+
+    await dbFunctions.deleteFase(torneioId, escalaoId, ultimaFase);
+    
+    res.status(200).json({ 
+      success: true ,
+      fase: fase,
+      escalaoId: escalaoId
+    });
 
   } catch(err) {
     console.log(err);
     res.status(200).json({
       success: false,
-      errMsg: `Não foi possível eliminar a fase ${((fase != 100) ? fase : 'Final')}`
+      errMsg: err.message
     });
   }
 }

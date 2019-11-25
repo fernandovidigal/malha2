@@ -1,6 +1,5 @@
 const express = require('./node_modules/express');
 const app = express();
-const port = 3000;
 const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
@@ -8,6 +7,8 @@ const passport = require('passport');
 const flash = require('connect-flash');
 const methodOverride = require('method-override');
 const breadcrumbs = require('express-breadcrumbs');
+
+const secure = require('./helpers/secure');
 
 const util = require('./helpers/util');
 const fileStruct = require('./helpers/fileStruct');
@@ -35,17 +36,21 @@ try {
 // Chech File Structure
 fileStruct.dataDirectoryCheck();
 
+//var hw = secure.encrypt("Some serious stuff")
+//console.log(hw)
+//console.log(secure.decrypt(hw))
+
 configFile.readConfigFile()
-    .then(data => {
-        serverConfig = data;
-        console.log("Configuração do servidor carregada!");
-    })
-    .catch(err => {
-        configFile.writeConfigFile(serverConfig)
-            .then(() => {
-                console.log("Carregada configuração por defeito do servidor!");
-            });
+.then(data => {
+    serverConfig = data;
+    console.log("Configuração do servidor carregada!");
+})
+.catch(err => {
+    configFile.writeConfigFile(serverConfig)
+    .then(() => {
+        console.log("Carregada configuração por defeito do servidor!");
     });
+});
 
 // Database
 const sequelize = require('./helpers/database');
@@ -164,25 +169,25 @@ app.all('*', (req, res) => {
 });
 
 sequelize
-    .sync()
-    .then(async (result) => {
-        await Users.findOrCreate({
-            where: { username: 'admin' },
-            defaults: {
-                password: util.encrypt('12345'),
-                level: 10
-            }
-        })
-            .then(([user, created]) => {
-                // Utilizador por defeito criado.
-                // Server Start
-                const port = serverConfig.server.port;
-                app.listen(port, () => console.log(`Malha App em localhost:${port} ou <IP da máquina>:${port}`));
-            })
-            .catch((err) => {
-                console.log("Não foi possível criar ou aceder ao utilizador por defeito. Contacte o administrador da aplicação.");
-            });
+.sync()
+.then(async (result) => {
+    await Users.findOrCreate({
+        where: { username: 'admin' },
+        defaults: {
+            password: util.encrypt('12345'),
+            level: 10
+        }
     })
-    .catch(err => {
-        console.log(err);
+    .then(([user, created]) => {
+        // Utilizador por defeito criado.
+        // Server Start
+        const port = serverConfig.server.port;
+        app.listen(port, () => console.log(`Malha App em localhost:${port} ou <IP da máquina>:${port}`));
+    })
+    .catch((err) => {
+        console.log("Não foi possível criar ou aceder ao utilizador por defeito. Contacte o administrador da aplicação.");
     });
+})
+.catch(err => {
+    console.log(err);
+});

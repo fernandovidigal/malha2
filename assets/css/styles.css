@@ -212,6 +212,51 @@ li {
     box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.3);
 }
 
+.btn-switch {
+    line-height: 2.3;
+    padding: 0 16px;
+    border: none;
+    background-color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-switch-on {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-top: solid 1px #b4bac5;
+    border-left: solid 1px #b4bac5;
+    border-bottom: solid 1px #b4bac5;
+}
+
+.btn-switch-on:hover {
+    background-color: #dcf3e3;
+}
+
+.btn-switch-on--selected,
+.btn-switch-on--selected:hover {
+    background-color: #4da530;
+    color: white;
+}
+
+.btn-switch-off{
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-top: solid 1px #b4bac5;
+    border-right: solid 1px #b4bac5;
+    border-bottom: solid 1px #b4bac5;
+}
+
+.btn-switch-off:hover {
+    background-color: #f3dddc;
+}
+
+.btn-switch-off--selected,
+.btn-switch-off--selected:hover {
+    background-color: #d03939;
+    color: white;
+}
+
 .dummyTopSpacer {
     width: 100%;
     height: 20px;
@@ -741,30 +786,48 @@ input::placeholder {
     margin-bottom: 30px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 0 26px;
 }
 
 .user {
     color: white;
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
 .user > i {
     margin-right: 20px; 
+    font-size: 24px;
+}
+
+.user > span {
+    margin-top: -4px;
 }
 
 .userMenu {
     position: relative;
-    padding-right: 5px;
     cursor: pointer;
+    background-color: #333F4D;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.userMenu:hover {
+    background-color: #27313c;
 }
 
 .user__navigation {
     display: none;
     width: 200px;
     position: absolute;
-    top: -95px;
-    left: -175px;
+    bottom: 140%;
+    right: 0;
     background-color: #F2F2F2;
     border-radius: 4px;
     box-shadow: 0 3px 18px rgba(0, 0, 0, 0.25);
@@ -2273,4 +2336,67 @@ input::placeholder {
 .swal-apart {
     margin-top: 10px;
     font-size: 16px;
+}
+
+.tooltipBtn__wrapper {
+    position: relative;
+}
+
+.tooltip {
+    visibility: hidden;
+    position: absolute;
+    padding: 0 16px;
+    top: calc(100% + 7px);
+    right: 0;
+    background-color: #333F4d;
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    z-index: 99;
+    border-radius: 8px;  
+    line-height: 2.2;
+    white-space: nowrap;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    -webkit-animation: out .1s;
+    animation: out .1s;
+}
+
+.tooltip::after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: -5px;
+    right: 12px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 6px 5px 6px;
+    border-color:  transparent transparent #333F4d transparent;
+}
+
+.tooltipBtn__wrapper:hover .tooltip {
+    -webkit-animation: in .2s;
+    animation: in .2s;
+    animation-delay: 1s;
+    animation-fill-mode: forwards;
+}
+
+@-webkit-keyframes in {
+    from   { visibility: hidden; }
+    to { visibility: visible; }
+}
+
+@keyframes in {
+    from   { visibility: hidden; }
+    to { visibility: visible; }
+}
+
+@-webkit-keyframes out {
+    0%   { visibility: hidden; }
+    100% { visibility: hidden; }
+}
+
+@keyframes out {
+    0%   { visibility: hidden; }
+    100% { visibility: hidden; }
 }

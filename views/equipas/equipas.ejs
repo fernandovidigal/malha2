@@ -9,8 +9,14 @@
         <% if(escaloes.length > 0 && localidades.length > 0){ %>
             <div class="barraTorneio__buttons">
                 <a href="/equipas/adicionarEquipa" class="btn btn-primary">Adicionar Equipa</a>
-                <button class="btn btn-import"><i class="fas fa-download"></i></button>
-                <button class="btn btn-print"><i class="fas fa-print"></i></button>
+                <div class="tooltipBtn__wrapper">
+                    <button class="btn btn-import"><i class="fas fa-download"></i></button>
+                    <span class="tooltip">Importar Equipas</span>
+                </div>
+                <div class="tooltipBtn__wrapper">  
+                    <button class="btn btn-print"><i class="fas fa-print"></i></button>
+                    <span class="tooltip">Imprimir</span>
+                </div>
             </div>
         <% } %>
     </div>

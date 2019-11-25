@@ -1,6 +1,6 @@
 const configFunctions = require('../../helpers/configFunctions'); 
 
-exports.getConfig = (req, res, next) => {
+exports.getConfig = (req, res) => {
     configFunctions.readConfigFile()
     .then(data => {
         res.render('admin/configuracoes', {server: data.server, breadcrumbs: req.breadcrumbs()});
@@ -12,7 +12,7 @@ exports.getConfig = (req, res, next) => {
     });
 }
 
-exports.writeConfigServerPorta = async (req, res, next) => {
+exports.writeConfigServerPorta = async (req, res) => {
     try {
         const server = {
             server: {
@@ -30,4 +30,8 @@ exports.writeConfigServerPorta = async (req, res, next) => {
             success: false
         });
     }
+}
+
+exports.switchFaker = (req, res) => {
+    console.log("aqui");
 }

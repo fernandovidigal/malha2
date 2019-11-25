@@ -4746,6 +4746,8 @@ var _axios = _interopRequireDefault(require("axios"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _readOnlyError(name) { throw new Error("\"" + name + "\" is read-only"); }
+
 // SERVER PORT
 var serverPortBtn = document.querySelector('.changeServerPort-btn');
 serverPortBtn.addEventListener('click', function _callee(e) {
@@ -4819,5 +4821,74 @@ function showError(element, errorText) {
     parentElement.insertBefore(errorElement, element);
     element.classList.add('inputError');
   }
+} // SWITCH BUTTON
+
+
+var switchBtn = document.querySelectorAll('.btn-switch');
+
+if (switchBtn) {
+  switchBtn.forEach(function (el, i) {
+    el.addEventListener('click', function _callee2(e) {
+      var otherIndex, selectedClass, response;
+      return regeneratorRuntime.async(function _callee2$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              otherIndex = i == 0 ? 1 : 0;
+              selectedClass = ['btn-switch-on--selected', 'btn-switch-off--selected'];
+              response = null;
+              switchBtn[i].classList.add(selectedClass[i]);
+              switchBtn[otherIndex].classList.remove(selectedClass[otherIndex]);
+
+              if (!e.target.classList.contains('btn-switch-on')) {
+                _context2.next = 10;
+                break;
+              }
+
+              _readOnlyError("response");
+
+              _context2.next = 9;
+              return regeneratorRuntime.awrap((0, _axios.default)({
+                method: 'PUT',
+                url: '/admin/configuracoes/switchFaker',
+                data: {
+                  "switch": 1
+                }
+              }));
+
+            case 9:
+              response = _context2.sent;
+
+            case 10:
+              if (!e.target.classList.contains('btn-switch-off')) {
+                _context2.next = 15;
+                break;
+              }
+
+              _readOnlyError("response");
+
+              _context2.next = 14;
+              return regeneratorRuntime.awrap((0, _axios.default)({
+                method: 'PUT',
+                url: '/admin/configuracoes/switchFaker',
+                data: {
+                  "switch": 0
+                }
+              }));
+
+            case 14:
+              response = _context2.sent;
+
+            case 15:
+              if (response) {}
+
+            case 16:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      });
+    });
+  });
 }
 },{"sweetalert2":"../../node_modules/sweetalert2/dist/sweetalert2.all.js","axios":"../../node_modules/axios/index.js"}]},{},["configuracoes.js"], null)

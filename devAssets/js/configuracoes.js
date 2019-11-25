@@ -56,3 +56,42 @@ function showError(element, errorText){
         element.classList.add('inputError');
     }
 }
+
+// SWITCH BUTTON
+const switchBtn = document.querySelectorAll('.btn-switch');
+if(switchBtn){
+    switchBtn.forEach((el, i) => {
+        el.addEventListener('click', async function(e){
+            const otherIndex = (i == 0) ? 1 : 0;
+            const selectedClass = ['btn-switch-on--selected', 'btn-switch-off--selected'];
+            const response = null;
+
+            switchBtn[i].classList.add(selectedClass[i]);
+            switchBtn[otherIndex].classList.remove(selectedClass[otherIndex]);
+
+            if(e.target.classList.contains('btn-switch-on')){
+                response = await axios({
+                    method: 'PUT',
+                    url: '/admin/configuracoes/switchFaker',
+                    data: {
+                        switch: 1
+                    }
+                });
+            }
+
+            if(e.target.classList.contains('btn-switch-off')){
+                response = await axios({
+                    method: 'PUT',
+                    url: '/admin/configuracoes/switchFaker',
+                    data: {
+                        switch: 0
+                    }
+                });
+            }
+
+            if(response){
+
+            }
+        });
+    });
+}

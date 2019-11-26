@@ -31,7 +31,7 @@
                     <h2 class="equipasWarning__text">Não existem escalões registados.</h2>
                     <p class="equipasWarning__subText">Deve adicionar escalões para poder adicionar equipas.</p>
                 </div>
-                <a href="/admin/escaloes" class="btn btn-secondary">Adicionar Escalões</a>
+                <a href="/admin/escaloes" class="btn btn-secondary">Ver Escalões</a>
             </div>
         </div>
     <% } else if(localidades == null || localidades.length == 0){ %>
@@ -42,12 +42,12 @@
                     <h2 class="equipasWarning__text">Não existem localidades registadas.</h2>
                     <p class="equipasWarning__subText">Deve adicionar localidades para poder adicionar equipas.</p>
                 </div>
-                <a href="/admin/localidades" class="btn btn-secondary">Adicionar localidades</a>
+                <a href="/admin/localidades" class="btn btn-secondary">Ver Localidades</a>
             </div>
         </div>
     <% } else { %>
 
-    <div class="container_wrapper">
+    <div class="container_wrapper equipasContainer__wrapper">
         <div class="actionBar__wrapper">
             <h2 class="actionBar__title">Equipas <span class="numEquipas__Badge"><%= (typeof numEquipas != 'undefined') ? numEquipas : '' %></span></h2>
             <div class="actionBar__buttons">
@@ -136,7 +136,7 @@
         </div>
 
         <div class="table__wrapper equipasTable_wrapper">
-            <table class="mainTable">
+            <table class="mainTable mainTable-equipas">
                 <thead>
                     <tr>
                         <th class="equipas__column">Equipa</th>
@@ -152,7 +152,7 @@
                         <% equipas.forEach(function(equipa){ %>
                             <tr>
                                 <td align="center"><%= equipa.equipaId %></td>
-                                <td class="equipasElementos"><%= equipa.primeiroElemento %><br><%= equipa.segundoElemento %></td>
+                                <td class="equipasElementos"><span><%= equipa.primeiroElemento %></span><span><%= equipa.segundoElemento %></span></td>
                                 <td align="left"><%= equipa.localidade %></td>
                                 <td class="escalao__column" align="center"><%= equipa.escalao %><br><small>(<%= equipa.sexo == 0 ? 'Feminino': 'Masculino' %>)</small></td>
                                 <td class="detalhesBtn__column"><a href="/equipas/editarEquipa/<%= equipa.escalaoId %>/<%= equipa.equipaId %>" class="btn btn-secondary">Detalhes</a></td>

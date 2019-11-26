@@ -678,6 +678,16 @@ exports.getNumJogosPorEscalao = (torneioId, escalaoId) => {
     });
 }
 
+exports.getNumJogosDeCadaEscalao = (torneioId) => {
+    return Jogos.findAll({
+        attributes: ['escalaoId', [sequelize.fn('count', sequelize.col('jogoId')), 'numJogos']],
+        where: {
+            torneioId: torneioId
+        },
+        group: ['escalaoId']
+    });
+}
+
 exports.getNumeroJogosPorFase = (torneioId, escalaoId, fase) => {
     return Jogos.count({
         where: {

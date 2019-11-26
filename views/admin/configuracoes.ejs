@@ -13,7 +13,7 @@
             <tbody>
                 <tr>
                     <td>Porta</td>
-                    <td class="detalhesBtn__column"><input type="text" name="serverPort" id="serverPort" value="<%= server.port %>" size="12"></td>
+                    <td class="detalhesBtn__column"><input type="text" name="serverPort" id="serverPort" value="<%= config.server.port %>" size="12"></td>
                     <td class="detalhesBtn__column"><a class="btn btn-secondary changeServerPort-btn">Guardar</a></td>
                 </tr>
             </tbody>
@@ -26,7 +26,7 @@
             <tbody>
                 <tr>
                     <td>Gerar Equipas Aleatórias</td>
-                    <td class="detalhesBtn__column"><button class="btn-switch btn-switch-on">Lig.</button><button class="btn-switch btn-switch-off btn-switch-off--selected">Deslig.</button></td>
+                    <td class="detalhesBtn__column"><button class="btn-switch btn-switch-on <%= (config.faker) ? 'btn-switch-on--selected' : '' %>">Lig.</button><button class="btn-switch btn-switch-off <%= (!config.faker) ? 'btn-switch-off--selected' : '' %>">Deslig.</button></td>
                 </tr>
             </tbody>
         </table>

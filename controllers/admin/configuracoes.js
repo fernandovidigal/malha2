@@ -1,30 +1,31 @@
-const configFunctions = require('../../helpers/configFunctions'); 
+const configFunctions = require('../../helpers/configFunctions');
 
-exports.getConfig = (req, res) => {
-    configFunctions.readConfigFile()
-    .then(data => {
-        res.render('admin/configuracoes', {server: data.server, breadcrumbs: req.breadcrumbs()});
-    })
-    .catch(err => {
+exports.getConfig = async (req, res) => {
+    try {
+        const configData = await configFunctions.readConfigFile();
+        if(!configData) throw new Error();
+        
+        res.render('admin/configuracoes', {config: configData, breadcrumbs: req.breadcrumbs()});
+    } catch(err) {
         console.log(err);
         req.flash('error', 'Não foi possível carregar o ficheiro de configuração!')
-        res.redirect('../');
-    });
+        res.redirect('/admin');
+    }
 }
 
 exports.writeConfigServerPorta = async (req, res) => {
     try {
-        const server = {
-            server: {
-                port: req.body.serverPort
-            }  
+        const configData = await configFunctions.readConfigFile();
+        const inputPort = parseInt(req.body.serverPort);
+
+        if(parseInt(configData.server.port) != inputPort){
+            configData.server.port = parseInt(req.body.serverPort);
+            await configFunctions.writeConfigFile(configData);
         }
 
-        await configFunctions.writeConfigFile(server);
         res.status(200).json({
             success: true
         });
-
     } catch (err) {
         res.status(404).json({
             success: false
@@ -32,6 +33,22 @@ exports.writeConfigServerPorta = async (req, res) => {
     }
 }
 
-exports.switchFaker = (req, res) => {
-    console.log("aqui");
+exports.switchFaker = async (req, res) => {
+    try {
+        const configData = await configFunctions.readConfigFile();
+        const onOffSwitch = (parseInt(req.body.switch) == 1) ? true : false;
+        
+        if(configData.faker != onOffSwitch){
+            configData.faker = onOffSwitch;
+            await configFunctions.writeConfigFile(configData);
+        }
+
+        res.status(200).json({
+            success: true
+        });
+    } catch (err) {
+        res.status(404).json({
+            success: false
+        });
+    }
 }

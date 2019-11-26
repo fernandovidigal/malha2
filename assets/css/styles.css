@@ -88,13 +88,17 @@ li {
 }
 
 .errMsg {
-    background-color: #EDC8C5;
+    /*background-color: #EDC8C5;
     border: solid 1px #BE8180;
+    padding: 6px 20px;*/
     color: #B4302B;
-    padding: 6px 20px;
-    margin-left: 20px;
     border-radius: 6px;
     font-size: 14px;
+    display: inline-block;
+}
+
+.mrgBtm20 {
+    margin-bottom: 20px;
 }
 
 /************************************
@@ -959,6 +963,12 @@ input::placeholder {
     EQUIPAS
 ************************************/
 
+.equipasContainer__wrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
 .equipasWarning__wrapper {
     display: flex;
     justify-content: center;
@@ -1006,6 +1016,18 @@ input::placeholder {
     margin-right: 60px;
 }
 
+.actionBar__buttons .customSelect{
+    margin-left: 12px;
+}
+
+.equipasElementos span {
+    display: block;
+}
+
+.equipasElementos span:first-of-type {
+    padding-bottom: 6px;
+}
+
 /************************************
     SELECT BOXES PERSONALIZADAS
 ************************************/
@@ -1014,7 +1036,7 @@ input::placeholder {
     min-width: 180px;
     width: auto;
     position: relative;
-    margin-left: 12px;
+    /*margin-left: 12px;*/
 }
 
 .placeholder {
@@ -1136,7 +1158,7 @@ input::placeholder {
 
 .customSelect__links:hover,
 .perPageSelect__link:hover {
-    background-color: #EEEFF3;
+    background-color: #F5F5F5;
 }
 
 .customSelect__links-selected,
@@ -1271,12 +1293,19 @@ input::placeholder {
 }
 
 .equipasTable_wrapper {
-    margin-bottom: 50px;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 .mainTable {
     width: 100%;
     border-collapse: collapse;
+}
+
+.mainTable-equipas {
+    margin-bottom: auto;
 }
 
 .mainTable th {
@@ -1363,10 +1392,11 @@ input::placeholder {
 }
 
 .paginacao__item:hover {
-    background-color: #F3F5F7;
+    background-color: #F5F5F5;
 }
 
-.paginacao__selected {
+.paginacao__selected,
+.paginacao__selected:hover {
     background-color: #E7EEF3;
 }
 
@@ -1683,6 +1713,7 @@ input::placeholder {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-left: 20px;
 }
 
 .listagems__item-inputs {
@@ -2377,7 +2408,7 @@ input::placeholder {
 .tooltipBtn__wrapper:hover .tooltip {
     -webkit-animation: in .2s;
     animation: in .2s;
-    animation-delay: 1s;
+    animation-delay: .8s;
     animation-fill-mode: forwards;
 }
 

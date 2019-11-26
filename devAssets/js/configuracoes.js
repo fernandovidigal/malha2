@@ -64,33 +64,45 @@ if(switchBtn){
         el.addEventListener('click', async function(e){
             const otherIndex = (i == 0) ? 1 : 0;
             const selectedClass = ['btn-switch-on--selected', 'btn-switch-off--selected'];
-            const response = null;
+            let msg = '';
+            let errMsg = '';
+            const query = {
+                method: 'PUT',
+                url: '/admin/configuracoes/switchFaker'
+            };
 
             switchBtn[i].classList.add(selectedClass[i]);
             switchBtn[otherIndex].classList.remove(selectedClass[otherIndex]);
 
             if(e.target.classList.contains('btn-switch-on')){
-                response = await axios({
-                    method: 'PUT',
-                    url: '/admin/configuracoes/switchFaker',
-                    data: {
-                        switch: 1
-                    }
-                });
+                query.data = { switch: 1 };
+                msg = 'Geração de equipas aleatórias Ligado';
+                errMsg = 'Não foi possível ligar a geração de equipas aleatórias';
             }
 
             if(e.target.classList.contains('btn-switch-off')){
-                response = await axios({
-                    method: 'PUT',
-                    url: '/admin/configuracoes/switchFaker',
-                    data: {
-                        switch: 0
-                    }
-                });
+                query.data = { switch: 0 };
+                msg = 'Geração de equipas aleatórias Desligado';
+                errMsg = 'Não foi possível desligar a geração de equipas aleatórias';
             }
 
-            if(response){
+            const response = await axios(query);
 
+            if(response){
+                if(response.data.success){
+                    Swal.fire({
+                        icon: 'success',
+                        title: msg,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: errMsg,
+                    });
+                }
             }
         });
     });

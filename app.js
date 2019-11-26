@@ -8,8 +8,6 @@ const flash = require('connect-flash');
 const methodOverride = require('method-override');
 const breadcrumbs = require('express-breadcrumbs');
 
-const secure = require('./helpers/secure');
-
 const util = require('./helpers/util');
 const fileStruct = require('./helpers/fileStruct');
 const configFile = require('./helpers/configFunctions');
@@ -17,7 +15,8 @@ const configFile = require('./helpers/configFunctions');
 let serverConfig = {
     server: {
         port: 3000
-    }
+    },
+    faker: false
 }
 
 // Para Produção

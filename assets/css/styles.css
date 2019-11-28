@@ -26,6 +26,7 @@
 
 body {
     font-family: 'Lato', sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
 h1 {
@@ -1014,6 +1015,7 @@ input::placeholder {
 .actionBar__buttons {
     display: flex;
     margin-right: 60px;
+    align-items: center;
 }
 
 .actionBar__buttons .customSelect{
@@ -1229,10 +1231,10 @@ input::placeholder {
     padding: 6px 35px 6px 20px;
     border-radius: 6px !important;
     color: #576575;
-    cursor: pointer;
     font-size: 15px;
     width: 120px;
     user-select: none;
+    height: 32px !important;
 }
 
 .searchedEquipaId__wrapper {
@@ -1241,6 +1243,7 @@ input::placeholder {
     border: solid 1px #919498;
 }
 
+.searchBox__input:focus,
 .searchedEquipaId__selected {
     border: solid 1px #919498 !important;
 }
@@ -1263,6 +1266,7 @@ input::placeholder {
     color: #576575;
     font-size: 15px;
     cursor: pointer;
+    display: flex;
 }
 
 .escaloesDefinidos {
@@ -1599,7 +1603,7 @@ input::placeholder {
 
 .escalaoNumCampos:not(:disabled) + label:hover {
     color: #333f4d;
-    background-color: #e8e8e8;
+    background-color: #fdf1f1;
 }
 
 .escalaoNumCampos:checked + label,

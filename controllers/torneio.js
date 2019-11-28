@@ -315,7 +315,7 @@ exports.setNumeroCampos = async (req, res, next) => {
             }
 
             if(transaction.finished === 'commit'){
-                req.flash("success", "Número de campos do torneio foi actualizado com sucesso!");
+                req.flash("success", "Número de campos do torneio foi definido com sucesso!");
                 res.redirect('/torneio');
             } else {
                 req.flash("error", "Não foi possível definir o número de campos para o torneio.");

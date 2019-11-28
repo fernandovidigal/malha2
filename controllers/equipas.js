@@ -4,6 +4,7 @@ const sequelize = require('../helpers/database');
 const { validationResult } = require('express-validator/check');
 const util = require('../helpers/util');
 const torneioHelpers = require('../helpers/torneioHelperFunctions');
+const configFile = require('../helpers/configFunctions');
 
 const faker = require('faker');
 faker.locale = "pt_BR";
@@ -365,7 +366,7 @@ exports.createEquipa = async (req, res) => {
 
             if(created){
                 req.flash('success', 'Equipa adicionada com sucesso.');
-                res.redirect('/equipas');
+                return res.redirect('/equipas');
             } else {
                 const errors = [{
                     msg: 'A equipa já se encontra registada neste torneio.'
@@ -412,70 +413,69 @@ exports.updateEquipa = async (req, res) => {
             const torneio = await dbFunctions.getTorneioInfo();
             const equipa = await dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId, oldEscalaoId, false);
 
-            if(equipa){
-                let createdEquipa = null;
-                let updatedEquipa = null;
-
-                if(escalaoId != oldEscalaoId){
-                    const lastId = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId) || 0;
-
-                    const _equipa = {
-                        equipaId: lastId+1,
-                        torneioId: torneio.torneioId,
-                        primeiroElemento: primeiroElemento,
-                        segundoElemento: segundoElemento,
-                        localidadeId: localidadeId,
-                        escalaoId: escalaoId
-                    }
-
-                    let transaction;
-                    try{
-                        transaction = await sequelize.transaction();
-
-                        // Verifica se a Equipas já existe no escalão selecionado
-                        const existeEquipa = await Equipas.findOne({
-                            where: _equipa,
-                            transaction
-                        });
-
-                        if(existeEquipa) {
-                            throw 'A equipas já existe no escalão selecionado'
-                        } else {
-                            // Elimina a equipa do escalão antigo
-                            await equipa.destroy({transaction});
-                            // Regista a equipa no novo escalão
-                            console.log(_equipa);
-                            createdEquipa = await Equipas.create(_equipa, {transaction});
-
-                            if(createdEquipa) {
-                                await transaction.commit();
-                            } else {
-                                throw "Não foi possível actualizar a equipa";
-                            }
-                        }
-                    } catch(err){
-                        if(transaction) await transaction.rollback();
-                        throw err;
-                    }
-                    
-                } else {
-                    equipa.primeiroElemento = primeiroElemento;
-                    equipa.segundoElemento = segundoElemento;
-                    equipa.localidadeId = localidadeId;
-                    equipa.escalaoId = escalaoId;
-
-                    updatedEquipa = await equipa.save();
-                }
-
-                if(updatedEquipa || createdEquipa){
-                    req.flash('success', 'Equipa actualizada com sucesso.')
-                    res.redirect('/equipas');
-                } else {
-                    req.flash('error', 'Não foi possível actualizar a equipa.')
-                    res.redirect('/equipas');
-                }
-            } else {
+            if(!equipa){
                 req.flash('error', 'Equipa não existe.')
+                return res.redirect('/equipas');
+            }
+
+            let createdEquipa = null;
+            let updatedEquipa = null;
+
+            if(escalaoId != oldEscalaoId){
+                const lastId = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId) || 0;
+
+                const _equipa = {
+                    equipaId: lastId+1,
+                    torneioId: torneio.torneioId,
+                    primeiroElemento: primeiroElemento,
+                    segundoElemento: segundoElemento,
+                    localidadeId: localidadeId,
+                    escalaoId: escalaoId
+                }
+
+                let transaction;
+                try{
+                    transaction = await sequelize.transaction();
+
+                    // Verifica se a Equipas já existe no escalão selecionado
+                    const existeEquipa = await Equipas.findOne({
+                        where: _equipa,
+                        transaction
+                    });
+
+                    if(existeEquipa) {
+                        throw 'A equipas já existe no escalão selecionado'
+                    } else {
+                        // Elimina a equipa do escalão antigo
+                        await equipa.destroy({transaction});
+                        // Regista a equipa no novo escalão
+                        createdEquipa = await Equipas.create(_equipa, {transaction});
+
+                        if(createdEquipa) {
+                            await transaction.commit();
+                        } else {
+                            throw "Não foi possível actualizar a equipa";
+                        }
+                    }
+                } catch(err){
+                    if(transaction) await transaction.rollback();
+                    throw err;
+                }
+                
+            } else {
+                equipa.primeiroElemento = primeiroElemento;
+                equipa.segundoElemento = segundoElemento;
+                equipa.localidadeId = localidadeId;
+                equipa.escalaoId = escalaoId;
+
+                updatedEquipa = await equipa.save();
+            }
+
+            if(updatedEquipa || createdEquipa){
+                req.flash('success', 'Equipa actualizada com sucesso.')
+                res.redirect('/equipas');
+            } else {
+                req.flash('error', 'Não foi possível actualizar a equipa.')
                 res.redirect('/equipas');
             }
         } catch(err) {
@@ -486,15 +486,13 @@ exports.updateEquipa = async (req, res) => {
     }
 }
 
-exports.getEquipaToDelete = async (req, res, next) => {
-    const equipaId = parseInt(req.params.equipaId);
-    const escalaoId = parseInt(req.params.escalaoId);
-
-    let response = {
-        success: false
-    };
+exports.getEquipaToDelete = async (req, res) => {
+    let response = { success: false };
     
     try {
+        const equipaId = parseInt(req.params.equipaId);
+        const escalaoId = parseInt(req.params.escalaoId);
+
         const torneio = await dbFunctions.getTorneioInfo();
         const equipa = await dbFunctions.getEquipaFullDetails(torneio.torneioId, equipaId, escalaoId);
 
@@ -518,17 +516,16 @@ exports.getEquipaToDelete = async (req, res, next) => {
     res.status(200).json(response);
 }
 
-exports.deleteEquipa = async (req, res, next) => {
-    const equipaId = parseInt(req.body.equipaId);
-    const torneioId = parseInt(req.body.torneioId);
-    const escalaoId = parseInt(req.body.escalaoId);
-
-    let response = {
-        success: false
-    };
+exports.deleteEquipa = async (req, res) => {
+    let response = { success: false };
 
     try {
+        const equipaId = parseInt(req.body.equipaId);
+        const torneioId = parseInt(req.body.torneioId);
+        const escalaoId = parseInt(req.body.escalaoId);
+
         const equipa = await dbFunctions.getSimpleEquipa(torneioId, equipaId, escalaoId, false);
+
         if(equipa){
             const result = await equipa.destroy();
             response = {
@@ -543,19 +540,19 @@ exports.deleteEquipa = async (req, res, next) => {
 }
 
 // Pesquisar Equipas
-exports.searchEquipa = async (req, res, next) => {
-    const equipaId = parseInt(req.body.pesquisaEquipaId);
-    const escalaoId = parseInt(req.params.escalao);
-    const localidadeId = parseInt(req.params.localidadeId) || 0;
-    const errors = validationResult(req);
+exports.searchEquipa = async (req, res) => {
+    try {
+        const equipaId = parseInt(req.body.pesquisaEquipaId);
+        const escalaoId = parseInt(req.params.escalao);
+        const localidadeId = parseInt(req.params.localidadeId) || 0;
+        const errors = validationResult(req);
 
-    if(!errors.isEmpty()){
-        const error = errors.array({ onlyFirstError: true })[0].msg;
-        req.flash("error", error);
-        res.redirect('/equipas');
-    } else {
-        try {
-            if(!escalaoId) throw new Error();
+        if(!errors.isEmpty()){
+            const error = errors.array({ onlyFirstError: true })[0].msg;
+            req.flash("error", error);
+            res.redirect('/equipas');
+        } else {
+            if(!escalaoId || !equipaId) throw new Error();
 
             const torneio = await dbFunctions.getTorneioInfo();
             const equipa = await dbFunctions.getEquipaFullDetails(torneio.torneioId, equipaId, escalaoId);
@@ -606,16 +603,16 @@ exports.searchEquipa = async (req, res, next) => {
                 numEquipas: searchedEquipa.length,
                 breadcrumbs: req.breadcrumbs()
             });
-        } catch(err) {
-            console.log(err);
-            req.flash('error', 'Não foi possível pesquisar a equipa.');
-            res.redirect('/equipas');
         }
+    } catch(err){
+        console.log(err);
+        req.flash('error', 'Não foi possível pesquisar a equipa.');
+        res.redirect('/equipas');
     }
 }
 
 // Filtrar Equipas
-exports.filtrarEquipas = async (req, res, next) => {
+exports.filtrarEquipas = async (req, res) => {
     try {
         const localidadeId = parseInt(req.params.localidadeId);
         const escalaoId = parseInt(req.params.escalaoId);
@@ -705,7 +702,7 @@ exports.filtrarEquipas = async (req, res, next) => {
 }
 
 // API
-exports.listagemEquipas = async (req, res, next) => {
+exports.listagemEquipas = async (req, res) => {
     try {
         const localidadeId = parseInt(req.params.localidade);
         const escalaoId = parseInt(req.params.escalao);
@@ -773,21 +770,28 @@ exports.listagemEquipas = async (req, res, next) => {
 }
 
 // Faker
-exports.createEquipasAleatoriamente = async (req, res, next) => {
-    const num = parseInt(req.params.num) || 0;
+exports.createEquipasAleatoriamente = async (req, res) => {
+    try {
+        const configData = await configFile.readConfigFile();
 
-    const torneioInfo = dbFunctions.getTorneioInfo();
-    const localidadesInfo = dbFunctions.getAllLocalidadesID();
-    const escaloesInfo = dbFunctions.getEscaloesInfo();
+        if(!configData.faker) {
+            req.flash('info', 'Gerar equipas aleatóriamente está DESACTIVADO');
+            return res.redirect('/equipas');
+        }
 
-    await Promise.all([torneioInfo, localidadesInfo, escaloesInfo])
-    .then(async ([torneio, localidades, escaloes]) => {
-        
+        const num = parseInt(req.params.num) || 0;
+        const torneioInfo = dbFunctions.getTorneioInfo();
+        const localidadesInfo = dbFunctions.getAllLocalidadesID();
+        const escaloesInfo = dbFunctions.getEscaloesInfo();
+
+        const [torneio, localidades, escaloes] = await Promise.all([torneioInfo, localidadesInfo, escaloesInfo]);
+
         const _listaLocalidades = localidades.map(localidade => localidade.localidadeId);
         const _listaEscaloes = escaloes.map(escalao => escalao.escalaoId);
         const listaEquipas = [];
 
         let listaEscaloes = await dbFunctions.getLastEquipaIDTodosEscaloes(torneio.torneioId);
+        const listaEscaloesComJogos = await dbFunctions.getNumJogosDeCadaEscalao(torneio.torneioId);
 
         for(const escalao of _listaEscaloes){
             const found = listaEscaloes.find(el => el.escalaoId == escalao);
@@ -798,6 +802,9 @@ exports.createEquipasAleatoriamente = async (req, res, next) => {
                 });
             }
         }
+
+        listaEscaloes.filter(el => -1 === listaEscaloesComJogos.findIndex(x => x.escalaoId == el.escalaoId));
+        //console.log(listaEscaloes);
 
         for(let i = 0; i < num; i++){
             const _escalao = listaEscaloes[Math.floor(Math.random() * listaEscaloes.length)];
@@ -813,27 +820,40 @@ exports.createEquipasAleatoriamente = async (req, res, next) => {
             listaEquipas.push(equipa);
         }
 
-        await Equipas.bulkCreate(listaEquipas);     
-    }).then(() => {
-        req.flash('success', `${num} equipas adicionadas com sucesso.`);
+        await Equipas.bulkCreate(listaEquipas); 
+
+        req.flash('success', `${listaEquipas.length} equipas adicionadas com sucesso.`);
         res.redirect('/equipas');
-    })
-    .catch(err => {
+
+    } catch(err){
         console.log(err);
         req.flash('error', 'Não foi possível gerar equipas aleatóriamente.');
         res.redirect('/equipas');
-    });
+    }
 }
 
-exports.createEquipasAleatoriamentePorEscalao = async (req, res, next) => {
-    const escalaoId = parseInt(req.params.escalao);
-    const num = parseInt(req.params.num) || 0;
+exports.createEquipasAleatoriamentePorEscalao = async (req, res) => {
+    try {
+        const configData = await configFile.readConfigFile();
 
-    const torneioInfo = dbFunctions.getTorneioInfo();
-    const localidadesInfo = dbFunctions.getAllLocalidadesID();
+        if(!configData.faker) {
+            req.flash('info', 'Gerar equipas aleatóriamente está DESACTIVADO');
+            return res.redirect('/equipas');
+        }
+        const escalaoId = parseInt(req.params.escalao);
+        const num = parseInt(req.params.num) || 0;
 
-    await Promise.all([torneioInfo, localidadesInfo])
-    .then(async ([torneio, localidades]) => {
+        const torneioInfo = dbFunctions.getTorneioInfo();
+        const localidadesInfo = dbFunctions.getAllLocalidadesID();
+
+        const [torneio, localidades] = await Promise.all([torneioInfo, localidadesInfo]);
+
+        const numJogos = await dbFunctions.getNumJogosPorEscalao(torneio.torneioId, escalaoId);
+        if(numJogos > 0){
+            req.flash('warning', 'O escalão selecionado já iniciou a competição');
+            return res.redirect('/equipas');
+        }
+
         const listaLocalidades = localidades.map(localidade => localidade.localidadeId);
         const listaEquipas = [];
 
@@ -852,14 +872,12 @@ exports.createEquipasAleatoriamentePorEscalao = async (req, res, next) => {
         }
 
         await Equipas.bulkCreate(listaEquipas);
-    })
-    .then(() => {
+
         req.flash('success', `${num} equipas adicionadas com sucesso.`);
         res.redirect('/equipas');
-    })
-    .catch(err => {
+    } catch(err) {
         console.log(err);
         req.flash('error', 'Não foi possível gerar equipas aleatóriamente.');
         res.redirect('/equipas');
-    });
+    }
 }

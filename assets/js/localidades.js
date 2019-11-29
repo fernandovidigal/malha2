@@ -4907,8 +4907,7 @@ deleteBtns.forEach(function (item, index) {
 
             _sweetalert.default.fire({
               icon: 'error',
-              title: 'Oops...',
-              text: 'Não foi possível eliminar a localidade'
+              title: 'Não foi possível eliminar a localidade'
             });
 
           case 22:

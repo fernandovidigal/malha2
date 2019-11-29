@@ -48,7 +48,7 @@ async function processaListaEquipasAgrupadasPorCampos(torneioId, escalaoId, fase
     }
 }
 
-exports.mostraListagens = async (req, res, next) => {
+exports.mostraListagens = async (req, res) => {
     const torneio = await dbFunctions.getTorneioInfo();
 
     if(!torneio){
@@ -71,7 +71,7 @@ exports.mostraListagens = async (req, res, next) => {
 }
 
 // API
-exports.getFases = async (req, res, next) => {
+exports.getFases = async (req, res) => {
     try {
         const torneio = await dbFunctions.getTorneioInfo();
         const escalaoId = parseInt(req.params.escalao);
@@ -105,7 +105,7 @@ exports.getFases = async (req, res, next) => {
     }
 }
 
-exports.getCampos = async (req, res, next) => {
+exports.getCampos = async (req, res) => {
     try {
         const torneio = await dbFunctions.getTorneioInfo();
         const escalaoId = parseInt(req.params.escalao);
@@ -144,7 +144,7 @@ exports.getCampos = async (req, res, next) => {
     } 
 }
 
-exports.getEquipas = async (req, res, next) => {
+exports.getEquipas = async (req, res) => {
     try {
         const torneio = await dbFunctions.getTorneioInfo();
         const escalaoId = parseInt(req.params.escalao);
@@ -166,7 +166,7 @@ exports.getEquipas = async (req, res, next) => {
         } else {
             response.errMsg = 'Não existem equipas para este escalão.';
         }
-    
+
         res.status(200).json(response);
     } catch(err) {
         console.log(err);
@@ -177,7 +177,7 @@ exports.getEquipas = async (req, res, next) => {
     } 
 }
 
-exports.getListaEquipasPorConcelho = async (req, res, next) => {
+exports.getListaEquipasPorConcelho = async (req, res) => {
     try {
         const localidadeId = parseInt(req.params.localidadeId);
         const torneio = await dbFunctions.getTorneioInfo();
@@ -221,7 +221,7 @@ exports.getListaEquipasPorConcelho = async (req, res, next) => {
     }
 }
 
-exports.getNumEquipasPorConcelho = async (req, res, next) => {
+exports.getNumEquipasPorConcelho = async (req, res) => {
     try{
         const escalaoId = parseInt(req.params.escalao);
         const torneioInfo = dbFunctions.getTorneioInfo();
@@ -270,7 +270,7 @@ exports.getNumEquipasPorConcelho = async (req, res, next) => {
     }
 }
 
-exports.getEquipasAgrupadasPorCampos = async (req, res, next) => {
+exports.getEquipasAgrupadasPorCampos = async (req, res) => {
     try {
         const escalaoId = parseInt(req.params.escalao);
         const fase = parseInt(req.params.fase);
@@ -340,7 +340,7 @@ exports.getEquipasAgrupadasPorCampos = async (req, res, next) => {
     }
 }
 
-exports.getFichasJogo = async (req, res, next) => {
+exports.getFichasJogo = async (req, res) => {
     try {
         const escalaoId = parseInt(req.params.escalao);
         const campo = parseInt(req.params.campo);
@@ -411,7 +411,7 @@ exports.getFichasJogo = async (req, res, next) => {
     }
 }
 
-exports.getClassificacao = async (req, res, next) => {
+exports.getClassificacao = async (req, res) => {
     try {
 
         const escalaoId = parseInt(req.params.escalao);

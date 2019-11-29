@@ -57,8 +57,7 @@ async function showDeleteMessage(equipa){
         } catch(err) {
             Swal.fire({
                 icon: 'error',
-                title: 'Oops...',
-                text: 'Não foi possível eliminar a equipa',
+                title: 'Não foi possível eliminar a equipa',
             });
         }
     }

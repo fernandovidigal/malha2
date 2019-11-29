@@ -9,7 +9,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 let guardaResultados = document.getElementsByName('guardaResultados');
 
 if(guardaResultados){
-    guardaResultados.forEach((btn, index) => {
+    guardaResultados.forEach(btn => {
         btn.addEventListener('click', function(e){
             e.preventDefault();
             handleParciais(btn, "/torneio/registaParciais", true);
@@ -86,8 +86,7 @@ if(equipaParciais){
                 }
             });
 
-            
-            parcial.addEventListener('change', function(e){
+            parcial.addEventListener('input', function(){
                 const parcial1 = validaParesDeParciais(parciaisInput[0], parciaisInput[1]);
                 const parcial2 = validaParesDeParciais(parciaisInput[2], parciaisInput[3]);
                 const parcial3 = validaParesDeParciais(parciaisInput[4], parciaisInput[5]);
@@ -133,14 +132,14 @@ if(equipaParciais){
 function getEquipasInputValues(jogosInfoRow){
     return {
         equipa1: {
-            parcial1: parseInt(jogosInfoRow.querySelector('.equipa1_parcial1').value),
-            parcial2: parseInt(jogosInfoRow.querySelector('.equipa1_parcial2').value),
-            parcial3: (isNaN(parseInt(jogosInfoRow.querySelector('.equipa1_parcial3').value))) ? 0 : parseInt(jogosInfoRow.querySelector('.equipa1_parcial3').value)
+            parcial1: jogosInfoRow.querySelector('.equipa1_parcial1'),
+            parcial2: jogosInfoRow.querySelector('.equipa1_parcial2'),
+            parcial3: jogosInfoRow.querySelector('.equipa1_parcial3')
         },
         equipa2: {
-            parcial1: parseInt(jogosInfoRow.querySelector('.equipa2_parcial1').value),
-            parcial2: parseInt(jogosInfoRow.querySelector('.equipa2_parcial2').value),
-            parcial3: (isNaN(parseInt(jogosInfoRow.querySelector('.equipa2_parcial3').value))) ? 0 : parseInt(jogosInfoRow.querySelector('.equipa2_parcial3').value)
+            parcial1: jogosInfoRow.querySelector('.equipa2_parcial1'),
+            parcial2: jogosInfoRow.querySelector('.equipa2_parcial2'),
+            parcial3: jogosInfoRow.querySelector('.equipa2_parcial3')
         }
     }
 }
@@ -148,37 +147,54 @@ function getEquipasInputValues(jogosInfoRow){
 function validaPontosEquipas(equipa1, equipa2){
     let valido = true;
 
-    if(equipa1.parcial1 < 0 || equipa1.parcial1 > 30 || equipa2.parcial1 < 0 || equipa2.parcial1 > 30 || equipa1.parcial1 == equipa2.parcial1 || equipa1.parcial1 % 3 != 0 || equipa2.parcial1 % 3 != 0 || (equipa1.parcial1 != 30 && equipa2.parcial1 != 30)){
-        valido = false;
+    // Valida Parcial 1
+    const parcial1 = validaParesDeParciais(equipa1.parcial1, equipa2.parcial1);
+    if(!parcial1) {
         Swal.fire({
             icon: 'error',
             title: 'Parciais',
             text: 'Parciais do primeiro jogo inválidos'
         });
-    } else if(equipa1.parcial2 < 0 || equipa1.parcial2 > 30 || equipa2.parcial2 < 0 || equipa2.parcial2 > 30 || equipa1.parcial2 == equipa2.parcial2 || equipa1.parcial2 % 3 != 0 || equipa2.parcial2 % 3 != 0 || (equipa1.parcial2 != 30 && equipa2.parcial2 != 30)){
-        valido = false;
+        return false;
+    }
+
+    // Valida Parcial 2
+    const parcial2 = validaParesDeParciais(equipa1.parcial2, equipa2.parcial2);
+    if(!parcial2) {
         Swal.fire({
             icon: 'error',
             title: 'Parciais',
             text: 'Parciais do segundo jogo inválidos'
         });
-    } else if(equipa1.parcial3 < 0 || equipa1.parcial2 > 30 || equipa2.parcial3 < 0 || equipa2.parcial3 > 30 || equipa1.parcial3 % 3 != 0 || equipa2.parcial3 % 3 != 0){
-        valido = false;
-        Swal.fire({
-            icon: 'error',
-            title: 'Parciais',
-            text: 'Parciais do terceiro jogo inválidos'
-        });
-    } else if(equipa1.parcial3 != 0 && equipa2.parcial3 != 0 && (equipa1.parcial3 == equipa2.parcial3 || (equipa1.parcial3 != 30 && equipa2.parcial3 != 30))){
-        valido = false;
-        Swal.fire({
-            icon: 'error',
-            title: 'Parciais',
-            text: 'Parciais do terceiro jogo inválidos'
-        });
+        return false;
     }
 
-    return valido;
+    // Valida Parcial 3
+    const parcial3 = validaParesDeParciais(equipa1.parcial3, equipa2.parcial3);
+    if(!parcial3) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Parciais',
+            text: 'Parciais do terceiro jogo inválidos'
+        });
+        return false;
+    }
+
+    if(parcial1 && parcial2) {
+        const vencedorParcial1 = verificaVencedor(parseInt(equipa1.parcial1.value), parseInt(equipa2.parcial1.value));
+        const vencedorParcial2 = verificaVencedor(parseInt(equipa1.parcial2.value), parseInt(equipa2.parcial2.value));
+
+        if(vencedorParcial1 != vencedorParcial2 && (equipa1.parcial3.value == 0 && equipa2.parcial3.value == 0)){
+            Swal.fire({
+                icon: 'error',
+                title: 'Parciais',
+                text: 'Parciais do terceiro jogo inválidos'
+            });
+            return false;
+        }
+    }
+
+    return true;
 }
 
 async function handleParciais(btn, url, moveToEnd, actualizar = 0){
@@ -201,7 +217,18 @@ async function handleParciais(btn, url, moveToEnd, actualizar = 0){
                 url: url,
                 data: {
                     jogoId: jogoID,
-                    parciaisData: equipasInputValues
+                    parciaisData: {
+                        equipa1: {
+                            parcial1: equipasInputValues.equipa1.parcial1.value,
+                            parcial2: equipasInputValues.equipa1.parcial2.value,
+                            parcial3: equipasInputValues.equipa1.parcial3.value
+                        },
+                        equipa2: {
+                            parcial1: equipasInputValues.equipa2.parcial1.value,
+                            parcial2: equipasInputValues.equipa2.parcial2.value,
+                            parcial3: equipasInputValues.equipa2.parcial3.value
+                        }
+                    }
                 }
             });
             const data = response.data;
@@ -229,8 +256,7 @@ async function handleParciais(btn, url, moveToEnd, actualizar = 0){
 
                 Swal.fire({
                     icon: 'success',
-                    title: 'Parciais',
-                    text: `Parciais ${(actualizar == 0) ? 'adicionados': 'actualizados'} com sucesso!`,
+                    title: `Parciais ${(actualizar == 0) ? 'adicionados': 'actualizados'} com sucesso!`,
                     showConfirmButton: false,
                     timer: 1500
                 });
@@ -241,8 +267,7 @@ async function handleParciais(btn, url, moveToEnd, actualizar = 0){
         } catch(err) {
             Swal.fire({
                 icon: 'error',
-                title: 'Oops...',
-                text: err.message,
+                title: err.message,
             });
             currentBtnWrapper.replaceChild(btn, loadingDiv);
         }
@@ -357,15 +382,13 @@ async function imprimeFichaParciais(escalao, fase, campo){
         } else {
             Swal.fire({
                 icon: 'error',
-                title: 'Oops...',
-                text: data.errMsg,
+                title: data.errMsg,
             });
         }
     } catch(err){
         Swal.fire({
             icon: 'error',
-            title: 'Oops...',
-            text: 'Não foi possível obter os dados!',
+            title: 'Não foi possível obter os dados!',
         });
     }
 }

@@ -150,15 +150,13 @@ async function imprimeListaEquipasPorConcelho(localidadeId) {
     } else {
       Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: response.errMsg
+        title: response.errMsg
       });
     }
   } catch(err) {
     Swal.fire({
       icon: "error",
-      title: "Oops...",
-      text: "Não foi possível obter os dados!"
+      title: "Não foi possível obter os dados!"
     });
   }
 }
@@ -183,15 +181,13 @@ async function imprimeNumEquipasPorConcelho(escalaoId) {
     } else {
       Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: data.errMsg
+        title: data.errMsg
       });
     }
   } catch (err) {
     Swal.fire({
       icon: "error",
-      title: "Oops...",
-      text: "Não foi possível obter os dados!"
+      title: "Não foi possível obter os dados!"
     });
   }
 }
@@ -199,7 +195,7 @@ async function imprimeNumEquipasPorConcelho(escalaoId) {
 async function imprimeEquipasAgrupadasPorCampos(escalaoId, fase, campo) {
   try {
     const response = await axios(`/listagens/equipasAgrupadasPorCampos/${escalaoId}/${fase}/${campo}`);
-    const data = response.dataM
+    const data = response.data;
 
     printFunctions.docDefinition.content = [];
 
@@ -233,15 +229,14 @@ async function imprimeEquipasAgrupadasPorCampos(escalaoId, fase, campo) {
     } else {
       Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: data.errMsg
+        title: data.errMsg
       });
     }
   } catch (err) {
+    console.log(err);
     Swal.fire({
       icon: "error",
-      title: "Oops...",
-      text: "Não foi possível obter os dados!"
+      title: "Não foi possível obter os dados!"
     });
   }
 }
@@ -275,14 +270,14 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent) {
 
         if (fase == 1) {
           const soFolhaRosto = parent.querySelector(".soFolhaRostoInput");
-          printFunctions.makeFolhaRostoJogosPrimeiraFase(printFunctions.docDefinition, campo, equipas.listaEquipas, fase);
+          printFunctions.makeFolhaRostoJogosPrimeiraFase(printFunctions.docDefinition, campo, equipas.data.listaEquipas, fase);
 
           // Verifica se só se pretende imprimir a folha de rosto
           if (!soFolhaRosto.checked) {
             printFunctions.makeContentFichaJogoPrimeiraFase(printFunctions.docDefinition, campo, fase);
           }
         } else {
-          printFunctions.makeFichasJogoFasesSeguintes(printFunctions.docDefinition, campo, equipas.listaEquipas, fase);
+          printFunctions.makeFichasJogoFasesSeguintes(printFunctions.docDefinition, campo, equipas.data.listaEquipas, fase);
         }
       });
 
@@ -294,15 +289,14 @@ async function imprimeFichasJogo(escalaoId, fase, campo, parent) {
     } else {
       Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: data.errMsg
+        title: data.errMsg
       });
     }
   } catch (err) {
+    console.log(err);
     Swal.fire({
       icon: "error",
-      title: "Oops...",
-      text: "Não foi possível obter os dados!"
+      title: "Não foi possível obter os dados!"
     });
   }
 }
@@ -335,15 +329,13 @@ async function imprimeResultados(escalaoId, fase, campo) {
     } else {
       Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: data.errMsg
+        title: data.errMsg
       });
     }
   } catch (err) {
     Swal.fire({
       icon: "error",
-      title: "Oops...",
-      text: "Não foi possível obter os dados!"
+      title: "Não foi possível obter os dados!"
     });
   }
 }
@@ -408,8 +400,7 @@ itemsListagem.forEach((itemListagem, index) => {
     } catch (err) {
       Swal.fire({
         icon: 'error',
-        title: 'Oops...',
-        text: 'Não foi possível obter os dados!'
+        title: 'Não foi possível obter os dados!'
       });
     }
   });
@@ -426,8 +417,7 @@ if(listaEquipasPorConcelhoBtn){
     } else {
       Swal.fire({
         icon: "warning",
-        title: "Oops...",
-        text: "Deve selecionar a Localidade."
+        title: "Deve selecionar a Localidade."
       });
     }
   });
@@ -445,8 +435,7 @@ if(numEquipasPorConcelhoBtn){
     } else {
       Swal.fire({
         icon: "warning",
-        title: "Oops...",
-        text: "Deve selecionar o Escalão."
+        title: "Deve selecionar o Escalão."
       });
     }
   });
@@ -473,8 +462,7 @@ if(equipasAgrupadasPorCamposBtn){
     } catch (err) {
       Swal.fire({
         icon: "warning",
-        title: "Oops...",
-        text: err
+        title: err
       });
     }
   });
@@ -501,8 +489,7 @@ if(fichasJogoBtn){
     } catch (err) {
       Swal.fire({
         icon: "warning",
-        title: "Oops...",
-        text: err
+        title: err
       });
     }
   });
@@ -529,8 +516,7 @@ if(resultadosBtn){
     } catch (err) {
       Swal.fire({
         icon: "warning",
-        title: "Oops...",
-        text: err
+        title: err
       });
     }
   });

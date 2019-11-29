@@ -49,8 +49,7 @@ deleteBtns.forEach(function(item, index){
             } catch(err) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Oops...',
-                    text: 'Não foi possível eliminar o torneio',
+                    title: 'Não foi possível eliminar o torneio',
                 });
             }
         }
@@ -109,8 +108,7 @@ resetButtons.forEach(btn => {
             } catch(err) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Oops...',
-                    text: 'Não foi possível eliminar a fase selecionada',
+                    title: 'Não foi possível eliminar a fase selecionada',
                 });
             }
         }

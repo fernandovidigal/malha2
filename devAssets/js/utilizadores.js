@@ -47,8 +47,7 @@ deleteBtns.forEach(function(item, index){
                     if(response.status == 204){
                         Swal.fire({
                             icon: 'error',
-                            title: 'Oops...',
-                            text: 'Deve existir no mínimo um utilizador com privilégios de Administrador',
+                            title: 'Deve existir no mínimo um utilizador com privilégios de Administrador',
                         });
                     } else {
                         throw new Error();
@@ -57,8 +56,7 @@ deleteBtns.forEach(function(item, index){
             } catch(err) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Oops...',
-                    text: 'Não foi possível eliminar o utilizador',
+                    title: 'Não foi possível eliminar o utilizador',
                 });
             }
         }

@@ -1198,23 +1198,25 @@ input::placeholder {
     color: #333f4d;
     min-width: 47px;
     white-space: nowrap;
+    cursor: pointer;
 }
 
 .customSelect__campos-link:hover,
 .customSelect__campos-link-selected {
     background-color: white;
     box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.15);
+    border: solid 1px #919498;
 }
 
-.customSelect__campos-link-selected {
+/*.customSelect__campos-link-selected {
     border: solid 1px #D05744;
-}
+}*/
 
 .customSelect__campos-link-completed {
     background-color: #DDF3D5;
 }
 
-.customSelect__campos-link-complete:hover {
+.customSelect__campos-link-completed:hover {
     background-color: #DDF3D5;
     box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.15);
 }
@@ -1723,6 +1725,10 @@ input::placeholder {
 .listagems__item-inputs {
     display: flex;
     align-items: center;
+}
+
+.listagems__item-inputs > .customSelect {
+    margin-right: 12px;
 }
 
 .listagem__item-printBtn {
@@ -2291,7 +2297,7 @@ input::placeholder {
     margin-right: 10px;
 }
 
-.competicaoOptions-menu-item:first-child {
+.competicaoOptions-menu-item:not(:last-child) {
     border-bottom: solid 1px rgba(205,85,67,.2);
 }
 

@@ -467,7 +467,7 @@ export function makeEquipasAgrupadasPorCampos(ddContent, listaCampos, fase) {
 
     const content = {
       table: {
-        widths: [45, "auto", "*", "auto"],
+        widths: [45, "auto", "*", "25%"],
         headerRows: 2,
         body: [
           [
@@ -763,7 +763,7 @@ export function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase) {
       }
     };
   
-    listaJogos.forEach((jogo, index) => {
+    listaJogos.forEach(jogo => {
   
       const equipa1 = equipas.find(equipa => equipa.equipaId == jogo.equipa1Id);
       const equipa2 = equipas.find(equipa => equipa.equipaId == jogo.equipa2Id);
@@ -1153,7 +1153,7 @@ export function makeContentResultados(dd, data, fase, numCampos) {
   const _table = {
     table: {
       headerRows: 2,
-      widths: ["auto", "auto", "auto", "*", "auto", "auto", "auto"],
+      widths: ["auto", "auto", "auto", "*", "22%", "7%", "7%"],
       body: [
         [
           {
@@ -1172,13 +1172,13 @@ export function makeContentResultados(dd, data, fase, numCampos) {
           ""
         ],
         [
-          { text: "Classif.", bold: true, fontSize: 10 },
-          { text: "Equipa", bold: true, fontSize: 10 },
-          { text: "Jogadores", colSpan: 2, bold: true, fontSize: 10 },
+          { text: "Classif.", bold: true, fontSize: 10, margin: [0,11.5,0,0] },
+          { text: "Equipa", bold: true, fontSize: 10, margin: [0,11.5,0,0] },
+          { text: "Jogadores", colSpan: 2, bold: true, fontSize: 10, margin: [0,11.5,0,0] },
           { text: "" },
-          { text: "Localidade", bold: true, fontSize: 10 },
-          { text: "Jogos Ganhos", bold: true, fontSize: 10 },
-          { text: "Pontos", bold: true, fontSize: 10 }
+          { text: "Localidade", bold: true, fontSize: 10, margin: [0,11.5,0,0] },
+          { text: "Jogos Ganhos", bold: true, fontSize: 10, alignment: "center" },
+          { text: "Pontos", bold: true, fontSize: 10, margin: [0,11.5,0,0] }
         ]
       ]
     },
@@ -1222,7 +1222,7 @@ export function makeContentResultados(dd, data, fase, numCampos) {
   let ordem = fase != 100 ? 1 : data.inicioClassificacao;
   data.classificacao.forEach(equipa => {
     const classificacaoRow = [
-      { text: `${ordem++}º`, alignment: "center", margin: [5, 5] },
+      { text: `${ordem++}º`, fontSize: 10, alignment: "center", margin: [5, 5] },
       {
         text: `${equipa.equipaId}`,
         fontSize: 10,
@@ -1236,8 +1236,8 @@ export function makeContentResultados(dd, data, fase, numCampos) {
         fontSize: 10,
         margin: [0, 6]
       },
-      { text: `${equipa.vitorias}`, alignment: "center", margin: [0, 5] },
-      { text: `${equipa.pontos}`, alignment: "center", margin: [0, 5] }
+      { text: `${equipa.vitorias}`, fontSize: 10, alignment: "center", margin: [0, 5] },
+      { text: `${equipa.pontos}`, fontSize: 10, alignment: "center", margin: [0, 5] }
     ];
     _table.table.body.push(classificacaoRow);
   });

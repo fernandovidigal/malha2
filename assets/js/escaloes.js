@@ -4908,8 +4908,7 @@ deleteBtns.forEach(function (item, index) {
 
             _sweetalert.default.fire({
               icon: 'error',
-              title: 'Oops...',
-              text: 'Não foi possível eliminar o escalão'
+              title: 'Não foi possível eliminar o escalão'
             });
 
           case 23:

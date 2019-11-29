@@ -803,8 +803,7 @@ exports.createEquipasAleatoriamente = async (req, res) => {
             }
         }
 
-        listaEscaloes.filter(el => -1 === listaEscaloesComJogos.findIndex(x => x.escalaoId == el.escalaoId));
-        //console.log(listaEscaloes);
+        listaEscaloes = listaEscaloes.filter(el => -1 === listaEscaloesComJogos.findIndex(x => x.escalaoId == el.escalaoId));
 
         for(let i = 0; i < num; i++){
             const _escalao = listaEscaloes[Math.floor(Math.random() * listaEscaloes.length)];

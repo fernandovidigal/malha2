@@ -42,15 +42,13 @@ if(printClassificacaoBtn){
             } else {
                 Swal.fire({
                     icon: "error",
-                    title: "Oops...",
-                    text: data.errMsg
+                    title: data.errMsg
                 });
             }
         } catch (err) {
             Swal.fire({
                 icon: "error",
-                title: "Oops...",
-                text: "Não foi possível obter os dados!"
+                title: "Não foi possível obter os dados!"
             });
         }
     });

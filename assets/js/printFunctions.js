@@ -579,7 +579,7 @@ function makeEquipasAgrupadasPorCampos(ddContent, listaCampos, fase) {
 
     var content = {
       table: {
-        widths: [45, "auto", "*", "auto"],
+        widths: [45, "auto", "*", "25%"],
         headerRows: 2,
         body: [[{
           text: "Campo ".concat(campo.campo),
@@ -917,7 +917,7 @@ function makeFolhaRostoJogosPrimeiraFase(dd, data, equipas, fase) {
         }
       }
     };
-    listaJogos.forEach(function (jogo, index) {
+    listaJogos.forEach(function (jogo) {
       var equipa1 = equipas.find(function (equipa) {
         return equipa.equipaId == jogo.equipa1Id;
       });
@@ -1324,7 +1324,7 @@ function makeContentResultados(dd, data, fase, numCampos) {
   var _table = {
     table: {
       headerRows: 2,
-      widths: ["auto", "auto", "auto", "*", "auto", "auto", "auto"],
+      widths: ["auto", "auto", "auto", "*", "22%", "7%", "7%"],
       body: [[{
         text: "Campo ".concat(data.campo),
         bold: true,
@@ -1335,30 +1335,36 @@ function makeContentResultados(dd, data, fase, numCampos) {
       }, "", "", "", "", "", ""], [{
         text: "Classif.",
         bold: true,
-        fontSize: 10
+        fontSize: 10,
+        margin: [0, 11.5, 0, 0]
       }, {
         text: "Equipa",
         bold: true,
-        fontSize: 10
+        fontSize: 10,
+        margin: [0, 11.5, 0, 0]
       }, {
         text: "Jogadores",
         colSpan: 2,
         bold: true,
-        fontSize: 10
+        fontSize: 10,
+        margin: [0, 11.5, 0, 0]
       }, {
         text: ""
       }, {
         text: "Localidade",
         bold: true,
-        fontSize: 10
+        fontSize: 10,
+        margin: [0, 11.5, 0, 0]
       }, {
         text: "Jogos Ganhos",
         bold: true,
-        fontSize: 10
+        fontSize: 10,
+        alignment: "center"
       }, {
         text: "Pontos",
         bold: true,
-        fontSize: 10
+        fontSize: 10,
+        margin: [0, 11.5, 0, 0]
       }]]
     },
     margin: [0, 0, 0, 20],
@@ -1401,6 +1407,7 @@ function makeContentResultados(dd, data, fase, numCampos) {
   data.classificacao.forEach(function (equipa) {
     var classificacaoRow = [{
       text: "".concat(ordem++, "\xBA"),
+      fontSize: 10,
       alignment: "center",
       margin: [5, 5]
     }, {
@@ -1422,10 +1429,12 @@ function makeContentResultados(dd, data, fase, numCampos) {
       margin: [0, 6]
     }, {
       text: "".concat(equipa.vitorias),
+      fontSize: 10,
       alignment: "center",
       margin: [0, 5]
     }, {
       text: "".concat(equipa.pontos),
+      fontSize: 10,
       alignment: "center",
       margin: [0, 5]
     }];

@@ -92,7 +92,7 @@ exports.checkCampos = async (req, res, next) => {
     }
 }
 
-exports.getStarting = async (req, res, next) => {
+exports.getStarting = async (req, res) => {
     try {
         const escaloesMasculinos = [];
         const escaloesFemininos = [];
@@ -236,7 +236,7 @@ exports.getStarting = async (req, res, next) => {
     }
 }
 
-exports.setNumeroCampos = async (req, res, next) => {
+exports.setNumeroCampos = async (req, res) => {
     try{
         req.breadcrumbs('Definir Número de Campos', '/torneio/definirNumeroCampos');
         const errors = validationResult(req).array({ onlyFirstError: true });
@@ -310,7 +310,7 @@ exports.setNumeroCampos = async (req, res, next) => {
 
             } catch(err) {
                 console.log(err);
-                await transaction.rollback();
+                if(transaction) await transaction.rollback();
                 throw err;
             }
 
@@ -329,26 +329,11 @@ exports.setNumeroCampos = async (req, res, next) => {
     }
 }
 
-exports.distribuirTodasEquipas = async (req, res, next) => {
+exports.distribuirTodasEquipas = async (req, res) => {
     try{
         const torneio = await dbFunctions.getTorneioInfo();
 
         await torneioHelpers.distribuiEquipasPorCampos(torneio.torneioId);
-        /*const escaloesDistribuidos = await torneioHelpers.distribuiEquipasPorCampos(torneio.torneioId);
-        
-        let distribuidos = 0;
-        let naoDistribuidos = 0;
-        escaloesDistribuidos.forEach(escalao => {
-            (escalao.sucesso) ? distribuidos++ : naoDistribuidos++;
-        });
-
-        if(naoDistribuidos > 0 && naoDistribuidos < escaloesDistribuidos.length){
-            req.flash('warning', 'Existem escalões da qual não foi possível distribuir equipas.');
-        } else if(naoDistribuidos == escaloesDistribuidos.length) {
-            req.flash('warning', 'Existem escalões da qual não foi possível distribuir equipas.');
-        } else {
-            req.flash('success', 'Todos as equipas foram distribuídas, no respectivo escalão, com sucesso.');
-        }*/
         
         res.redirect('/torneio');
     } catch(err) {
@@ -376,7 +361,7 @@ exports.distribuirEquipasPorEscalao = async (req, res, next) => {
 }
 
 // Resultados
-exports.mostraResultados = async (req, res, next) => {
+exports.mostraResultados = async (req, res) => {
     try{
         const escalaoId = parseInt(req.params.escalao);
         const fase = parseInt(req.params.fase);
@@ -474,7 +459,7 @@ exports.mostraResultados = async (req, res, next) => {
     }
 }
 
-exports.processaProximaFase = async (req, res, next) => {
+exports.processaProximaFase = async (req, res) => {
     try{
         const escalaoId = parseInt(req.params.escalao);
 
@@ -568,7 +553,7 @@ exports.processaProximaFase = async (req, res, next) => {
 }
 
 // Classificação
-exports.mostraClassificacao = async (req, res, next) => {
+exports.mostraClassificacao = async (req, res) => {
     try {
         const escalaoId = parseInt(req.params.escalao);
         const fase = parseInt(req.params.fase);
@@ -611,7 +596,7 @@ exports.mostraClassificacao = async (req, res, next) => {
     }
 }
 
-exports.interditarCampos = async (req, res, next) => {
+exports.interditarCampos = async (req, res) => {
     try {
         const escalaoId = parseInt(req.params.escalao);
 
@@ -653,7 +638,7 @@ exports.interditarCampos = async (req, res, next) => {
     }
 }
 
-exports.adicionarCamposInterditos = async (req, res, next) => {
+exports.adicionarCamposInterditos = async (req, res) => {
 
     try {
         const escalaoId = parseInt(req.params.escalao);
@@ -727,7 +712,7 @@ exports.adicionarCamposInterditos = async (req, res, next) => {
 }
 
 // API
-exports.createParciais = async (req, res, next) => {
+exports.createParciais = async (req, res) => {
     try{
         let data = req.body;
         const jogoId = parseInt(data.jogoId);
@@ -759,7 +744,7 @@ exports.createParciais = async (req, res, next) => {
     }
 }
 
-exports.updateParciais = async (req, res, next) => {
+exports.updateParciais = async (req, res) => {
     let data = req.body;
     const jogoId = data.jogoId;
     const equipas = await dbFunctions.getEquipasPorJogo(jogoId);
@@ -784,7 +769,7 @@ exports.updateParciais = async (req, res, next) => {
     }
 }
 
-exports.getEscalaoInfo = async (req, res, next) => {
+exports.getEscalaoInfo = async (req, res) => {
     const escalaoId = req.params.escalaoId;
     const torneio = await dbFunctions.getTorneioInfo();
 
@@ -816,7 +801,7 @@ exports.getEscalaoInfo = async (req, res, next) => {
     });
 }
 
-exports.setNumeroCamposAPI = (req, res, next) => {
+exports.setNumeroCamposAPI = (req, res) => {
     const torneioId = parseInt(req.body.torneioId);
     const escalaoId = parseInt(req.body.escalaoId);
     const numCampos = parseInt(req.body.numCampos);
@@ -833,7 +818,7 @@ exports.setNumeroCamposAPI = (req, res, next) => {
     });
 }
 
-exports.fichasParciais = async (req, res, next) => {
+exports.fichasParciais = async (req, res) => {
     try {
         const escalaoId = parseInt(req.params.escalao);
         const campo = parseInt(req.params.campo);
@@ -907,7 +892,7 @@ exports.fichasParciais = async (req, res, next) => {
     }
 }
 
-exports.getAllCamposPorFase = async (req, res, next) => {
+exports.getAllCamposPorFase = async (req, res) => {
     try {
         const escalaoId = parseInt(req.params.escalaoId);
         const fase = parseInt(req.params.fase);

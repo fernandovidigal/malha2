@@ -4902,8 +4902,7 @@ deleteBtns.forEach(function (item, index) {
 
             _sweetalert.default.fire({
               icon: 'error',
-              title: 'Oops...',
-              text: 'Deve existir no mínimo um utilizador com privilégios de Administrador'
+              title: 'Deve existir no mínimo um utilizador com privilégios de Administrador'
             });
 
             _context.next = 21;
@@ -4922,8 +4921,7 @@ deleteBtns.forEach(function (item, index) {
 
             _sweetalert.default.fire({
               icon: 'error',
-              title: 'Oops...',
-              text: 'Não foi possível eliminar o utilizador'
+              title: 'Não foi possível eliminar o utilizador'
             });
 
           case 26:

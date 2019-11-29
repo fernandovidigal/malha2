@@ -4908,8 +4908,7 @@ deleteBtns.forEach(function (item, index) {
 
             _sweetalert.default.fire({
               icon: 'error',
-              title: 'Oops...',
-              text: 'Não foi possível eliminar o torneio'
+              title: 'Não foi possível eliminar o torneio'
             });
 
           case 23:
@@ -5002,8 +5001,7 @@ resetButtons.forEach(function (btn) {
 
             _sweetalert.default.fire({
               icon: 'error',
-              title: 'Oops...',
-              text: 'Não foi possível eliminar a fase selecionada'
+              title: 'Não foi possível eliminar a fase selecionada'
             });
 
           case 23:

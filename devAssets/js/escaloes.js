@@ -50,8 +50,7 @@ deleteBtns.forEach(function(item, index){
             } catch(err) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Oops...',
-                    text: 'Não foi possível eliminar o escalão',
+                    title: 'Não foi possível eliminar o escalão',
                 });
             }
         }

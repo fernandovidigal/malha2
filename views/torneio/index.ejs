@@ -16,7 +16,7 @@
 
     <div class="container_wrapper">
         <div class="actionBar__wrapper">
-            <h2 class="actionBar__title"><%= info.escalao.designacao %> (<%= (info.escalao.sexo == 1) ? 'Masculinos' : 'Femininos' %>)</h2>
+            <h2 class="actionBar__title"><%= info.escalao.designacao %> (<%= (info.escalao.sexo == 1) ? 'Masculinos' : 'Femininos' %>)<span class="numEquipas__Badge"><%= (info.fase != 100) ? info.fase + 'ª Fase' : 'Fase Final' %></span></h2>
 
             <div class="actionBar__buttons">
                 <div class="customSelect">

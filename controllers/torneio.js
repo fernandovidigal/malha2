@@ -18,12 +18,11 @@ exports.checkCampos = async (req, res, next) => {
         // e se exitem pelo menos 2 equipas
         const numEquipas = await dbFunctions.getNumEquipas(torneioId);
         if(numEquipas == 0){
-            const error = { msg: "Não existem equipas registadas no torneio."};
             return res.render('torneio/includes/noEquipas', {torneio: torneio, breadcrumbs: req.breadcrumbs()});
-        } else if(numEquipas < 2){
+        } /*else if(numEquipas < 2){
             const error = { msg: "Existem menos de 2 equipas registadas."};
             return res.render('torneio/index', {torneio: torneio, messages: error, breadcrumbs: req.breadcrumbs()});
-        }
+        }*/
 
         // Lista dos Escalões com equipas registadas
         const _listaEscaloes = dbFunctions.getEscaloesComEquipas(torneioId);
@@ -65,7 +64,7 @@ exports.checkCampos = async (req, res, next) => {
                 }
 
                 // Calcula o número de campos mínimo para o número de equipas
-                const numCamposMaximo = Math.floor(escalao.numEquipas / 3);;
+                const numCamposMaximo = Math.floor(escalao.numEquipas / 3);
                 for(let i = 0; i < listaDeCamposPotenciaDeDois.length; i++){
                     if(numCamposMaximo < listaDeCamposPotenciaDeDois[i]){
                         escalao.numCamposMax = listaDeCamposPotenciaDeDois[i-1];

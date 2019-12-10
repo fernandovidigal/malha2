@@ -121,7 +121,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 var define;
 var global = arguments[3];
 /*!
-* sweetalert2 v9.3.17
+* sweetalert2 v9.4.1
 * Released under the MIT License.
 */
 (function (global, factory) {
@@ -434,7 +434,7 @@ var prefix = function prefix(items) {
 
   return result;
 };
-var swalClasses = prefix(['container', 'shown', 'height-auto', 'iosfix', 'popup', 'modal', 'no-backdrop', 'toast', 'toast-shown', 'toast-column', 'show', 'hide', 'close', 'title', 'header', 'content', 'actions', 'confirm', 'cancel', 'footer', 'icon', 'icon-content', 'image', 'input', 'file', 'range', 'select', 'radio', 'checkbox', 'label', 'textarea', 'inputerror', 'validation-message', 'progress-steps', 'active-progress-step', 'progress-step', 'progress-step-line', 'loading', 'styled', 'top', 'top-start', 'top-end', 'top-left', 'top-right', 'center', 'center-start', 'center-end', 'center-left', 'center-right', 'bottom', 'bottom-start', 'bottom-end', 'bottom-left', 'bottom-right', 'grow-row', 'grow-column', 'grow-fullscreen', 'rtl', 'timer-progress-bar', 'scrollbar-measure']);
+var swalClasses = prefix(['container', 'shown', 'height-auto', 'iosfix', 'popup', 'modal', 'no-backdrop', 'toast', 'toast-shown', 'toast-column', 'show', 'hide', 'close', 'title', 'header', 'content', 'html-container', 'actions', 'confirm', 'cancel', 'footer', 'icon', 'icon-content', 'image', 'input', 'file', 'range', 'select', 'radio', 'checkbox', 'label', 'textarea', 'inputerror', 'validation-message', 'progress-steps', 'active-progress-step', 'progress-step', 'progress-step-line', 'loading', 'styled', 'top', 'top-start', 'top-end', 'top-left', 'top-right', 'center', 'center-start', 'center-end', 'center-left', 'center-right', 'bottom', 'bottom-start', 'bottom-end', 'bottom-left', 'bottom-right', 'grow-row', 'grow-column', 'grow-fullscreen', 'rtl', 'timer-progress-bar', 'scrollbar-measure']);
 var iconTypes = prefix(['success', 'warning', 'info', 'question', 'error']);
 
 var getContainer = function getContainer() {
@@ -467,6 +467,9 @@ var getTitle = function getTitle() {
 };
 var getContent = function getContent() {
   return elementByClass(swalClasses.content);
+};
+var getHtmlContainer = function getHtmlContainer() {
+  return elementByClass(swalClasses['html-container']);
 };
 var getImage = function getImage() {
   return elementByClass(swalClasses.image);
@@ -707,7 +710,7 @@ var isNodeEnv = function isNodeEnv() {
   return typeof window === 'undefined' || typeof document === 'undefined';
 };
 
-var sweetHTML = "\n <div aria-labelledby=\"".concat(swalClasses.title, "\" aria-describedby=\"").concat(swalClasses.content, "\" class=\"").concat(swalClasses.popup, "\" tabindex=\"-1\">\n   <div class=\"").concat(swalClasses.header, "\">\n     <ul class=\"").concat(swalClasses['progress-steps'], "\"></ul>\n     <div class=\"").concat(swalClasses.icon, " ").concat(iconTypes.error, "\"></div>\n     <div class=\"").concat(swalClasses.icon, " ").concat(iconTypes.question, "\"></div>\n     <div class=\"").concat(swalClasses.icon, " ").concat(iconTypes.warning, "\"></div>\n     <div class=\"").concat(swalClasses.icon, " ").concat(iconTypes.info, "\"></div>\n     <div class=\"").concat(swalClasses.icon, " ").concat(iconTypes.success, "\"></div>\n     <img class=\"").concat(swalClasses.image, "\" />\n     <h2 class=\"").concat(swalClasses.title, "\" id=\"").concat(swalClasses.title, "\"></h2>\n     <button type=\"button\" class=\"").concat(swalClasses.close, "\"></button>\n   </div>\n   <div class=\"").concat(swalClasses.content, "\">\n     <div id=\"").concat(swalClasses.content, "\"></div>\n     <input class=\"").concat(swalClasses.input, "\" />\n     <input type=\"file\" class=\"").concat(swalClasses.file, "\" />\n     <div class=\"").concat(swalClasses.range, "\">\n       <input type=\"range\" />\n       <output></output>\n     </div>\n     <select class=\"").concat(swalClasses.select, "\"></select>\n     <div class=\"").concat(swalClasses.radio, "\"></div>\n     <label for=\"").concat(swalClasses.checkbox, "\" class=\"").concat(swalClasses.checkbox, "\">\n       <input type=\"checkbox\" />\n       <span class=\"").concat(swalClasses.label, "\"></span>\n     </label>\n     <textarea class=\"").concat(swalClasses.textarea, "\"></textarea>\n     <div class=\"").concat(swalClasses['validation-message'], "\" id=\"").concat(swalClasses['validation-message'], "\"></div>\n   </div>\n   <div class=\"").concat(swalClasses.actions, "\">\n     <button type=\"button\" class=\"").concat(swalClasses.confirm, "\">OK</button>\n     <button type=\"button\" class=\"").concat(swalClasses.cancel, "\">Cancel</button>\n   </div>\n   <div class=\"").concat(swalClasses.footer, "\"></div>\n   <div class=\"").concat(swalClasses['timer-progress-bar'], "\"></div>\n </div>\n").replace(/(^|\n)\s*/g, '');
+var sweetHTML = "\n <div aria-labelledby=\"".concat(swalClasses.title, "\" aria-describedby=\"").concat(swalClasses.content, "\" class=\"").concat(swalClasses.popup, "\" tabindex=\"-1\">\n   <div class=\"").concat(swalClasses.header, "\">\n     <ul class=\"").concat(swalClasses['progress-steps'], "\"></ul>\n     <div class=\"").concat(swalClasses.icon, " ").concat(iconTypes.error, "\"></div>\n     <div class=\"").concat(swalClasses.icon, " ").concat(iconTypes.question, "\"></div>\n     <div class=\"").concat(swalClasses.icon, " ").concat(iconTypes.warning, "\"></div>\n     <div class=\"").concat(swalClasses.icon, " ").concat(iconTypes.info, "\"></div>\n     <div class=\"").concat(swalClasses.icon, " ").concat(iconTypes.success, "\"></div>\n     <img class=\"").concat(swalClasses.image, "\" />\n     <h2 class=\"").concat(swalClasses.title, "\" id=\"").concat(swalClasses.title, "\"></h2>\n     <button type=\"button\" class=\"").concat(swalClasses.close, "\"></button>\n   </div>\n   <div class=\"").concat(swalClasses.content, "\">\n     <div id=\"").concat(swalClasses.content, "\" class=\"").concat(swalClasses['html-container'], "\"></div>\n     <input class=\"").concat(swalClasses.input, "\" />\n     <input type=\"file\" class=\"").concat(swalClasses.file, "\" />\n     <div class=\"").concat(swalClasses.range, "\">\n       <input type=\"range\" />\n       <output></output>\n     </div>\n     <select class=\"").concat(swalClasses.select, "\"></select>\n     <div class=\"").concat(swalClasses.radio, "\"></div>\n     <label for=\"").concat(swalClasses.checkbox, "\" class=\"").concat(swalClasses.checkbox, "\">\n       <input type=\"checkbox\" />\n       <span class=\"").concat(swalClasses.label, "\"></span>\n     </label>\n     <textarea class=\"").concat(swalClasses.textarea, "\"></textarea>\n     <div class=\"").concat(swalClasses['validation-message'], "\" id=\"").concat(swalClasses['validation-message'], "\"></div>\n   </div>\n   <div class=\"").concat(swalClasses.actions, "\">\n     <button type=\"button\" class=\"").concat(swalClasses.confirm, "\">OK</button>\n     <button type=\"button\" class=\"").concat(swalClasses.cancel, "\">Cancel</button>\n   </div>\n   <div class=\"").concat(swalClasses.footer, "\"></div>\n   <div class=\"").concat(swalClasses['timer-progress-bar'], "\"></div>\n </div>\n").replace(/(^|\n)\s*/g, '');
 
 var resetOldContainer = function resetOldContainer() {
   var oldContainer = getContainer();
@@ -1672,8 +1675,8 @@ var defaultParams = {
   text: '',
   html: '',
   footer: '',
-  icon: null,
-  iconHtml: null,
+  icon: undefined,
+  iconHtml: undefined,
   toast: false,
   animation: true,
   showClass: {
@@ -1686,7 +1689,7 @@ var defaultParams = {
     backdrop: 'swal2-backdrop-hide',
     icon: 'swal2-icon-hide'
   },
-  customClass: '',
+  customClass: undefined,
   target: 'body',
   backdrop: true,
   heightAuto: true,
@@ -1697,13 +1700,13 @@ var defaultParams = {
   keydownListenerCapture: false,
   showConfirmButton: true,
   showCancelButton: false,
-  preConfirm: null,
+  preConfirm: undefined,
   confirmButtonText: 'OK',
   confirmButtonAriaLabel: '',
-  confirmButtonColor: null,
+  confirmButtonColor: undefined,
   cancelButtonText: 'Cancel',
   cancelButtonAriaLabel: '',
-  cancelButtonColor: null,
+  cancelButtonColor: undefined,
   buttonsStyling: true,
   reverseButtons: false,
   focusConfirm: true,
@@ -1712,33 +1715,33 @@ var defaultParams = {
   closeButtonHtml: '&times;',
   closeButtonAriaLabel: 'Close this dialog',
   showLoaderOnConfirm: false,
-  imageUrl: null,
-  imageWidth: null,
-  imageHeight: null,
+  imageUrl: undefined,
+  imageWidth: undefined,
+  imageHeight: undefined,
   imageAlt: '',
-  timer: null,
+  timer: undefined,
   timerProgressBar: false,
-  width: null,
-  padding: null,
-  background: null,
-  input: null,
+  width: undefined,
+  padding: undefined,
+  background: undefined,
+  input: undefined,
   inputPlaceholder: '',
   inputValue: '',
   inputOptions: {},
   inputAutoTrim: true,
   inputAttributes: {},
-  inputValidator: null,
-  validationMessage: null,
+  inputValidator: undefined,
+  validationMessage: undefined,
   grow: false,
   position: 'center',
   progressSteps: [],
-  currentProgressStep: null,
-  progressStepsDistance: null,
-  onBeforeOpen: null,
-  onOpen: null,
-  onRender: null,
-  onClose: null,
-  onAfterClose: null,
+  currentProgressStep: undefined,
+  progressStepsDistance: undefined,
+  onBeforeOpen: undefined,
+  onOpen: undefined,
+  onRender: undefined,
+  onClose: undefined,
+  onAfterClose: undefined,
   scrollbarPadding: true
 };
 var updatableParams = ['title', 'titleText', 'text', 'html', 'icon', 'customClass', 'showConfirmButton', 'showCancelButton', 'confirmButtonText', 'confirmButtonAriaLabel', 'confirmButtonColor', 'cancelButtonText', 'cancelButtonAriaLabel', 'cancelButtonColor', 'buttonsStyling', 'reverseButtons', 'imageUrl', 'imageWidth', 'imageHeight', 'imageAlt', 'progressSteps', 'currentProgressStep'];
@@ -1821,6 +1824,7 @@ var staticMethods = Object.freeze({
 	getPopup: getPopup,
 	getTitle: getTitle,
 	getContent: getContent,
+	getHtmlContainer: getHtmlContainer,
 	getImage: getImage,
 	getIcon: getIcon,
 	getIcons: getIcons,
@@ -3096,7 +3100,7 @@ Object.keys(instanceMethods).forEach(function (key) {
   };
 });
 SweetAlert.DismissReason = DismissReason;
-SweetAlert.version = '9.3.17';
+SweetAlert.version = '9.4.1';
 
 var Swal = SweetAlert;
 Swal["default"] = Swal;

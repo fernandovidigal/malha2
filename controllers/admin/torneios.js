@@ -328,7 +328,7 @@ exports.deleteFase = async (req, res) => {
     const torneioId = parseInt(req.body.torneioId);
     const fase = parseInt(req.body.fase);
 
-    if(req.user.level != 5 || req.user.level != 10){
+    if(req.user.level != 5 && req.user.level != 10){
       throw new Error('Não tem permissões para eliminar a fase');
     }
 

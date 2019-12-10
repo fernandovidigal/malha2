@@ -212,3 +212,15 @@ if(overlay){
 if(overlayCloseBtn){
     overlayCloseBtn.addEventListener('click', closeOverlay);
 }
+
+// Botão importar equipas
+const importBtn = document.querySelector('.btn-import');
+if(importBtn){
+    importBtn.addEventListener('click', function(){
+        Swal.fire({
+            icon: 'info',
+            title: 'Importar Equipas',
+            text: 'Disponível quando a plataforma web estiver concluída!'
+        });
+    });
+}

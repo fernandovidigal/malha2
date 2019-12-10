@@ -258,7 +258,7 @@ async function handleParciais(btn, url, moveToEnd, actualizar = 0){
                     icon: 'success',
                     title: `Parciais ${(actualizar == 0) ? 'adicionados': 'actualizados'} com sucesso!`,
                     showConfirmButton: false,
-                    timer: 1500
+                    timer: 1000
                 });
 
             } else {

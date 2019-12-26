@@ -121,7 +121,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 var define;
 var global = arguments[3];
 /*!
-* sweetalert2 v9.4.1
+* sweetalert2 v9.5.3
 * Released under the MIT License.
 */
 (function (global, factory) {
@@ -434,7 +434,7 @@ var prefix = function prefix(items) {
 
   return result;
 };
-var swalClasses = prefix(['container', 'shown', 'height-auto', 'iosfix', 'popup', 'modal', 'no-backdrop', 'toast', 'toast-shown', 'toast-column', 'show', 'hide', 'close', 'title', 'header', 'content', 'html-container', 'actions', 'confirm', 'cancel', 'footer', 'icon', 'icon-content', 'image', 'input', 'file', 'range', 'select', 'radio', 'checkbox', 'label', 'textarea', 'inputerror', 'validation-message', 'progress-steps', 'active-progress-step', 'progress-step', 'progress-step-line', 'loading', 'styled', 'top', 'top-start', 'top-end', 'top-left', 'top-right', 'center', 'center-start', 'center-end', 'center-left', 'center-right', 'bottom', 'bottom-start', 'bottom-end', 'bottom-left', 'bottom-right', 'grow-row', 'grow-column', 'grow-fullscreen', 'rtl', 'timer-progress-bar', 'scrollbar-measure']);
+var swalClasses = prefix(['container', 'shown', 'height-auto', 'iosfix', 'popup', 'modal', 'no-backdrop', 'toast', 'toast-shown', 'toast-column', 'show', 'hide', 'close', 'title', 'header', 'content', 'html-container', 'actions', 'confirm', 'cancel', 'footer', 'icon', 'icon-content', 'image', 'input', 'file', 'range', 'select', 'radio', 'checkbox', 'label', 'textarea', 'inputerror', 'validation-message', 'progress-steps', 'active-progress-step', 'progress-step', 'progress-step-line', 'loading', 'styled', 'top', 'top-start', 'top-end', 'top-left', 'top-right', 'center', 'center-start', 'center-end', 'center-left', 'center-right', 'bottom', 'bottom-start', 'bottom-end', 'bottom-left', 'bottom-right', 'grow-row', 'grow-column', 'grow-fullscreen', 'rtl', 'timer-progress-bar', 'scrollbar-measure', 'icon-success', 'icon-warning', 'icon-info', 'icon-question', 'icon-error']);
 var iconTypes = prefix(['success', 'warning', 'info', 'question', 'error']);
 
 var getContainer = function getContainer() {
@@ -962,7 +962,14 @@ var renderContainer = function renderContainer(instance, params) {
   handlePositionParam(container, params.position);
   handleGrowParam(container, params.grow); // Custom class
 
-  applyCustomClass(container, params, 'container');
+  applyCustomClass(container, params, 'container'); // Set queue step attribute for getQueueStep() method
+
+  var queueStep = document.body.getAttribute('data-swal2-queue-step');
+
+  if (queueStep) {
+    container.setAttribute('data-queue-step', queueStep);
+    document.body.removeAttribute('data-swal2-queue-step');
+  }
 };
 
 /**
@@ -1286,6 +1293,71 @@ var renderImage = function renderImage(instance, params) {
   applyCustomClass(image, params, 'image');
 };
 
+var currentSteps = [];
+/*
+ * Global function for chaining sweetAlert popups
+ */
+
+var queue = function queue(steps) {
+  var Swal = this;
+  currentSteps = steps;
+
+  var resetAndResolve = function resetAndResolve(resolve, value) {
+    currentSteps = [];
+    resolve(value);
+  };
+
+  var queueResult = [];
+  return new Promise(function (resolve) {
+    (function step(i, callback) {
+      if (i < currentSteps.length) {
+        document.body.setAttribute('data-swal2-queue-step', i);
+        Swal.fire(currentSteps[i]).then(function (result) {
+          if (typeof result.value !== 'undefined') {
+            queueResult.push(result.value);
+            step(i + 1, callback);
+          } else {
+            resetAndResolve(resolve, {
+              dismiss: result.dismiss
+            });
+          }
+        });
+      } else {
+        resetAndResolve(resolve, {
+          value: queueResult
+        });
+      }
+    })(0);
+  });
+};
+/*
+ * Global function for getting the index of current popup in queue
+ */
+
+var getQueueStep = function getQueueStep() {
+  return getContainer().getAttribute('data-queue-step');
+};
+/*
+ * Global function for inserting a popup to the queue
+ */
+
+var insertQueueStep = function insertQueueStep(step, index) {
+  if (index && index < currentSteps.length) {
+    return currentSteps.splice(index, 0, step);
+  }
+
+  return currentSteps.push(step);
+};
+/*
+ * Global function for deleting a popup from the queue
+ */
+
+var deleteQueueStep = function deleteQueueStep(index) {
+  if (typeof currentSteps[index] !== 'undefined') {
+    currentSteps.splice(index, 1);
+  }
+};
+
 var createStepElement = function createStepElement(step) {
   var stepEl = document.createElement('li');
   addClass(stepEl, swalClasses['progress-step']);
@@ -1313,7 +1385,7 @@ var renderProgressSteps = function renderProgressSteps(instance, params) {
 
   show(progressStepsContainer);
   progressStepsContainer.innerHTML = '';
-  var currentProgressStep = parseInt(params.currentProgressStep === null ? Swal.getQueueStep() : params.currentProgressStep);
+  var currentProgressStep = parseInt(params.currentProgressStep === undefined ? getQueueStep() : params.currentProgressStep);
 
   if (currentProgressStep >= params.progressSteps.length) {
     warn('Invalid currentProgressStep parameter, it should be less than progressSteps.length ' + '(currentProgressStep like JS arrays starts from 0)');
@@ -1375,10 +1447,15 @@ var renderPopup = function renderPopup(instance, params) {
 
   if (params.background) {
     popup.style.background = params.background;
-  } // Default Class
+  } // Classes
 
 
-  popup.className = swalClasses.popup;
+  addClasses(popup, params);
+};
+
+var addClasses = function addClasses(popup, params) {
+  // Default Class + showClass when updating Swal.update({})
+  popup.className = "".concat(swalClasses.popup, " ").concat(isVisible(popup) ? params.showClass.popup : '');
 
   if (params.toast) {
     addClass([document.documentElement, document.body], swalClasses['toast-shown']);
@@ -1392,11 +1469,11 @@ var renderPopup = function renderPopup(instance, params) {
 
   if (typeof params.customClass === 'string') {
     addClass(popup, params.customClass);
-  } // Add showClass when updating Swal.update({})
+  } // Icon class (#1842)
 
 
-  if (isVisible(popup)) {
-    addClass(popup, params.showClass.popup);
+  if (params.icon) {
+    addClass(popup, swalClasses["icon-".concat(params.icon)]);
   }
 };
 
@@ -1487,73 +1564,6 @@ function mixin(mixinParams) {
 
   return MixinSwal;
 }
-
-// private global state for the queue feature
-var currentSteps = [];
-/*
- * Global function for chaining sweetAlert popups
- */
-
-var queue = function queue(steps) {
-  var Swal = this;
-  currentSteps = steps;
-
-  var resetAndResolve = function resetAndResolve(resolve, value) {
-    currentSteps = [];
-    document.body.removeAttribute('data-swal2-queue-step');
-    resolve(value);
-  };
-
-  var queueResult = [];
-  return new Promise(function (resolve) {
-    (function step(i, callback) {
-      if (i < currentSteps.length) {
-        document.body.setAttribute('data-swal2-queue-step', i);
-        Swal.fire(currentSteps[i]).then(function (result) {
-          if (typeof result.value !== 'undefined') {
-            queueResult.push(result.value);
-            step(i + 1, callback);
-          } else {
-            resetAndResolve(resolve, {
-              dismiss: result.dismiss
-            });
-          }
-        });
-      } else {
-        resetAndResolve(resolve, {
-          value: queueResult
-        });
-      }
-    })(0);
-  });
-};
-/*
- * Global function for getting the index of current popup in queue
- */
-
-var getQueueStep = function getQueueStep() {
-  return document.body.getAttribute('data-swal2-queue-step');
-};
-/*
- * Global function for inserting a popup to the queue
- */
-
-var insertQueueStep = function insertQueueStep(step, index) {
-  if (index && index < currentSteps.length) {
-    return currentSteps.splice(index, 0, step);
-  }
-
-  return currentSteps.push(step);
-};
-/*
- * Global function for deleting a popup from the queue
- */
-
-var deleteQueueStep = function deleteQueueStep(index) {
-  if (typeof currentSteps[index] !== 'undefined') {
-    currentSteps.splice(index, 1);
-  }
-};
 
 /**
  * Show spinner instead of Confirm button
@@ -2371,7 +2381,7 @@ var openPopup = function openPopup(params) {
     params.onBeforeOpen(popup);
   }
 
-  addClasses(container, popup, params); // scrolling is 'hidden' until animation is done, after that 'auto'
+  addClasses$1(container, popup, params); // scrolling is 'hidden' until animation is done, after that 'auto'
 
   setScrollingVisibility(container, popup);
 
@@ -2393,7 +2403,11 @@ var openPopup = function openPopup(params) {
 var setScrollingVisibility = function setScrollingVisibility(container, popup) {
   if (animationEndEvent && hasCssAnimation(popup)) {
     container.style.overflowY = 'hidden';
-    popup.addEventListener(animationEndEvent, swalOpenAnimationFinished.bind(null, popup, container));
+    popup.addEventListener(animationEndEvent, function (e) {
+      if (e.target === popup) {
+        swalOpenAnimationFinished.bind(null, popup, container);
+      }
+    });
   } else {
     container.style.overflowY = 'auto';
   }
@@ -2414,7 +2428,7 @@ var fixScrollContainer = function fixScrollContainer(container, scrollbarPadding
   });
 };
 
-var addClasses = function addClasses(container, popup, params) {
+var addClasses$1 = function addClasses(container, popup, params) {
   addClass(container, params.showClass.backdrop);
   show(popup); // Animate popup right after showing it
 
@@ -3100,7 +3114,7 @@ Object.keys(instanceMethods).forEach(function (key) {
   };
 });
 SweetAlert.DismissReason = DismissReason;
-SweetAlert.version = '9.4.1';
+SweetAlert.version = '9.5.3';
 
 var Swal = SweetAlert;
 Swal["default"] = Swal;
@@ -4975,6 +4989,46 @@ if (switchBtn) {
           }
         }
       });
+    });
+  });
+} // ENDERECO WEB
+
+
+var enderecoWebBtn = document.querySelector('.changeEnderecoWeb-btn');
+
+if (enderecoWebBtn) {
+  enderecoWebBtn.addEventListener('click', function _callee3(e) {
+    var enderecoWeb, enderecoWebValue, response;
+    return regeneratorRuntime.async(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            e.preventDefault();
+            enderecoWeb = document.getElementById('enderecoWeb');
+            enderecoWebValue = enderecoWeb.value.trim();
+
+            if (enderecoWebValue.length == 0 || !enderecoWebValue.startsWith('http')) {
+              showError(enderecoWeb, 'Endereço Web inválido');
+            }
+
+            _context3.next = 6;
+            return regeneratorRuntime.awrap((0, _axios.default)({
+              method: 'PUT',
+              url: '/admin/configuracoes/definirEnderecoWeb',
+              data: {
+                enderecoWeb: enderecoWebValue
+              }
+            }));
+
+          case 6:
+            response = _context3.sent;
+            console.log(response);
+
+          case 8:
+          case "end":
+            return _context3.stop();
+        }
+      }
     });
   });
 }

@@ -1,4 +1,14 @@
 const configFunctions = require('../../helpers/configFunctions');
+const axios = require('axios');
+
+async function checkConnection(url){
+    const response = await axios.get(url + '/api/checkConnection.php');
+    if(response.status == 200 && response.data.sucesso){
+        return true;
+    }
+
+    return false;
+}
 
 exports.getConfig = async (req, res) => {
     try {
@@ -19,7 +29,7 @@ exports.writeConfigServerPorta = async (req, res) => {
         const inputPort = parseInt(req.body.serverPort);
 
         if(parseInt(configData.server.port) != inputPort){
-            configData.server.port = parseInt(req.body.serverPort);
+            configData.server.port = inputPort;
             await configFunctions.writeConfigFile(configData);
         }
 
@@ -48,6 +58,38 @@ exports.switchFaker = async (req, res) => {
         });
     } catch (err) {
         res.status(404).json({
+            success: false
+        });
+    }
+}
+
+exports.definirEnderecoWeb = async (req, res) => {
+    try {
+        const configData = await configFunctions.readConfigFile();
+        const enderecoWebInputed = req.body.enderecoWeb.trim();
+
+        if(configData.enderecoWeb != enderecoWebInputed){
+            let enderecoWeb = '';
+            if(!enderecoWebInputed.endsWith('/')) {
+                enderecoWeb = enderecoWebInputed.concat('/');
+            } else {
+                enderecoWeb = enderecoWebInputed;
+            }
+
+            const checked = await checkConnection(enderecoWeb);
+            if(!checked){
+                throw new Error();
+            }
+
+            configData.enderecoWeb = enderecoWeb;
+            await configFunctions.writeConfigFile(configData);
+        }
+
+        res.status(200).json({
+            success: true
+        });
+    } catch (err) {
+        res.status(200).json({
             success: false
         });
     }

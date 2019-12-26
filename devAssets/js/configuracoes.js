@@ -107,3 +107,27 @@ if(switchBtn){
         });
     });
 }
+
+// ENDERECO WEB
+const enderecoWebBtn = document.querySelector('.changeEnderecoWeb-btn');
+if(enderecoWebBtn){
+    enderecoWebBtn.addEventListener('click', async function(e){
+        e.preventDefault();
+        const enderecoWeb = document.getElementById('enderecoWeb');
+        const enderecoWebValue = enderecoWeb.value.trim();
+
+        if(enderecoWebValue.length == 0 || !enderecoWebValue.startsWith('http')){
+            showError(enderecoWeb, 'Endereço Web inválido');
+        }
+
+        const response = await axios({
+            method: 'PUT',
+            url: '/admin/configuracoes/definirEnderecoWeb',
+            data: {
+                enderecoWeb: enderecoWebValue
+            }
+        });
+
+        console.log(response);
+    });
+}

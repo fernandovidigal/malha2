@@ -170,22 +170,25 @@ app.all('*', (req, res) => {
 sequelize
 .sync()
 .then(async (result) => {
-    await Users.findOrCreate({
+    const [user, created] = await Users.findOrCreate({
         where: { username: 'admin' },
         defaults: {
             password: util.encrypt('12345'),
             level: 10
         }
-    })
-    .then(([user, created]) => {
-        // Utilizador por defeito criado.
-        // Server Start
-        const port = serverConfig.server.port;
-        app.listen(port, () => console.log(`Malha App em localhost:${port} ou <IP da máquina>:${port}`));
-    })
-    .catch((err) => {
-        console.log("Não foi possível criar ou aceder ao utilizador por defeito. Contacte o administrador da aplicação.");
     });
+
+    if(!user) {
+        console.log("Não foi possível criar ou aceder ao utilizador por defeito. Contacte o administrador da aplicação.");
+    }
+
+    const port = serverConfig.server.port;
+    app.listen(port, () => console.log(`\nMalha App em localhost:${port} ou <IP da máquina>:${port}`));
+    if(serverConfig.enderecoWeb){
+
+    } else {
+        console.log('Não foi possível sincronizar com a Aplicação Web');
+    }
 })
 .catch(err => {
     console.log(err);

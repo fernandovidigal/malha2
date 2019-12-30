@@ -5,6 +5,7 @@
   "main": "app.js",
   "bin": "app.js",
   "scripts": {
+    "start": "concurrently \"nodemon app.js\" \"npm run watch:js\" \"npm run watch:css\"",
     "watch:js": "parcel watch ./devAssets/js/*.js --out-dir ./assets/js/ --no-source-maps --no-hmr",
     "watch:css": "parcel watch ./devAssets/css/styles.css --out-dir ./assets/css/ --out-file styles.css --no-source-maps --no-hmr"
   },
@@ -37,7 +38,7 @@
     "pdfmake": "^0.1.63",
     "sequelize": "^5.21.3",
     "sqlite3": "^4.1.1",
-    "sweetalert2": "^9.5.3"
+    "sweetalert2": "^9.5.4"
   },
   "pkg": {
     "scripts": [],
@@ -48,6 +49,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^9.7.3",
+    "concurrently": "^5.0.2",
     "faker": "^4.1.0",
     "parcel-bundler": "^1.12.4"
   },

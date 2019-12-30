@@ -15,6 +15,24 @@ const Localidade = sequelize.define('localidades', {
             args: true,
             msg: "A localidade já existe."
         }
+    },
+    syncHash: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: {
+            args: true,
+            msg: "A localidade já existe."
+        }
+    },
+    syncApp: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 1
+    },
+    syncWeb: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
     }
 });
 

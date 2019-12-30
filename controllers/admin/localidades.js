@@ -2,8 +2,9 @@ const Localidade = require('../../models/Localidades');
 const { validationResult } = require('express-validator/check');
 const util = require('../../helpers/util');
 const dbFunctions = require('../../helpers/DBFunctions');
+const crypto = require('crypto');
 
-exports.getAllLocalidades = async (req, res, next) => {
+exports.getAllLocalidades = async (req, res) => {
     try {
         const _localidades = dbFunctions.getAllLocalidades();
         const _listaLocalidadesComEquipas = dbFunctions.getLocalidadesComEquipas();
@@ -28,7 +29,7 @@ exports.getAllLocalidades = async (req, res, next) => {
     }
 }
 
-exports.getLocalidade = async (req, res, next) => {
+exports.getLocalidade = async (req, res) => {
     try {
         const localidadeId = parseInt(req.params.id);
 
@@ -47,7 +48,7 @@ exports.getLocalidade = async (req, res, next) => {
     }
 }
 
-exports.createLocalidade = async (req, res, next) => {
+exports.createLocalidade = async (req, res) => {
     try {
         const localidade = req.body.localidade.trim();
         const errors = validationResult(req);
@@ -60,7 +61,8 @@ exports.createLocalidade = async (req, res, next) => {
             req.breadcrumbs('Adicionar Localidade', '/admin/adicionarLocalidade');
             res.render('admin/adicionarLocalidade', {validationErrors: errors.array({ onlyFirstError: true }), localidade: oldData, breadcrumbs: req.breadcrumbs()});
         } else {
-            const [localidadeModel, created] = await Localidade.findOrCreate({ where: { nome: localidade } });
+            const hash = crypto.createHash('sha512').update(localidade.toUpperCase()).digest('hex');
+            const [localidadeModel, created] = await Localidade.findOrCreate({ where: { nome: localidade, syncHash: hash } });
         
             if(created){
                 req.flash('success', `${localidadeModel.nome} adicionada com sucesso`);

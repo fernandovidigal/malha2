@@ -11,6 +11,7 @@ const breadcrumbs = require('express-breadcrumbs');
 const util = require('./helpers/util');
 const fileStruct = require('./helpers/fileStruct');
 const configFile = require('./helpers/configFunctions');
+const webApi = require('./helpers/webApi');
 
 let serverConfig = {
     server: {
@@ -180,15 +181,23 @@ sequelize
 
     if(!user) {
         console.log("Não foi possível criar ou aceder ao utilizador por defeito. Contacte o administrador da aplicação.");
+        process.exit();
+    }
+
+    if(serverConfig.enderecoWeb){
+        const haveConnection = await webApi.checkConnection(serverConfig.enderecoWeb);
+        if(haveConnection){
+            console.log('Estabelecida conexão à plataforma Web');
+            await webApi.syncAll(serverConfig.enderecoWeb);
+        } else {
+            console.log('Não existe conexão à plataforma Web');
+        }
+    } else {
+        console.log('Não existe conexão à plataforma Web');
     }
 
     const port = serverConfig.server.port;
     app.listen(port, () => console.log(`\nMalha App em localhost:${port} ou <IP da máquina>:${port}`));
-    if(serverConfig.enderecoWeb){
-
-    } else {
-        console.log('Não foi possível sincronizar com a Aplicação Web');
-    }
 })
 .catch(err => {
     console.log(err);

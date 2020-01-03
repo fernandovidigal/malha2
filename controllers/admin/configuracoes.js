@@ -1,14 +1,6 @@
 const configFunctions = require('../../helpers/configFunctions');
 const axios = require('axios');
-
-async function checkConnection(url){
-    const response = await axios.get(url + '/api/checkConnection.php');
-    if(response.status == 200 && response.data.sucesso){
-        return true;
-    }
-
-    return false;
-}
+const webApi = require('../../helpers/webApi');
 
 exports.getConfig = async (req, res) => {
     try {
@@ -76,7 +68,7 @@ exports.definirEnderecoWeb = async (req, res) => {
                 enderecoWeb = enderecoWebInputed;
             }
 
-            const checked = await checkConnection(enderecoWeb);
+            const checked = await webApi.checkConnection(enderecoWeb);
             if(!checked){
                 throw new Error();
             }

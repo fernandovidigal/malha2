@@ -246,6 +246,45 @@ exports.getAllLocalidadesID = () => {
     });
 }
 
+exports.createLocalidade = (nome, syncHash, syncApp, syncWeb) => {
+    return Localidades.create({
+        nome: nome,
+        syncHash: syncHash,
+        syncApp: syncApp,
+        syncWeb: syncWeb
+    });
+}
+
+exports.updateLocalidadeSyncWeb = (localidadeId, value) => {
+    return Localidades.update(
+        { syncWeb: value },
+        { where: { localidadeId: localidadeId }, limit: 1}
+    );
+}
+
+exports.updateLocalidadeSyncApp = (localidadeId, value) => {
+    return Localidades.update(
+        { syncApp: value },
+        { where: { localidadeId: localidadeId }, limit: 1}
+    );
+}
+
+exports.updateLocalidadeSync = (localidadeId, appValue, webValue) => {
+    return Localidades.update(
+        { syncApp: appValue, syncWeb: webValue },
+        { where: { localidadeId: localidadeId }, limit: 1}
+    );
+}
+
+exports.deleteLocalidade = (localidadeId) => {
+    return Localidades.destroy({
+        where: {
+            localidadeId: localidadeId
+        },
+        limit: 1
+    });
+}
+
 ////////////////////////////////////////////////////////
 //                        INTERDIÇÕES
 ////////////////////////////////////////////////////////

@@ -3,12 +3,6 @@ const dbFunctions = require('../helpers/DBFunctions');
 
 const apiKey = 'LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy';
 
-/*async function asyncForEach(array, callback) {
-    for (let index = 0; index < array.length; index++) {
-      await callback(array[index], index, array);
-    }
-}*/
-
 async function syncLocalidades(url){
     try {
         const _responseWeb = axios.get(`${url}api/localidades/read.php?key=${apiKey}`);

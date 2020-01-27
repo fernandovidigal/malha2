@@ -33,6 +33,11 @@ const Localidade = sequelize.define('localidades', {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0
+    },
+    editOldHash: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: null
     }
 });
 

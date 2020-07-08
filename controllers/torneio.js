@@ -1,5 +1,5 @@
 const sequelize = require('../helpers/database');
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 const torneioHelpers = require('../helpers/torneioHelperFunctions');
 const dbFunctions = require('../helpers/DBFunctions');
 

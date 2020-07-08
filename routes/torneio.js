@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { userAuthenticated } = require('../helpers/auth');
-const { check } = require('express-validator/check');
+const { check } = require('express-validator');
 const TorneiosController = require('../controllers/torneio');
 
 router.all('/*', userAuthenticated, (req, res, next) => {

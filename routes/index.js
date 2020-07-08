@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {userAuthenticated, checkAdminStatus} = require('../helpers/auth');
 const indexController = require('../controllers/index');
-const { check } = require('express-validator/check');
+const { check } = require('express-validator');
 
 router.all('/*', userAuthenticated, (req, res, next) => {
     next();

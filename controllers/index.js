@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const util = require('../helpers/util');
 const bcrypt = require('bcryptjs');
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 
 exports.changeUserPassword = (req, res) => {
     const userId = parseInt(req.params.userId);

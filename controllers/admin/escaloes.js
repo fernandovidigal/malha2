@@ -1,5 +1,5 @@
 const Escaloes = require('../../models/Escaloes');
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 const dbFunctions = require('../../helpers/DBFunctions');
 
 exports.getAllEscaloes = async (req, res) => {

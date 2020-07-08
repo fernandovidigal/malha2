@@ -16,26 +16,16 @@ const Localidade = sequelize.define('localidades', {
             msg: "A localidade já existe."
         }
     },
-    syncHash: {
-        type: Sequelize.STRING,
+    syncApp: {
+        type: Sequelize.STRING(128),
         allowNull: false,
         unique: {
             args: true,
             msg: "A localidade já existe."
         }
     },
-    syncApp: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 1
-    },
     syncWeb: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0
-    },
-    editOldHash: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(128),
         allowNull: true,
         defaultValue: null
     }

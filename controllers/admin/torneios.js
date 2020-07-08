@@ -2,7 +2,7 @@ const sequelize = require("../../helpers/database");
 const Torneios = require("../../models/Torneios");
 const Campos = require("../../models/Campos");
 const dbFunctions = require("../../helpers/DBFunctions");
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 
 exports.getAllTorneios = async (req, res) => {
   try {

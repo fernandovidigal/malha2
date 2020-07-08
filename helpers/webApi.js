@@ -3,7 +3,7 @@ const dbFunctions = require('../helpers/DBFunctions');
 
 const apiKey = 'LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy';
 
-async function syncLocalidades(url){
+/*async function syncLocalidades(url){
     try {
         const _responseWeb = axios.get(`${url}api/localidades/read.php?key=${apiKey}`);
         const _localidadesApp = dbFunctions.getAllLocalidades();
@@ -19,8 +19,9 @@ async function syncLocalidades(url){
         const localidadesAppSincronizar = [];
         const localidadesAppComDefeito = [];
         const localidadesWebComDefeito = [];
+
         localidadesApp.forEach(lapp => {
-            const index = localidadesWeb.findIndex(lweb => lweb.syncHash == lapp.syncHash);
+            const index = localidadesWeb.findIndex(lweb => lweb.syncWeb == lapp.syncWeb);
             // Foi encontrado um elemento igual
             if(index != -1) {
                 // Verifica se a localidade tem defeitos na sincronização, ou seja, algum dos elementos syncWeb ou syncApp não é 1
@@ -111,6 +112,32 @@ async function syncLocalidades(url){
         // Sincroniza todas as localidades paralelamente
         await Promise.all(localidadesASincronizar);
 
+    } catch(error) {
+        return false;
+    }
+}*/
+
+async function syncLocalidades(url){
+    try {
+        const _responseWeb = axios.get(`${url}api/localidades/read.php?key=${apiKey}`);
+        const _localidadesApp = dbFunctions.getAllLocalidades();
+
+        const [responseWeb, localidadesApp] = await Promise.all([_responseWeb, _localidadesApp]);
+        if (!responseWeb.data.sucesso){
+            throw new Error();
+        }
+
+        const localidadesWeb = responseWeb.data.data;
+
+        // Remove das listas as localidades que já estão sincronizadas
+        const localidadesWebSincronizar = [];
+        const localidadesAppSincronizar = [];
+        const localidadeWebEliminada = [];
+        const localidadesAppComDefeito = [];
+        const localidadesWebComDefeito = [];
+
+        const localidadesAppNaoSincronizadas = localidadesApp.filter(lapp => lapp.syncWeb == null);
+        console.log(localidadesAppNaoSincronizadas);
     } catch(error) {
         return false;
     }

@@ -1,7 +1,7 @@
 const Equipas = require('../models/Equipas');
 const dbFunctions = require('../helpers/DBFunctions');
 const sequelize = require('../helpers/database');
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 const util = require('../helpers/util');
 const torneioHelpers = require('../helpers/torneioHelperFunctions');
 const configFile = require('../helpers/configFunctions');

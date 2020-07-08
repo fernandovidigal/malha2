@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { userAuthenticated, checkGestorStatus } = require('../../helpers/auth');
-const { check } = require('express-validator/check');
+const { check } = require('express-validator');
 const EscaloesController = require('../../controllers/admin/escaloes');
 
 router.all('/*', [userAuthenticated, checkGestorStatus], (req, res, next) => {

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { userAuthenticated, checkAdminStatus } = require('../../helpers/auth');
-const { check } = require('express-validator/check');
+const { check } = require('express-validator');
 const ConfiguracoesController = require('../../controllers/admin/configuracoes');
 
 router.all('/*', [userAuthenticated, checkAdminStatus], (req, res, next) => {

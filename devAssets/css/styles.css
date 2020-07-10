@@ -118,8 +118,11 @@ li {
 .wrapper {
     width: 100%;
     height: 100%;
-    display: flex;
-    align-items: stretch;
+    /*display: flex;
+    align-items: stretch;*/
+    display: grid;
+    grid-template-columns: minmax(230px, 17%) auto;
+    grid-template-rows: auto;
 }
 
 .btn,
@@ -665,14 +668,13 @@ input::placeholder {
 ************************************/
 
 .navigation__wrapper {
-    width: 17%;
-    min-width: 230px;
+    /*width: 17%;
+    min-width: 230px;*/
+    grid-column: 1/2;
+    grid-row: 1/2;
     background-color: #333F4D;
     display: flex;
     flex-direction: column;
-    position: fixed;
-    top: 0;
-    bottom: 0;
 }
 
 .navigation__logo{
@@ -877,9 +879,9 @@ input::placeholder {
 ************************************/
 
 .content__wrapper {
-    width: 100%;
+    grid-column: 2/3;
+    grid-row: 1/1;
     min-height: 100vh;
-    margin-left: 17%;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -1913,7 +1915,7 @@ input::placeholder {
     color: #333F4D;
     box-shadow: none;
     transition: all .3s;
-    min-width: 180px;
+    min-width: 240px;
     max-width: 260px;
     margin: 16px;
 }

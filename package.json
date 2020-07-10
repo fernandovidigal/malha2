@@ -37,9 +37,9 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "pdfmake": "^0.1.66",
-    "sequelize": "^6.3.0",
+    "sequelize": "^6.3.1",
     "sqlite3": "^5.0.0",
-    "sweetalert2": "^9.15.2"
+    "sweetalert2": "^9.15.3"
   },
   "pkg": {
     "scripts": [],
@@ -52,7 +52,7 @@
     "autoprefixer": "^9.8.4",
     "concurrently": "^5.2.0",
     "faker": "^4.1.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "parcel-bundler": "^1.12.4"
   },
   "browserslist": [

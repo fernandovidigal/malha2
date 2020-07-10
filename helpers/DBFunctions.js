@@ -246,18 +246,17 @@ exports.getAllLocalidadesID = () => {
     });
 }
 
-exports.createLocalidade = (nome, syncHash, syncApp, syncWeb) => {
+exports.createLocalidade = (nome, syncApp, syncWeb) => {
     return Localidades.create({
         nome: nome,
-        syncHash: syncHash,
         syncApp: syncApp,
         syncWeb: syncWeb
     });
 }
 
-exports.updateLocalidadeSyncWeb = (localidadeId, value) => {
+exports.updateLocalidadeSyncWeb = (localidadeId, syncWeb) => {
     return Localidades.update(
-        { syncWeb: value },
+        { syncWeb: syncWeb },
         { where: { localidadeId: localidadeId }, limit: 1}
     );
 }
@@ -269,9 +268,9 @@ exports.updateLocalidadeSyncApp = (localidadeId, value) => {
     );
 }
 
-exports.updateLocalidadeSync = (localidadeId, appValue, webValue) => {
+exports.updateLocalidadeSync = (localidadeId, syncApp, syncWeb) => {
     return Localidades.update(
-        { syncApp: appValue, syncWeb: webValue },
+        { syncApp: syncApp, syncWeb: syncWeb },
         { where: { localidadeId: localidadeId }, limit: 1}
     );
 }

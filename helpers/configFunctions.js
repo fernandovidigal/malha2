@@ -1,5 +1,4 @@
 const fs = require('fs');
-const path = require('path');
 const appPaths = require('./appPaths');
 const secure = require('./secure');
 

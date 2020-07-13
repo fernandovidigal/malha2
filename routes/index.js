@@ -3,14 +3,22 @@ const router = express.Router();
 const {userAuthenticated, checkAdminStatus} = require('../helpers/auth');
 const indexController = require('../controllers/index');
 const { check } = require('express-validator');
+const { syncData } = require('../helpers/webApi');
 
 router.all('/*', userAuthenticated, (req, res, next) => {
     next();
 });
 
 router.get('/', (req, res) => {
-    res.render('index', { breadcrumbs: req.breadcrumbs()});
+    let sync = false;
+    if(!req.session.hasSynced){
+        sync = true;
+        req.session.hasSynced = true;
+    }
+    res.render('index', {sync: sync, breadcrumbs: req.breadcrumbs()});
 });
+
+router.get('/syncData', syncData);
 
 router.get('/admin(/*)?', (req, res, next) => {
     res.locals.menuAdmin = true;

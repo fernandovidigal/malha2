@@ -1,6 +1,4 @@
 const configFunctions = require('../../helpers/configFunctions');
-const axios = require('axios');
-const webApi = require('../../helpers/webApi');
 
 exports.getConfig = async (req, res) => {
     try {
@@ -38,10 +36,32 @@ exports.writeConfigServerPorta = async (req, res) => {
 exports.switchFaker = async (req, res) => {
     try {
         const configData = await configFunctions.readConfigFile();
-        const onOffSwitch = (parseInt(req.body.switch) == 1) ? true : false;
+        const onOffSwitch = req.body.faker;
         
         if(configData.faker != onOffSwitch){
             configData.faker = onOffSwitch;
+            await configFunctions.writeConfigFile(configData);
+        }
+
+        res.status(200).json({
+            success: true
+        });
+    } catch (err) {
+        res.status(404).json({
+            success: false
+        });
+    }
+}
+
+exports.switchSync= async (req, res) => {
+    try {
+        const configData = await configFunctions.readConfigFile();
+        const onOffSyncSwitch = req.body.sync;
+
+        console.log(configData);
+        
+        if(configData.sync != onOffSyncSwitch){
+            configData.sync = onOffSyncSwitch;
             await configFunctions.writeConfigFile(configData);
         }
 
@@ -66,11 +86,6 @@ exports.definirEnderecoWeb = async (req, res) => {
                 enderecoWeb = enderecoWebInputed.concat('/');
             } else {
                 enderecoWeb = enderecoWebInputed;
-            }
-
-            const checked = await webApi.checkConnection(enderecoWeb);
-            if(!checked){
-                throw new Error();
             }
 
             configData.enderecoWeb = enderecoWeb;

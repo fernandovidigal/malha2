@@ -121,7 +121,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 var define;
 var global = arguments[3];
 /*!
-* sweetalert2 v9.15.2
+* sweetalert2 v9.15.3
 * Released under the MIT License.
 */
 (function (global, factory) {
@@ -2385,8 +2385,8 @@ var global = arguments[3];
       return /^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9-]{2,24}$/.test(string) ? Promise.resolve() : Promise.resolve(validationMessage || 'Invalid email address');
     },
     url: function url(string, validationMessage) {
-      // taken from https://stackoverflow.com/a/3809435 with a small change from #1306
-      return /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,63}\b([-a-zA-Z0-9@:%_+.~#?&/=]*)$/.test(string) ? Promise.resolve() : Promise.resolve(validationMessage || 'Invalid URL');
+      // taken from https://stackoverflow.com/a/3809435 with a small change from #1306 and #2013
+      return /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-z]{2,63}\b([-a-zA-Z0-9@:%_+.~#?&/=]*)$/.test(string) ? Promise.resolve() : Promise.resolve(validationMessage || 'Invalid URL');
     }
   };
 
@@ -3290,7 +3290,7 @@ var global = arguments[3];
     };
   });
   SweetAlert.DismissReason = DismissReason;
-  SweetAlert.version = '9.15.2';
+  SweetAlert.version = '9.15.3';
 
   var Swal = SweetAlert;
   Swal["default"] = Swal;
@@ -5146,7 +5146,7 @@ function showError(element, errorText) {
     parentElement.insertBefore(errorElement, element);
     element.classList.add('inputError');
   }
-} // SWITCH BUTTON
+} // FAKER SWITCH BUTTON
 
 
 var switchBtn = document.querySelectorAll('.btn-switch');
@@ -5154,64 +5154,95 @@ var switchBtn = document.querySelectorAll('.btn-switch');
 if (switchBtn) {
   switchBtn.forEach(function (el, i) {
     el.addEventListener('click', function _callee2(e) {
-      var otherIndex, selectedClass, msg, errMsg, query, response;
+      var otherIndex, selectedClass, query, response;
       return regeneratorRuntime.async(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
               otherIndex = i == 0 ? 1 : 0;
               selectedClass = ['btn-switch-on--selected', 'btn-switch-off--selected'];
-              msg = '';
-              errMsg = '';
               query = {
                 method: 'PUT',
                 url: '/admin/configuracoes/switchFaker'
               };
-              switchBtn[i].classList.add(selectedClass[i]);
-              switchBtn[otherIndex].classList.remove(selectedClass[otherIndex]);
 
               if (e.target.classList.contains('btn-switch-on')) {
                 query.data = {
-                  "switch": 1
+                  faker: true
                 };
-                msg = 'Geração de equipas aleatórias Ligado';
-                errMsg = 'Não foi possível ligar a geração de equipas aleatórias';
               }
 
               if (e.target.classList.contains('btn-switch-off')) {
                 query.data = {
-                  "switch": 0
+                  faker: false
                 };
-                msg = 'Geração de equipas aleatórias Desligado';
-                errMsg = 'Não foi possível desligar a geração de equipas aleatórias';
               }
 
-              _context2.next = 11;
+              _context2.next = 7;
               return regeneratorRuntime.awrap((0, _axios.default)(query));
 
-            case 11:
+            case 7:
               response = _context2.sent;
 
-              if (response) {
-                if (response.data.success) {
-                  _sweetalert.default.fire({
-                    icon: 'success',
-                    title: msg,
-                    showConfirmButton: false,
-                    timer: 1500
-                  });
-                } else {
-                  _sweetalert.default.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: errMsg
-                  });
-                }
+              if (response.data.success) {
+                switchBtn[i].classList.add(selectedClass[i]);
+                switchBtn[otherIndex].classList.remove(selectedClass[otherIndex]);
               }
 
-            case 13:
+            case 9:
             case "end":
               return _context2.stop();
+          }
+        }
+      });
+    });
+  });
+} // SYNC SWITCH BUTTON
+
+
+var syncSwitchBtn = document.querySelectorAll('.btn-SyncSwitch');
+
+if (syncSwitchBtn) {
+  syncSwitchBtn.forEach(function (el, i) {
+    el.addEventListener('click', function _callee3(e) {
+      var otherIndex, selectedClass, query, response;
+      return regeneratorRuntime.async(function _callee3$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              otherIndex = i == 0 ? 1 : 0;
+              selectedClass = ['btn-SyncSwitch-on--selected', 'btn-SyncSwitch-off--selected'];
+              query = {
+                method: 'PUT',
+                url: '/admin/configuracoes/switchSync'
+              };
+
+              if (e.target.classList.contains('btn-SyncSwitch-on')) {
+                query.data = {
+                  sync: true
+                };
+              }
+
+              if (e.target.classList.contains('btn-SyncSwitch-off')) {
+                query.data = {
+                  sync: false
+                };
+              }
+
+              _context3.next = 7;
+              return regeneratorRuntime.awrap((0, _axios.default)(query));
+
+            case 7:
+              response = _context3.sent;
+
+              if (response.data.success) {
+                syncSwitchBtn[i].classList.add(selectedClass[i]);
+                syncSwitchBtn[otherIndex].classList.remove(selectedClass[otherIndex]);
+              }
+
+            case 9:
+            case "end":
+              return _context3.stop();
           }
         }
       });
@@ -5223,21 +5254,27 @@ if (switchBtn) {
 var enderecoWebBtn = document.querySelector('.changeEnderecoWeb-btn');
 
 if (enderecoWebBtn) {
-  enderecoWebBtn.addEventListener('click', function _callee3(e) {
+  enderecoWebBtn.addEventListener('click', function _callee4(e) {
     var enderecoWeb, enderecoWebValue, response;
-    return regeneratorRuntime.async(function _callee3$(_context3) {
+    return regeneratorRuntime.async(function _callee4$(_context4) {
       while (1) {
-        switch (_context3.prev = _context3.next) {
+        switch (_context4.prev = _context4.next) {
           case 0:
             e.preventDefault();
             enderecoWeb = document.getElementById('enderecoWeb');
             enderecoWebValue = enderecoWeb.value.trim();
 
-            if (enderecoWebValue.length == 0 || !enderecoWebValue.startsWith('http')) {
-              showError(enderecoWeb, 'Endereço Web inválido');
+            if (!(enderecoWebValue.length == 0 || !enderecoWebValue.startsWith('http://'))) {
+              _context4.next = 7;
+              break;
             }
 
-            _context3.next = 6;
+            showError(enderecoWeb, 'Endereço Web inválido');
+            _context4.next = 10;
+            break;
+
+          case 7:
+            _context4.next = 9;
             return regeneratorRuntime.awrap((0, _axios.default)({
               method: 'PUT',
               url: '/admin/configuracoes/definirEnderecoWeb',
@@ -5246,16 +5283,84 @@ if (enderecoWebBtn) {
               }
             }));
 
-          case 6:
-            response = _context3.sent;
-            console.log(response);
+          case 9:
+            response = _context4.sent;
 
-          case 8:
+          case 10:
           case "end":
-            return _context3.stop();
+            return _context4.stop();
         }
       }
     });
+  });
+}
+
+var enderecoWebInput = document.getElementById('enderecoWeb');
+var testConnectionBtn = document.querySelector('.testConnection__btn');
+
+if (enderecoWebInput && testConnectionBtn) {
+  enderecoWebInput.addEventListener('keyup', function () {
+    var url = enderecoWebInput.value.trim();
+
+    if (url.length >= 10) {
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        testConnectionBtn.classList.add('testConnection__btn-show');
+      } else {
+        testConnectionBtn.classList.remove('testConnection__btn-show');
+      }
+    } else {
+      // Esconde botão de testar ligação 
+      testConnectionBtn.classList.remove('testConnection__btn-show');
+    }
+  });
+  testConnectionBtn.addEventListener('click', function _callee5() {
+    var url, response;
+    return regeneratorRuntime.async(function _callee5$(_context5) {
+      while (1) {
+        switch (_context5.prev = _context5.next) {
+          case 0:
+            url = enderecoWebInput.value.trim();
+
+            if (!url.endsWith('/')) {
+              url = url + '/';
+            }
+
+            testConnectionBtn.textContent = 'A testar...';
+            _context5.prev = 3;
+            _context5.next = 6;
+            return regeneratorRuntime.awrap(_axios.default.get("".concat(url, "checkConnection.php?key=Avrd45h6DbfFfNe4dBBTA34hrb5dfb5eBdbAMR37ff2gd4fD")));
+
+          case 6:
+            response = _context5.sent;
+
+            if (response.data.sucesso) {
+              _sweetalert.default.fire({
+                icon: 'success',
+                title: 'Ligação efectuada'
+              });
+            }
+
+            _context5.next = 13;
+            break;
+
+          case 10:
+            _context5.prev = 10;
+            _context5.t0 = _context5["catch"](3);
+
+            _sweetalert.default.fire({
+              icon: 'error',
+              title: 'Não foi possível estabelecer ligação'
+            });
+
+          case 13:
+            testConnectionBtn.textContent = 'Testar Ligação';
+
+          case 14:
+          case "end":
+            return _context5.stop();
+        }
+      }
+    }, null, null, [[3, 10]]);
   });
 }
 },{"sweetalert2":"../../node_modules/sweetalert2/dist/sweetalert2.all.js","axios":"../../node_modules/axios/index.js"}]},{},["configuracoes.js"], null)

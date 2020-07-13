@@ -16,6 +16,8 @@ router.put('/definirPorta', ConfiguracoesController.writeConfigServerPorta);
 
 router.put('/switchFaker', ConfiguracoesController.switchFaker);
 
+router.put('/switchSync', ConfiguracoesController.switchSync);
+
 router.put('/definirEnderecoWeb', ConfiguracoesController.definirEnderecoWeb);
 
 module.exports = router;

@@ -57,52 +57,63 @@ function showError(element, errorText){
     }
 }
 
-// SWITCH BUTTON
+// FAKER SWITCH BUTTON
 const switchBtn = document.querySelectorAll('.btn-switch');
 if(switchBtn){
     switchBtn.forEach((el, i) => {
         el.addEventListener('click', async function(e){
             const otherIndex = (i == 0) ? 1 : 0;
             const selectedClass = ['btn-switch-on--selected', 'btn-switch-off--selected'];
-            let msg = '';
-            let errMsg = '';
+
             const query = {
                 method: 'PUT',
                 url: '/admin/configuracoes/switchFaker'
             };
 
-            switchBtn[i].classList.add(selectedClass[i]);
-            switchBtn[otherIndex].classList.remove(selectedClass[otherIndex]);
-
             if(e.target.classList.contains('btn-switch-on')){
-                query.data = { switch: 1 };
-                msg = 'Geração de equipas aleatórias Ligado';
-                errMsg = 'Não foi possível ligar a geração de equipas aleatórias';
+                query.data = { faker: true };
             }
 
             if(e.target.classList.contains('btn-switch-off')){
-                query.data = { switch: 0 };
-                msg = 'Geração de equipas aleatórias Desligado';
-                errMsg = 'Não foi possível desligar a geração de equipas aleatórias';
+                query.data = { faker: false };
             }
 
             const response = await axios(query);
 
-            if(response){
-                if(response.data.success){
-                    Swal.fire({
-                        icon: 'success',
-                        title: msg,
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: errMsg,
-                    });
-                }
+            if(response.data.success){
+                switchBtn[i].classList.add(selectedClass[i]);
+                switchBtn[otherIndex].classList.remove(selectedClass[otherIndex]);
+            }
+        });
+    });
+}
+
+// SYNC SWITCH BUTTON
+const syncSwitchBtn = document.querySelectorAll('.btn-SyncSwitch');
+if(syncSwitchBtn){
+    syncSwitchBtn.forEach((el, i) => {
+        el.addEventListener('click', async function(e){
+            const otherIndex = (i == 0) ? 1 : 0;
+            const selectedClass = ['btn-SyncSwitch-on--selected', 'btn-SyncSwitch-off--selected'];
+
+            const query = {
+                method: 'PUT',
+                url: '/admin/configuracoes/switchSync'
+            };
+
+            if(e.target.classList.contains('btn-SyncSwitch-on')){
+                query.data = { sync: true };
+            }
+
+            if(e.target.classList.contains('btn-SyncSwitch-off')){
+                query.data = { sync: false };
+            }
+
+            const response = await axios(query);
+
+            if(response.data.success){
+                syncSwitchBtn[i].classList.add(selectedClass[i]);
+                syncSwitchBtn[otherIndex].classList.remove(selectedClass[otherIndex]);
             }
         });
     });
@@ -116,18 +127,61 @@ if(enderecoWebBtn){
         const enderecoWeb = document.getElementById('enderecoWeb');
         const enderecoWebValue = enderecoWeb.value.trim();
 
-        if(enderecoWebValue.length == 0 || !enderecoWebValue.startsWith('http')){
+        if(enderecoWebValue.length == 0 || !enderecoWebValue.startsWith('http://')){
             showError(enderecoWeb, 'Endereço Web inválido');
+        } else {
+            const response = await axios({
+                method: 'PUT',
+                url: '/admin/configuracoes/definirEnderecoWeb',
+                data: {
+                    enderecoWeb: enderecoWebValue
+                }
+            });
+        }
+    });
+}
+
+const enderecoWebInput = document.getElementById('enderecoWeb');
+const testConnectionBtn = document.querySelector('.testConnection__btn');
+if(enderecoWebInput && testConnectionBtn){
+    enderecoWebInput.addEventListener('keyup', function(){
+        const url = enderecoWebInput.value.trim();
+        if(url.length >= 10){
+            if(url.startsWith('http://') || url.startsWith('https://')){
+                testConnectionBtn.classList.add('testConnection__btn-show');
+            } else {
+                testConnectionBtn.classList.remove('testConnection__btn-show');
+            }
+        } else {
+            // Esconde botão de testar ligação 
+            testConnectionBtn.classList.remove('testConnection__btn-show');
+        }
+    });
+
+    testConnectionBtn.addEventListener('click', async function(){
+        let url = enderecoWebInput.value.trim();
+        if(!url.endsWith('/')){
+            url = url + '/';
         }
 
-        const response = await axios({
-            method: 'PUT',
-            url: '/admin/configuracoes/definirEnderecoWeb',
-            data: {
-                enderecoWeb: enderecoWebValue
-            }
-        });
+        testConnectionBtn.textContent = 'A testar...';
 
-        console.log(response);
+        try{
+            
+            const response = await axios.get(`${url}checkConnection.php?key=Avrd45h6DbfFfNe4dBBTA34hrb5dfb5eBdbAMR37ff2gd4fD`);
+            if(response.data.sucesso){
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Ligação efectuada'
+                });
+            }
+        } catch(error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Não foi possível estabelecer ligação'
+            });
+        }  
+        
+        testConnectionBtn.textContent = 'Testar Ligação';
     });
 }

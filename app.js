@@ -17,7 +17,8 @@ let serverConfig = {
     server: {
         port: 3000
     },
-    faker: false
+    faker: false,
+    sync: false
 }
 
 // Para Produção
@@ -154,7 +155,15 @@ app.use('/', breadcrumbs.setHome({
 }));
 
 app.use('/login', login);
-app.use('/', index);
+app.use('/', (req,res,next) => {
+    if(!req.session.hasSynced){
+        if(serverConfig.sync && serverConfig.enderecoWeb){
+            req.sync = serverConfig.sync;
+            req.syncUrl = serverConfig.enderecoWeb;
+        }
+    }
+    next();
+}, index);
 app.use('/admin/utilizadores', adminUtilizadores);
 app.use('/admin/localidades', adminLocalidades);
 app.use('/admin/escaloes', adminEscaloes);
@@ -184,7 +193,7 @@ sequelize
         process.exit();
     }
 
-    if(serverConfig.enderecoWeb){
+    /*if(serverConfig.enderecoWeb && erverConfig.sync){
         const haveConnection = await webApi.checkConnection(serverConfig.enderecoWeb);
         if(haveConnection){
             console.log('Estabelecida conexão à plataforma Web');
@@ -194,7 +203,7 @@ sequelize
         }
     } else {
         console.log('Não existe conexão à plataforma Web');
-    }
+    }*/
 
     const port = serverConfig.server.port;
     app.listen(port, () => console.log(`\nMalha App em localhost:${port} ou <IP da máquina>:${port}`));

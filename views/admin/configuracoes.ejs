@@ -37,9 +37,16 @@
         <table class="mainTable">
             <tbody>
                 <tr>
-                    <td>Endereço</td>
-                    <td class="detalhesBtn__column"><input type="text" name="enderecoWeb" id="enderecoWeb" value="<%= config.enderecoWeb %>" size="60"></td>
-                    <td class="detalhesBtn__column"><a class="btn btn-secondary changeEnderecoWeb-btn">Sincronizar</a></td>
+                    <td colspan="2">Syncronização Automática</td>
+                    <td class="detalhesBtn__column"><button class="btn-SyncSwitch btn-SyncSwitch-on <%= (config.sync) ? 'btn-SyncSwitch-on--selected' : '' %>">Lig.</button><button class="btn-SyncSwitch btn-SyncSwitch-off <%= (!config.sync) ? 'btn-SyncSwitch-off--selected' : '' %>">Deslig.</button></td>
+                </tr>
+                <tr>
+                    <td>Endereço API</td>
+                    <td class="detalhesBtn__column enderecoWeb__input-wrapper">
+                        <input type="text" name="enderecoWeb" id="enderecoWeb" value="<%= config.enderecoWeb %>" size="60">
+                        <button class="testConnection__btn <%= (config.enderecoWeb) ? 'testConnection__btn-show' : '' %>">Testar Ligação</button>
+                    </td>
+                    <td align="right" class="detalhesBtn__column"><a class="btn btn-secondary changeEnderecoWeb-btn">Guardar</a></td>
                 </tr>
             </tbody>
         </table>

@@ -1,4 +1,5 @@
-const { default: Swal } = require("sweetalert2");
+import Swal from 'sweetalert2';
+import axios from 'axios';
 
 const sync = document.querySelector('.syncData');
 if(sync){
@@ -10,6 +11,25 @@ if(sync){
         imageHeight: 120,
         imageAlt: 'Custom image',
         allowOutsideClick: false,
-        allowEscapeKey: false
+        allowEscapeKey: false,
+        showConfirmButton: false,
     });
+
+    (async () => {
+        const syncResponse = await axios.get('/syncData');
+        console.log();
+        if(!syncResponse.data.success){
+            Swal.fire({
+                icon: 'error',
+                title: "Erro",
+                text: syncResponse.data.message
+            });
+        } else {
+            Swal.fire({
+                icon: 'success',
+                title: "Sucesso",
+                text: 'Sincronização efectuada'
+            });
+        }
+    })();
 }

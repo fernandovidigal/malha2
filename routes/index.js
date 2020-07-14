@@ -11,7 +11,7 @@ router.all('/*', userAuthenticated, (req, res, next) => {
 
 router.get('/', (req, res) => {
     let sync = false;
-    if(!req.session.hasSynced){
+    if(!req.session.hasSynced && req.session.sync){
         sync = true;
         req.session.hasSynced = true;
     }
@@ -45,6 +45,7 @@ router.get('/admin', (req, res) => {
 
 router.get('/logout', (req, res) => {
     req.logout();
+    req.session.destroy();
     res.redirect('/login');
 });
 

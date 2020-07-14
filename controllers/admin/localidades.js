@@ -3,7 +3,8 @@ const { validationResult } = require('express-validator');
 const util = require('../../helpers/util');
 const dbFunctions = require('../../helpers/DBFunctions');
 const crypto = require('crypto');
-
+const axios = require('axios');
+ 
 exports.getAllLocalidades = async (req, res) => {
     try {
         const _localidades = dbFunctions.getAllLocalidades();
@@ -42,7 +43,6 @@ exports.getLocalidade = async (req, res) => {
             res.redirect('/admin/localidades');
         }
     } catch(err) {
-        console.log(err);
         req.flash('error', 'Não foi possível obter os dados da localidade');
         res.redirect('/admin/localidades');
     }
@@ -68,8 +68,25 @@ exports.createLocalidade = async (req, res) => {
                     nome: localidade
                 }
             });
-        
+
             if(created){
+                if(req.session.sync){
+                    const responseWeb = await axios.post(`${req.session.syncUrl}localidades/createSync.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                        nome: localidade,
+                        syncApp: syncAppHash
+                    });
+                    if(responseWeb.data.sucesso){
+                        await Localidade.update({
+                            syncWeb: syncAppHash
+                        }, {
+                            where: {
+                                localidadeId: localidadeModel.localidadeId,
+                                syncApp: syncAppHash
+                            }
+                        });
+                    }
+                }
+                
                 req.flash('success', `${localidadeModel.nome} adicionada com sucesso`);
                 res.redirect('/admin/localidades');
             } else {
@@ -82,7 +99,6 @@ exports.createLocalidade = async (req, res) => {
             }
         }
     } catch(err) {
-        console.log(err);
         req.flash('error', 'Não foi possível adicionar a localidade');
         res.redirect('/admin/localidades');
     }
@@ -105,7 +121,7 @@ exports.updateLocalidade = async (req, res) => {
         } else {
             const updatedSyncAppHash = crypto.createHash('sha512').update(nomeLocalidade.toUpperCase()).digest('hex');
 
-            const updatedLocalidade = await Localidade.update({
+            await Localidade.update({
                 nome: nomeLocalidade,
                 syncApp: updatedSyncAppHash
             }, {
@@ -113,6 +129,29 @@ exports.updateLocalidade = async (req, res) => {
                     localidadeId: localidadeId
                 }
             });
+
+            const localidade = await Localidade.findByPk(localidadeId);
+            console.log(localidade.syncApp);
+            console.log(localidade.syncWeb);
+
+            if(req.session.sync){
+                const result = await axios.post(`${req.session.syncUrl}localidades/editSync.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                    nome: nomeLocalidade,
+                    syncApp: updatedSyncAppHash,
+                    syncWeb: localidade.syncWeb
+                });
+                console.log(result);
+                if(result.data.sucesso){
+                    await Localidade.update({
+                        syncWeb: updatedSyncAppHash
+                    }, {
+                        where: {
+                            localidadeId: localidadeId,
+                            syncApp: updatedSyncAppHash
+                        }
+                    });
+                }
+            }
             
             req.flash('success', 'Localidade actualizada com sucesso');
             res.redirect('/admin/localidades');

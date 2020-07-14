@@ -156,12 +156,12 @@ app.use('/', breadcrumbs.setHome({
 
 app.use('/login', login);
 app.use('/', (req,res,next) => {
-    if(!req.session.hasSynced){
+    //if(!req.session.hasSynced){
         if(serverConfig.sync && serverConfig.enderecoWeb){
-            req.sync = serverConfig.sync;
-            req.syncUrl = serverConfig.enderecoWeb;
+            req.session.sync = serverConfig.sync;
+            req.session.syncUrl = serverConfig.enderecoWeb;
         }
-    }
+    //}
     next();
 }, index);
 app.use('/admin/utilizadores', adminUtilizadores);

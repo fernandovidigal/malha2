@@ -131,8 +131,6 @@ exports.updateLocalidade = async (req, res) => {
             });
 
             const localidade = await Localidade.findByPk(localidadeId);
-            console.log(localidade.syncApp);
-            console.log(localidade.syncWeb);
 
             if(req.session.sync){
                 const result = await axios.post(`${req.session.syncUrl}localidades/editSync.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
@@ -140,7 +138,6 @@ exports.updateLocalidade = async (req, res) => {
                     syncApp: updatedSyncAppHash,
                     syncWeb: localidade.syncWeb
                 });
-                console.log(result);
                 if(result.data.sucesso){
                     await Localidade.update({
                         syncWeb: updatedSyncAppHash
@@ -171,13 +168,20 @@ exports.updateLocalidade = async (req, res) => {
     }
 }
 
-exports.deleteLocalidade = (req, res) => {
+exports.deleteLocalidade = async (req, res) => {
     const localidadeId = parseInt(req.body.id);
 
     if(req.user.level == 5 || req.user.level == 10){
+        const localidade = await Localidade.findByPk(localidadeId);
         Localidade.destroy({where: {localidadeId: localidadeId}, limit: 1})
         .then(result => {
             if(result){
+                if(req.session.sync){
+                    const result = axios.post(`${req.session.syncUrl}localidades/deleteSync.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                        nome: localidade.nome,
+                        syncApp: localidade.syncApp
+                    });
+                }
                 res.status(200).json({ success: true });
             } else {
                 res.status(200).json({ success: false });

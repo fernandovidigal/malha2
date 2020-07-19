@@ -39,7 +39,7 @@
     "pdfmake": "^0.1.66",
     "sequelize": "^6.3.3",
     "sqlite3": "^5.0.0",
-    "sweetalert2": "^9.15.3"
+    "sweetalert2": "^9.17.0"
   },
   "pkg": {
     "scripts": [],

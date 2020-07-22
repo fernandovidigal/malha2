@@ -15,11 +15,11 @@ exports.syncLocalidades = async (url) => {
 
         const localidadesWeb = responseWeb.data.data;
 
-        // Remove das listas as localidades que já estão sincronizadas
         const localidadesAppSincronizar = [];
         const localidadesIguaisSincronizar = [];
         const localidadesComDefeito = [];
 
+        // Remove das listas as localidades que já estão sincronizadas
         localidadesApp.forEach(lapp => {
             // Verificar se a localidade existe na Web
             const webIndex = localidadesWeb.findIndex(lweb => lweb.syncWeb == lapp.syncApp);
@@ -49,15 +49,6 @@ exports.syncLocalidades = async (url) => {
                 localidadesAppSincronizar.push(lapp);
             }
         });
-        
-        /*console.log("Localidade A sincronizar");
-        console.log(localidadesAppSincronizar);
-        console.log("Localidade iguais mas estão desincronizadas");
-        console.log(localidadesIguaisSincronizar);
-        console.log("Localidade com defeito");
-        console.log(localidadesComDefeito);
-        console.log("Localidade WEB");
-        console.log(localidadesWeb);*/
 
         const localidadesASincronizar = [];
 

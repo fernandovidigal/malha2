@@ -133,6 +133,8 @@ app.use(function (req, res, next) {
     res.locals.error = req.flash('error');
     res.locals.info = req.flash('info');
     res.locals.warning = req.flash('warning');
+    res.locals.activeConnection = req.session.activeConnection || false;
+    res.locals.syncActive = req.session.sync || false;
     next();
 });
 
@@ -156,12 +158,10 @@ app.use('/', breadcrumbs.setHome({
 
 app.use('/login', login);
 app.use('/', (req,res,next) => {
-    //if(!req.session.hasSynced){
-        if(serverConfig.sync && serverConfig.enderecoWeb){
-            req.session.sync = serverConfig.sync;
-            req.session.syncUrl = serverConfig.enderecoWeb;
-        }
-    //}
+    if(serverConfig.sync && serverConfig.enderecoWeb){
+        req.session.sync = serverConfig.sync;
+        req.session.syncUrl = serverConfig.enderecoWeb;
+    }
     next();
 }, index);
 app.use('/admin/utilizadores', adminUtilizadores);

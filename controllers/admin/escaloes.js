@@ -1,6 +1,8 @@
 const Escaloes = require('../../models/Escaloes');
 const { validationResult } = require('express-validator');
 const dbFunctions = require('../../helpers/DBFunctions');
+const crypto = require('crypto');
+const axios = require('axios');
 
 exports.getAllEscaloes = async (req, res) => {
     try {
@@ -69,26 +71,30 @@ exports.getEscalaoBySexo = async (req, res) => {
 }
 
 exports.createEscalao = async (req, res) => {
-    try {
-        const designacao = req.body.designacao.trim();
-        const sexo = parseInt(req.body.sexo);
-        const errors = validationResult(req);
-        
-        const oldData = {
-            designacao: designacao,
-            sexo: sexo
-        }
+    const designacao = req.body.designacao.trim();
+    const sexo = parseInt(req.body.sexo);
+    const errors = validationResult(req);
+    
+    const oldData = {
+        designacao: designacao,
+        sexo: sexo
+    }
 
+    try {
         if(!errors.isEmpty()){
             req.breadcrumbs('Adicionar Escalão', '/admin/adicionarEscalao');
             res.render('admin/adicionarEscalao', {validationErrors: errors.array(), escalao: oldData, breadcrumbs: req.breadcrumbs()});
         } else {
-            const [escalao, created] = await Escaloes.findOrCreate({
-                                                where: {
-                                                    designacao: designacao,
-                                                    sexo: sexo
-                                                }
-                                            });
+            const escalaoToHash = designacao + sexo;
+            const syncAppHash = crypto.createHash('sha512').update(escalaoToHash.toUpperCase()).digest('hex');
+            const [escalaoModel, created] = await Escaloes.findOrCreate({
+                where: { syncApp: syncAppHash },
+                defaults: {
+                    designacao: designacao,
+                    sexo: sexo
+                }
+            });
+
             if(!created){
                 const errors = [{
                     msg: 'Escalão já existe',
@@ -98,7 +104,26 @@ exports.createEscalao = async (req, res) => {
                 return res.render('admin/adicionarEscalao', {validationErrors: errors, escalao: oldData, breadcrumbs: req.breadcrumbs()});
             }
 
-            req.flash('success', `Escalão ${escalao.designacao} adicionado com sucesso.`);
+            if(req.session.sync){
+                const responseWeb = await axios.post(`${req.session.syncUrl}escaloes/createSync.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                    designacao: designacao,
+                    sexo: sexo,
+                    syncApp: syncAppHash
+                });
+                if(responseWeb.data.sucesso){
+                    await Escaloes.update({
+                        syncWeb: syncAppHash
+                    }, {
+                        where: {
+                            escalaoId: escalaoModel.escalaoId,
+                            syncApp: syncAppHash
+                        }
+                    });
+                }
+            }
+
+
+            req.flash('success', `Escalão ${escalaoModel.designacao} adicionado com sucesso.`);
             res.redirect('/admin/escaloes');
         }
     } catch(err) {

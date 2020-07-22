@@ -87,7 +87,7 @@ exports.createLocalidade = async (req, res) => {
                     }
                 }
                 
-                req.flash('success', `${localidadeModel.nome} adicionada com sucesso`);
+                req.flash('success', `${localidadeModel.nome} adicionado com sucesso`);
                 res.redirect('/admin/localidades');
             } else {
                 const errors = [{

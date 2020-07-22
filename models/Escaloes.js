@@ -19,6 +19,19 @@ const Escaloes = sequelize.define('escaloes', {
             min: 0,
             max: 1
         }
+    },
+    syncApp: {
+        type: Sequelize.STRING(128),
+        allowNull: false,
+        unique: {
+            args: true,
+            msg: "O escalão já existe."
+        }
+    },
+    syncWeb: {
+        type: Sequelize.STRING(128),
+        allowNull: true,
+        defaultValue: null
     }
 }, {
     name: {

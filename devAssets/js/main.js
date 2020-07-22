@@ -1,3 +1,5 @@
+import Swal from 'sweetalert2';
+
 var msgCloseBtn = document.querySelector('.floatMessage-closeBtn');
 
 if(msgCloseBtn){
@@ -44,4 +46,22 @@ if(userNavToggle) {
 	document.addEventListener('click', function(){
 		userMenu.classList.remove('user__navigation-open');
 	});
+}
+
+const dialogMessage = document.querySelector('.dialogMessage');
+if(dialogMessage){
+	const type = dialogMessage.dataset.type;
+	const text = dialogMessage.dataset.text;
+	const selfClose = dialogMessage.dataset.selfclose;
+
+	console.log(text, selfClose);
+	const dialogParams = {
+		icon: type,
+		text: text,
+		showConfirmButton: selfClose == "true" ? false : true,
+	}
+	if(selfClose == "true"){
+		dialogParams.timer = 1500;
+	}
+	Swal.fire(dialogParams);
 }

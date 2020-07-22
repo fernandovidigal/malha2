@@ -141,6 +141,38 @@ exports.getAllEscaloesSemCampos = (torneioId, listaEscaloesComCampo) => {
     });
 }
 
+exports.createEscalao = (designacao, sexo, syncApp, syncWeb) => {
+    return Escaloes.create({
+        designacao: designacao,
+        sexo: sexo,
+        syncApp: syncApp,
+        syncWeb: syncWeb
+    });
+}
+
+exports.deleteEscalao = (escalaoId) => {
+    return Escaloes.destroy({
+        where: {
+            escalaoId: escalaoId
+        },
+        limit: 1
+    });
+}
+
+exports.updateEscalaoSync = (escalaoId, syncApp, syncWeb) => {
+    return Escaloes.update(
+        { syncApp: syncApp, syncWeb: syncWeb },
+        { where: { escalaoId: escalaoId }, limit: 1}
+    );
+}
+
+exports.updateEscalaoSyncWeb = (escalaoId, syncWeb) => {
+    return Escaloes.update(
+        { syncWeb: syncWeb },
+        { where: { escalaoId: escalaoId }, limit: 1}
+    );
+}
+
 ////////////////////////////////////////////////////////
 //                        CAMPOS
 ////////////////////////////////////////////////////////

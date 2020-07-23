@@ -28,6 +28,19 @@ const Torneios = sequelize.define('torneios', {
             min: 0,
             max: 1
         }
+    },
+    syncApp: {
+        type: Sequelize.STRING(128),
+        allowNull: false,
+        unique: {
+            args: true,
+            msg: "O Torneio já existe."
+        }
+    },
+    syncWeb: {
+        type: Sequelize.STRING(128),
+        allowNull: true,
+        defaultValue: null
     }
 });
 

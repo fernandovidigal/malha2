@@ -28,6 +28,19 @@ const Equipas = sequelize.define('equipas', {
         type: Sequelize.INTEGER,
         allowNull: false,
         primaryKey: true
+    },
+    syncApp: {
+        type: Sequelize.STRING(128),
+        allowNull: false,
+        unique: {
+            args: true,
+            msg: "A equipa já existe."
+        }
+    },
+    syncWeb: {
+        type: Sequelize.STRING(128),
+        allowNull: true,
+        defaultValue: null
     }
 });
 

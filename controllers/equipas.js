@@ -5,6 +5,8 @@ const { validationResult } = require('express-validator');
 const util = require('../helpers/util');
 const torneioHelpers = require('../helpers/torneioHelperFunctions');
 const configFile = require('../helpers/configFunctions');
+const crypto = require('crypto');
+const axios = require('axios');
 
 const faker = require('faker');
 faker.locale = "pt_BR";
@@ -354,12 +356,16 @@ exports.createEquipa = async (req, res) => {
             let lastEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId) || 0;
             lastEquipaID++;
 
+            const equipaToHash = primeiroElemento + segundoElemento + escalaoId + localidadeId + torneioInfo.syncApp;
+            const syncAppHash = crypto.createHash('sha512').update(equipaToHash.toUpperCase()).digest('hex');
+
             const equipa = {
                 torneioId: torneio.torneioId,
                 primeiroElemento: primeiroElemento,
                 segundoElemento: segundoElemento,
                 localidadeId: localidadeId,
-                escalaoId: escalaoId
+                escalaoId: escalaoId,
+                syncApp: syncAppHash
             }
 
             const [_equipa, created] = await dbFunctions.createEquipa(equipa, lastEquipaID);

@@ -25,7 +25,7 @@ const Escaloes = sequelize.define('escaloes', {
         allowNull: false,
         unique: {
             args: true,
-            msg: "O escalão já existe."
+            msg: "O Escalão já existe."
         }
     },
     syncWeb: {

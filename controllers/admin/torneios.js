@@ -3,6 +3,8 @@ const Torneios = require("../../models/Torneios");
 const Campos = require("../../models/Campos");
 const dbFunctions = require("../../helpers/DBFunctions");
 const { validationResult } = require("express-validator");
+const crypto = require('crypto');
+const axios = require('axios');
 
 exports.getAllTorneios = async (req, res) => {
   try {
@@ -99,13 +101,18 @@ async function processaCriacaoCampos(transaction, torneioId, listaEscaloes) {
 }
 
 exports.createTorneio = async (req, res) => {
-  try {
-    const designacao = req.body.designacao.trim();
-    const localidade = req.body.localidade.trim();
-    const ano = parseInt(req.body.ano.trim());
-    const oldAno = req.body.ano.trim();
-    const errors = validationResult(req).array({ onlyFirstError: true });
+  const designacao = req.body.designacao.trim();
+  const localidade = req.body.localidade.trim();
+  const ano = parseInt(req.body.ano.trim());
+  const errors = validationResult(req);
 
+  const oldData = {
+    designacao: designacao,
+    localidade: localidade,
+    ano: ano
+  };
+
+  try {
     // Processa todos os escalões
     const listaEscaloes = await dbFunctions.getAllEscaloes();
     listaEscaloes.forEach(escalao => {
@@ -113,65 +120,57 @@ exports.createTorneio = async (req, res) => {
       escalao.campos = (Math.log2(numCampos) % 1 === 0) ? numCampos : 0;
     });
 
-    if(isNaN(ano)){
-      errors.push({
-        location: 'body',
-        param: 'ano',
-        value: '',
-        msg: 'Ano do torneio inválido'
-      });
+    if(!errors.isEmpty()){
+      req.breadcrumbs("Adicionar Torneio", "/admin/adicionarTorneio");
+      return res.render("admin/adicionarTorneio", { validationErrors: errors.array({ onlyFirstError: true }), escaloes: listaEscaloes, torneio: oldData, breadcrumbs: req.breadcrumbs() });
     }
 
-    if (errors.length > 0) {
-      const oldData = {
-        designacao: designacao,
-        localidade: localidade,
-        ano: isNaN(ano) ? oldAno : ano
-      };
+    const torneioToHash = designacao + localidade + ano;
+    const syncAppHash = crypto.createHash('sha512').update(torneioToHash.toUpperCase()).digest('hex');
 
-      req.breadcrumbs("Adicionar Torneio", "/admin/adicionarTorneio");
-      res.render("admin/adicionarTorneio", { validationErrors: errors, escaloes: listaEscaloes, torneio: oldData, breadcrumbs: req.breadcrumbs() });
+    let transaction;
 
-    } else {
-      let novoTorneioId = 0;
-      let transaction;
+    try {
+      transaction = await sequelize.transaction();
 
-      try {
-        transaction = await sequelize.transaction();
-
-        let torneioCriado = await Torneios.create(
-          {
+      const [torneioModel, created] = await Torneios.findOrCreate({
+        where: { syncApp: syncAppHash },
+        defaults: {
             designacao: designacao,
             localidade: localidade,
             ano: ano
-          },
-          { transaction }
-        );
+        },
+        transaction: transaction
+      });
 
-        novoTorneioId = torneioCriado.torneioId;
-
-        await processaCriacaoCampos(transaction, novoTorneioId, listaEscaloes);
-
-        await transaction.commit();
-      } catch (err) {
-        console.log(err);
+      if(!created){
         await transaction.rollback();
-        throw err;
+        const errors = [{
+          msg: 'O Torneio já existe',
+          param: 'designacao'
+        }];
+        req.breadcrumbs("Adicionar Torneio", "/admin/adicionarTorneio");
+        return res.render("admin/adicionarTorneio", { validationErrors: errors, escaloes: listaEscaloes, torneio: oldData, breadcrumbs: req.breadcrumbs() });
       }
 
-      if (transaction.finished === "commit" && novoTorneioId != 0) {
+      await processaCriacaoCampos(transaction, torneioModel.torneioId, listaEscaloes);
+
+      await transaction.commit();
+
+      if (transaction.finished === "commit") {
+        // TODO: Sync na plataforma WEB
+
         // Escolheu adicionar e activar o torneios
         if (req.body.adicionar_activar) {
-          await dbFunctions.setTorneioActivo(novoTorneioId);
+          await dbFunctions.setTorneioActivo(torneioModel.torneioId);
           req.flash("success", "Torneio adicionado e activado com sucesso.");
           res.redirect("/admin/torneios");
         } else {
           // Escolheu só adicionar o torneio
-
           // Se só existe 1 torneio registado este fica activo
           const numTorneios = await dbFunctions.getNumTorneios();
           if (numTorneios == 1) {
-            await dbFunctions.setTorneioActivo(novoTorneioId);
+            await dbFunctions.setTorneioActivo(torneioModel.torneioId);
             req.flash("success", "Torneio adicionado e activado com sucesso.");
             res.redirect("/admin/torneios");
           } else {
@@ -183,13 +182,16 @@ exports.createTorneio = async (req, res) => {
         req.flash("error", "Não foi possível adicionar o torneio.");
         res.redirect("/admin/torneios");
       }
+
+    } catch(err){
+      await transaction.rollback();
+      throw err;
     }
   } catch (err) {
-    console.log(err);
     req.flash("error", "Não foi possivel adicionar o torneio.");
     res.redirect("/admin/torneios");
   }
-};
+}
 
 exports.ActivaTorneio = async (req, res) => {
   try {
@@ -237,66 +239,89 @@ async function processaUpdateCampos(transaction, torneioId, listaEscaloes) {
 }
 
 exports.updateTorneio = async (req, res) => {
+  const torneioId = parseInt(req.params.id);
+  const designacao = req.body.designacao.trim();
+  const localidade = req.body.localidade.trim();
+  const ano = parseInt(req.body.ano.trim());
+  let tab = req.params.tab || 1;
+
+    if(tab < 1 || tab > 3){
+      tab = 1;
+    }
+
+  // Processa todos os escalões
+  const listaEscaloes = await dbFunctions.getAllEscaloes();
+  listaEscaloes.forEach(escalao => {
+    const numCampos = parseInt(req.body[escalao.escalaoId]);
+    escalao.campos = (Math.log2(numCampos) % 1 === 0) ? numCampos : 0;
+  });
+
+  const oldData = {
+    torneioId: torneioId,
+    designacao: designacao,
+    localidade: localidade,
+    ano: ano
+  };
+
   try {
-    const torneioId = parseInt(req.params.id);
-    const designacao = req.body.designacao.trim();
-    const localidade = req.body.localidade.trim();
-    const ano = parseInt(req.body.ano.trim());
-    const errors = validationResult(req).array({ onlyFirstError: true });
+    
+    const errors = validationResult(req);
 
-    // Processa todos os escalões
-    const listaEscaloes = await dbFunctions.getAllEscaloes();
-    listaEscaloes.forEach(escalao => {
-      const numCampos = parseInt(req.body[escalao.escalaoId]);
-      escalao.campos = (Math.log2(numCampos) % 1 === 0) ? numCampos : 0;
-    });
-
-    if (errors.length > 0) {
-      const oldData = {
-        torneioId: torneioId,
-        designacao: designacao,
-        localidade: localidade,
-        ano: ano
-      };
+    if (!errors.isEmpty()) {
       req.breadcrumbs("Editar Torneio", "/admin/editarTorneio");
-      res.render("admin/editarTorneio", { validationErrors: errors, torneio: oldData, escaloes: listaEscaloes, breadcrumbs: req.breadcrumbs() });
-    } else {
-      let transaction;
-      try {
-        transaction = await sequelize.transaction();
+      return res.render("admin/editarTorneio", { validationErrors: errors.array({ onlyFirstError: true }), torneio: oldData, escaloes: listaEscaloes, selectedTab: tab, breadcrumbs: req.breadcrumbs() });
+    }
 
-        let torneioToUpdate = await Torneios.findByPk(torneioId, {
-          transaction
-        });
+    const torneioToHash = designacao + localidade + ano;
+    const updatedSyncAppHash = crypto.createHash('sha512').update(torneioToHash.toUpperCase()).digest('hex');
 
-        await torneioToUpdate.update(
-          {
-            designacao: designacao,
-            localidade: localidade,
-            ano: ano
-          },
-          { transaction }
-        );
+    let transaction;
 
-        await processaUpdateCampos(transaction, torneioId, listaEscaloes);
+    try {
+      transaction = await sequelize.transaction();
 
-        await transaction.commit();
-      } catch (err) {
-        console.log(err);
-        await transaction.rollback();
-        throw err;
-      }
+      await Torneios.update(
+        {
+          designacao: designacao,
+          localidade: localidade,
+          ano: ano,
+          syncApp: updatedSyncAppHash
+        },
+        {
+          where: { torneioId: torneioId }
+        },
+        { transaction: transaction }
+      );
+
+      await processaUpdateCampos(transaction, torneioId, listaEscaloes);
+
+      await transaction.commit();
 
       if (transaction.finished === "commit") {
+        const torneio = await Torneios.findByPk(torneioId);
+
+        // TODO: Sync com plataforma WEB
+
         req.flash("success", "Torneio actualizado com sucesso");
         res.redirect("/admin/torneios");
       } else {
         req.flash("error", "Não foi possível actualizar o torneio");
         res.redirect("/admin/torneios");
       }
+
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
     }
   } catch (err) {
-    console.log(err);
+    if(err.name == 'SequelizeUniqueConstraintError'){
+      const errors = [{
+          msg: 'O Torneio já existe',
+          param: 'designacao'
+      }];
+      req.breadcrumbs("Editar Torneio", "/admin/editarTorneio");
+      return res.render("admin/editarTorneio", { validationErrors: errors, torneio: oldData, escaloes: listaEscaloes, selectedTab: tab, breadcrumbs: req.breadcrumbs() });
+    }
     req.flash("error", "Não foi possível actualizar o torneio");
     res.redirect("/admin/torneios");
   }

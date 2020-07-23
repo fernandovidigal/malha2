@@ -51,12 +51,14 @@ if(userNavToggle) {
 const dialogMessage = document.querySelector('.dialogMessage');
 if(dialogMessage){
 	const type = dialogMessage.dataset.type;
+	const title = dialogMessage.dataset.title;
 	const text = dialogMessage.dataset.text;
 	const selfClose = dialogMessage.dataset.selfclose;
 
 	console.log(text, selfClose);
 	const dialogParams = {
 		icon: type,
+		title: title,
 		text: text,
 		showConfirmButton: selfClose == "true" ? false : true,
 	}

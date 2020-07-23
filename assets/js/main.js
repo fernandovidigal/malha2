@@ -3358,11 +3358,13 @@ var dialogMessage = document.querySelector('.dialogMessage');
 
 if (dialogMessage) {
   var type = dialogMessage.dataset.type;
+  var title = dialogMessage.dataset.title;
   var text = dialogMessage.dataset.text;
   var selfClose = dialogMessage.dataset.selfclose;
   console.log(text, selfClose);
   var dialogParams = {
     icon: type,
+    title: title,
     text: text,
     showConfirmButton: selfClose == "true" ? false : true
   };

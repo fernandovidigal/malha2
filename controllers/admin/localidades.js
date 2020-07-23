@@ -156,7 +156,7 @@ exports.updateLocalidade = async (req, res) => {
     } catch(err) {
         if(err.name == 'SequelizeUniqueConstraintError'){
             const errors = [{
-                msg: 'Localidade já existe',
+                msg: 'A Localidade já existe',
                 param: 'localidade'
             }];
             req.breadcrumbs('Editar Localidade', '/admin/editarLocalidade');

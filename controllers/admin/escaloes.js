@@ -122,67 +122,62 @@ exports.createEscalao = async (req, res) => {
                 }
             }
 
-
             req.flash('success', `Escalão ${escalaoModel.designacao} adicionado com sucesso.`);
             res.redirect('/admin/escaloes');
         }
     } catch(err) {
-        console.log(err);
         req.flash('error', 'Não foi possível adicionar o escalão.');
         res.redirect('/admin/escaloes');
     }
 }
 
 exports.updateEscalao = async (req, res) => {
-    try {
-        const escalaoId = req.params.id;
-        const designacao = req.body.designacao.trim();
-        const sexo = req.body.sexo;
-        const errors = validationResult(req);
-        
-        const oldData = {
-            escalaoId: escalaoId,
-            designacao: designacao,
-            sexo: sexo
-        }
+    const escalaoId = req.params.id;
+    const designacao = req.body.designacao.trim();
+    const sexo = req.body.sexo;
+    const errors = validationResult(req);
     
+    const oldData = {
+        escalaoId: escalaoId,
+        designacao: designacao,
+        sexo: sexo
+    }
+
+    try {
         if(!errors.isEmpty()){
             req.breadcrumbs('Editar Escalão', '/admin/editarEscalao');
             res.render('admin/editarEscalao', {validationErrors: errors.array(), escalao: oldData, breadcrumbs: req.breadcrumbs()});
         } else {
-            const _escalao = Escaloes.findByPk(escalaoId);
-            const _existeEscalao = Escaloes.findOne({
-                                    where: {
-                                        designacao: designacao,
-                                        sexo: sexo
-                                    }, 
-                                    raw: true    
-                                });
-            const [escalao, existeEscalao] = await Promise.all([_escalao, _existeEscalao]);
+            const escalaoToHash = designacao + sexo;
+            const updatedSyncAppHash = crypto.createHash('sha512').update(escalaoToHash.toUpperCase()).digest('hex');
 
-            if(existeEscalao){
-                const errors = [{
-                    msg: 'Escalão já existe.',
-                    param: 'designacao'
-                }];
+            await Escaloes.update({
+                designacao: designacao,
+                sexo: sexo,
+                syncApp: updatedSyncAppHash
+            }, {
+                where: {
+                    escalaoId: escalaoId
+                }
+            });
 
-                req.breadcrumbs('Editar Escalão', '/admin/editarEscalao');
-                return res.render('admin/editarEscalao', {validationErrors: errors, escalao: oldData, breadcrumbs: req.breadcrumbs()});
-            }
-
-            escalao.designacao = designacao;
-            escalao.sexo = sexo;
-            const result = await escalao.save();
-
-            if(!result){
-                throw new Error();
-            }
+            // TODO: WEB Sync
 
             req.flash('success', 'Escalão actualizado com sucesso.');
             res.redirect('/admin/escaloes');
         }
     } catch(err) {
         console.log(err);
+        if(err.name == 'SequelizeUniqueConstraintError'){
+            const errors = [{
+                msg: 'O Escalão já existe.',
+                param: 'designacao'
+            }];
+
+            req.breadcrumbs('Editar Escalão', '/admin/editarEscalao');
+            return res.render('admin/editarEscalao', {validationErrors: errors, escalao: oldData, breadcrumbs: req.breadcrumbs()});
+        }
+
         req.flash('error', 'Não foi possível actualizar o escalão.');
         res.redirect('/admin/escaloes');
     }

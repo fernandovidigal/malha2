@@ -455,7 +455,8 @@ exports.getAllEquipasPaginacao = (torneioId, offset, limit) => {
         ],
         where: {torneioId: torneioId},
         offset: _offset,
-        limit: limit
+        limit: limit,
+        order: [['escalaoId', 'ASC'], ['equipaId', 'ASC']]
     });
 }
 

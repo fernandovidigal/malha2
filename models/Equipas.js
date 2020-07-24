@@ -22,7 +22,8 @@ const Equipas = sequelize.define('equipas', {
     },
     localidadeId: {
         type: Sequelize.INTEGER,
-        allowNull: false
+        allowNull: false,
+        primaryKey: true
     },
     escalaoId: {
         type: Sequelize.INTEGER,
@@ -31,17 +32,25 @@ const Equipas = sequelize.define('equipas', {
     },
     syncApp: {
         type: Sequelize.STRING(128),
-        allowNull: false,
-        unique: {
-            args: true,
-            msg: "A equipa já existe."
-        }
+        allowNull: false
     },
     syncWeb: {
         type: Sequelize.STRING(128),
         allowNull: true,
         defaultValue: null
     }
+},
+{
+    indexes: [
+        {
+            unique: true,
+            fields: ['torneioId', 'syncApp']
+        },
+        {
+            unique: true,
+            fields: ['equipaId', 'torneioId', 'localidadeId', 'escalaoId']
+        }
+    ]
 });
 
 module.exports = Equipas;

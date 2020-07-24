@@ -1478,7 +1478,7 @@ input::placeholder {
 }
 
 .checkmarkError {
-    border: solid 1px red;
+    border: solid 1px red !important;
 }
 
 .inputRadioContainer:hover input ~ .checkmark{

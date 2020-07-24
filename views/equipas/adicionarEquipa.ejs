@@ -31,6 +31,8 @@
                     %>
                                 class="inputError"
                             <% } %>
+                    <% } else if(locals.errors){ %>
+                        class="inputError"
                     <% } %>
                 >
                 <% 
@@ -57,6 +59,8 @@
                     %>
                                 class="inputError"
                             <% } %>
+                    <% } else if(locals.errors){ %>
+                        class="inputError"
                     <% } %>
                 >
                 <% 
@@ -88,6 +92,9 @@
                         %>
                                     inputError
                                 <% } %>
+                        
+                        <% } else if(locals.errors){ %>
+                            inputError
                         <% } %>">
                         <% 
                             if(locals.equipa){ 
@@ -143,6 +150,8 @@
                                     %>
                                                 checkmarkError
                                             <% } %>
+                                    <% } else if(locals.errors && locals.equipa && equipa.escalaoId == escalao.escalaoId){ %>
+                                        checkmarkError
                                     <% } %>
                                     "></span>
                                 </label>
@@ -170,6 +179,8 @@
                                     %>
                                                 checkmarkError
                                             <% } %>
+                                    <% } else if(locals.errors && locals.equipa && equipa.escalaoId == escalao.escalaoId){ %>
+                                        checkmarkError
                                     <% } %>
                                     "></span>
                                 </label>

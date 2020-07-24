@@ -326,37 +326,37 @@ exports.adicionarEquipa = async (req, res) => {
 }
 
 exports.createEquipa = async (req, res) => {
+    const primeiroElemento = req.body.primeiroElemento.trim();
+    const segundoElemento = req.body.segundoElemento.trim();
+    const localidadeId = parseInt(req.body.localidade);
+    const escalaoId = parseInt(req.body.escalao);
+    const errors = validationResult(req);
+
+    const inputData = {
+        primeiroElemento: primeiroElemento,
+        segundoElemento: segundoElemento,
+        localidadeId: localidadeId,
+        escalaoId: escalaoId
+    }
+
+    const torneioInfo = dbFunctions.getTorneioInfo();
+    const localidadesInfo = dbFunctions.getLocalidadesInfo();
+    const escaloesInfo = dbFunctions.getEscaloesInfo();
+
+    const [torneio, localidades, escaloes] = await Promise.all([torneioInfo, localidadesInfo, escaloesInfo]);
+    util.sort(localidades);
+    // Exclui da lista de esclões os escalões que já tenham jogos distribuídos
+    // Se já existe jogos distribuídos não é possível adicionar mais equipas
+    const listaEscaloes = await processaListaEscaloes(escaloes, torneio.torneioId);
+
     try{
-        const primeiroElemento = req.body.primeiroElemento.trim();
-        const segundoElemento = req.body.segundoElemento.trim();
-        const localidadeId = parseInt(req.body.localidade);
-        const escalaoId = parseInt(req.body.escalao);
-        const errors = validationResult(req);
-
-        req.breadcrumbs('Adicionar Equipa', '/equipas/adicionarEquipa');
-        
-        const inputData = {
-            primeiroElemento: primeiroElemento,
-            segundoElemento: segundoElemento,
-            localidadeId: localidadeId,
-            escalaoId: escalaoId
-        }
-
         if(!errors.isEmpty()){
             showValidationErrors(req, res, errors, 'adicionarEquipa', inputData);
         } else {
-            const torneioInfo = dbFunctions.getTorneioInfo();
-            const localidadesInfo = dbFunctions.getLocalidadesInfo();
-            const escaloesInfo = dbFunctions.getEscaloesInfo();
-    
-            const [torneio, localidades, escaloes] = await Promise.all([torneioInfo, localidadesInfo, escaloesInfo]);
-            
-            util.sort(localidades);
-
             let lastEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId) || 0;
             lastEquipaID++;
 
-            const equipaToHash = primeiroElemento + segundoElemento + escalaoId + localidadeId + torneioInfo.syncApp;
+            const equipaToHash = primeiroElemento + segundoElemento + localidadeId;
             const syncAppHash = crypto.createHash('sha512').update(equipaToHash.toUpperCase()).digest('hex');
 
             const equipa = {
@@ -370,23 +370,26 @@ exports.createEquipa = async (req, res) => {
 
             const [_equipa, created] = await dbFunctions.createEquipa(equipa, lastEquipaID);
 
-            if(created){
-                req.flash('success', 'Equipa adicionada com sucesso.');
-                return res.redirect('/equipas');
-            } else {
+            if(!created){
                 const errors = [{
                     msg: 'A equipa já se encontra registada neste torneio.'
                 }];
-
-                // Exclui da lista de esclões os escalões que já tenham jogos distribuídos
-                // Se já existe jogos distribuídos não é possível adicionar mais equipas
-                const listaEscaloes = await processaListaEscaloes(escaloes, torneio.torneioId);
-
-                res.render('equipas/adicionarEquipa', {errors: errors, equipa: inputData, localidades: localidades, escaloes: listaEscaloes, torneio: torneio, breadcrumbs: req.breadcrumbs()});
+                req.breadcrumbs('Adicionar Equipa', '/equipas/adicionarEquipa');
+                return res.render('equipas/adicionarEquipa', {errors: errors, equipa: inputData, localidades: localidades, escaloes: listaEscaloes, torneio: torneio, breadcrumbs: req.breadcrumbs()});
             }
+
+            req.flash('success', 'Equipa adicionada com sucesso.');
+            return res.redirect('/equipas');
         }
     } catch(err) {
         console.log(err);
+        if(err.name == 'SequelizeUniqueConstraintError'){
+            const errors = [{
+                msg: 'A equipa já se encontra registada neste torneio.',
+            }];
+            req.breadcrumbs('Adicionar Equipa', '/equipas/adicionarEquipa');
+            return res.render('equipas/adicionarEquipa', {errors: errors, equipa: inputData, localidades: localidades, escaloes: listaEscaloes, torneio: torneio, breadcrumbs: req.breadcrumbs()});
+        }
         req.flash('error', 'Não foi possível registar a equipa');
         res.redirect('/equipas');
     }
@@ -814,13 +817,19 @@ exports.createEquipasAleatoriamente = async (req, res) => {
         for(let i = 0; i < num; i++){
             const _escalao = listaEscaloes[Math.floor(Math.random() * listaEscaloes.length)];
             _escalao.lastId++;
+            const primeiroElemento = faker.name.firstName() + " " + faker.name.lastName();
+            const segundoElemento = faker.name.firstName() + " " + faker.name.lastName();
+            const localidadeId = _listaLocalidades[Math.floor(Math.random() * _listaLocalidades.length)];
+            const equipaToHash = primeiroElemento + segundoElemento + localidadeId;
+            const syncAppHash = crypto.createHash('sha512').update(equipaToHash.toUpperCase()).digest('hex');
             const equipa = {
                 equipaId: _escalao.lastId,
                 torneioId: torneio.torneioId,
-                primeiroElemento: faker.name.firstName() + " " + faker.name.lastName(),
-                segundoElemento: faker.name.firstName() + " " + faker.name.lastName(),
-                localidadeId: _listaLocalidades[Math.floor(Math.random() * _listaLocalidades.length)],
-                escalaoId: _escalao.escalaoId
+                primeiroElemento: primeiroElemento,
+                segundoElemento: segundoElemento,
+                localidadeId: localidadeId,
+                escalaoId: _escalao.escalaoId,
+                syncApp: syncAppHash
             }
             listaEquipas.push(equipa);
         }

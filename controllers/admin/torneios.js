@@ -164,7 +164,7 @@ exports.createTorneio = async (req, res) => {
         if (req.body.adicionar_activar) {
           await dbFunctions.setTorneioActivo(torneioModel.torneioId);
           req.flash("success", "Torneio adicionado e activado com sucesso.");
-          res.redirect("/admin/torneios");
+          return res.redirect("/admin/torneios");
         } else {
           // Escolheu só adicionar o torneio
           // Se só existe 1 torneio registado este fica activo
@@ -172,15 +172,15 @@ exports.createTorneio = async (req, res) => {
           if (numTorneios == 1) {
             await dbFunctions.setTorneioActivo(torneioModel.torneioId);
             req.flash("success", "Torneio adicionado e activado com sucesso.");
-            res.redirect("/admin/torneios");
+            return res.redirect("/admin/torneios");
           } else {
             req.flash("success", "Torneio adicionado com sucesso.");
-            res.redirect("/admin/torneios");
+            return res.redirect("/admin/torneios");
           }
         }
       } else {
         req.flash("error", "Não foi possível adicionar o torneio.");
-        res.redirect("/admin/torneios");
+        return res.redirect("/admin/torneios");
       }
 
     } catch(err){
@@ -245,9 +245,9 @@ exports.updateTorneio = async (req, res) => {
   const ano = parseInt(req.body.ano.trim());
   let tab = req.params.tab || 1;
 
-    if(tab < 1 || tab > 3){
-      tab = 1;
-    }
+  if(tab < 1 || tab > 3){
+    tab = 1;
+  }
 
   // Processa todos os escalões
   const listaEscaloes = await dbFunctions.getAllEscaloes();
@@ -303,10 +303,10 @@ exports.updateTorneio = async (req, res) => {
         // TODO: Sync com plataforma WEB
 
         req.flash("success", "Torneio actualizado com sucesso");
-        res.redirect("/admin/torneios");
+        return res.redirect("/admin/torneios");
       } else {
         req.flash("error", "Não foi possível actualizar o torneio");
-        res.redirect("/admin/torneios");
+        return res.redirect("/admin/torneios");
       }
 
     } catch (err) {

@@ -1,6 +1,7 @@
 const axios = require('axios');
 const { syncLocalidades } = require('./sync/localidades');
 const { syncEscaloes } = require('./sync/escaloes');
+const { syncTorneios } = require('./sync/torneios');
 
 exports.checkConnection = async (req, res) => {
     try {
@@ -20,17 +21,15 @@ exports.checkConnection = async (req, res) => {
 exports.syncData = async (req, res, next) => {
     try {
         const url = req.session.syncUrl;
-        // 1. Verifica se existe conexão
-        /*const connection = await this.checkConnection(url);
-        if(!connection){
-            throw new Error('Não existe ligação à plataforma Web');
-        }*/
         
 
-        // 2. Faz sincronização
+        // Fazer sincronização
         // Localidades
         await syncLocalidades(url);
+        // Escalões
         await syncEscaloes(url);
+        // Torneios
+        await syncTorneios(url);
 
         res.status(200).json({ success: true });
     } catch (error) {

@@ -12,18 +12,18 @@ const Localidade = sequelize.define('localidades', {
         type: Sequelize.STRING,
         allowNull: false
     },
-    syncApp: {
+    uuid: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4
+    },
+    hash: {
         type: Sequelize.STRING(128),
         allowNull: false,
         unique: {
             args: true,
             msg: "A Localidade já existe."
         }
-    },
-    syncWeb: {
-        type: Sequelize.STRING(128),
-        allowNull: true,
-        defaultValue: null
     }
 });
 

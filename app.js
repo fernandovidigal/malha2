@@ -66,6 +66,8 @@ const Jogos = require('./models/Jogos');
 const Parciais = require('./models/Parciais');
 const Campos = require('./models/Campos');
 const Interdicoes = require('./models/Interdicoes');
+const SyncMessages = require('./models/SyncMessages');
+const SyncTime = require('./models/SyncTime');
 
 // Definir relações entre as bases de dados
 Torneios.hasMany(Equipas, { foreignKey: 'torneioId', onDelete: 'cascade' });
@@ -146,6 +148,7 @@ const adminLocalidades = require('./routes/admin/localidades');
 const adminEscaloes = require('./routes/admin/escaloes');
 const adminTorneios = require('./routes/admin/torneios');
 const adminConfiguracoes = require('./routes/admin/configuracoes');
+const adminSincronizacao = require('./routes/admin/sincronizacao');
 const equipas = require('./routes/equipas');
 const torneio = require('./routes/torneio');
 const listagens = require('./routes/listagens');
@@ -169,6 +172,7 @@ app.use('/admin/localidades', adminLocalidades);
 app.use('/admin/escaloes', adminEscaloes);
 app.use('/admin/torneios', adminTorneios);
 app.use('/admin/configuracoes', adminConfiguracoes);
+app.use('/admin/sincronizacao', adminSincronizacao);
 app.use('/equipas', equipas);
 app.use('/torneio', torneio);
 app.use('/listagens', listagens);

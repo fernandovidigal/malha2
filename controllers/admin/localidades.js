@@ -1,9 +1,12 @@
 const Localidade = require('../../models/Localidades');
+const SyncMessages = require('../../models/SyncMessages');
 const { validationResult } = require('express-validator');
 const util = require('../../helpers/util');
 const dbFunctions = require('../../helpers/DBFunctions');
 const crypto = require('crypto');
 const axios = require('axios');
+const Sequelize = require('sequelize');
+const db = require('../../helpers/database');
  
 exports.getAllLocalidades = async (req, res) => {
     try {
@@ -49,27 +52,54 @@ exports.getLocalidade = async (req, res) => {
 }
 
 exports.createLocalidade = async (req, res) => {
+    const localidade = req.body.localidade.trim();
+    const errors = validationResult(req);
+
+    const oldData = {
+        nome: localidade
+    }
+
     try {
-        const localidade = req.body.localidade.trim();
-        const errors = validationResult(req);
-
-        const oldData = {
-            nome: localidade
-        }
-
         if(!errors.isEmpty()){
             req.breadcrumbs('Adicionar Localidade', '/admin/adicionarLocalidade');
             res.render('admin/adicionarLocalidade', {validationErrors: errors.array({ onlyFirstError: true }), localidade: oldData, breadcrumbs: req.breadcrumbs()});
         } else {
-            const syncAppHash = crypto.createHash('sha512').update(localidade.toUpperCase()).digest('hex');
-            const [localidadeModel, created] = await Localidade.findOrCreate({
-                where: { syncApp: syncAppHash },
-                defaults: {
-                    nome: localidade
-                }
-            });
+            const hash = crypto.createHash('sha512').update(localidade.toUpperCase()).digest('hex');
+            const transaction = await db.transaction();
+            const syncData = [`nome:${localidade}`];
 
-            if(created){
+            try {
+                const localidadeModel = await Localidade.create({
+                    nome: localidade,
+                    hash: hash
+                }, { transaction: transaction });
+
+                await SyncMessages.create({
+                    status: 'CREATED',
+                    uuid: localidadeModel.uuid,
+                    dataset: 'localidades',
+                    columnvalue: JSON.stringify(syncData),
+                    fieldhash: hash
+                }, { transaction: transaction });
+
+                await transaction.commit();
+
+                req.flash('success', `${localidadeModel.nome} adicionada com sucesso`);
+                res.redirect('/admin/localidades');
+            } catch (error) {
+                await transaction.rollback();
+                throw error;
+            }
+
+
+
+
+
+
+
+            
+
+            /*if(created){
                 if(req.session.sync){
                     const responseWeb = await axios.post(`${req.session.syncUrl}localidades/createSync.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
                         nome: localidade,
@@ -85,22 +115,30 @@ exports.createLocalidade = async (req, res) => {
                             }
                         });
                     }
-                }
+                }*/
                 
-                req.flash('success', `${localidadeModel.nome} adicionada com sucesso`);
-                res.redirect('/admin/localidades');
-            } else {
+                
+            /*} else {
                 const errors = [{
                     msg: 'Localidade já existe',
                     param: 'localidade'
                 }];
                 req.breadcrumbs('Adicionar Localidade', '/admin/adicionarLocalidade');
                 res.render('admin/adicionarLocalidade', {validationErrors: errors, localidade: oldData, breadcrumbs: req.breadcrumbs()});
-            }
+            }*/
         }
     } catch(err) {
-        req.flash('error', 'Não foi possível adicionar a localidade');
-        res.redirect('/admin/localidades');
+        if(err instanceof Sequelize.UniqueConstraintError){
+            const errors = [{
+                msg: 'Localidade já existe',
+                param: 'localidade'
+            }];
+            req.breadcrumbs('Adicionar Localidade', '/admin/adicionarLocalidade');
+            res.render('admin/adicionarLocalidade', {validationErrors: errors, localidade: oldData, breadcrumbs: req.breadcrumbs()});
+        } else {
+            req.flash('error', 'Não foi possível adicionar a localidade');
+            res.redirect('/admin/localidades');
+        }
     }
 }
 
@@ -119,20 +157,50 @@ exports.updateLocalidade = async (req, res) => {
             req.breadcrumbs('Editar Localidade', '/admin/editarLocalidade');
             res.render('admin/editarLocalidade', {validationErrors: errors.array({ onlyFirstError: true }), localidade: oldData, breadcrumbs: req.breadcrumbs()});
         } else {
-            const updatedSyncAppHash = crypto.createHash('sha512').update(nomeLocalidade.toUpperCase()).digest('hex');
+            const hash = crypto.createHash('sha512').update(nomeLocalidade.toUpperCase()).digest('hex');
+            const transaction = await db.transaction();
+            const syncData = [`nome:${nomeLocalidade}`];
 
-            await Localidade.update({
-                nome: nomeLocalidade,
-                syncApp: updatedSyncAppHash
-            }, {
-                where: {
-                    localidadeId: localidadeId
-                }
-            });
+            try {
+                const localidade = await Localidade.findByPk(localidadeId);
 
-            const localidade = await Localidade.findByPk(localidadeId);
+                localidade.nome = nomeLocalidade;
+                localidade.hash = hash;
 
-            if(req.session.sync){
+                await localidade.save({transaction: transaction});
+                /*await Localidade.update({
+                    nome: nomeLocalidade,
+                    hash: hash,
+                }, {
+                    where: {
+                        localidadeId: localidadeId
+                    },
+                    transaction: transaction
+                });*/
+
+                await SyncMessages.create({
+                    status: 'UPDATED',
+                    uuid: localidade.uuid,
+                    dataset: 'localidades',
+                    columnvalue: JSON.stringify(syncData),
+                    fieldhash: hash
+                }, { transaction: transaction });
+
+                await transaction.commit();
+
+                req.flash('success', 'Localidade actualizada com sucesso');
+                res.redirect('/admin/localidades');
+
+            } catch (error) {
+                transaction.rollback();
+                throw error;
+            }
+
+            
+
+            //const localidade = await Localidade.findByPk(localidadeId);
+
+            /*if(req.session.sync){
                 const result = await axios.post(`${req.session.syncUrl}localidades/editSync.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
                     nome: nomeLocalidade,
                     syncApp: updatedSyncAppHash,
@@ -148,13 +216,10 @@ exports.updateLocalidade = async (req, res) => {
                         }
                     });
                 }
-            }
-            
-            req.flash('success', 'Localidade actualizada com sucesso');
-            res.redirect('/admin/localidades');
+            }*/
         }
     } catch(err) {
-        if(err.name == 'SequelizeUniqueConstraintError'){
+        if(err instanceof Sequelize.UniqueConstraintError){
             const errors = [{
                 msg: 'A Localidade já existe',
                 param: 'localidade'
@@ -171,9 +236,58 @@ exports.updateLocalidade = async (req, res) => {
 exports.deleteLocalidade = async (req, res) => {
     const localidadeId = parseInt(req.body.id);
 
-    if(req.user.level == 5 || req.user.level == 10){
-        const localidade = await Localidade.findByPk(localidadeId);
-        Localidade.destroy({where: {localidadeId: localidadeId}, limit: 1})
+    try{
+        if(req.user.level == 5 || req.user.level == 10){
+            const localidade = await Localidade.findByPk(localidadeId);
+
+            const transaction = await db.transaction();
+
+            try {
+                await SyncMessages.create({
+                    status: 'DELETED',
+                    uuid: localidade.uuid,
+                    dataset: 'localidades'
+                }, { transaction: transaction });
+
+                await localidade.destroy({ transaction: transaction });
+
+                await transaction.commit();
+
+                res.status(200).json({ success: true });
+
+            } catch (error) {
+                transaction.rollback();
+                throw error;
+            }
+    
+            // Não tem UID então ainda não está sincronizado
+            /*if(localidade.uid == null){
+                await Localidade.destroy({where: {localidadeId: localidadeId}, limit: 1});
+                res.status(200).json({ success: true });
+            } else {
+                // Já têm UID então está sincronizado
+                
+                // Verifica se a sincronização está activa
+                if(req.session.sync){
+
+                } else {
+                    await Localidade.update({
+                        status: 'DELETED',
+                    }, {
+                        where: {
+                            localidadeId: localidade.localidadeId
+                        }
+                    });
+                    res.status(200).json({ success: true });
+                }
+            }*/
+        }
+    } catch(err){
+        res.status(200).json({ success: false });
+    }
+    
+
+        /*Localidade.destroy({where: {localidadeId: localidadeId}, limit: 1})
         .then(result => {
             if(result){
                 if(req.session.sync){
@@ -189,8 +303,5 @@ exports.deleteLocalidade = async (req, res) => {
         })
         .catch(err => { 
             res.status(200).json({ success: false });
-        });
-    } else {
-        res.status(200).json({ success: false });
-    }
+        });*/
 }

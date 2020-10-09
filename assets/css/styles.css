@@ -701,7 +701,9 @@
 }
 
 .swal2-progress-steps {
+  flex-wrap: wrap;
   align-items: center;
+  max-width: 100%;
   margin: 0 0 1.25em;
   padding: 0;
   background: inherit;
@@ -713,6 +715,7 @@
 }
 .swal2-progress-steps .swal2-progress-step {
   z-index: 20;
+  flex-shrink: 0;
   width: 2em;
   height: 2em;
   border-radius: 2em;
@@ -733,6 +736,7 @@
 }
 .swal2-progress-steps .swal2-progress-step-line {
   z-index: 10;
+  flex-shrink: 0;
   width: 2.5em;
   height: 0.4em;
   margin: 0 -1px;

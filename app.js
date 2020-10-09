@@ -18,7 +18,8 @@ let serverConfig = {
         port: 3000
     },
     faker: false,
-    sync: false
+    sync: false,
+    syncUrl: null
 }
 
 // Para Produção
@@ -66,8 +67,6 @@ const Jogos = require('./models/Jogos');
 const Parciais = require('./models/Parciais');
 const Campos = require('./models/Campos');
 const Interdicoes = require('./models/Interdicoes');
-const SyncMessages = require('./models/SyncMessages');
-const SyncTime = require('./models/SyncTime');
 
 // Definir relações entre as bases de dados
 Torneios.hasMany(Equipas, { foreignKey: 'torneioId', onDelete: 'cascade' });
@@ -161,10 +160,8 @@ app.use('/', breadcrumbs.setHome({
 
 app.use('/login', login);
 app.use('/', (req,res,next) => {
-    if(serverConfig.sync && serverConfig.enderecoWeb){
-        req.session.sync = serverConfig.sync;
-        req.session.syncUrl = serverConfig.enderecoWeb;
-    }
+    req.session.sync = serverConfig.sync;
+    req.session.syncUrl = serverConfig.syncUrl;
     next();
 }, index);
 app.use('/admin/utilizadores', adminUtilizadores);

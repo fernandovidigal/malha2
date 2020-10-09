@@ -1,5 +1,4 @@
 const Localidade = require('../../models/Localidades');
-const SyncMessages = require('../../models/SyncMessages');
 const { validationResult } = require('express-validator');
 const util = require('../../helpers/util');
 const dbFunctions = require('../../helpers/DBFunctions');
@@ -27,7 +26,6 @@ exports.getAllLocalidades = async (req, res) => {
         res.render('admin/localidades', {localidades: localidades, breadcrumbs: req.breadcrumbs()});
 
     } catch(err){
-        console.log(err);
         req.flash('error', 'Não foi possível obter os dados das localidades');
         res.redirect('/admin/localidades');
     }
@@ -65,67 +63,25 @@ exports.createLocalidade = async (req, res) => {
             res.render('admin/adicionarLocalidade', {validationErrors: errors.array({ onlyFirstError: true }), localidade: oldData, breadcrumbs: req.breadcrumbs()});
         } else {
             const hash = crypto.createHash('sha512').update(localidade.toUpperCase()).digest('hex');
-            const transaction = await db.transaction();
-            const syncData = [`nome:${localidade}`];
 
-            try {
-                const localidadeModel = await Localidade.create({
+            if(req.session.activeConnection){
+                const responseWeb = await axios.post(`${req.session.syncUrl}localidades/create.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
                     nome: localidade,
                     hash: hash
-                }, { transaction: transaction });
+                });
 
-                await SyncMessages.create({
-                    status: 'CREATED',
-                    uuid: localidadeModel.uuid,
-                    dataset: 'localidades',
-                    columnvalue: JSON.stringify(syncData),
-                    fieldhash: hash
-                }, { transaction: transaction });
-
-                await transaction.commit();
-
-                req.flash('success', `${localidadeModel.nome} adicionada com sucesso`);
-                res.redirect('/admin/localidades');
-            } catch (error) {
-                await transaction.rollback();
-                throw error;
-            }
-
-
-
-
-
-
-
-            
-
-            /*if(created){
-                if(req.session.sync){
-                    const responseWeb = await axios.post(`${req.session.syncUrl}localidades/createSync.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                if(responseWeb.data.sucesso){
+                    const localidadeModel = await Localidade.create({
                         nome: localidade,
-                        syncApp: syncAppHash
+                        hash: hash,
+                        uuid: responseWeb.data.localidade.uuid
                     });
-                    if(responseWeb.data.sucesso){
-                        await Localidade.update({
-                            syncWeb: syncAppHash
-                        }, {
-                            where: {
-                                localidadeId: localidadeModel.localidadeId,
-                                syncApp: syncAppHash
-                            }
-                        });
-                    }
-                }*/
-                
-                
-            /*} else {
-                const errors = [{
-                    msg: 'Localidade já existe',
-                    param: 'localidade'
-                }];
-                req.breadcrumbs('Adicionar Localidade', '/admin/adicionarLocalidade');
-                res.render('admin/adicionarLocalidade', {validationErrors: errors, localidade: oldData, breadcrumbs: req.breadcrumbs()});
-            }*/
+                    req.flash('success', `${localidadeModel.nome} adicionada com sucesso`);
+                    res.redirect('/admin/localidades');
+                } else {
+                    throw new Error();
+                } 
+            }
         }
     } catch(err) {
         if(err instanceof Sequelize.UniqueConstraintError){
@@ -157,66 +113,40 @@ exports.updateLocalidade = async (req, res) => {
             req.breadcrumbs('Editar Localidade', '/admin/editarLocalidade');
             res.render('admin/editarLocalidade', {validationErrors: errors.array({ onlyFirstError: true }), localidade: oldData, breadcrumbs: req.breadcrumbs()});
         } else {
-            const hash = crypto.createHash('sha512').update(nomeLocalidade.toUpperCase()).digest('hex');
-            const transaction = await db.transaction();
-            const syncData = [`nome:${nomeLocalidade}`];
+            if(req.session.activeConnection){
+                const hash = crypto.createHash('sha512').update(nomeLocalidade.toUpperCase()).digest('hex');
+                const transaction = await db.transaction();
+                try {
+                    const localidade = await Localidade.findByPk(localidadeId);
 
-            try {
-                const localidade = await Localidade.findByPk(localidadeId);
-
-                localidade.nome = nomeLocalidade;
-                localidade.hash = hash;
-
-                await localidade.save({transaction: transaction});
-                /*await Localidade.update({
-                    nome: nomeLocalidade,
-                    hash: hash,
-                }, {
-                    where: {
-                        localidadeId: localidadeId
-                    },
-                    transaction: transaction
-                });*/
-
-                await SyncMessages.create({
-                    status: 'UPDATED',
-                    uuid: localidade.uuid,
-                    dataset: 'localidades',
-                    columnvalue: JSON.stringify(syncData),
-                    fieldhash: hash
-                }, { transaction: transaction });
-
-                await transaction.commit();
-
-                req.flash('success', 'Localidade actualizada com sucesso');
-                res.redirect('/admin/localidades');
-
-            } catch (error) {
-                transaction.rollback();
-                throw error;
-            }
-
-            
-
-            //const localidade = await Localidade.findByPk(localidadeId);
-
-            /*if(req.session.sync){
-                const result = await axios.post(`${req.session.syncUrl}localidades/editSync.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
-                    nome: nomeLocalidade,
-                    syncApp: updatedSyncAppHash,
-                    syncWeb: localidade.syncWeb
-                });
-                if(result.data.sucesso){
                     await Localidade.update({
-                        syncWeb: updatedSyncAppHash
+                        nome: nomeLocalidade,
+                        hash: hash,
                     }, {
                         where: {
-                            localidadeId: localidadeId,
-                            syncApp: updatedSyncAppHash
-                        }
+                            localidadeId: localidadeId
+                        },
+                        transaction: transaction
                     });
-                }
-            }*/
+
+                    const response = await axios.post(`${req.session.syncUrl}localidades/update.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                        uuid: localidade.uuid,
+                        nome: nomeLocalidade,
+                        hash: hash
+                    });
+
+                    if(response.data.sucesso){
+                        await transaction.commit();
+                        req.flash('success', 'Localidade actualizada com sucesso');
+                        res.redirect('/admin/localidades');
+                    } else {
+                        throw new Error();
+                    }
+                } catch (error) {
+                    await transaction.rollback();
+                    throw error;
+                }    
+            }
         }
     } catch(err) {
         if(err instanceof Sequelize.UniqueConstraintError){
@@ -237,71 +167,27 @@ exports.deleteLocalidade = async (req, res) => {
     const localidadeId = parseInt(req.body.id);
 
     try{
-        if(req.user.level == 5 || req.user.level == 10){
-            const localidade = await Localidade.findByPk(localidadeId);
-
-            const transaction = await db.transaction();
-
+        if(req.session.activeConnection && (req.user.level == 5 || req.user.level == 10)){
             try {
-                await SyncMessages.create({
-                    status: 'DELETED',
-                    uuid: localidade.uuid,
-                    dataset: 'localidades'
-                }, { transaction: transaction });
+                const localidade = await Localidade.findByPk(localidadeId);
+                const response = await axios.post(`${req.session.syncUrl}localidades/delete.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                    uuid: localidade.uuid
+                });
 
-                await localidade.destroy({ transaction: transaction });
-
-                await transaction.commit();
+                if(response.data.sucesso){
+                    await localidade.destroy();
+                } else {
+                    throw new Error();
+                }
 
                 res.status(200).json({ success: true });
-
             } catch (error) {
-                transaction.rollback();
                 throw error;
             }
-    
-            // Não tem UID então ainda não está sincronizado
-            /*if(localidade.uid == null){
-                await Localidade.destroy({where: {localidadeId: localidadeId}, limit: 1});
-                res.status(200).json({ success: true });
-            } else {
-                // Já têm UID então está sincronizado
-                
-                // Verifica se a sincronização está activa
-                if(req.session.sync){
-
-                } else {
-                    await Localidade.update({
-                        status: 'DELETED',
-                    }, {
-                        where: {
-                            localidadeId: localidade.localidadeId
-                        }
-                    });
-                    res.status(200).json({ success: true });
-                }
-            }*/
+        } else {
+            throw new Error();
         }
     } catch(err){
         res.status(200).json({ success: false });
     }
-    
-
-        /*Localidade.destroy({where: {localidadeId: localidadeId}, limit: 1})
-        .then(result => {
-            if(result){
-                if(req.session.sync){
-                    const result = axios.post(`${req.session.syncUrl}localidades/deleteSync.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
-                        nome: localidade.nome,
-                        syncApp: localidade.syncApp
-                    });
-                }
-                res.status(200).json({ success: true });
-            } else {
-                res.status(200).json({ success: false });
-            }
-        })
-        .catch(err => { 
-            res.status(200).json({ success: false });
-        });*/
 }

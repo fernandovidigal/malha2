@@ -80,7 +80,7 @@ exports.definirEnderecoWeb = async (req, res) => {
         const configData = await configFunctions.readConfigFile();
         const enderecoWebInputed = req.body.enderecoWeb.trim();
 
-        if(configData.enderecoWeb != enderecoWebInputed){
+        if(configData.syncUrl != enderecoWebInputed){
             let enderecoWeb = '';
             if(!enderecoWebInputed.endsWith('/')) {
                 enderecoWeb = enderecoWebInputed.concat('/');
@@ -88,10 +88,9 @@ exports.definirEnderecoWeb = async (req, res) => {
                 enderecoWeb = enderecoWebInputed;
             }
 
-            configData.enderecoWeb = enderecoWeb;
+            configData.syncUrl = enderecoWeb;
             await configFunctions.writeConfigFile(configData);
         }
-
         res.status(200).json({
             success: true
         });

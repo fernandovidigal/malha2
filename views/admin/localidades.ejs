@@ -2,7 +2,11 @@
 
 <div class="barraTorneio">
     <div class="barraTorneio__buttons">
-        <a href="/admin/localidades/adicionarLocalidade" class="btn btn-primary">Adicionar Localidade</a>
+        <% if(activeConnection) { %>
+            <a href="/admin/localidades/adicionarLocalidade" class="btn btn-primary">Adicionar Localidade</a>
+        <% } else { %>
+            <span class="btn btn-disabled">Adicionar Localidade</span>
+        <% } %>
     </div>
 </div>
 
@@ -27,12 +31,18 @@
                     <% localidades.forEach(function(localidade){ %>
                         <tr>
                             <td class="localidade"><%= localidade.nome %></td>
-                            <td class="detalhesBtn__column"><a href="/admin/localidades/editarLocalidade/<%= localidade.localidadeId %>" class="btn btn-secondary">Editar</a></td>
+                            <td class="detalhesBtn__column">
+                                <% if(activeConnection) { %>
+                                    <a href="/admin/localidades/editarLocalidade/<%= localidade.localidadeId %>" class="btn btn-secondary">Editar</a>
+                                <% } else { %>
+                                    <span class="btn btn-disabled">Editar</span>
+                                <% } %>
+                            </td>
                             <td class="deleteBtn__column">
-                                <% if(localidade.eliminavel){ %>
+                                <% if(localidade.eliminavel && activeConnection){ %>
                                     <a href="" class="btn btn-delete" data-localidade="<%= localidade.localidadeId %>"><i class="fas fa-trash-alt"></i></a>
                                 <% } else { %>
-                                    <p class="btn-disabled"><i class="fas fa-trash-alt"></i></p>
+                                    <p class="btn btn-disabled"><i class="fas fa-trash-alt"></i></p>
                                 <% } %>
                             </td>
                         </tr>

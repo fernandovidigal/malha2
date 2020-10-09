@@ -130,13 +130,35 @@ if(enderecoWebBtn){
         if(enderecoWebValue.length == 0 || !enderecoWebValue.startsWith('http://')){
             showError(enderecoWeb, 'Endereço Web inválido');
         } else {
-            const response = await axios({
-                method: 'PUT',
-                url: '/admin/configuracoes/definirEnderecoWeb',
-                data: {
-                    enderecoWeb: enderecoWebValue
+            try {
+                const response = await axios({
+                    method: 'PUT',
+                    url: '/admin/configuracoes/definirEnderecoWeb',
+                    data: {
+                        enderecoWeb: enderecoWebValue
+                    }
+                });
+
+                if(response.data.success){
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Endereço API',
+                        text: 'Endereço API guardado com sucesso'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Endereço API',
+                        text: 'Não foi possível guardar o Endereço API'
+                    });
                 }
-            });
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Endereço API',
+                    text: 'Não foi possível guardar o Endereço API'
+                });
+            }
         }
     });
 }
@@ -172,7 +194,7 @@ if(enderecoWebInput && testConnectionBtn){
             if(response.data.sucesso){
                 Swal.fire({
                     icon: 'success',
-                    title: 'Ligação efectuada'
+                    title: 'Ligação efectuada com sucesso'
                 });
             }
         } catch(error) {

@@ -3,6 +3,7 @@ const router = express.Router();
 const { userAuthenticated, checkGestorStatus } = require('../../helpers/auth');
 const { check } = require('express-validator');
 const LocalidadesController = require('../../controllers/admin/localidades');
+const { checkActiveConnection } = require('../../helpers/webApi');
 
 router.all('/*', [userAuthenticated, checkGestorStatus], (req, res, next) => {
     res.locals.menuAdminLocalidades = true;
@@ -10,7 +11,7 @@ router.all('/*', [userAuthenticated, checkGestorStatus], (req, res, next) => {
     next();
 });
 
-router.get('/', LocalidadesController.getAllLocalidades);
+router.get('/', checkActiveConnection, LocalidadesController.getAllLocalidades);
 
 router.get('/adicionarLocalidade', (req, res) => {
     req.breadcrumbs('Adicionar Localidade', '/admin/adicionarLocalidade');

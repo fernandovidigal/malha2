@@ -8,11 +8,15 @@
         </div>
         <% if(escaloes.length > 0 && localidades.length > 0){ %>
             <div class="barraTorneio__buttons">
+                <% if(activeConnection) { %>
                 <a href="/equipas/adicionarEquipa" class="btn btn-primary">Adicionar Equipa</a>
                 <div class="tooltipBtn__wrapper">
-                    <button class="btn btn-import"><i class="fas fa-download"></i></button>
-                    <span class="tooltip">Importar Equipas</span>
+                    <button class="btn btn-import"><i class="fas fa-exchange-alt"></i></button>
+                    <span class="tooltip">Sincronizar Equipas</span>
                 </div>
+                <% } else { %>
+                    <span class="btn btn-disabled">Adicionar Localidade</span>
+                <% } %>
                 <div class="tooltipBtn__wrapper">  
                     <button class="btn btn-print"><i class="fas fa-print"></i></button>
                     <span class="tooltip">Imprimir</span>
@@ -157,7 +161,7 @@
                                 <td class="escalao__column" align="center"><%= equipa.escalao %><br><small>(<%= equipa.sexo == 0 ? 'Feminino': 'Masculino' %>)</small></td>
                                 <td class="detalhesBtn__column"><a href="/equipas/editarEquipa/<%= equipa.escalaoId %>/<%= equipa.equipaId %>" class="btn btn-secondary">Detalhes</a></td>
                                 <td class="deleteBtn__column">
-                                    <% if(equipa.eliminavel) {%>
+                                    <% if(activeConnection && equipa.eliminavel) {%>
                                         <a href="" class="btn btn-delete" data-equipa="<%= equipa.equipaId %>" data-escalao="<%= equipa.escalaoId %>"><i class="fa fa-trash-alt"></i></a>
                                     <% } else { %>
                                         <p class="btn-disabled"><i class="fas fa-trash-alt"></i></p>

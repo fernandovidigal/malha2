@@ -57,8 +57,6 @@ exports.switchSync= async (req, res) => {
     try {
         const configData = await configFunctions.readConfigFile();
         const onOffSyncSwitch = req.body.sync;
-
-        console.log(configData);
         
         if(configData.sync != onOffSyncSwitch){
             configData.sync = onOffSyncSwitch;

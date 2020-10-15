@@ -194,18 +194,6 @@ sequelize
         process.exit();
     }
 
-    /*if(serverConfig.enderecoWeb && erverConfig.sync){
-        const haveConnection = await webApi.checkConnection(serverConfig.enderecoWeb);
-        if(haveConnection){
-            console.log('Estabelecida conexão à plataforma Web');
-            await webApi.syncAll(serverConfig.enderecoWeb);
-        } else {
-            console.log('Não existe conexão à plataforma Web');
-        }
-    } else {
-        console.log('Não existe conexão à plataforma Web');
-    }*/
-
     const port = serverConfig.server.port;
     app.listen(port, () => console.log(`\nMalha App em localhost:${port} ou <IP da máquina>:${port}`));
 })

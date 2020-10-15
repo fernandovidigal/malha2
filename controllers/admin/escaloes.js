@@ -3,6 +3,8 @@ const { validationResult } = require('express-validator');
 const dbFunctions = require('../../helpers/DBFunctions');
 const crypto = require('crypto');
 const axios = require('axios');
+const Sequelize = require('sequelize');
+const db = require('../../helpers/database');
 
 exports.getAllEscaloes = async (req, res) => {
     try {
@@ -86,48 +88,42 @@ exports.createEscalao = async (req, res) => {
             res.render('admin/adicionarEscalao', {validationErrors: errors.array(), escalao: oldData, breadcrumbs: req.breadcrumbs()});
         } else {
             const escalaoToHash = designacao + sexo;
-            const syncAppHash = crypto.createHash('sha512').update(escalaoToHash.toUpperCase()).digest('hex');
-            const [escalaoModel, created] = await Escaloes.findOrCreate({
-                where: { syncApp: syncAppHash },
-                defaults: {
-                    designacao: designacao,
-                    sexo: sexo
-                }
-            });
+            const hash = crypto.createHash('sha512').update(escalaoToHash.toUpperCase()).digest('hex');
 
-            if(!created){
-                const errors = [{
-                    msg: 'Escalão já existe',
-                    param: 'designacao'
-                }];
-                req.breadcrumbs('Adicionar Escalão', '/admin/adicionarEscalao');
-                return res.render('admin/adicionarEscalao', {validationErrors: errors, escalao: oldData, breadcrumbs: req.breadcrumbs()});
-            }
-
-            if(req.session.sync){
-                const responseWeb = await axios.post(`${req.session.syncUrl}escaloes/createSync.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+            if(req.session.activeConnection){
+                const response = await axios.post(`${req.session.syncUrl}escaloes/create.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
                     designacao: designacao,
                     sexo: sexo,
-                    syncApp: syncAppHash
+                    hash: hash
                 });
-                if(responseWeb.data.sucesso){
-                    await Escaloes.update({
-                        syncWeb: syncAppHash
-                    }, {
-                        where: {
-                            escalaoId: escalaoModel.escalaoId,
-                            syncApp: syncAppHash
-                        }
-                    });
-                }
-            }
 
-            req.flash('success', `Escalão ${escalaoModel.designacao} adicionado com sucesso.`);
-            res.redirect('/admin/escaloes');
+                if(response.data.sucesso && (response.data.uuid || response.data.escalao)){
+                    const escalaoModel = await Escaloes.create({
+                        designacao: designacao,
+                        sexo: sexo,
+                        hash: hash,
+                        uuid: response.data.uuid || response.data.escalao.uuid
+                    });
+
+                    req.flash('success', `Escalão ${escalaoModel.designacao} adicionado com sucesso.`);
+                    res.redirect('/admin/escaloes');
+                } else {
+                    throw new Error();
+                } 
+            }
         }
     } catch(err) {
-        req.flash('error', 'Não foi possível adicionar o escalão.');
-        res.redirect('/admin/escaloes');
+        if(err instanceof Sequelize.UniqueConstraintError){
+            const errors = [{
+                msg: 'Escalão já existe',
+                param: 'designacao'
+            }];
+            req.breadcrumbs('Adicionar Escalão', '/admin/adicionarEscalao');
+            return res.render('admin/adicionarEscalao', {validationErrors: errors, escalao: oldData, breadcrumbs: req.breadcrumbs()});
+        } else {
+            req.flash('error', 'Não foi possível adicionar o escalão.');
+            res.redirect('/admin/escaloes');
+        }
     }
 }
 
@@ -148,27 +144,49 @@ exports.updateEscalao = async (req, res) => {
             req.breadcrumbs('Editar Escalão', '/admin/editarEscalao');
             res.render('admin/editarEscalao', {validationErrors: errors.array(), escalao: oldData, breadcrumbs: req.breadcrumbs()});
         } else {
-            const escalaoToHash = designacao + sexo;
-            const updatedSyncAppHash = crypto.createHash('sha512').update(escalaoToHash.toUpperCase()).digest('hex');
+            if(req.session.activeConnection){
+                const escalaoToHash = designacao + sexo;
+                const hash = crypto.createHash('sha512').update(escalaoToHash.toUpperCase()).digest('hex');
+                const transaction = await db.transaction();
 
-            await Escaloes.update({
-                designacao: designacao,
-                sexo: sexo,
-                syncApp: updatedSyncAppHash
-            }, {
-                where: {
-                    escalaoId: escalaoId
-                }
-            });
+                try {
+                    const escalao = Escaloes.findByPk(escalaoId);
 
-            // TODO: WEB Sync
+                    await Escaloes.update({
+                        designacao: designacao,
+                        sexo: sexo,
+                        hash: hash
+                    }, {
+                        where: {
+                            escalaoId: escalaoId
+                        },
+                        transaction: transaction
+                    });
 
-            req.flash('success', 'Escalão actualizado com sucesso.');
-            res.redirect('/admin/escaloes');
+                    const response = await axios.post(`${req.session.syncUrl}escaloes/update.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                        uuid: escalao.uuid,
+                        designacao: designacao,
+                        sexo: sexo,
+                        hash: hash
+                    });
+
+                    if(response.data.sucesso){
+                        await transaction.commit();
+                        req.flash('success', 'Escalão actualizado com sucesso.');
+                        res.redirect('/admin/escaloes');
+                    } else {
+                        throw new Error();
+                    }
+                } catch (error) {
+                    await transaction.rollback();
+                    throw error;
+                }  
+            } else {
+                throw new Error();
+            }          
         }
     } catch(err) {
-        console.log(err);
-        if(err.name == 'SequelizeUniqueConstraintError'){
+        if(err instanceof Sequelize.UniqueConstraintError){
             const errors = [{
                 msg: 'O Escalão já existe.',
                 param: 'designacao'
@@ -177,29 +195,31 @@ exports.updateEscalao = async (req, res) => {
             req.breadcrumbs('Editar Escalão', '/admin/editarEscalao');
             return res.render('admin/editarEscalao', {validationErrors: errors, escalao: oldData, breadcrumbs: req.breadcrumbs()});
         }
-
         req.flash('error', 'Não foi possível actualizar o escalão.');
         res.redirect('/admin/escaloes');
     }
 }
 
-exports.deleteEscalao = (req, res) => {
+exports.deleteEscalao = async (req, res) => {
     const escalaoId = parseInt(req.body.id);
 
-    if(req.user.level == 5 || req.user.level == 10){
-        Escaloes.destroy({where: {escalaoId: escalaoId}, limit: 1})
-        .then(result => {
-            if(result){
-                res.status(200).json({success: true});
+    if(req.session.activeConnection && (req.user.level == 5 || req.user.level == 10)){
+        try {
+            const escalao = await Escaloes.findByPk(escalaoId);
+            const response = await axios.post(`${req.session.syncUrl}escaloes/delete.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                uuid: escalao.uuid
+            });
+
+            if(response.data.sucesso){
+                await escalao.destroy();
             } else {
-                res.status(200).json({success: false});
+                throw new Error();
             }
-        })
-        .catch(err => { 
-            res.status(200).json({success: false});
-        });
+            res.status(200).json({ success: true });
+        } catch (error) {
+            throw error;
+        }
     } else {
         res.status(200).json({success: false});
     }
-    
 }

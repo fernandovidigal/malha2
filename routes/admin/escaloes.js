@@ -3,6 +3,7 @@ const router = express.Router();
 const { userAuthenticated, checkGestorStatus } = require('../../helpers/auth');
 const { check } = require('express-validator');
 const EscaloesController = require('../../controllers/admin/escaloes');
+const { checkActiveConnection } = require('../../helpers/webApi');
 
 router.all('/*', [userAuthenticated, checkGestorStatus], (req, res, next) => {
     res.locals.menuAdminEscaloes = true;
@@ -10,7 +11,7 @@ router.all('/*', [userAuthenticated, checkGestorStatus], (req, res, next) => {
     next();
 });
 
-router.get('/', EscaloesController.getAllEscaloes);
+router.get('/', checkActiveConnection, EscaloesController.getAllEscaloes);
 
 router.get('/filtro/:sexo', EscaloesController.getEscalaoBySexo);
 
@@ -21,7 +22,7 @@ router.get('/adicionarEscalao', (req, res) => {
 
 
 router.post('/adicionarEscalao', [
-    check('designacao').trim().escape().not().isEmpty().withMessage('Deve indicar a designação do escalão'),
+    check('designacao').trim().escape().notEmpty().withMessage('Deve indicar a designação do escalão'),
     check('sexo').custom((value, { req }) => {
         if(value !== '0' && value !== '1'){
             throw new Error('Deve selecionar o género a que corresponde o escalão');
@@ -34,7 +35,7 @@ router.post('/adicionarEscalao', [
 router.get('/editarEscalao/:id', EscaloesController.getEscalao);
 
 router.put('/editarEscalao/:id', [
-    check('designacao').trim().escape().not().isEmpty().withMessage('Deve indicar a designação do escalão'),
+    check('designacao').trim().escape().notEmpty().withMessage('Deve indicar a designação do escalão'),
     check('sexo').custom((value, { req }) => {
         if(value !== '0' && value !== '1'){
             throw new Error('Deve selecionar o género a que corresponde o escalão');

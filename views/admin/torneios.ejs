@@ -2,7 +2,12 @@
 
 <div class="barraTorneio">
     <div class="barraTorneio__buttons">
-        <a href="/admin/torneios/adicionarTorneio" class="btn btn-primary">Adicionar Torneio</a>
+        <% if(activeConnection) { %>
+            <a href="/admin/torneios/adicionarTorneio" class="btn btn-primary">Adicionar Torneio</a>
+            <a href="/admin/localidades/sincronizarTorneios" class="btn btn-secondary"  title="Sincronizar"><i class="fas fa-exchange-alt"></i></a>
+        <% } else { %>
+            <span class="btn btn-disabled">Adicionar Torneio</span>
+        <% } %>
     </div>
 </div>
 
@@ -16,7 +21,7 @@
         <table class="mainTable">
             <thead>
                 <tr>
-                    <th></th>
+                    <th width="1%"></th>
                     <th class="mainTable-headerElement-left">Torneio</th>
                     <th class="mainTable-headerElement-left">Localidade</th>
                     <th>Ano</th>
@@ -28,12 +33,29 @@
             <% if(torneios.length > 0) { %>
                 <% torneios.forEach(function(torneio){ %>
                     <tr>
-                        <td align="center"><a href="/admin/torneios/activaTorneio/<%= torneio.torneioId %>"><i class="fas fa-check-square <%= torneio.activo == 1 ? 'torneio-active' : 'torneio-not-active' %>"></i></a></td>
+                        <td align="center">
+                            <a href="/admin/torneios/activaTorneio/<%= torneio.torneioId %>" class="tag <%= (torneio.activo == 1) ? 'tag--active' : 'tag--activate' %>">
+                            <%= (torneio.activo == 1) ? 'Activo' : 'Activar' %>
+                            </a>
+                        </td>
+
                         <td class="torneio_designacao"><%= torneio.designacao %></td>
                         <td class="torneio_localidade"><%= torneio.localidade %></td>
                         <td align="center"><%= torneio.ano %></td>
-                        <td class="detalhesBtn__column"><a href="/admin/torneios/editarTorneio/<%= torneio.torneioId %>" class="btn btn-secondary">Editar</a></td>
-                        <td class="deleteBtn__column"><a href="" class="btn btn-delete" data-torneio="<%= torneio.torneioId %>"><i class="fa fa-trash-alt"></i></a></td>
+                        <td class="detalhesBtn__column">
+                            <% if(activeConnection) { %>
+                                <a href="/admin/torneios/editarTorneio/<%= torneio.torneioId %>" class="btn btn-secondary">Editar</a>
+                            <% } else { %>
+                                <span class="btn btn-disabled">Editar</span>
+                            <% } %>
+                        </td>
+                        <td class="deleteBtn__column">
+                            <% if(activeConnection) { %>
+                                <a href="" class="btn btn-delete" data-torneio="<%= torneio.torneioId %>"><i class="fa fa-trash-alt"></i></a>
+                            <% } else { %>
+                                <p class="btn btn-disabled"><i class="fas fa-trash-alt"></i></p>
+                            <% } %>
+                        </td>
                     </tr>
                 <% }); %>
             <% } else { %>

@@ -611,6 +611,14 @@ exports.getLocalidadesComEquipas = () => {
     });
 }
 
+exports.getTorneiosComEquipas = () => {
+    return Equipas.findAll({
+        attributes: ['torneioId'],
+        group: ['torneioId'],
+        raw: true
+    });
+}
+
 exports.getAllLocalidadesComEquipas = (torneioId) => {
     return Equipas.findAll({
         attributes: [['localidadeId', 'idLocalidade']],

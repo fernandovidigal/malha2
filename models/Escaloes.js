@@ -20,18 +20,18 @@ const Escaloes = sequelize.define('escaloes', {
             max: 1
         }
     },
-    syncApp: {
+    uuid: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4
+    },
+    hash: {
         type: Sequelize.STRING(128),
         allowNull: false,
         unique: {
             args: true,
             msg: "O Escalão já existe."
         }
-    },
-    syncWeb: {
-        type: Sequelize.STRING(128),
-        allowNull: true,
-        defaultValue: null
     }
 }, {
     name: {

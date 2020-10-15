@@ -5,6 +5,7 @@ const dbFunctions = require("../../helpers/DBFunctions");
 const { validationResult } = require("express-validator");
 const crypto = require('crypto');
 const axios = require('axios');
+const Sequelize = require('sequelize');
 
 exports.getAllTorneios = async (req, res) => {
   try {
@@ -14,7 +15,6 @@ exports.getAllTorneios = async (req, res) => {
       breadcrumbs: req.breadcrumbs()
     });
   } catch (err) {
-    console.log(err);
     req.flash("error", "Não foi possível obter os torneios");
     res.redirect("/admin/torneios");
   }
@@ -120,76 +120,75 @@ exports.createTorneio = async (req, res) => {
       escalao.campos = (Math.log2(numCampos) % 1 === 0) ? numCampos : 0;
     });
 
+    // Verifica o número de torneios
+    const numTorneios = await dbFunctions.getNumTorneios();
+
     if(!errors.isEmpty()){
       req.breadcrumbs("Adicionar Torneio", "/admin/adicionarTorneio");
       return res.render("admin/adicionarTorneio", { validationErrors: errors.array({ onlyFirstError: true }), escaloes: listaEscaloes, torneio: oldData, breadcrumbs: req.breadcrumbs() });
     }
 
     const torneioToHash = designacao + localidade + ano;
-    const syncAppHash = crypto.createHash('sha512').update(torneioToHash.toUpperCase()).digest('hex');
-
-    let transaction;
+    const hash = crypto.createHash('sha512').update(torneioToHash.toUpperCase()).digest('hex');
+    const transaction = await sequelize.transaction();
 
     try {
-      transaction = await sequelize.transaction();
+      if(req.session.activeConnection){
+        const response = await axios.post(`${req.session.syncUrl}torneios/create.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+          designacao: designacao,
+          localidade: localidade,
+          ano: ano,
+          hash: hash
+        });
 
-      const [torneioModel, created] = await Torneios.findOrCreate({
-        where: { syncApp: syncAppHash },
-        defaults: {
+        // Pode ser retornado uma localidade (caso exista) ou o uuid (caso seja inserido)
+        if(response.data.sucesso && (response.data.uuid || response.data.torneio)){
+          const torneioModel = await Torneios.create({
             designacao: designacao,
             localidade: localidade,
-            ano: ano
-        },
-        transaction: transaction
-      });
-
-      if(!created){
-        await transaction.rollback();
-        const errors = [{
-          msg: 'O Torneio já existe',
-          param: 'designacao'
-        }];
-        req.breadcrumbs("Adicionar Torneio", "/admin/adicionarTorneio");
-        return res.render("admin/adicionarTorneio", { validationErrors: errors, escaloes: listaEscaloes, torneio: oldData, breadcrumbs: req.breadcrumbs() });
-      }
-
-      await processaCriacaoCampos(transaction, torneioModel.torneioId, listaEscaloes);
-
-      await transaction.commit();
-
-      if (transaction.finished === "commit") {
-        // TODO: Sync na plataforma WEB
-
-        // Escolheu adicionar e activar o torneios
-        if (req.body.adicionar_activar) {
-          await dbFunctions.setTorneioActivo(torneioModel.torneioId);
-          req.flash("success", "Torneio adicionado e activado com sucesso.");
-          return res.redirect("/admin/torneios");
-        } else {
-          // Escolheu só adicionar o torneio
-          // Se só existe 1 torneio registado este fica activo
-          const numTorneios = await dbFunctions.getNumTorneios();
-          if (numTorneios == 1) {
-            await dbFunctions.setTorneioActivo(torneioModel.torneioId);
-            req.flash("success", "Torneio adicionado e activado com sucesso.");
-            return res.redirect("/admin/torneios");
+            ano: ano,
+            activo: (req.body.adicionar_activar || numTorneios == 0) ? 1 : 0,
+            uuid: response.data.uuid || response.data.torneio.uuid,
+            hash: hash
+          }, {transaction: transaction});
+          
+          await processaCriacaoCampos(transaction, torneioModel.torneioId, listaEscaloes);
+         
+          let message = '';
+          // Escolheu adicionar e activar o torneios
+          if (req.body.adicionar_activar || numTorneios == 0) {
+            message = "Torneio adicionado e activado com sucesso.";
           } else {
-            req.flash("success", "Torneio adicionado com sucesso.");
-            return res.redirect("/admin/torneios");
+            message = "Torneio adicionado com sucesso.";
           }
+
+          await transaction.commit();
+
+          req.flash("success", message);
+          return res.redirect("/admin/torneios");
+
+        } else {
+          throw new Error();
         }
       } else {
-        req.flash("error", "Não foi possível adicionar o torneio.");
-        return res.redirect("/admin/torneios");
+        throw new Error();
       }
-
-    } catch(err){
+    } catch(error){
       await transaction.rollback();
-      throw err;
+      throw error;
     }
   } catch (err) {
-    req.flash("error", "Não foi possivel adicionar o torneio.");
-    res.redirect("/admin/torneios");
+    if(err instanceof Sequelize.UniqueConstraintError){
+      const errors = [{
+        msg: 'O Torneio já existe',
+        param: 'designacao'
+      }];
+      req.breadcrumbs("Adicionar Torneio", "/admin/adicionarTorneio");
+      return res.render("admin/adicionarTorneio", { validationErrors: errors, escaloes: listaEscaloes, torneio: oldData, breadcrumbs: req.breadcrumbs() });
+    } else {
+      req.flash("error", "Não foi possivel adicionar o torneio.");
+      res.redirect("/admin/torneios");
+    } 
   }
 }
 
@@ -273,48 +272,48 @@ exports.updateTorneio = async (req, res) => {
     }
 
     const torneioToHash = designacao + localidade + ano;
-    const updatedSyncAppHash = crypto.createHash('sha512').update(torneioToHash.toUpperCase()).digest('hex');
+    const hash = crypto.createHash('sha512').update(torneioToHash.toUpperCase()).digest('hex');
 
-    let transaction;
+    const transaction = await sequelize.transaction();
 
     try {
-      transaction = await sequelize.transaction();
+      const torneio = await Torneios.findByPk(torneioId);
 
-      await Torneios.update(
-        {
-          designacao: designacao,
-          localidade: localidade,
-          ano: ano,
-          syncApp: updatedSyncAppHash
+      await Torneios.update({
+        designacao: designacao,
+        localidade: localidade,
+        ano: ano,
+        hash: hash
+      }, {
+        where: {
+          torneioId: torneioId
         },
-        {
-          where: { torneioId: torneioId }
-        },
-        { transaction: transaction }
-      );
+        transaction: transaction
+      });
 
-      await processaUpdateCampos(transaction, torneioId, listaEscaloes);
+      const response = await axios.post(`${req.session.syncUrl}torneios/update.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+        uuid: torneio.uuid,
+        designacao: designacao,
+        localidade: localidade,
+        ano: ano,
+        hash: hash
+      });
 
-      await transaction.commit();
-
-      if (transaction.finished === "commit") {
-        const torneio = await Torneios.findByPk(torneioId);
-
-        // TODO: Sync com plataforma WEB
+      if(response.data.sucesso){
+        await processaUpdateCampos(transaction, torneioId, listaEscaloes);
+        await transaction.commit();
 
         req.flash("success", "Torneio actualizado com sucesso");
         return res.redirect("/admin/torneios");
       } else {
-        req.flash("error", "Não foi possível actualizar o torneio");
-        return res.redirect("/admin/torneios");
+        throw new Error();
       }
-
-    } catch (err) {
+    } catch(error) {
       await transaction.rollback();
-      throw err;
+      throw error;
     }
   } catch (err) {
-    if(err.name == 'SequelizeUniqueConstraintError'){
+    if(err instanceof Sequelize.UniqueConstraintError){
       const errors = [{
           msg: 'O Torneio já existe',
           param: 'designacao'
@@ -322,26 +321,32 @@ exports.updateTorneio = async (req, res) => {
       req.breadcrumbs("Editar Torneio", "/admin/editarTorneio");
       return res.render("admin/editarTorneio", { validationErrors: errors, torneio: oldData, escaloes: listaEscaloes, selectedTab: tab, breadcrumbs: req.breadcrumbs() });
     }
+
     req.flash("error", "Não foi possível actualizar o torneio");
     res.redirect("/admin/torneios");
   }
 };
 
-exports.deleteTorneio = (req, res) => {
+exports.deleteTorneio = async (req, res) => {
   const torneioId = parseInt(req.body.id);
 
-  if(req.user.level == 5 || req.user.level == 10){
-    Torneios.destroy({ where: { torneioId: torneioId }, limit: 1 })
-      .then(result => {
-        if (result) {
-          res.status(200).json({ success: true });
-        } else {
-          res.status(200).json({ success: false });
-        }
-      })
-      .catch(err => {
-        res.status(200).json({ success: false });
+  if(req.session.activeConnection && (req.user.level == 5 || req.user.level == 10)){
+    try {
+      const torneio = await Torneios.findByPk(torneioId);
+      const response = await axios.post(`${req.session.syncUrl}torneios/delete.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+        uuid: torneio.uuid
       });
+
+      if(response.data.sucesso){
+        await torneio.destroy();
+      } else {
+          throw new Error();
+      }
+
+      res.status(200).json({ success: true });
+    } catch(error){
+      throw error;
+    }
   } else {
     res.status(200).json({ success: false });
   }

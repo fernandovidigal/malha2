@@ -3,6 +3,7 @@ const router = express.Router();
 const { userAuthenticated, checkGestorStatus } = require('../../helpers/auth');
 const { check} = require('express-validator');
 const TorneiosController = require('../../controllers/admin/torneios');
+const { checkActiveConnection } = require('../../helpers/webApi');
 
 router.all('/*', [userAuthenticated, checkGestorStatus], (req, res, next) => {
     res.locals.menuAdminTorneios = true;
@@ -10,7 +11,7 @@ router.all('/*', [userAuthenticated, checkGestorStatus], (req, res, next) => {
     next();
 });
 
-router.get('/', TorneiosController.getAllTorneios);
+router.get('/', checkActiveConnection, TorneiosController.getAllTorneios);
 
 router.get('/adicionarTorneio', TorneiosController.adicionarTorneio);
 
@@ -27,10 +28,10 @@ router.get('/activaTorneio/:id', TorneiosController.ActivaTorneio);
 router.get('/editarTorneio/:id/:tab?', TorneiosController.getTorneio);
 
 router.put('/editarTorneio/:id/:tab?', [
-    check('designacao').not().isEmpty().withMessage('Deve indicar a designação do torneio.'),
-    check('localidade').not().isEmpty().withMessage('Deve indicar a localidade do torneio.'),
+    check('designacao').notEmpty().withMessage('Deve indicar a designação do torneio.'),
+    check('localidade').notEmpty().withMessage('Deve indicar a localidade do torneio.'),
     check('localidade').matches(/^[^0-9]+$/).withMessage('Nome da localidade inválido'),
-    check('ano').not().isEmpty().withMessage('Deve indicar o ano do torneio.'),
+    check('ano').notEmpty().withMessage('Deve indicar o ano do torneio.'),
     check('ano').matches(/^[0-9]{4}$/).withMessage('Ano do torneio inválido'),
 ] ,TorneiosController.updateTorneio);
 

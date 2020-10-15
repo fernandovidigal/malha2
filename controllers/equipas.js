@@ -1,4 +1,6 @@
 const Equipas = require('../models/Equipas');
+const Localidades = require('../models/Localidades');
+const Escaloes = require('../models/Escaloes');
 const dbFunctions = require('../helpers/DBFunctions');
 const sequelize = require('../helpers/database');
 const { validationResult } = require('express-validator');
@@ -7,6 +9,7 @@ const torneioHelpers = require('../helpers/torneioHelperFunctions');
 const configFile = require('../helpers/configFunctions');
 const crypto = require('crypto');
 const axios = require('axios');
+const Sequelize = require('sequelize');
 
 const faker = require('faker');
 faker.locale = "pt_BR";
@@ -170,6 +173,44 @@ async function processaPercurso(torneioId, equipaId, escalaoId){
     return listaFases;
 }
 
+/*const criarEquipa = async (equipa, syncUrl, transaction = null) => {
+    try {
+        const response = await axios.post(`${syncUrl}equipas/create.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+            primeiroElemento: equipa.primeiroElemento,
+            segundoElemento: equipa.segundoElemento,
+            torneioUUID: equipa.torneioUUID,
+            localidadeUUID: equipa.localidadeUUID,
+            escalaoUUID: equipa.escalaoUUID,
+            hash: equipa.hash
+        });
+
+        // Pode ser retornado uma equipa (caso exista) ou o uuid (caso seja inserido)
+        if(response.data.sucesso && (response.data.uuid || response.data.equipa)){
+            let lastEquipaID = await dbFunctions.getLastEquipaID(equipa.torneioId, equipa.escalaoId) || 0;
+            lastEquipaID++;
+
+            const t = transaction != null ?  { transaction: transaction } : {};
+    
+            await Equipas.create({
+                equipaId: lastEquipaID,
+                torneioId: equipa.torneioId,
+                primeiroElemento: equipa.primeiroElemento,
+                segundoElemento: equipa.segundoElemento,
+                localidadeId: equipa.localidadeId,
+                escalaoId: equipa.escalaoId,
+                hash: equipa.hash,
+                uuid: response.data.uuid || response.data.equipa.uuid
+            }, t);
+    
+            return true;
+        } else {
+            throw new Error();
+        }
+    } catch(error){
+        return false;
+    } 
+}*/
+
 exports.getAllEquipas = async (req, res) => {
     try{
         const torneioInfo = dbFunctions.getTorneioInfo();
@@ -205,6 +246,7 @@ exports.getAllEquipas = async (req, res) => {
         for(const equipa of _listaEquipas){
             const _escalao = listaEquipasComJogos.find(el => el.escalaoId == equipa.escalaoId);
             const _equipa = {
+                rowId: equipa.rowId,
                 equipaId: equipa.equipaId,
                 primeiroElemento: equipa.primeiroElemento,
                 segundoElemento: equipa.segundoElemento,
@@ -248,7 +290,7 @@ exports.getEquipaToEdit = async (req, res) => {
 
         const [torneio, localidades, escaloes] = await Promise.all([torneioInfo, localidadesInfo, escaloesInfo]);
 
-        const equipa = await dbFunctions.getEquipaFullDetails(torneio.torneioId, equipaId, escalaoId);    
+        const equipa = await dbFunctions.getEquipaFullDetails(torneio.torneioId, equipaId, escalaoId);
         if(!equipa){
             req.flash('error', 'Equipa não existe!');
             return res.redirect('/equipas'); 
@@ -345,7 +387,7 @@ exports.createEquipa = async (req, res) => {
 
     const [torneio, localidades, escaloes] = await Promise.all([torneioInfo, localidadesInfo, escaloesInfo]);
     util.sort(localidades);
-    // Exclui da lista de esclões os escalões que já tenham jogos distribuídos
+    // Exclui da lista de escalões os escalões que já tenham jogos distribuídos
     // Se já existe jogos distribuídos não é possível adicionar mais equipas
     const listaEscaloes = await processaListaEscaloes(escaloes, torneio.torneioId);
 
@@ -353,37 +395,49 @@ exports.createEquipa = async (req, res) => {
         if(!errors.isEmpty()){
             showValidationErrors(req, res, errors, 'adicionarEquipa', inputData);
         } else {
-            let lastEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId) || 0;
-            lastEquipaID++;
+            if(req.session.activeConnection){
+                // Obtem os UUIDs da localidade e do escalão
+                const selectedLocalidade = localidades.find(localidade => localidade.localidadeId == localidadeId);
+                const selectedEscalao = escaloes.find(escalao => escalao.escalaoId == escalaoId);
 
-            const equipaToHash = primeiroElemento + segundoElemento + localidadeId;
-            const syncAppHash = crypto.createHash('sha512').update(equipaToHash.toUpperCase()).digest('hex');
+                const equipaToHash = primeiroElemento + segundoElemento + localidadeId + escalaoId;
+                const hash = crypto.createHash('sha512').update(equipaToHash.toUpperCase()).digest('hex');
 
-            const equipa = {
-                torneioId: torneio.torneioId,
-                primeiroElemento: primeiroElemento,
-                segundoElemento: segundoElemento,
-                localidadeId: localidadeId,
-                escalaoId: escalaoId,
-                syncApp: syncAppHash
-            }
+                const response = await axios.post(`${req.session.syncUrl}equipas/create.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                    primeiroElemento: primeiroElemento,
+                    segundoElemento: segundoElemento,
+                    torneioUUID: torneio.uuid,
+                    localidadeUUID: selectedLocalidade.uuid,
+                    escalaoUUID: selectedEscalao.uuid,
+                    hash: hash
+                });
 
-            const [_equipa, created] = await dbFunctions.createEquipa(equipa, lastEquipaID);
+                // Pode ser retornado uma equipa (caso exista) ou o uuid (caso seja inserido)
+                if(response.data.sucesso && (response.data.uuid || response.data.equipa)){
+                    let lastEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId) || 0;
+                    lastEquipaID++;
 
-            if(!created){
-                const errors = [{
-                    msg: 'A equipa já se encontra registada neste torneio.'
-                }];
-                req.breadcrumbs('Adicionar Equipa', '/equipas/adicionarEquipa');
-                return res.render('equipas/adicionarEquipa', {errors: errors, equipa: inputData, localidades: localidades, escaloes: listaEscaloes, torneio: torneio, breadcrumbs: req.breadcrumbs()});
-            }
+                    await Equipas.create({
+                        equipaId: lastEquipaID,
+                        torneioId: torneio.torneioId,
+                        primeiroElemento: primeiroElemento,
+                        segundoElemento: segundoElemento,
+                        localidadeId: localidadeId,
+                        escalaoId: escalaoId,
+                        hash: hash,
+                        uuid: response.data.uuid || response.data.equipa.uuid
+                    });
 
-            req.flash('success', 'Equipa adicionada com sucesso.');
-            return res.redirect('/equipas');
+                    req.flash('success', 'Equipa adicionada com sucesso.');
+                    return res.redirect('/equipas');
+                } else {
+                    throw new Error();
+                }  
+            }           
         }
     } catch(err) {
         console.log(err);
-        if(err.name == 'SequelizeUniqueConstraintError'){
+        if(err instanceof Sequelize.UniqueConstraintError){
             const errors = [{
                 msg: 'A equipa já se encontra registada neste torneio.',
             }];
@@ -419,73 +473,84 @@ exports.updateEquipa = async (req, res) => {
     } else {
 
         try {
-            const torneio = await dbFunctions.getTorneioInfo();
-            const equipa = await dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId, oldEscalaoId, false);
+            if(req.session.activeConnection){
+                const torneio = await dbFunctions.getTorneioInfo();
+                const equipaToHash = primeiroElemento + segundoElemento + localidadeId + escalaoId;
+                const hash = crypto.createHash('sha512').update(equipaToHash.toUpperCase()).digest('hex');
 
-            if(!equipa){
-                req.flash('error', 'Equipa não existe.')
-                return res.redirect('/equipas');
-            }
+                const _equipa = dbFunctions.getSimpleEquipa(torneio.torneioId, equipaId, oldEscalaoId, false);
+                const _localidade = Localidades.findByPk(localidadeId);
+                const _escalao = Escaloes.findByPk(escalaoId);
 
-            let createdEquipa = null;
-            let updatedEquipa = null;
+                const [equipa, localidade, escalao] = await Promise.all([_equipa, _localidade, _escalao]);
 
-            if(escalaoId != oldEscalaoId){
-                const lastId = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId) || 0;
-
-                const _equipa = {
-                    equipaId: lastId+1,
-                    torneioId: torneio.torneioId,
-                    primeiroElemento: primeiroElemento,
-                    segundoElemento: segundoElemento,
-                    localidadeId: localidadeId,
-                    escalaoId: escalaoId
-                }
-
-                let transaction;
-                try{
-                    transaction = await sequelize.transaction();
-
-                    // Verifica se a Equipas já existe no escalão selecionado
-                    const existeEquipa = await Equipas.findOne({
-                        where: _equipa,
-                        transaction
+                // Escalão diferente, é preciso fazer novo registo e eliminar o anterior
+                if(escalaoId != oldEscalaoId){
+                    const response = await axios.post(`${req.session.syncUrl}equipas/changeEscalao.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                        primeiroElemento: primeiroElemento,
+                        segundoElemento: segundoElemento,
+                        torneioUUID: torneio.uuid,
+                        localidadeUUID: localidade.uuid,
+                        escalaoUUID: escalao.uuid,
+                        hash: hash,
+                        equipaUUID: equipa.uuid
                     });
 
-                    if(existeEquipa) {
-                        throw 'A equipas já existe no escalão selecionado'
+                    if(response.data.sucesso){
+                        let lastEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId) || 0;
+                        lastEquipaID++;
+
+                        equipa.equipaId = lastEquipaID;
+                        equipa.primeiroElemento = primeiroElemento,
+                        equipa.segundoElemento = segundoElemento,
+                        equipa.localidadeId = localidadeId,
+                        equipa.escalaoId = escalaoId,
+                        equipa.hash = hash;
+
+                        await equipa.save();
+
+                        req.flash('success', 'Equipa actualizada com sucesso.1')
+                        return res.redirect('/equipas');
                     } else {
-                        // Elimina a equipa do escalão antigo
-                        await equipa.destroy({transaction});
-                        // Regista a equipa no novo escalão
-                        createdEquipa = await Equipas.create(_equipa, {transaction});
+                        throw new Error();
+                    }   
+                } else {
+                    const transaction = await sequelize.transaction();
 
-                        if(createdEquipa) {
+                    try {
+                        // O escalão é o mesmo, basta actualizar a equipa
+                        equipa.primeiroElemento = primeiroElemento,
+                        equipa.segundoElemento = segundoElemento,
+                        equipa.localidadeId = localidadeId,
+                        equipa.escalaoId = escalaoId,
+                        equipa.hash = hash;
+
+                        await equipa.save({transaction: transaction});
+
+                        const response = await axios.post(`${req.session.syncUrl}equipas/update.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                            primeiroElemento: primeiroElemento,
+                            segundoElemento: segundoElemento,
+                            torneioUUID: torneio.uuid,
+                            localidadeUUID: localidade.uuid,
+                            escalaoUUID: escalao.uuid,
+                            hash: hash,
+                            equipaUUID: equipa.uuid
+                        });
+
+                        if(response.data.sucesso){
                             await transaction.commit();
+                            req.flash('success', 'Equipa actualizada com sucesso.2')
+                            return res.redirect('/equipas');
                         } else {
-                            throw "Não foi possível actualizar a equipa";
+                            throw new Error();
                         }
+                    } catch (error) {
+                        transaction.rollback();
+                        throw error;
                     }
-                } catch(err){
-                    if(transaction) await transaction.rollback();
-                    throw err;
                 }
-                
             } else {
-                equipa.primeiroElemento = primeiroElemento;
-                equipa.segundoElemento = segundoElemento;
-                equipa.localidadeId = localidadeId;
-                equipa.escalaoId = escalaoId;
-
-                updatedEquipa = await equipa.save();
-            }
-
-            if(updatedEquipa || createdEquipa){
-                req.flash('success', 'Equipa actualizada com sucesso.')
-                res.redirect('/equipas');
-            } else {
-                req.flash('error', 'Não foi possível actualizar a equipa.')
-                res.redirect('/equipas');
+                throw new Error();
             }
         } catch(err) {
             console.log(err);
@@ -526,26 +591,30 @@ exports.getEquipaToDelete = async (req, res) => {
 }
 
 exports.deleteEquipa = async (req, res) => {
-    let response = { success: false };
+    const equipaId = parseInt(req.body.equipaId);
+    const torneioId = parseInt(req.body.torneioId);
+    const escalaoId = parseInt(req.body.escalaoId);
 
-    try {
-        const equipaId = parseInt(req.body.equipaId);
-        const torneioId = parseInt(req.body.torneioId);
-        const escalaoId = parseInt(req.body.escalaoId);
+    if(req.session.activeConnection){
+        try {
+            const equipa = await dbFunctions.getSimpleEquipa(torneioId, equipaId, escalaoId, false);
+            const response = await axios.post(`${req.session.syncUrl}equipas/delete.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                uuid: equipa.uuid
+            });
 
-        const equipa = await dbFunctions.getSimpleEquipa(torneioId, equipaId, escalaoId, false);
-
-        if(equipa){
-            const result = await equipa.destroy();
-            response = {
-                success: (result) ? true: false,
+            if(response.data.sucesso){
+                await equipa.destroy();
+            } else {
+                throw new Error();
             }
-        }
-    } catch(err) {
-        console.log(err);
-    }
 
-    res.status(200).json(response);
+            return res.status(200).json({ success: true });
+        } catch(error) {
+            return res.status(200).json({ success: false });
+        }
+    } else {
+        return res.status(200).json({ success: false });
+    }
 }
 
 // Pesquisar Equipas
@@ -820,8 +889,8 @@ exports.createEquipasAleatoriamente = async (req, res) => {
             const primeiroElemento = faker.name.firstName() + " " + faker.name.lastName();
             const segundoElemento = faker.name.firstName() + " " + faker.name.lastName();
             const localidadeId = _listaLocalidades[Math.floor(Math.random() * _listaLocalidades.length)];
-            const equipaToHash = primeiroElemento + segundoElemento + localidadeId;
-            const syncAppHash = crypto.createHash('sha512').update(equipaToHash.toUpperCase()).digest('hex');
+            const equipaToHash = primeiroElemento + segundoElemento + localidadeId + _escalao.escalaoId;
+            const hash = crypto.createHash('sha512').update(equipaToHash.toUpperCase()).digest('hex');
             const equipa = {
                 equipaId: _escalao.lastId,
                 torneioId: torneio.torneioId,
@@ -829,7 +898,7 @@ exports.createEquipasAleatoriamente = async (req, res) => {
                 segundoElemento: segundoElemento,
                 localidadeId: localidadeId,
                 escalaoId: _escalao.escalaoId,
-                syncApp: syncAppHash
+                hash: hash
             }
             listaEquipas.push(equipa);
         }

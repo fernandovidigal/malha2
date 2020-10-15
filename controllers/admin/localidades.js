@@ -65,22 +65,25 @@ exports.createLocalidade = async (req, res) => {
             const hash = crypto.createHash('sha512').update(localidade.toUpperCase()).digest('hex');
 
             if(req.session.activeConnection){
-                const responseWeb = await axios.post(`${req.session.syncUrl}localidades/create.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                const response = await axios.post(`${req.session.syncUrl}localidades/create.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
                     nome: localidade,
                     hash: hash
                 });
 
-                if(responseWeb.data.sucesso){
+                // Pode ser retornado uma localidade (caso exista) ou o uuid (caso seja inserido)
+                if(response.data.sucesso && (response.data.uuid || response.data.localidade)){
                     const localidadeModel = await Localidade.create({
                         nome: localidade,
                         hash: hash,
-                        uuid: responseWeb.data.localidade.uuid
+                        uuid: response.data.uuid || response.data.localidade.uuid
                     });
                     req.flash('success', `${localidadeModel.nome} adicionada com sucesso`);
                     res.redirect('/admin/localidades');
                 } else {
                     throw new Error();
                 } 
+            } else {
+                throw new Error();
             }
         }
     } catch(err) {
@@ -146,6 +149,8 @@ exports.updateLocalidade = async (req, res) => {
                     await transaction.rollback();
                     throw error;
                 }    
+            } else {
+                throw new Error();
             }
         }
     } catch(err) {
@@ -166,28 +171,24 @@ exports.updateLocalidade = async (req, res) => {
 exports.deleteLocalidade = async (req, res) => {
     const localidadeId = parseInt(req.body.id);
 
-    try{
-        if(req.session.activeConnection && (req.user.level == 5 || req.user.level == 10)){
-            try {
-                const localidade = await Localidade.findByPk(localidadeId);
-                const response = await axios.post(`${req.session.syncUrl}localidades/delete.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
-                    uuid: localidade.uuid
-                });
+    if(req.session.activeConnection && (req.user.level == 5 || req.user.level == 10)){
+        try {
+            const localidade = await Localidade.findByPk(localidadeId);
+            const response = await axios.post(`${req.session.syncUrl}localidades/delete.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                uuid: localidade.uuid
+            });
 
-                if(response.data.sucesso){
-                    await localidade.destroy();
-                } else {
-                    throw new Error();
-                }
-
-                res.status(200).json({ success: true });
-            } catch (error) {
-                throw error;
+            if(response.data.sucesso){
+                await localidade.destroy();
+            } else {
+                throw new Error();
             }
-        } else {
-            throw new Error();
+
+            res.status(200).json({ success: true });
+        } catch (error) {
+            throw error;
         }
-    } catch(err){
+    } else {
         res.status(200).json({ success: false });
     }
 }

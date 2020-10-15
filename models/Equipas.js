@@ -23,33 +23,26 @@ const Equipas = sequelize.define('equipas', {
     localidadeId: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        primaryKey: true
     },
     escalaoId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         primaryKey: true
     },
-    syncApp: {
-        type: Sequelize.STRING(128),
-        allowNull: false
+    uuid: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4
     },
-    syncWeb: {
+    hash: {
         type: Sequelize.STRING(128),
-        allowNull: true,
-        defaultValue: null
+        allowNull: false,
     }
 },
 {
     indexes: [
-        {
-            unique: true,
-            fields: ['torneioId', 'syncApp']
-        },
-        {
-            unique: true,
-            fields: ['equipaId', 'torneioId', 'localidadeId', 'escalaoId']
-        }
+        { unique: true, fields: ['torneioId', 'hash'] },
+        { unique: true, fields: ['torneioId', 'equipaId', 'escalaoId'] }
     ]
 });
 

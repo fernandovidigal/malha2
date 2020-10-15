@@ -31,7 +31,11 @@
             <%- include('includes/equipaPercurso.ejs') %>
         </div>
         <div class="inputBtnBar">
-            <input type="submit" name="actualizar" value="Actualizar" class="btn btn-primary">
+            <% if(activeConnection) { %>
+                <input type="submit" name="actualizar" value="Actualizar" class="btn btn-primary">
+            <% } else { %>
+                <span class="btn btn-disabled">Actualizar</span>
+            <% } %>
             <a href="/equipas" class="btn-cancel">Cancelar</a>
         </div>
         </form>

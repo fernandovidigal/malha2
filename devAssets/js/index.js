@@ -55,7 +55,7 @@ if(sync){
         } else {
             Swal.fire({
                 icon: 'error',
-                title: "Erro",
+                title: "Sincronização",
                 text: 'Não existe conexão activa',
             });
         }

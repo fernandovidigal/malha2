@@ -22,7 +22,6 @@ exports.checkConnection = async (req, res) => {
 }
 
 exports.checkActiveConnection = async (req, res, next) => {
-    console.log("aqui");
     const url = req.session.syncUrl;
     try{
         if(url == null){
@@ -47,28 +46,22 @@ exports.checkActiveConnection = async (req, res, next) => {
 exports.syncData = async (req, res, next) => {
     try {
         const url = req.session.syncUrl;
-        
-
+    
         // Fazer sincronização
         // Localidades
         await syncLocalidades(url);
 
         // Escalões
-        //await syncEscaloes(url);
+        await syncEscaloes(url);
         
         // Torneios
-        //await syncTorneios(url);
+        await syncTorneios(url);
 
         res.status(200).json({ success: true });
     } catch (error) {
-        console.log(error);
-        let message = "Não foi possível efectuar a sincronização";
-        if(error.message){
-            message = error.message;
-        }
         res.status(200).json({
             success: false,
-            message: message
+            message: error.message ? error.message : "Não foi possível efectuar a sincronização"
         });
     }
 }

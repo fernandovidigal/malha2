@@ -1,7 +1,12 @@
 <%- include('../includes/header.ejs') %>
 <div class="barraTorneio">
     <div class="barraTorneio__buttons">
-        <a href="/admin/escaloes/adicionarEscalao" class="btn btn-primary">Adicionar Escalão</a>
+        <% if(activeConnection) { %>
+            <a href="/admin/escaloes/adicionarEscalao" class="btn btn-primary">Adicionar Escalão</a>
+            <a href="/admin/localidades/sincronizarEscaloes" class="btn btn-secondary"  title="Sincronizar"><i class="fas fa-exchange-alt"></i></a>
+        <% } else { %>
+            <span class="btn btn-disabled">Adicionar Escalão</span>
+        <% } %>
     </div>
 </div>
 <%- include('../includes/breadcrumbs.ejs') %>
@@ -32,12 +37,18 @@
                         <tr>
                             <td class="escalao"><%= escalao.designacao %></td>
                             <td class="sexo"><%= escalao.sexo == 0 ? 'Feminino' : 'Masculino' %></td>
-                            <td class="detalhesBtn__column"><a href="/admin/escaloes/editarEscalao/<%= escalao.escalaoId %>" class="btn btn-secondary">Editar</a></td>
+                            <td class="detalhesBtn__column">
+                                <% if(activeConnection) { %>
+                                    <a href="/admin/escaloes/editarEscalao/<%= escalao.escalaoId %>" class="btn btn-secondary">Editar</a>
+                                <% } else { %>
+                                    <span class="btn btn-disabled">Editar</span>
+                                <% } %>
+                            </td>
                             <td class="deleteBtn__column">
-                                <% if(escalao.eliminavel){ %>
+                                <% if(escalao.eliminavel && activeConnection){ %>
                                     <a href="" class="btn btn-delete" data-escalao="<%= escalao.escalaoId %>"><i class="fa fa-trash-alt"></i></a>
                                 <% } else { %>
-                                    <p class="btn-disabled"><i class="fas fa-trash-alt"></i></p>
+                                    <p class="btn btn-disabled"><i class="fas fa-trash-alt"></i></p>
                                 <% } %>
                             </td>
                         </tr>

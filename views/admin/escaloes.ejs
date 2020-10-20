@@ -3,7 +3,10 @@
     <div class="barraTorneio__buttons">
         <% if(activeConnection) { %>
             <a href="/admin/escaloes/adicionarEscalao" class="btn btn-primary">Adicionar Escalão</a>
-            <a href="/admin/localidades/sincronizarEscaloes" class="btn btn-secondary"  title="Sincronizar"><i class="fas fa-exchange-alt"></i></a>
+            <div class="tooltipBtn__wrapper">
+                <a href="/admin/escaloes/sincronizarEscaloes" class="btn btn-secondary"><i class="fas fa-exchange-alt"></i></a>
+                <span class="tooltip">Sincronizar Localidades</span>
+            </div>
         <% } else { %>
             <span class="btn btn-disabled">Adicionar Escalão</span>
         <% } %>

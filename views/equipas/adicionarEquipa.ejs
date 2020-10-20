@@ -202,6 +202,13 @@
                 <% } %>
             </div>
 
+            <div class="formInput__wrapper">
+                <label for="syncWeb" class="checkbox__wrapper <%= !activeConnection ? 'checkbox__wrapper-disabled' : '' %>">
+                    <input type="checkbox" name="syncWeb" id="syncWeb" <%= !activeConnection ? 'disabled' : '' %>> Sincronizar com a plataforma Web
+                    <span class="checkbox__checkmark"></span>
+                </label>
+            </div>
+
             <div class="inputBtnBar">
                 <input type="submit" name="adicionar" value="Adicionar" class="btn btn-primary">
                 <a href="/equipas" class="btn-cancel">Cancelar</a>

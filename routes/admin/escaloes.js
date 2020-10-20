@@ -47,5 +47,7 @@ router.put('/editarEscalao/:id', [
 
 router.delete('/deleteEscalao', EscaloesController.deleteEscalao);
 
+router.get('/sincronizarEscaloes', EscaloesController.sincronizarEscaloes);
+
 
 module.exports = router;

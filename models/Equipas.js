@@ -29,6 +29,11 @@ const Equipas = sequelize.define('equipas', {
         allowNull: false,
         primaryKey: true
     },
+    local: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+    },
     uuid: {
         type: Sequelize.UUID,
         allowNull: false,

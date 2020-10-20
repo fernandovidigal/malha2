@@ -1,5 +1,13 @@
 <%- include('../includes/header.ejs') %>
-<div class="dummyTopSpacer"></div>
+<div class="barraTorneio">
+    <div class="barraTorneio__buttons">
+        <% if(activeConnection) { %>
+            <a href="/admin/sincronizacao/sincronizarTodos" class="btn btn-primary">Sincronizar Todos</a>
+        <% } else { %>
+            <span class="btn btn-disabled">Sincronizar Todos</span>
+        <% } %>
+    </div>
+</div>
 <%- include('../includes/breadcrumbs.ejs') %>
 
 <div class="container_wrapper">
@@ -13,22 +21,46 @@
                 <tr>
                     <td>Torneios</td>
                     <td class="detalhesBtn__column"></td>
-                    <td class="detalhesBtn__column"><a class="btn btn-secondary">Sincronizar</a></td>
+                    <td class="detalhesBtn__column">
+                        <% if(activeConnection) { %>
+                            <a href="/admin/sincronizacao/sincronizarTorneios" class="btn btn-secondary">Sincronizar</a>
+                        <% } else { %>
+                            <span class="btn btn-disabled">Sincronizar</span>
+                        <% } %>
+                    </td>
                 </tr>
                 <tr>
                     <td>Localidades</td>
                     <td class="detalhesBtn__column"></td>
-                    <td class="detalhesBtn__column"><a class="btn btn-secondary">Sincronizar</a></td>
+                    <td class="detalhesBtn__column">
+                        <% if(activeConnection) { %>
+                            <a href="/admin/sincronizacao/sincronizarLocalidades" class="btn btn-secondary">Sincronizar</a>
+                        <% } else { %>
+                            <span class="btn btn-disabled">Sincronizar</span>
+                        <% } %>
+                    </td>
                 </tr>
                 <tr>
                     <td>Escalões</td>
                     <td class="detalhesBtn__column"></td>
-                    <td class="detalhesBtn__column"><a class="btn btn-secondary">Sincronizar</a></td>
+                    <td class="detalhesBtn__column">
+                        <% if(activeConnection) { %>
+                            <a href="/admin/sincronizacao/sincronizarEscaloes" class="btn btn-secondary">Sincronizar</a>
+                        <% } else { %>
+                            <span class="btn btn-disabled">Sincronizar</span>
+                        <% } %>
+                    </td>
                 </tr>
                 <tr>
                     <td>Equipas</td>
                     <td class="detalhesBtn__column"></td>
-                    <td class="detalhesBtn__column"><a class="btn btn-secondary">Sincronizar</a></td>
+                    <td class="detalhesBtn__column">
+                        <% if(activeConnection) { %>
+                            <a href="/admin/sincronizacao/sincronizarEquipas" class="btn btn-secondary">Sincronizar</a>
+                        <% } else { %>
+                            <span class="btn btn-disabled">Sincronizar</span>
+                        <% } %>
+                    </td>
                 </tr>
             </tbody>
         </table>

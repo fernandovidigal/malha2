@@ -39,4 +39,6 @@ router.delete('/deleteTorneio', TorneiosController.deleteTorneio);
 
 router.delete('/deleteFase', TorneiosController.deleteFase);
 
+router.get('/sincronizarTorneios', TorneiosController.sincronizarTorneios);
+
 module.exports = router;

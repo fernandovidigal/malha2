@@ -4,7 +4,10 @@
     <div class="barraTorneio__buttons">
         <% if(activeConnection) { %>
             <a href="/admin/torneios/adicionarTorneio" class="btn btn-primary">Adicionar Torneio</a>
-            <a href="/admin/localidades/sincronizarTorneios" class="btn btn-secondary"  title="Sincronizar"><i class="fas fa-exchange-alt"></i></a>
+            <div class="tooltipBtn__wrapper">
+                <a href="/admin/torneios/sincronizarTorneios" class="btn btn-secondary"><i class="fas fa-exchange-alt"></i></a>
+                <span class="tooltip">Sincronizar Torneios</span>
+            </div>
         <% } else { %>
             <span class="btn btn-disabled">Adicionar Torneio</span>
         <% } %>

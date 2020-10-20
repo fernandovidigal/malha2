@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const axios = require('axios');
 const Sequelize = require('sequelize');
 const db = require('../../helpers/database');
+const { syncEscaloes } = require('../../helpers/sync/escaloes');
 
 exports.getAllEscaloes = async (req, res) => {
     try {
@@ -221,5 +222,17 @@ exports.deleteEscalao = async (req, res) => {
         }
     } else {
         res.status(200).json({success: false});
+    }
+}
+
+exports.sincronizarEscaloes = async (req, res) => {
+    try {
+      const url = req.session.syncUrl;
+      await syncEscaloes(url);
+      req.flash("success", "Escalões sincronizados");
+      return res.redirect("/admin/escaloes");
+    } catch(error) {
+      req.flash("error", "Não foi sincronizar os escalões");
+      res.redirect("/admin/escaloes");
     }
 }

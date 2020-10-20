@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const axios = require('axios');
 const Sequelize = require('sequelize');
 const db = require('../../helpers/database');
+const { syncLocalidades } = require('../../helpers/sync/localidades');
  
 exports.getAllLocalidades = async (req, res) => {
     try {
@@ -190,5 +191,17 @@ exports.deleteLocalidade = async (req, res) => {
         }
     } else {
         res.status(200).json({ success: false });
+    }
+}
+
+exports.sincronizarLocalidades = async (req, res) => {
+    try {
+      const url = req.session.syncUrl;
+      await syncLocalidades(url);
+      req.flash("success", "Localidades sincronizadas");
+      return res.redirect("/admin/localidades");
+    } catch(error) {
+      req.flash("error", "Não foi sincronizar as localidades");
+      res.redirect("/admin/localidades");
     }
 }

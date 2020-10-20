@@ -6,6 +6,7 @@ const { validationResult } = require("express-validator");
 const crypto = require('crypto');
 const axios = require('axios');
 const Sequelize = require('sequelize');
+const { syncTorneios } = require('../../helpers/sync/torneios');
 
 exports.getAllTorneios = async (req, res) => {
   try {
@@ -382,5 +383,17 @@ exports.deleteFase = async (req, res) => {
       success: false,
       errMsg: err.message
     });
+  }
+}
+
+exports.sincronizarTorneios = async (req, res) => {
+  try {
+    const url = req.session.syncUrl;
+    await syncTorneios(url);
+    req.flash("success", "Torneios sincronizados");
+    return res.redirect("/admin/torneios");
+  } catch(error) {
+    req.flash("error", "Não foi sincronizar os torneios");
+    res.redirect("/admin/torneios");
   }
 }

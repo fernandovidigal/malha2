@@ -121,7 +121,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 var define;
 var global = arguments[3];
 /*!
-* sweetalert2 v10.5.0
+* sweetalert2 v10.5.1
 * Released under the MIT License.
 */
 (function (global, factory) {
@@ -3474,7 +3474,7 @@ var global = arguments[3];
     };
   });
   SweetAlert.DismissReason = DismissReason;
-  SweetAlert.version = '10.5.0';
+  SweetAlert.version = '10.5.1';
 
   var Swal = SweetAlert;
   Swal["default"] = Swal;
@@ -5383,7 +5383,7 @@ if (sync) {
           case 11:
             _sweetalert.default.fire({
               icon: 'error',
-              title: "Sincronização",
+              title: "Sincronização ao Iniciar",
               text: 'Não existe conexão activa'
             });
 

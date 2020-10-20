@@ -3,6 +3,7 @@ const router = express.Router();
 const { userAuthenticated } = require('../helpers/auth');
 const { check } = require('express-validator');
 const EquipasController = require('../controllers/equipas');
+const { checkActiveConnection } = require('../helpers/webApi');
 
 router.all('/*', userAuthenticated, (req, res, next) => {
     res.locals.menuEquipas = true;
@@ -59,6 +60,6 @@ router.get('/faker/:num', EquipasController.createEquipasAleatoriamente);
 
 router.get('/faker/:num/:escalao', EquipasController.createEquipasAleatoriamentePorEscalao);
 
-router.get('/:perPage?/:page?', EquipasController.getAllEquipas);
+router.get('/:perPage?/:page?', checkActiveConnection, EquipasController.getAllEquipas);
 
 module.exports = router;

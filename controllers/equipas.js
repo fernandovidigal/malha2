@@ -173,44 +173,6 @@ async function processaPercurso(torneioId, equipaId, escalaoId){
     return listaFases;
 }
 
-/*const criarEquipa = async (equipa, syncUrl, transaction = null) => {
-    try {
-        const response = await axios.post(`${syncUrl}equipas/create.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
-            primeiroElemento: equipa.primeiroElemento,
-            segundoElemento: equipa.segundoElemento,
-            torneioUUID: equipa.torneioUUID,
-            localidadeUUID: equipa.localidadeUUID,
-            escalaoUUID: equipa.escalaoUUID,
-            hash: equipa.hash
-        });
-
-        // Pode ser retornado uma equipa (caso exista) ou o uuid (caso seja inserido)
-        if(response.data.sucesso && (response.data.uuid || response.data.equipa)){
-            let lastEquipaID = await dbFunctions.getLastEquipaID(equipa.torneioId, equipa.escalaoId) || 0;
-            lastEquipaID++;
-
-            const t = transaction != null ?  { transaction: transaction } : {};
-    
-            await Equipas.create({
-                equipaId: lastEquipaID,
-                torneioId: equipa.torneioId,
-                primeiroElemento: equipa.primeiroElemento,
-                segundoElemento: equipa.segundoElemento,
-                localidadeId: equipa.localidadeId,
-                escalaoId: equipa.escalaoId,
-                hash: equipa.hash,
-                uuid: response.data.uuid || response.data.equipa.uuid
-            }, t);
-    
-            return true;
-        } else {
-            throw new Error();
-        }
-    } catch(error){
-        return false;
-    } 
-}*/
-
 exports.getAllEquipas = async (req, res) => {
     try{
         const torneioInfo = dbFunctions.getTorneioInfo();

@@ -1460,7 +1460,7 @@ input::placeholder {
     cursor: pointer;
     user-select: none;
     margin-right: 40px;
-    color: #576575;
+    /*color: #576575;*/
 }
 
 .inputRadioContainer input {
@@ -2498,7 +2498,7 @@ input::placeholder {
 }
 
 .connectionStatus:hover {
-    width: 150px;
+    width: 180px;
 }
 
 .noConnection {
@@ -2551,4 +2551,75 @@ input::placeholder {
     background-color: #d05744;
     color: white;
     cursor: pointer;
+}
+
+.checkbox__wrapper {
+    display: block;
+    position: relative;
+    padding-top: 2px;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    margin-top: 22px;
+    cursor: pointer;
+    font-size: 16px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.checkbox__wrapper-disabled {
+    color: #dddddd;
+}
+
+.checkbox__wrapper input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkbox__checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    border: 1px solid #b4bac5;
+    border-radius: 4px;
+}
+
+.checkbox__wrapper:hover input ~ .checkbox__checkmark {
+    background-color: #f1f1f1;
+}
+
+.checkbox__wrapper-disabled:hover input ~ .checkbox__checkmark {
+    background-color: white;
+}
+
+/*.checkbox__wrapper input:checked ~ .checkbox__checkmark {
+    background-color: #2196F3;
+}*/
+
+.checkbox__checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkbox__wrapper input:checked ~ .checkbox__checkmark:after {
+    display: block;
+}
+
+.checkbox__wrapper .checkbox__checkmark:after {
+    left: 8px;
+    top: 3px;
+    width: 8px;
+    height: 14px;
+    border: solid black;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
 }

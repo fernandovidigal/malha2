@@ -33,4 +33,7 @@ router.put('/editarLocalidade/:id', [
 // APAGAR LOCALIDADE
 router.delete('/deleteLocalidade', LocalidadesController.deleteLocalidade);
 
+// SINCRONIZAR LOCALIDADES
+router.get('/sincronizarLocalidades', LocalidadesController.sincronizarLocalidades);
+
 module.exports = router;

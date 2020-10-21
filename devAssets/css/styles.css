@@ -2559,7 +2559,7 @@ input::placeholder {
     padding-top: 2px;
     padding-left: 35px;
     margin-bottom: 12px;
-    margin-top: 22px;
+    margin-top: 35px;
     cursor: pointer;
     font-size: 16px;
     -webkit-user-select: none;
@@ -2622,4 +2622,12 @@ input::placeholder {
     -webkit-transform: rotate(45deg);
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
+}
+
+.localTeam {
+    background-color: #ccc;
+    border-radius: 50%;
+    min-width: 22px;
+    min-height: 22px;
+    display: block;
 }

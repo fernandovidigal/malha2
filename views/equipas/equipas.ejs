@@ -153,7 +153,7 @@
                     <% if(typeof equipas != 'undefined' && equipas.length > 0){ %>
                         <% equipas.forEach(function(equipa){ %>
                             <tr>
-                                <td align="center"><%= equipa.equipaId %></td>
+                                <td align="center"><span class="<%= equipa.local ? 'localTeam' : '' %>"><%= equipa.equipaId %></span></td>
                                 <td class="equipasElementos"><span><%= equipa.primeiroElemento %></span><span><%= equipa.segundoElemento %></span></td>
                                 <td align="left"><%= equipa.localidade %></td>
                                 <td class="escalao__column" align="center"><%= equipa.escalao %><br><small>(<%= equipa.sexo == 0 ? 'Feminino': 'Masculino' %>)</small></td>

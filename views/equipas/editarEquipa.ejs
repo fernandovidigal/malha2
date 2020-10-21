@@ -12,6 +12,12 @@
     <div class="container_wrapper">
         <div class="actionBar__wrapper">
             <h2 class="actionBar__title">Editar Equipa</h2>
+            <% if(equipa.local){ %>
+                <div class="tooltipBtn__wrapper">
+                    <a href="equipas/sincronizarEquipa/<%= equipa.equipaId %>" class="btn btn-import"><i class="fas fa-exchange-alt"></i></a>
+                    <span class="tooltip">Sincronizar Equipa</span>
+                </div>
+            <% } %>
         </div>
     </div>
 
@@ -31,7 +37,7 @@
             <%- include('includes/equipaPercurso.ejs') %>
         </div>
         <div class="inputBtnBar">
-            <% if(activeConnection) { %>
+            <% if(equipa.local || activeConnection) { %>
                 <input type="submit" name="actualizar" value="Actualizar" class="btn btn-primary">
             <% } else { %>
                 <span class="btn btn-disabled">Actualizar</span>

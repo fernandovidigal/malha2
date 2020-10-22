@@ -184,7 +184,8 @@ li {
     padding: 0 10px;
 }
 
-.btn-delete {
+.btn-delete,
+.btn-quaternary {
     background-color: #d9534f;
 }
 
@@ -491,6 +492,10 @@ li {
 
 .inputBtnBar > *:not(:first-child){
     margin-left: 20px;
+}
+
+.inputBtnBar--hide {
+    display: none;
 }
 
 .formInput__wrapper {
@@ -1363,6 +1368,10 @@ input::placeholder {
 
 .mainTable tbody tr td {
     padding: 12px 20px;
+}
+
+.mainTable tbody tr td.icon {
+    padding: 12px 0;
 }
 
 .mainTable__smallHeader {
@@ -2625,9 +2634,12 @@ input::placeholder {
 }
 
 .localTeam {
-    background-color: #ccc;
-    border-radius: 50%;
-    min-width: 22px;
-    min-height: 22px;
+    background-color: #aaa;
+    width: 17px;
+    height: 18px;
     display: block;
+}
+
+.smallTextInfo {
+    color: #b5b5b5;
 }

@@ -1,6 +1,7 @@
 <div class="formInput__wrapper">
     <label for="designacao" class="inputLabel">Nome do Torneio <span class="labelRequiredField">*</span></label>
-    <input type="text" name="designacao" id="designacao" size="80" required value="<%= torneio.designacao %>"  
+    <input type="text" name="designacao" id="designacao" size="80" required value="<%= torneio.designacao %>" 
+        <%= !activeConnection ? 'disabled' : '' %>
         <% 
             if(typeof validationErrors != 'undefined'){
                 const erro = validationErrors.find(el => el.param === 'designacao');
@@ -24,7 +25,8 @@
 <div class="formInput__wrapper">
     <label for="localidade" class="inputLabel">Localidade <span class="labelRequiredField">*</span></label>
     <input type="text" name="localidade" id="localidade" pattern="^[^0-9]+$" required size="40" value="<%= torneio.localidade %>"
-        <% 
+        <%= !activeConnection ? 'disabled' : '' %>
+        <%
             if(typeof validationErrors != 'undefined'){
                 const erro = validationErrors.find(el => el.param === 'localidade');
                 if(erro){
@@ -47,6 +49,7 @@
 <div class="formInput__wrapper">
     <label for="ano" class="inputLabel">Ano <span class="labelRequiredField">*</span></label>
     <input type="text" name="ano" id="ano" maxlength="4" pattern="^[0-9]{4}$" required value="<%= torneio.ano %>" placeholder="Ex: 2019"
+        <%= !activeConnection ? 'disabled' : '' %>
         <% 
             if(typeof validationErrors != 'undefined'){
                 const erro = validationErrors.find(el => el.param === 'ano');

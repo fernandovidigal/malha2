@@ -5312,6 +5312,7 @@ deleteBtns.forEach(function (item, index) {
               html: "<strong>" + designacao + " (" + localidade + ")</strong> será eliminado!<br><p class='swal-apart'>Todas as Equipas, Jogos e Resultados serão eliminados!</p><p class='smallWarningText'>Esta acção não é reversível.</p>",
               icon: 'question',
               showCancelButton: true,
+              cancelButtonColor: '#398ad0',
               confirmButtonText: 'Sim, eliminar!',
               confirmButtonColor: '#d9534f',
               cancelButtonText: 'Não!',
@@ -5402,6 +5403,7 @@ resetButtons.forEach(function (btn) {
               html: "A <strong>Fase " + (fase != 100 ? fase : 'Final') + "</strong> do escalão <strong>" + designacao + "</strong> será eliminada!",
               icon: 'question',
               showCancelButton: true,
+              cancelButtonColor: '#398ad0',
               confirmButtonText: 'Sim, eliminar!',
               confirmButtonColor: '#d9534f',
               cancelButtonText: 'Não!',
@@ -5485,11 +5487,189 @@ function closeAllTabs(tabItems, tabContainers) {
 
 var tabItems = document.querySelectorAll('.tabbedMenu__item');
 var tabContainers = document.querySelectorAll('.tabbedContainer');
+var actionBtnsBar = document.querySelector('.inputBtnBar');
 tabItems.forEach(function (item, index) {
   item.addEventListener('click', function () {
     closeAllTabs(tabItems, tabContainers);
     item.classList.add('tabbedMenu__item-selected');
     tabContainers[index].classList.add('tabbedContainer-open');
+
+    if (index == 3) {
+      actionBtnsBar.classList.add('inputBtnBar--hide');
+    } else {
+      actionBtnsBar.classList.remove('inputBtnBar--hide');
+    }
   });
-});
+}); // REINICIALIZAR TORNEIO
+
+var resetBtn = document.querySelector('.ResetTorneio-btn');
+
+if (resetBtn) {
+  resetBtn.addEventListener('click', function _callee3(e) {
+    var torneioId, result, response;
+    return regeneratorRuntime.async(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            torneioId = this.dataset.torneio;
+            _context3.next = 3;
+            return regeneratorRuntime.awrap(_sweetalert.default.fire({
+              title: 'Reinicializar o Torneio',
+              html: "<strong>Tem a certeza?</strong><br><p class='swal-apart'>Todos os Jogos, Fases, Resultados e Distribuição de Equipas será elimiado</p><p class='smallWarningText'>Esta acção não é reversível.</p>",
+              icon: 'question',
+              showCancelButton: true,
+              cancelButtonColor: '#398ad0',
+              confirmButtonText: 'Sim, eliminar!',
+              confirmButtonColor: '#d9534f',
+              cancelButtonText: 'Não!',
+              reverseButtons: true,
+              animation: true
+            }));
+
+          case 3:
+            result = _context3.sent;
+
+            if (!result.value) {
+              _context3.next = 20;
+              break;
+            }
+
+            _context3.prev = 5;
+            _context3.next = 8;
+            return regeneratorRuntime.awrap((0, _axios.default)({
+              method: 'DELETE',
+              url: '/admin/torneios/resetTorneio',
+              data: {
+                torneioId: torneioId
+              }
+            }));
+
+          case 8:
+            response = _context3.sent;
+
+            if (!response.data.success) {
+              _context3.next = 13;
+              break;
+            }
+
+            _sweetalert.default.fire({
+              icon: 'success',
+              title: 'Sucesso',
+              text: 'Torneio reinicializado'
+            });
+
+            _context3.next = 14;
+            break;
+
+          case 13:
+            throw new Error();
+
+          case 14:
+            _context3.next = 20;
+            break;
+
+          case 16:
+            _context3.prev = 16;
+            _context3.t0 = _context3["catch"](5);
+            console.log(_context3.t0);
+
+            _sweetalert.default.fire({
+              icon: 'error',
+              title: 'Não foi possível reinicializar o torneio'
+            });
+
+          case 20:
+          case "end":
+            return _context3.stop();
+        }
+      }
+    }, null, this, [[5, 16]]);
+  });
+}
+
+var deleteEquipasBtn = document.querySelector('.DeleteEquipasTorneio-btn');
+
+if (deleteEquipasBtn) {
+  deleteEquipasBtn.addEventListener('click', function _callee4(e) {
+    var torneioId, result, response;
+    return regeneratorRuntime.async(function _callee4$(_context4) {
+      while (1) {
+        switch (_context4.prev = _context4.next) {
+          case 0:
+            torneioId = this.dataset.torneio;
+            _context4.next = 3;
+            return regeneratorRuntime.awrap(_sweetalert.default.fire({
+              icon: 'question',
+              title: 'Eliminar Equipas',
+              html: "<strong>Tem a certeza?</strong><br><p class='swal-apart'>Todos as Equipas serão eliminadas</p><p class='smallWarningText'>Esta acção não é reversível.</p>",
+              showCancelButton: true,
+              cancelButtonColor: '#398ad0',
+              confirmButtonText: 'Sim, eliminar!',
+              confirmButtonColor: '#d9534f',
+              cancelButtonText: 'Não!',
+              reverseButtons: true,
+              animation: true
+            }));
+
+          case 3:
+            result = _context4.sent;
+
+            if (!result.value) {
+              _context4.next = 21;
+              break;
+            }
+
+            _context4.prev = 5;
+            _context4.next = 8;
+            return regeneratorRuntime.awrap((0, _axios.default)({
+              method: 'DELETE',
+              url: '/admin/torneios/deleteEquipas',
+              data: {
+                torneioId: torneioId
+              }
+            }));
+
+          case 8:
+            response = _context4.sent;
+            console.log(response);
+
+            if (!response.data.success) {
+              _context4.next = 14;
+              break;
+            }
+
+            _sweetalert.default.fire({
+              icon: 'success',
+              title: 'Sucesso',
+              text: 'Equipas Eliminadas'
+            });
+
+            _context4.next = 15;
+            break;
+
+          case 14:
+            throw new Error();
+
+          case 15:
+            _context4.next = 21;
+            break;
+
+          case 17:
+            _context4.prev = 17;
+            _context4.t0 = _context4["catch"](5);
+            console.log(_context4.t0);
+
+            _sweetalert.default.fire({
+              icon: 'error',
+              title: 'Não foi possível eliminar as equipas'
+            });
+
+          case 21:
+          case "end":
+            return _context4.stop();
+        }
+      }
+    }, null, this, [[5, 17]]);
+  });
+}
 },{"sweetalert2":"../../node_modules/sweetalert2/dist/sweetalert2.all.js","axios":"../../node_modules/axios/index.js"}]},{},["torneios.js"], null)

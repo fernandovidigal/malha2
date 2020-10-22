@@ -1,6 +1,9 @@
 const sequelize = require("../../helpers/database");
 const Torneios = require("../../models/Torneios");
 const Campos = require("../../models/Campos");
+const Jogos = require("../../models/Jogos");
+const Equipas = require("../../models/Equipas");
+const Interdicoes = require("../../models/Interdicoes");
 const dbFunctions = require("../../helpers/DBFunctions");
 const { validationResult } = require("express-validator");
 const crypto = require('crypto');
@@ -26,7 +29,7 @@ exports.getTorneio = async (req, res) => {
     const torneioId = parseInt(req.params.id);
     let tab = req.params.tab || 1;
 
-    if(tab < 1 || tab > 3){
+    if(tab < 1 || tab > 4){
       tab = 1;
     }
     
@@ -36,15 +39,19 @@ exports.getTorneio = async (req, res) => {
     const _listaUltimaFasePorEscalao = dbFunctions.getUltimaFasePorEscalao(torneioId);
     const _listaNumCampos = dbFunctions.getNumCamposEscaloes(torneioId);
     const _numEquipasPorEscalao = dbFunctions.getNumEquipasPorCadaEscalao(torneioId);
+    const _totalJogos = dbFunctions.getTotalJogos(torneioId);
 
-    const [listaEscaloes, torneio, listaNumJogos, listaUltimaFasePorEscalao, listaNumCampos, numEquipasPorEscalao] = await Promise.all([
+    const [listaEscaloes, torneio, listaNumJogos, listaUltimaFasePorEscalao, listaNumCampos, numEquipasPorEscalao, totalJogos] = await Promise.all([
       _listaEscaloes,
       _torneio,
       _listaNumJogos,
       _listaUltimaFasePorEscalao,
       _listaNumCampos,
-      _numEquipasPorEscalao
+      _numEquipasPorEscalao,
+      _totalJogos
     ]);
+
+    const numTotalEquipas = numEquipasPorEscalao.reduce((acumulador, {numEquipas}) => acumulador + numEquipas, 0);
 
     for (const escalao of listaEscaloes) {
       const jogos = listaNumJogos.find(el => el.escalaoId == escalao.escalaoId);
@@ -59,7 +66,7 @@ exports.getTorneio = async (req, res) => {
     }
 
     req.breadcrumbs("Editar Torneio", "/admin/editarTorneio");
-    res.render("admin/editarTorneio", { torneio: torneio, escaloes: listaEscaloes, selectedTab: tab, breadcrumbs: req.breadcrumbs() });
+    res.render("admin/editarTorneio", { torneio: torneio, escaloes: listaEscaloes, selectedTab: tab, numTotalJogos: totalJogos, numTotalEquipas: numTotalEquipas, breadcrumbs: req.breadcrumbs() });
   } catch (err) {
     console.log(err);
     req.flash("error", "Não é possível editar o torneio");
@@ -372,13 +379,12 @@ exports.deleteFase = async (req, res) => {
     await dbFunctions.deleteFase(torneioId, escalaoId, ultimaFase);
     
     res.status(200).json({ 
-      success: true ,
+      success: true,
       fase: fase,
       escalaoId: escalaoId
     });
 
   } catch(err) {
-    console.log(err);
     res.status(200).json({
       success: false,
       errMsg: err.message
@@ -395,5 +401,55 @@ exports.sincronizarTorneios = async (req, res) => {
   } catch(error) {
     req.flash("error", "Não foi sincronizar os torneios");
     res.redirect("/admin/torneios");
+  }
+}
+
+exports.resetTorneio = async (req, res) => {
+  try {
+    const torneioId = parseInt(req.body.torneioId);
+    const torneio = await Torneios.findByPk(torneioId);
+
+    await Campos.destroy({
+      where: { torneioId: torneio.torneioId }
+    });
+
+    await Jogos.destroy({
+      where: { torneioId: torneio.torneioId }
+    });
+
+    await Interdicoes.destroy({
+      where: { torneioId: torneio.torneioId }
+    });
+
+    res.status(200).json({ 
+      success: true
+    });
+
+  } catch(error){
+    res.status(200).json({
+      success: false,
+      errMsg: error.message
+    });
+  }
+}
+
+exports.deleteEquipas = async (req, res) => {
+  try {
+    const torneioId = parseInt(req.body.torneioId);
+    const torneio = await Torneios.findByPk(torneioId);
+
+    await Equipas.destroy({
+      where: { torneioId: torneio.torneioId }
+    });
+
+    res.status(200).json({ 
+      success: true
+    });
+
+  } catch(error){
+    res.status(200).json({
+      success: false,
+      errMsg: error.message
+    });
   }
 }

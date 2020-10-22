@@ -16,6 +16,7 @@ deleteBtns.forEach(function(item, index){
             html: "<strong>" + designacao + " (" + localidade + ")</strong> será eliminado!<br><p class='swal-apart'>Todas as Equipas, Jogos e Resultados serão eliminados!</p><p class='smallWarningText'>Esta acção não é reversível.</p>",
             icon: 'question',
             showCancelButton: true,
+            cancelButtonColor: '#398ad0',
             confirmButtonText: 'Sim, eliminar!',
             confirmButtonColor: '#d9534f',
             cancelButtonText: 'Não!',
@@ -72,6 +73,7 @@ resetButtons.forEach(btn => {
             html: "A <strong>Fase " + ((fase != 100) ? fase : 'Final' ) + "</strong> do escalão <strong>" + designacao + "</strong> será eliminada!",
             icon: 'question',
             showCancelButton: true,
+            cancelButtonColor: '#398ad0',
             confirmButtonText: 'Sim, eliminar!',
             confirmButtonColor: '#d9534f',
             cancelButtonText: 'Não!',
@@ -124,11 +126,118 @@ function closeAllTabs(tabItems, tabContainers){
 }
 const tabItems = document.querySelectorAll('.tabbedMenu__item');
 const tabContainers = document.querySelectorAll('.tabbedContainer');
+const actionBtnsBar = document.querySelector('.inputBtnBar');
 
 tabItems.forEach((item, index) => {
     item.addEventListener('click', function(){
         closeAllTabs(tabItems, tabContainers);
         item.classList.add('tabbedMenu__item-selected');
         tabContainers[index].classList.add('tabbedContainer-open');
+        if(index == 3){
+            actionBtnsBar.classList.add('inputBtnBar--hide');
+        } else {
+            actionBtnsBar.classList.remove('inputBtnBar--hide');
+        }
     });
 });
+
+// REINICIALIZAR TORNEIO
+const resetBtn = document.querySelector('.ResetTorneio-btn');
+if(resetBtn){
+    resetBtn.addEventListener('click', async function(e){
+        const torneioId = this.dataset.torneio;
+
+        const result = await Swal.fire({
+            title: 'Reinicializar o Torneio',
+            html: "<strong>Tem a certeza?</strong><br><p class='swal-apart'>Todos os Jogos, Fases, Resultados e Distribuição de Equipas será elimiado</p><p class='smallWarningText'>Esta acção não é reversível.</p>",
+            icon: 'question',
+            showCancelButton: true,
+            cancelButtonColor: '#398ad0',
+            confirmButtonText: 'Sim, eliminar!',
+            confirmButtonColor: '#d9534f',
+            cancelButtonText: 'Não!',
+            reverseButtons: true,
+            animation: true
+        });
+
+        if(result.value){
+            try {
+                const response = await axios({
+                    method: 'DELETE',
+                    url: '/admin/torneios/resetTorneio',
+                    data: {
+                        torneioId
+                    }
+                });
+
+                if(response.data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sucesso',
+                        text: 'Torneio reinicializado'
+                    });
+                } else {
+                    throw new Error();
+                }
+                
+            } catch(err) {
+                console.log(err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Não foi possível reinicializar o torneio',
+                });
+            }
+        }
+    });
+}
+
+const deleteEquipasBtn = document.querySelector('.DeleteEquipasTorneio-btn');
+if(deleteEquipasBtn){
+    deleteEquipasBtn.addEventListener('click', async function(e){
+        const torneioId = this.dataset.torneio;
+
+        const result = await Swal.fire({
+            icon: 'question',
+            title: 'Eliminar Equipas',
+            html: "<strong>Tem a certeza?</strong><br><p class='swal-apart'>Todos as Equipas serão eliminadas</p><p class='smallWarningText'>Esta acção não é reversível.</p>",
+            showCancelButton: true,
+            cancelButtonColor: '#398ad0',
+            confirmButtonText: 'Sim, eliminar!',
+            confirmButtonColor: '#d9534f',
+            cancelButtonText: 'Não!',
+            reverseButtons: true,
+            animation: true
+        });
+
+        if(result.value){
+            try {
+                const response = await axios({
+                    method: 'DELETE',
+                    url: '/admin/torneios/deleteEquipas',
+                    data: {
+                        torneioId
+                    }
+                });
+
+                console.log(response);
+
+                if(response.data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sucesso',
+                        text: 'Equipas Eliminadas'
+                    });
+                } else {
+                    throw new Error();
+                }
+                
+            } catch(err) {
+                console.log(err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Não foi possível eliminar as equipas',
+                });
+            }
+        }
+    });
+}

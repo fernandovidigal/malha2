@@ -1011,6 +1011,14 @@ exports.getListaCamposActuais = (torneioId, escalaoId) => {
     });
 }
 
+exports.getTotalJogos = (torneioId) => {
+    return Jogos.count({
+        where: {
+            torneioId: torneioId
+        }
+    });
+}
+
 ////////////////////////////////////////////////////////
 //                        PARCIAIS
 ////////////////////////////////////////////////////////

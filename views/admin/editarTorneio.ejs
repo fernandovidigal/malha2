@@ -13,6 +13,7 @@
             <li class="tabbedMenu__item<%= (locals.selectedTab && selectedTab == 2) ? ' tabbedMenu__item-selected' : '' %>">Campos</li>
             <% if(loggedUser.level === 10){ %>
                 <li class="tabbedMenu__item<%= (locals.selectedTab && selectedTab == 3) ? ' tabbedMenu__item-selected' : '' %>">Remover Fases</li>
+                <li class="tabbedMenu__item<%= (locals.selectedTab && selectedTab == 4) ? ' tabbedMenu__item-selected' : '' %>">Definições</li>
             <% } %>
         </ul>
     </div>
@@ -28,6 +29,9 @@
         <% if(loggedUser.level === 10){ %>
             <div id="fases" class="tabbedContainer<%= (locals.selectedTab && selectedTab == 3) ? ' tabbedContainer-open' : '' %>">
                 <%- include('includes/torneioFases.ejs') %>
+            </div>
+            <div id="fases" class="tabbedContainer<%= (locals.selectedTab && selectedTab == 4) ? ' tabbedContainer-open' : '' %>">
+                <%- include('includes/torneioDefinicoes.ejs') %>
             </div>
         <% } %>
         <div class="inputBtnBar">

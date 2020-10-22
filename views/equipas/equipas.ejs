@@ -141,7 +141,9 @@
             <table class="mainTable mainTable-equipas">
                 <thead>
                     <tr>
+                        
                         <th class="equipas__column">Equipa</th>
+                        <th></th>
                         <th class="mainTable-headerElement-left">Elementos</th>
                         <th class="mainTable-headerElement-left">Localidade</th>
                         <th>Escalão</th>
@@ -153,7 +155,15 @@
                     <% if(typeof equipas != 'undefined' && equipas.length > 0){ %>
                         <% equipas.forEach(function(equipa){ %>
                             <tr>
-                                <td align="center"><span class="<%= equipa.local ? 'localTeam' : '' %>"><%= equipa.equipaId %></span></td>
+                                <td align="center"><%= equipa.equipaId %></td>
+                                <td class="icon" align="center">
+                                    <% if(equipa.local){ %>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" viewBox="0 0 19 20" fill="none">
+                                    <path d="M14.025 6.77551V8.15306C14.025 9.36703 10.884 10.3571 7.0125 10.3571C3.14101 10.3571 0 9.36703 0 8.15306V6.77551C0 5.56154 3.14101 4.57143 7.0125 4.57143C10.884 4.57143 14.025 5.56154 14.025 6.77551ZM14.025 9.875V12.9745C14.025 14.1885 10.884 15.1786 7.0125 15.1786C3.14101 15.1786 0 14.1885 0 12.9745V9.875C1.50659 10.8737 4.2641 11.3387 7.0125 11.3387C9.7609 11.3387 12.5184 10.8737 14.025 9.875ZM14.025 14.6964V17.7959C14.025 19.0099 10.884 20 7.0125 20C3.14101 20 0 19.0099 0 17.7959V14.6964C1.50659 15.6952 4.2641 16.1601 7.0125 16.1601C9.7609 16.1601 12.5184 15.6952 14.025 14.6964Z" fill="#B8B8B8"/>
+                                    <path d="M17.3164 6.90978L12.7271 1.764H11.0729L6.48423 6.90902C6.48403 6.90925 6.48383 6.90947 6.48363 6.90969C6.19016 7.23765 6.11921 7.70614 6.29525 8.10514C6.47217 8.50731 6.86932 8.76844 7.30996 8.76844H7.72997V11.7711C7.72997 12.381 8.22105 12.8857 8.83997 12.8857H10.37C10.9889 12.8857 11.48 12.381 11.48 11.7711V10.3124H12.32V11.7711C12.32 12.381 12.8111 12.8857 13.43 12.8857H14.96C15.5789 12.8857 16.07 12.381 16.07 11.7711V8.76844H16.49C16.9307 8.76844 17.3278 8.50732 17.5047 8.10516C17.6811 7.70553 17.6093 7.23793 17.3167 6.91012C17.3166 6.91001 17.3165 6.90989 17.3164 6.90978ZM12.727 1.76387C12.2952 1.27882 11.5053 1.27871 11.0733 1.76353L12.727 1.76387Z" fill="#B8B8B8" stroke="white" stroke-width="1.2"/>
+                                    </svg>
+                                    <% } %>
+                                </td>
                                 <td class="equipasElementos"><span><%= equipa.primeiroElemento %></span><span><%= equipa.segundoElemento %></span></td>
                                 <td align="left"><%= equipa.localidade %></td>
                                 <td class="escalao__column" align="center"><%= equipa.escalao %><br><small>(<%= equipa.sexo == 0 ? 'Feminino': 'Masculino' %>)</small></td>

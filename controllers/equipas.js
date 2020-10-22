@@ -313,7 +313,6 @@ exports.getEquipaToEdit = async (req, res) => {
             breadcrumbs: req.breadcrumbs()
         });
     } catch(err) {
-        console.log(err);
         req.flash('error', 'Não foi possível obter os dados da equipa.');
         res.redirect('/equipas');
     }
@@ -583,26 +582,22 @@ exports.deleteEquipa = async (req, res) => {
     const torneioId = parseInt(req.body.torneioId);
     const escalaoId = parseInt(req.body.escalaoId);
 
-    if(req.session.activeConnection){
-        try {
-            const equipa = await dbFunctions.getSimpleEquipa(torneioId, equipaId, escalaoId, false);
-            if(!equipa.local){
-                const response = await axios.post(`${req.session.syncUrl}equipas/delete.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
-                    uuid: equipa.uuid
-                });
-    
-                if(!response.data.sucesso){
-                    throw new Error();
-                }
-            }
-            
-            await equipa.destroy();
+    try {
+        const equipa = await dbFunctions.getSimpleEquipa(torneioId, equipaId, escalaoId, false);
+        if(!equipa.local && req.session.activeConnection){
+            const response = await axios.post(`${req.session.syncUrl}equipas/delete.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                uuid: equipa.uuid
+            });
 
-            return res.status(200).json({ success: true });
-        } catch(error) {
-            return res.status(200).json({ success: false });
+            if(!response.data.sucesso){
+                throw new Error();
+            }
         }
-    } else {
+        
+        await equipa.destroy();
+
+        return res.status(200).json({ success: true });
+    } catch(error) {
         return res.status(200).json({ success: false });
     }
 }

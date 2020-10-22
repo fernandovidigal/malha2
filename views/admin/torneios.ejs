@@ -45,13 +45,7 @@
                         <td class="torneio_designacao"><%= torneio.designacao %></td>
                         <td class="torneio_localidade"><%= torneio.localidade %></td>
                         <td align="center"><%= torneio.ano %></td>
-                        <td class="detalhesBtn__column">
-                            <% if(activeConnection) { %>
-                                <a href="/admin/torneios/editarTorneio/<%= torneio.torneioId %>" class="btn btn-secondary">Editar</a>
-                            <% } else { %>
-                                <span class="btn btn-disabled">Editar</span>
-                            <% } %>
-                        </td>
+                        <td class="detalhesBtn__column"><a href="/admin/torneios/editarTorneio/<%= torneio.torneioId %>" class="btn btn-secondary">Detalhes</a></td>
                         <td class="deleteBtn__column">
                             <% if(activeConnection) { %>
                                 <a href="" class="btn btn-delete" data-torneio="<%= torneio.torneioId %>"><i class="fa fa-trash-alt"></i></a>

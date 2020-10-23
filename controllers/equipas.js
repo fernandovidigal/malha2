@@ -12,7 +12,7 @@ const axios = require('axios');
 const Sequelize = require('sequelize');
 
 const faker = require('faker');
-faker.locale = "pt_BR";
+faker.locale = "pt_PT";
 
 function showValidationErrors(req, res, errors, page, oldData){
     const localidadesInfo = dbFunctions.getLocalidadesInfo();
@@ -928,13 +928,19 @@ exports.createEquipasAleatoriamentePorEscalao = async (req, res) => {
         let lastEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId, escalaoId) || 0;
         for(let i = 0; i < num; i++){
             lastEquipaID++;
+            const primeiroElemento = faker.name.firstName() + " " + faker.name.lastName();
+            const segundoElemento = faker.name.firstName() + " " + faker.name.lastName();
+            const localidadeId = listaLocalidades[Math.floor(Math.random() * listaLocalidades.length)];
+            const equipaToHash = primeiroElemento + segundoElemento + localidadeId + escalaoId;
+            const hash = crypto.createHash('sha512').update(equipaToHash.toUpperCase()).digest('hex');
             const equipa = {
                 equipaId: lastEquipaID,
                 torneioId: torneio.torneioId,
-                primeiroElemento: faker.name.firstName() + " " + faker.name.lastName(),
-                segundoElemento: faker.name.firstName() + " " + faker.name.lastName(),
-                localidadeId: listaLocalidades[Math.floor(Math.random() * listaLocalidades.length)],
-                escalaoId: escalaoId
+                primeiroElemento: primeiroElemento,
+                segundoElemento: segundoElemento,
+                localidadeId: localidadeId,
+                escalaoId: escalaoId,
+                hash: hash
             }
             listaEquipas.push(equipa);
         }
@@ -947,5 +953,15 @@ exports.createEquipasAleatoriamentePorEscalao = async (req, res) => {
         console.log(err);
         req.flash('error', 'Não foi possível gerar equipas aleatóriamente.');
         res.redirect('/equipas');
+    }
+}
+
+exports.getEscaloes = async (req, res) => {
+    try {
+        const escaloes = await dbFunctions.getAllEscaloes();
+
+        return res.status(200).json({ success: true, escaloes: escaloes });
+    } catch(error) {
+        return res.status(200).json({ success: false });
     }
 }

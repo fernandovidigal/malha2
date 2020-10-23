@@ -53,13 +53,14 @@ router.get('/filtro/localidade/:localidadeId/escalao/:escalaoId/:perPage?/:page?
 
 // API
 router.get('/listagem/:localidade/:escalao', EquipasController.listagemEquipas);
+router.get('/escaloes', EquipasController.getEscaloes);
+// GERAR EQUIPAS ALEATÓRIAMENTE
+router.post('/faker/:num', EquipasController.createEquipasAleatoriamente);
+router.post('/faker/:num/:escalao', EquipasController.createEquipasAleatoriamentePorEscalao);
 
-// FAKER
-// Gera equipa aleatóriamente
-router.get('/faker/:num', EquipasController.createEquipasAleatoriamente);
-
-router.get('/faker/:num/:escalao', EquipasController.createEquipasAleatoriamentePorEscalao);
 
 router.get('/:perPage?/:page?', checkActiveConnection, EquipasController.getAllEquipas);
+
+
 
 module.exports = router;

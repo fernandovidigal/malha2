@@ -247,6 +247,8 @@ exports.setNumeroCampos = async (req, res) => {
         const [listaEscaloes, listaNumEquipasPorCadaEscalao] = await Promise.all([_listaEscaloes, _listaNumEquipasPorCadaEscalao]);
         const listaEscaloesEditados = [];
 
+        console.log(listaEscaloes);
+
         for(const escalao of listaEscaloes){
         
             // Procura na lista com o número de equipas pro escalão, qual o número de equipa para determinado escalão
@@ -295,7 +297,7 @@ exports.setNumeroCampos = async (req, res) => {
         }
 
         if(errors.length > 0){
-            res.render('torneio/definirNumeroCampos', {validationErrors: errors, torneio: torneio, escaloes: listaEscaloesEditados, breadcrumbs: req.breadcrumbs()});
+            res.render('torneio/definirNumeroCampos', {validationErrors: errors, torneio: torneio, escaloes: listaEscaloes, breadcrumbs: req.breadcrumbs()});
         } else {
 
             let transaction;

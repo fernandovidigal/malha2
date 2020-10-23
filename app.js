@@ -136,6 +136,7 @@ app.use(function (req, res, next) {
     res.locals.warning = req.flash('warning');
     res.locals.activeConnection = req.session.activeConnection || false;
     res.locals.syncActive = req.session.sync || false;
+    res.locals.faker = req.session.faker || false;
     next();
 });
 
@@ -162,6 +163,7 @@ app.use('/login', login);
 app.use('/', (req,res,next) => {
     req.session.sync = serverConfig.sync;
     req.session.syncUrl = serverConfig.syncUrl;
+    req.session.faker = serverConfig.faker;
     next();
 }, index);
 app.use('/admin/utilizadores', adminUtilizadores);

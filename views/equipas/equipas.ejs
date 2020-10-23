@@ -19,6 +19,12 @@
                     <button class="btn btn-print"><i class="fas fa-print"></i></button>
                     <span class="tooltip">Imprimir</span>
                 </div>
+                <% if(faker) { %>
+                    <div class="tooltipBtn__wrapper">
+                        <button class="btn btn-quintary btn-fakerGenerator"><i class="fas fa-theater-masks"></i></button>
+                        <span class="tooltip">Gerar Equipas Aleatóriamente</span>
+                    </div>
+                <% } %>
             </div>
         <% } %>
     </div>

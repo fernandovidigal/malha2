@@ -5615,7 +5615,7 @@ if (deleteEquipasBtn) {
             result = _context4.sent;
 
             if (!result.value) {
-              _context4.next = 21;
+              _context4.next = 20;
               break;
             }
 
@@ -5631,10 +5631,9 @@ if (deleteEquipasBtn) {
 
           case 8:
             response = _context4.sent;
-            console.log(response);
 
             if (!response.data.success) {
-              _context4.next = 14;
+              _context4.next = 13;
               break;
             }
 
@@ -5644,18 +5643,18 @@ if (deleteEquipasBtn) {
               text: 'Equipas Eliminadas'
             });
 
-            _context4.next = 15;
+            _context4.next = 14;
             break;
 
-          case 14:
+          case 13:
             throw new Error();
 
-          case 15:
-            _context4.next = 21;
+          case 14:
+            _context4.next = 20;
             break;
 
-          case 17:
-            _context4.prev = 17;
+          case 16:
+            _context4.prev = 16;
             _context4.t0 = _context4["catch"](5);
             console.log(_context4.t0);
 
@@ -5664,12 +5663,12 @@ if (deleteEquipasBtn) {
               title: 'Não foi possível eliminar as equipas'
             });
 
-          case 21:
+          case 20:
           case "end":
             return _context4.stop();
         }
       }
-    }, null, this, [[5, 17]]);
+    }, null, this, [[5, 16]]);
   });
 }
 },{"sweetalert2":"../../node_modules/sweetalert2/dist/sweetalert2.all.js","axios":"../../node_modules/axios/index.js"}]},{},["torneios.js"], null)

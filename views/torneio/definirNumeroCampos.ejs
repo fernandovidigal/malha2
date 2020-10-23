@@ -28,11 +28,8 @@
                         <thead>
                             <tr>
                                 <th class="mainTable-headerElement-left">Escalão</th>
-                                <th>Número de Equipas Registadas</th>
-                                <% if(typeof validationErrors !== 'undefined' && validationErrors.length > 0){ %>
-                                    <th></th>
-                                <% } %>
-                                <th class="mainTable-headerElement-left">Número de Campos</th>
+                                <th width="20%">Número de Equipas</th>
+                                <th class="mainTable-headerElement-left" width="32%">Número de Campos</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -46,10 +43,7 @@
                                     <td><%= escalao.designacao %></td>
                                     <td align="center"><%= escalao.numEquipas %></td>
                                     <% if(escalao.numEquipas > 5){ %>
-                                        <% if(typeof erro !== 'undefined'){ %>
-                                            <td class="camposErrorMsg camposColumn" align="right"><%= erro.msg %></td>
-                                        <% } %>
-                                        <td class="camposColumn" align="right">
+                                        <td class="camposColumn">
                                             <% for(let i = 0; i < 8; i++){ %>
                                                 <input type="radio" class="escalaoNumCampos<%= (typeof escalao.numCamposMax != 'undefined' && escalao.numCamposMax == Math.pow(2,i) ? ' escalaoNumCamposMaxRecomendado' : (Math.pow(2,i) > escalao.numCamposMax) ? ' escalaoExcessoCampos' : '') %>" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" <%= (Math.pow(2,i) > escalao.numCamposMax) ? 'disabled' : '' %>
                                                 <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
@@ -59,6 +53,10 @@
                                                 <% } %>
                                                 >
                                                 <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
+                                            <% } %>
+                                            <% if(typeof erro !== 'undefined'){ %>
+                                                <br>
+                                                <span class="camposErrorMsg camposColumn" align="right"><%= erro.msg %></span>
                                             <% } %>
                                         </td>
                                     <% } else { %>
@@ -82,11 +80,8 @@
                         <thead>
                             <tr>
                                 <th class="mainTable-headerElement-left">Escalão</th>
-                                <th>Número de Equipas Registadas</th>
-                                <% if(typeof validationErrors !== 'undefined' && validationErrors.length > 0){ %>
-                                    <th></th>
-                                <% } %>
-                                <th class="mainTable-headerElement-left">Número de Campos</th>
+                                <th width="20%">Número de Equipas</th>
+                                <th class="mainTable-headerElement-left" width="32%">Número de Campos</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -100,10 +95,7 @@
                                     <td><%= escalao.designacao %></td>
                                     <td align="center"><%= escalao.numEquipas %></td>
                                     <% if(escalao.numEquipas > 5){ %>
-                                        <% if(typeof erro !== 'undefined'){ %>
-                                            <td class="camposErrorMsg camposColumn" align="right"><%= erro.msg %></td>
-                                        <% } %>
-                                        <td class="camposColumn" align="right">
+                                        <td class="camposColumn">
                                             <% for(let i = 0; i < 8; i++){ %>
                                                 <input type="radio" class="escalaoNumCampos<%= (typeof escalao.numCamposMax != 'undefined' && escalao.numCamposMax == Math.pow(2,i) ? ' escalaoNumCamposMaxRecomendado' : (Math.pow(2,i) > escalao.numCamposMax) ? ' escalaoExcessoCampos' : '') %>" value="<%= (i != 0) ? Math.pow(2,i): 0 %>" name="<%= escalao.escalaoId %>" id="<%= (escalao.escalaoId * 10) + i %>" <%= (Math.pow(2,i) > escalao.numCamposMax) ? 'disabled' : '' %>
                                                 <% if(typeof escalao.campos != undefined && escalao.campos > 0){ %>
@@ -113,6 +105,10 @@
                                                 <% } %>
                                                 >
                                                 <label for="<%= (escalao.escalaoId * 10) + i %>"><%= (i != 0) ? Math.pow(2,i): 0 %></label>
+                                            <% } %>
+                                            <% if(typeof erro !== 'undefined'){ %>
+                                                <br>
+                                                <span class="camposErrorMsg camposColumn" align="right"><%= erro.msg %></span>
                                             <% } %>
                                         </td>
                                     <% } else { %>

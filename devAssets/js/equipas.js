@@ -22,6 +22,7 @@ async function showDeleteMessage(equipa){
         icon: 'question',
         customClass: 'swal-wide',
         showCancelButton: true,
+        cancelButtonColor: '#398ad0',
         confirmButtonText: 'Sim, eliminar!',
         confirmButtonColor: '#d9534f',
         cancelButtonText: 'Não!',
@@ -220,7 +221,66 @@ if(importBtn){
         Swal.fire({
             icon: 'info',
             title: 'Importar Equipas',
-            text: 'Disponível quando a plataforma web estiver concluída!'
+            text: 'Rever Código do Javascript'
         });
+    });
+}
+
+const fakeGenerator = document.querySelector('.btn-fakerGenerator');
+if(fakeGenerator){
+    fakeGenerator.addEventListener('click', async function(e){
+
+        const response = await axios.get('/equipas/escaloes');
+        let escalaoMasculinos = '<p class="inputSectionTitle">Masculinos</p>';
+        let escalaoFemininos = '<p class="inputSectionTitle">Femininos</p>';
+        for(const escalao of response.data.escaloes){
+            if(escalao.sexo == 1){
+                escalaoMasculinos += `<label><input type="radio" name="escalao" id="swal-input2" value="${escalao.escalaoId}" class="swal2-radio">${escalao.designacao}</label>`;
+            } else {
+                escalaoFemininos += `<label><input type="radio" name="escalao" id="swal-input2" value="${escalao.escalaoId}" class="swal2-radio">${escalao.designacao}</label>`;
+            }
+        }
+
+        const {value: formValues} = await Swal.fire({
+            title: 'Gerar Equipas Aleatóriamente',
+            html:
+                '<div class="formInput__wrapper swal__inputWrapper">'+
+                    '<label for="swal-input" class="inputLabel">Número de Equipas</label><input type="number" name="numEquipas" id="swal-input">' +
+                '</div>' +
+                '<div class="formInput__wrapper">'+
+                    '<label for="swal-input1" class="inputLabel">Escalão</label>'+
+                    '<div class="swal__two-cols">' +
+                        '<div class="swal__col">'+escalaoMasculinos+'</div>' +
+                        '<div class="swal__col">'+escalaoFemininos+'</div>' +
+                    '</div>'+
+                    '<small class="swal__infoMsg"><i class="fas fa-exclamation-triangle"></i>   Não selecionar o escalão implicar gerar equipas para todos os escalões</small>'+
+                '</div>',
+
+            showCancelButton: true,
+            cancelButtonColor: '#398ad0',
+            confirmButtonText: 'Gerar Equipas',
+            confirmButtonColor: '#d9534f',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+            animation: true,
+            preConfirm: () => {
+                const equipas = document.getElementById('swal-input').value;
+                const escalao = document.getElementsByName('escalao').value;
+                if(!equipas || equipas == "" || equipas <= "0") Swal.showValidationMessage("Número de equipas inválido");
+
+                return {
+                    equipas,
+                    escalao
+                }
+            }
+        });
+          
+        if(formValues) {
+            let url = `/equipas/faker/${formValues.equipas}`;
+            if(formValues.escalao) url += `/${formValues.escalao}`;
+
+            await axios.post(url);
+            location.reload();
+        }
     });
 }

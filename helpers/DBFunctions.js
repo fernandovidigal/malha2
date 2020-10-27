@@ -385,6 +385,14 @@ exports.getAllEquipas = (torneioId, escalaoId) => {
     });
 }
 
+exports.getAllEquipasInfo = (torneioId) => {
+    return Equipas.findAll({
+        where: {
+            torneioId: torneioId
+        }
+    });
+}
+
 exports.getAllEquipasTodasLocalidades = (torneioId, localidadeId) => {
     return Equipas.findAll({
         where: {
@@ -601,7 +609,7 @@ exports.getNumEquipasPorConcelhoInfo = (torneioId, escalaoId) => {
     });
 }
 
-// Serve para verificar se existem equipas para determinada localidade
+// Serve para verificar se existem equipas para determinada
 // para prevenir a eliminação de localidades com equipas registadas
 exports.getLocalidadesComEquipas = () => {
     return Equipas.findAll({

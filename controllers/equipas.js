@@ -118,20 +118,21 @@ async function processaPercurso(torneioId, equipaId, escalaoId){
     const jogosId = [..._jogosId];
     const _fases = new Set(jogos.map(el => el.fase));
     const fases = [..._fases];
-    const _campos = new Set(jogos.map(el => el.campo));
-    const campos = [..._campos];
 
     const listaFases = [];
 
-    for(const [index, fase] of fases.entries()){
+    for(const fase of fases){
+        const _jogo = jogos.find(jogo => jogo.fase == fase);
+
         const faseActual = {
             fase: fase,
-            campo: campos[index],
+            campo: _jogo.campo,
             jogos: []
         };
 
         // PROCESSA A CLASSIFICAÇÃO
-        const _classificacao = await torneioHelpers.processaClassificacao(torneioId, escalaoId, fase, campos[index]);
+        const _classificacao = await torneioHelpers.processaClassificacao(torneioId, escalaoId, fase, _jogo.campo);
+
         const posicao = _classificacao[0].classificacao.map(el => el.equipaId).indexOf(equipaId);
         const classificacao = {
             posicao: posicao + 1,
@@ -172,6 +173,75 @@ async function processaPercurso(torneioId, equipaId, escalaoId){
 
     return listaFases;
 }
+
+/*async function processaPercurso_old(torneioId, equipaId, escalaoId){
+    const _jogos = dbFunctions.getAllJogos(torneioId, equipaId, escalaoId);
+    const _equipas = dbFunctions.getAllEquipas(torneioId, escalaoId);
+
+    const [jogos, equipas] = await Promise.all([_jogos, _equipas]);
+
+    console.log(jogos);
+
+    const _jogosId = new Set(jogos.map(el => el.jogoId));
+    const jogosId = [..._jogosId];
+    const _fases = new Set(jogos.map(el => el.fase));
+    const fases = [..._fases];
+    const _campos = new Set(jogos.map(el => el.campo));
+    const campos = [..._campos];
+
+    const listaFases = [];
+
+    for(const [index, fase] of fases.entries()){
+        const faseActual = {
+            fase: fase,
+            campo: campos[index],
+            jogos: []
+        };
+
+        // PROCESSA A CLASSIFICAÇÃO
+        console.log(fase, campos[index]);
+        const _classificacao = await torneioHelpers.processaClassificacao(torneioId, escalaoId, fase, campos[index]);
+
+        const posicao = _classificacao[0].classificacao.map(el => el.equipaId).indexOf(equipaId);
+        const classificacao = {
+            posicao: posicao + 1,
+            vitorias: _classificacao[0].classificacao[posicao].vitorias,
+            pontos: _classificacao[0].classificacao[posicao].pontos
+        }
+        faseActual.classificacao = classificacao;
+
+        // PROCESSA JOGOS
+        const parciais = await dbFunctions.getAllParciais(jogosId);
+
+        //const parciais = await
+        for(const jogo of jogos){
+            if(jogo.fase == fase){
+                // Equipas
+                const equipa1 = equipas.find(el => el.equipaId == jogo.equipa1Id);
+                const equipa2 = equipas.find(el => el.equipaId == jogo.equipa2Id);
+                const _jogo = {
+                    equipas: [equipa1, equipa2]
+                }
+
+                // Parciais
+                const parciaisEquipa1 = parciais.find(el => (el.jogoId == jogo.jogoId && el.equipaId == equipa1.equipaId));
+                const parciaisEquipa2 = parciais.find(el => (el.jogoId == jogo.jogoId && el.equipaId == equipa2.equipaId));
+                _jogo.parciais = [parciaisEquipa1, parciaisEquipa2];
+
+                // Pontuação
+                _jogo.pontos = [jogo.equipa1Pontos, jogo.equipa2Pontos];
+
+                if(parciaisEquipa1 && parciaisEquipa2){
+                    faseActual.jogos.push(_jogo);
+                }
+            }
+        }
+
+        listaFases.push(faseActual);
+    }
+
+    return listaFases;
+}*/
 
 const criarEquipa = async (equipa, torneio, options = {}) => {
     let lastEquipaID = await dbFunctions.getLastEquipaID(torneio.torneioId, equipa.escalaoId) || 0;
@@ -313,6 +383,7 @@ exports.getEquipaToEdit = async (req, res) => {
             breadcrumbs: req.breadcrumbs()
         });
     } catch(err) {
+        console.log(err);
         req.flash('error', 'Não foi possível obter os dados da equipa.');
         res.redirect('/equipas');
     }
@@ -413,7 +484,7 @@ exports.createEquipa = async (req, res) => {
             
             await criarEquipa(equipa, torneio);
             
-            req.flash('success', 'Equipa adicionada com sucesso.');
+            req.flash('success', 'Equipa adicionada');
             return res.redirect('/equipas');
         }
     } catch(err) {
@@ -500,7 +571,7 @@ exports.updateEquipa = async (req, res) => {
                     }
                 });
                 
-                req.flash('success', 'Equipa actualizada com sucesso')
+                req.flash('success', 'Equipa actualizada')
                 return res.redirect('/equipas');
             } else {
                 const transaction = await sequelize.transaction();
@@ -531,7 +602,7 @@ exports.updateEquipa = async (req, res) => {
                     }
                     
                     await transaction.commit();
-                    req.flash('success', 'Equipa actualizada com sucesso')
+                    req.flash('success', 'Equipa actualizada')
                     return res.redirect('/equipas');
 
                 } catch (error) {
@@ -599,6 +670,54 @@ exports.deleteEquipa = async (req, res) => {
         return res.status(200).json({ success: true });
     } catch(error) {
         return res.status(200).json({ success: false });
+    }
+}
+
+exports.sincronizarEquipa = async (req, res) => {
+    const uuid = req.params.uuid;
+    
+    try {
+        if(req.session.activeConnection){
+            const equipa = await Equipas.findOne({ where: {uuid: uuid} });
+            // TODO: REver aqui para fazer include no query e assim não preciso
+            // de fazer vários queries à basa de dados
+
+            const torneioInfo = dbFunctions.getTorneioInfo();
+            const localidadesInfo = dbFunctions.getLocalidadesInfo();
+            const escaloesInfo = dbFunctions.getEscaloesInfo();
+
+            const [torneio, localidades, escaloes] = await Promise.all([torneioInfo, localidadesInfo, escaloesInfo]);
+
+            // Obtem os UUIDs da localidade e do escalão
+            const selectedLocalidade = localidades.find(localidade => localidade.localidadeId == equipa.localidadeId);
+            const selectedEscalao = escaloes.find(escalao => escalao.escalaoId == equipa.escalaoId);
+
+            const response = await axios.post(`${req.session.syncUrl}equipas/create.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
+                primeiroElemento: equipa.primeiroElemento,
+                segundoElemento: equipa.segundoElemento,
+                torneioUUID: torneio.uuid,
+                localidadeUUID: selectedLocalidade.uuid,
+                escalaoUUID: selectedEscalao.uuid,
+                hash: equipa.hash
+            });
+
+            // Pode ser retornado uma equipa (caso exista) ou o uuid (caso seja inserido)
+            if(response.data.sucesso && (response.data.uuid || response.data.equipa)){
+                equipa.uuid = response.data.uuid || response.data.equipa.uuid;
+                equipa.local = false;
+                await equipa.save();
+            } else {
+                throw new Error('Não foi possível sincronizar a equipa com o servidor');
+            }
+
+            req.flash('success', 'Equipa sincronizada');
+            return res.redirect('/equipas');
+        } else {
+            throw new Error('Não existe ligação activa');
+        }
+    } catch(error) {
+        req.flash('error', 'Não foi possível sincronizar a equipa');
+        res.redirect('/equipas');
     }
 }
 

@@ -1,6 +1,7 @@
 const { syncLocalidades } = require("../../helpers/sync/localidades");
 const { syncEscaloes } = require("../../helpers/sync/escaloes");
-const { syncTorneios } = require("../../helpers/sync//torneios");
+const { syncTorneios } = require("../../helpers/sync/torneios");
+const { syncEquipas } = require("../../helpers/sync/equipas");
 
 
 exports.init = (req, res) => {
@@ -61,11 +62,12 @@ exports.sincronizarTorneios = async (req, res) => {
 exports.sincronizarEquipas = async (req, res) => {
     try {
         // TODO: Sincronizar Equipas
-        /*const url = req.session.syncUrl;
-        await syncTorneios(url);
-        req.flash("success", "Torneios sincronizados");
-        return res.redirect("/admin/sincronizacao");*/
+        const url = req.session.syncUrl;
+        await syncEquipas(url);
+        req.flash("success", "Equipas sincronizadas");
+        return res.redirect("/admin/sincronizacao");
     } catch(error){
+        console.log(error);
         req.flash("error", "Não foi sincronizar as equipas");
         res.redirect("/admin/sincronizacao");
     }

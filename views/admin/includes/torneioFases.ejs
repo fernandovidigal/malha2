@@ -61,7 +61,7 @@
                                     <%= escalao.fase == 100 ? 'Final' : escalao.fase != 0 ? escalao.fase : 'Ainda não iniciou a competição' %>
                                 <% } %>
                             </td>
-                            <td class="deleteBtn__column">
+                            <td align="right" class="deleteBtn__column">
                                 <% if(escalao.fase != 0){ %>
                                     <a class="btn btn-secondary btn-faseReset" data-torneio="<%= torneio.torneioId %>" data-escalao="<%= escalao.escalaoId %>" data-fase="<%= escalao.fase %>" data-designacao="<%= escalao.designacao %> (<%= escalao.sexo == 1? 'Masculino': 'Feminino' %>)">Remover Fase</a>
                                 <% } %>

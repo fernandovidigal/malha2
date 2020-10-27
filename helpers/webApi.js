@@ -2,6 +2,7 @@ const axios = require('axios');
 const { syncLocalidades } = require('./sync/localidades');
 const { syncEscaloes } = require('./sync/escaloes');
 const { syncTorneios } = require('./sync/torneios');
+const { syncEquipas } = require('./sync/equipas');
 
 exports.checkConnection = async (req, res) => {
     try {
@@ -56,6 +57,9 @@ exports.syncData = async (req, res, next) => {
         
         // Torneios
         await syncTorneios(url);
+
+        // Equipas
+        await syncEquipas(url);
 
         res.status(200).json({ success: true });
     } catch (error) {

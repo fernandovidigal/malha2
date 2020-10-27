@@ -45,7 +45,8 @@ async function showDeleteMessage(equipa){
             if(response.data.success) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Equipa eliminada com sucesso',
+                    title: 'Sucesso',
+                    text: 'Equipa eliminada',
                     showConfirmButton: false,
                     timer: 1500,
                     onClose: () => {
@@ -152,12 +153,18 @@ function closeAllTabs(tabItems, tabContainers){
 }
 const tabItems = document.querySelectorAll('.tabbedMenu__item');
 const tabContainers = document.querySelectorAll('.tabbedContainer');
+const actionBtnsBar = document.querySelector('.inputBtnBar');
 if(tabItems && tabContainers){
     tabItems.forEach((item, index) => {
         item.addEventListener('click', function(){
             closeAllTabs(tabItems, tabContainers);
             item.classList.add('tabbedMenu__item-selected');
             tabContainers[index].classList.add('tabbedContainer-open');
+            if(index == 1){
+                actionBtnsBar.classList.add('inputBtnBar--hide');
+            } else {
+                actionBtnsBar.classList.remove('inputBtnBar--hide');
+            }
         });
     });
 }
@@ -245,15 +252,15 @@ if(fakeGenerator){
             title: 'Gerar Equipas Aleatóriamente',
             html:
                 '<div class="formInput__wrapper swal__inputWrapper">'+
-                    '<label for="swal-input" class="inputLabel">Número de Equipas</label><input type="number" name="numEquipas" id="swal-input">' +
+                    '<label for="swal-input" class="inputLabel">Número de Equipas</label><input type="number" name="numEquipas" id="swal-input" value="0">' +
                 '</div>' +
                 '<div class="formInput__wrapper">'+
                     '<label for="swal-input1" class="inputLabel">Escalão</label>'+
+                    '<label><input type="radio" name="escalao" id="swal-input2" value="0" class="swal2-radio" checked>Todos os escalões</label>'+
                     '<div class="swal__two-cols">' +
                         '<div class="swal__col">'+escalaoMasculinos+'</div>' +
                         '<div class="swal__col">'+escalaoFemininos+'</div>' +
                     '</div>'+
-                    '<small class="swal__infoMsg"><i class="fas fa-exclamation-triangle"></i>   Não selecionar o escalão implicar gerar equipas para todos os escalões</small>'+
                 '</div>',
 
             showCancelButton: true,
@@ -265,7 +272,7 @@ if(fakeGenerator){
             animation: true,
             preConfirm: () => {
                 const equipas = document.getElementById('swal-input').value;
-                const escalao = document.getElementsByName('escalao').value;
+                const escalao = document.querySelector("input[name=escalao]:checked").value;
                 if(!equipas || equipas == "" || equipas <= "0") Swal.showValidationMessage("Número de equipas inválido");
 
                 return {
@@ -274,10 +281,9 @@ if(fakeGenerator){
                 }
             }
         });
-          
         if(formValues) {
             let url = `/equipas/faker/${formValues.equipas}`;
-            if(formValues.escalao) url += `/${formValues.escalao}`;
+            if(formValues.escalao && formValues.escalao != '0') url += `/${formValues.escalao}`;
 
             await axios.post(url);
             location.reload();

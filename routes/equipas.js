@@ -33,6 +33,8 @@ router.put('/editarEquipa/:escalao/:id', [
     check('escalao').exists().withMessage('Deve selecionar o escalão ao qual pertence a equipa.')
 ], EquipasController.updateEquipa);
 
+router.get('/sincronizarEquipa/:uuid', EquipasController.sincronizarEquipa);
+
 router.get('/eliminarEquipa/:equipaId/:escalaoId', EquipasController.getEquipaToDelete);
 
 router.delete('/eliminarEquipa', EquipasController.deleteEquipa);

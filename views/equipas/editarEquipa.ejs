@@ -14,7 +14,7 @@
             <h2 class="actionBar__title">Editar Equipa</h2>
             <% if(equipa.local){ %>
                 <div class="tooltipBtn__wrapper">
-                    <a href="equipas/sincronizarEquipa/<%= equipa.equipaId %>" class="btn btn-import"><i class="fas fa-exchange-alt"></i></a>
+                    <a href="/equipas/sincronizarEquipa/<%= equipa.uuid %>" class="btn btn-secondary"><i class="fas fa-exchange-alt"></i></a>
                     <span class="tooltip">Sincronizar Equipa</span>
                 </div>
             <% } %>

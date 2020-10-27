@@ -17,7 +17,7 @@ exports.syncLocalidades = async (url) => {
 
         const localidadesWeb = responseWeb.data.data;
 
-        // Verifica que localidades são para inserir, ou seja, não existenm localmente
+        // Verifica que localidades são para inserir, ou seja, não existem localmente
         const localidadesInserir = checkInsert(localidadesWeb, localidadesApp);
 
         // Verifica que localidades são para actualizar, ou seja, existem localmente (UUID) mas

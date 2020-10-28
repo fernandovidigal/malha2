@@ -1,6 +1,5 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../helpers/database');
-const dbFunctions = require('../helpers/DBFunctions');
 
 const Equipas = sequelize.define('equipas', {
     equipaId: {

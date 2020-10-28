@@ -8,7 +8,9 @@
     "preinstall": "npx npm-force-resolutions",
     "start": "concurrently \"nodemon app.js\" \"npm run watch:js\" \"npm run watch:css\"",
     "watch:js": "parcel watch ./devAssets/js/*.js --out-dir ./assets/js/ --no-source-maps --no-hmr",
-    "watch:css": "parcel watch ./devAssets/css/styles.css --out-dir ./assets/css/ --out-file styles.css --no-source-maps --no-hmr"
+    "watch:css": "parcel watch ./devAssets/css/styles.css --out-dir ./assets/css/ --out-file styles.css --no-source-maps --no-hmr",
+    "build:js": "parcel build ./devAssets/js/*.js --out-dir ./assets/js/ --no-source-maps",
+    "build:css": "parcel build ./devAssets/css/styles.css --out-dir ./assets/css/ --out-file styles.css --no-source-maps"
   },
   "repository": {
     "type": "git",
@@ -22,7 +24,7 @@
   "homepage": "https://github.com/fernandovidigal/malha2#readme",
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
-    "axios": "^0.20.0",
+    "axios": "^0.21.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "connect-flash": "^0.1.1",
@@ -39,7 +41,7 @@
     "pdfmake": "^0.1.68",
     "sequelize": "^6.3.5",
     "sqlite3": "^5.0.0",
-    "sweetalert2": "^10.7.0"
+    "sweetalert2": "^10.8.1"
   },
   "pkg": {
     "scripts": [],

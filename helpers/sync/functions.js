@@ -19,6 +19,6 @@ exports.checkDelete = (web, app) => {
             return false;
         }
 
-        return web[index].eliminavel;
+        return appItem.eliminavel;
     });
 }

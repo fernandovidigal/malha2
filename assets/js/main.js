@@ -121,7 +121,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 var define;
 var global = arguments[3];
 /*!
-* sweetalert2 v10.7.0
+* sweetalert2 v10.8.1
 * Released under the MIT License.
 */
 (function (global, factory) {
@@ -1841,6 +1841,7 @@ var global = arguments[3];
     showDenyButton: false,
     showCancelButton: false,
     preConfirm: undefined,
+    preDeny: undefined,
     confirmButtonText: 'OK',
     confirmButtonAriaLabel: '',
     confirmButtonColor: undefined,
@@ -2848,12 +2849,12 @@ var global = arguments[3];
     }
   };
   var handleDenyButtonClick = function handleDenyButtonClick(instance, innerParams) {
-    instance.disableButtons(); // here we could add preDeny in future, if needed
+    instance.disableButtons();
 
     if (innerParams.returnInputValueOnDeny) {
       handleConfirmOrDenyWithInput(instance, innerParams, 'deny');
     } else {
-      deny(instance, false);
+      deny(instance, innerParams, false);
     }
   };
   var handleCancelButtonClick = function handleCancelButtonClick(instance, dismissWith) {
@@ -2872,7 +2873,7 @@ var global = arguments[3];
       instance.enableButtons();
       instance.showValidationMessage(innerParams.validationMessage);
     } else if (type === 'deny') {
-      deny(instance, inputValue);
+      deny(instance, innerParams, inputValue);
     } else {
       confirm(instance, innerParams, inputValue);
     }
@@ -2895,11 +2896,27 @@ var global = arguments[3];
     });
   };
 
-  var deny = function deny(instance, value) {
-    instance.closePopup({
-      isDenied: true,
-      value: value
-    });
+  var deny = function deny(instance, innerParams, value) {
+    if (innerParams.preDeny) {
+      var preDenyPromise = Promise.resolve().then(function () {
+        return asPromise(innerParams.preDeny(value, innerParams.validationMessage));
+      });
+      preDenyPromise.then(function (preDenyValue) {
+        if (preDenyValue === false) {
+          instance.hideLoading();
+        } else {
+          instance.closePopup({
+            isDenied: true,
+            value: typeof preDenyValue === 'undefined' ? value : preDenyValue
+          });
+        }
+      });
+    } else {
+      instance.closePopup({
+        isDenied: true,
+        value: value
+      });
+    }
   };
 
   var succeedWith = function succeedWith(instance, value) {
@@ -3482,7 +3499,7 @@ var global = arguments[3];
     };
   });
   SweetAlert.DismissReason = DismissReason;
-  SweetAlert.version = '10.7.0';
+  SweetAlert.version = '10.8.1';
 
   var Swal = SweetAlert;
   Swal["default"] = Swal;

@@ -221,18 +221,6 @@ if(overlayCloseBtn){
     overlayCloseBtn.addEventListener('click', closeOverlay);
 }
 
-// Botão importar equipas
-const importBtn = document.querySelector('.btn-import');
-if(importBtn){
-    importBtn.addEventListener('click', function(){
-        Swal.fire({
-            icon: 'info',
-            title: 'Importar Equipas',
-            text: 'Rever Código do Javascript'
-        });
-    });
-}
-
 const fakeGenerator = document.querySelector('.btn-fakerGenerator');
 if(fakeGenerator){
     fakeGenerator.addEventListener('click', async function(e){
@@ -256,7 +244,7 @@ if(fakeGenerator){
                 '</div>' +
                 '<div class="formInput__wrapper">'+
                     '<label for="swal-input1" class="inputLabel">Escalão</label>'+
-                    '<label><input type="radio" name="escalao" id="swal-input2" value="0" class="swal2-radio" checked>Todos os escalões</label>'+
+                    (response.data.todos ? '<label><input type="radio" name="escalao" id="swal-input2" value="0" class="swal2-radio" checked>Todos os escalões</label>' : '') +
                     '<div class="swal__two-cols">' +
                         '<div class="swal__col">'+escalaoMasculinos+'</div>' +
                         '<div class="swal__col">'+escalaoFemininos+'</div>' +

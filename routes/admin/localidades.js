@@ -8,6 +8,7 @@ const { checkActiveConnection } = require('../../helpers/webApi');
 router.all('/*', [userAuthenticated, checkGestorStatus], (req, res, next) => {
     res.locals.menuAdminLocalidades = true;
     req.breadcrumbs('Localidades', '/admin/localidades');
+    console.log("aqui");
     next();
 });
 

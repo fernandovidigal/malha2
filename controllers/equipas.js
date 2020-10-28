@@ -10,6 +10,7 @@ const configFile = require('../helpers/configFunctions');
 const crypto = require('crypto');
 const axios = require('axios');
 const Sequelize = require('sequelize');
+const { syncEquipas } = require('../helpers/sync/equipas');
 
 const faker = require('faker');
 faker.locale = "pt_PT";
@@ -99,7 +100,7 @@ async function processaListaEscaloes(escaloes, torneioId){
     const listaEscaloes = [];
     const listaEscaloesComJogos = await dbFunctions.getNumJogosDeCadaEscalao(torneioId);
     for(const escalao of escaloes){
-        const _escalaoComJogos = listaEscaloesComJogos.find(el => el.escalaoId = escalao.escalaoId);
+        const _escalaoComJogos = listaEscaloesComJogos.find(el => el.escalaoId == escalao.escalaoId);
         if(!_escalaoComJogos){
             listaEscaloes.push(escalao);
         }
@@ -678,26 +679,32 @@ exports.sincronizarEquipa = async (req, res) => {
     
     try {
         if(req.session.activeConnection){
-            const equipa = await Equipas.findOne({ where: {uuid: uuid} });
-            // TODO: REver aqui para fazer include no query e assim não preciso
-            // de fazer vários queries à basa de dados
+            const equipa = await Equipas.findOne({ 
+                where: {uuid: uuid},
+                include: [
+                    { model: Localidades },
+                    { model: Escaloes }
+                ],
+            });
 
-            const torneioInfo = dbFunctions.getTorneioInfo();
-            const localidadesInfo = dbFunctions.getLocalidadesInfo();
+            console.log(equipa.localidade.uuid);
+
+            const torneio = await dbFunctions.getTorneioInfo();
+            /*const localidadesInfo = dbFunctions.getLocalidadesInfo();
             const escaloesInfo = dbFunctions.getEscaloesInfo();
 
             const [torneio, localidades, escaloes] = await Promise.all([torneioInfo, localidadesInfo, escaloesInfo]);
 
             // Obtem os UUIDs da localidade e do escalão
             const selectedLocalidade = localidades.find(localidade => localidade.localidadeId == equipa.localidadeId);
-            const selectedEscalao = escaloes.find(escalao => escalao.escalaoId == equipa.escalaoId);
+            const selectedEscalao = escaloes.find(escalao => escalao.escalaoId == equipa.escalaoId);*/
 
             const response = await axios.post(`${req.session.syncUrl}equipas/create.php?key=LhuYm7Fr3FIy9rrUZ4HH9HTvYLr1DoGevZ0IWvXN1t90KrIy`, {
                 primeiroElemento: equipa.primeiroElemento,
                 segundoElemento: equipa.segundoElemento,
                 torneioUUID: torneio.uuid,
-                localidadeUUID: selectedLocalidade.uuid,
-                escalaoUUID: selectedEscalao.uuid,
+                localidadeUUID: equipa.localidade.uuid,
+                escalaoUUID: equipa.escalao.uuid,
                 hash: equipa.hash
             });
 
@@ -718,6 +725,18 @@ exports.sincronizarEquipa = async (req, res) => {
     } catch(error) {
         req.flash('error', 'Não foi possível sincronizar a equipa');
         res.redirect('/equipas');
+    }
+}
+
+exports.sincronizarTodasEquipas = async (req, res) => {
+    try {
+        const url = req.session.syncUrl;
+        await syncEquipas(url);
+        req.flash("success", "Equipas sincronizadas");
+        return res.redirect("/equipas");
+    } catch(error) {
+        req.flash("error", "Não foi sincronizar as equipas");
+        res.redirect("/equipas");
     }
 }
 
@@ -951,6 +970,25 @@ exports.listagemEquipas = async (req, res) => {
     }
 }
 
+exports.getEscaloes = async (req, res) => {
+    try {
+        const torneioInfo = dbFunctions.getTorneioInfo();
+        const escaloesInfo = dbFunctions.getEscaloesInfo();
+
+        const [torneio, escaloes] = await Promise.all([torneioInfo, escaloesInfo]);
+
+        if(escaloes.length == 0) throw new Error('Não existem escalões registados');
+
+        // Exclui da lista de escalões os escalões que já tenham jogos distribuídos
+        // Se já existe jogos distribuídos não é possível adicionar mais equipas
+        const listaEscaloes = await processaListaEscaloes(escaloes, torneio.torneioId);
+
+        return res.status(200).json({ success: true, escaloes: listaEscaloes, todos: escaloes.length == listaEscaloes.length ? true : false });
+    } catch(error) {
+        return res.status(200).json({ success: false });
+    }
+}
+
 // Faker
 exports.createEquipasAleatoriamente = async (req, res) => {
     try {
@@ -1072,15 +1110,5 @@ exports.createEquipasAleatoriamentePorEscalao = async (req, res) => {
         console.log(err);
         req.flash('error', 'Não foi possível gerar equipas aleatóriamente.');
         res.redirect('/equipas');
-    }
-}
-
-exports.getEscaloes = async (req, res) => {
-    try {
-        const escaloes = await dbFunctions.getAllEscaloes();
-
-        return res.status(200).json({ success: true, escaloes: escaloes });
-    } catch(error) {
-        return res.status(200).json({ success: false });
     }
 }

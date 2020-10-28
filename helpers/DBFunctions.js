@@ -388,7 +388,8 @@ exports.getAllEquipas = (torneioId, escalaoId) => {
 exports.getAllEquipasInfo = (torneioId) => {
     return Equipas.findAll({
         where: {
-            torneioId: torneioId
+            torneioId: torneioId,
+            local: false
         }
     });
 }

@@ -27,6 +27,7 @@ exports.getAllLocalidades = async (req, res) => {
         res.render('admin/localidades', {localidades: localidades, breadcrumbs: req.breadcrumbs()});
 
     } catch(err){
+        console.log(err);
         req.flash('error', 'Não foi possível obter os dados das localidades');
         res.redirect('/admin/localidades');
     }
@@ -196,12 +197,13 @@ exports.deleteLocalidade = async (req, res) => {
 
 exports.sincronizarLocalidades = async (req, res) => {
     try {
-      const url = req.session.syncUrl;
-      await syncLocalidades(url);
-      req.flash("success", "Localidades sincronizadas");
-      return res.redirect("/admin/localidades");
+        const url = req.session.syncUrl;
+        await syncLocalidades(url);
+        req.flash("success", "Localidades sincronizadas");
+        return res.redirect("/admin/localidades");
     } catch(error) {
-      req.flash("error", "Não foi sincronizar as localidades");
-      res.redirect("/admin/localidades");
+        console.log(error);
+        req.flash("error", "Não foi sincronizar as localidades");
+        res.redirect("/admin/localidades");
     }
 }

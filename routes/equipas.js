@@ -35,6 +35,8 @@ router.put('/editarEquipa/:escalao/:id', [
 
 router.get('/sincronizarEquipa/:uuid', EquipasController.sincronizarEquipa);
 
+router.get('/sincronizarTodasEquipas', EquipasController.sincronizarTodasEquipas);
+
 router.get('/eliminarEquipa/:equipaId/:escalaoId', EquipasController.getEquipaToDelete);
 
 router.delete('/eliminarEquipa', EquipasController.deleteEquipa);

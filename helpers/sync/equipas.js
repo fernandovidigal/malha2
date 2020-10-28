@@ -25,11 +25,11 @@ exports.syncEquipas = async (url) => {
         const torneio = await dbFunctions.getTorneioInfo();
 
         const _responseWeb = axios.get(`${url}equipas/get.php?key=${apiKey}&torneio=${torneio.uuid}`);
-        const _localidadesApp = dbFunctions.getAllEquipasInfo(torneio.torneioId);
+        const _equipasApp = dbFunctions.getAllEquipasInfo(torneio.torneioId);
         const _localidades = dbFunctions.getAllLocalidades();
         const _escaloes = dbFunctions.getAllEscaloes();
 
-        const [responseWeb, equipasApp, localidadesInfo, escaloesInfo] = await Promise.all([_responseWeb, _localidadesApp, _localidades, _escaloes]);
+        const [responseWeb, equipasApp, localidadesInfo, escaloesInfo] = await Promise.all([_responseWeb, _equipasApp, _localidades, _escaloes]);
         if (!responseWeb.data.sucesso){
             throw new Error();
         }
@@ -104,6 +104,34 @@ exports.syncEquipas = async (url) => {
         });
         // Processa todas as actualizações independentemente de alguma delas rejeitar
         await Promise.allSettled(ListaEquipasUpdate);
+
+        const delete_equipasApp = dbFunctions.getAllEquipasInfo(torneio.torneioId);
+        const delete_listaCompletaEquipasComJogos = dbFunctions.getAllEquipasComJogos(torneio.torneioId);
+
+        const [deleteEquipasApp, equipasComJogos] = await Promise.all([delete_equipasApp, delete_listaCompletaEquipasComJogos]);
+        // Adiciona a cada localidade a flag eliminável
+        if(deleteEquipasApp.length > 0){
+            deleteEquipasApp.forEach(equipa => {
+                const equipaIndex = equipasComJogos.find(el => el.escalaoId == equipa.escalaoId && (el.equipa1Id == equipa.equipaId || el.equipa2Id == equipa.equipaId));
+                equipa.eliminavel = (!equipaIndex) ? true : false;
+            });
+        }
+
+        const equipasDelete = checkDelete(equipasWeb, deleteEquipasApp);
+        const ListaEquipasDelete = [];
+        equipasDelete.forEach(equipa => {
+            const deleteStmt = Equipas.destroy({
+                where: {
+                    uuid: equipa.uuid
+                }
+            });
+            ListaEquipasDelete.push(deleteStmt);
+        });
+
+        await Promise.allSettled(ListaEquipasDelete);
+
+        return true;
+
     } catch (error) {
         throw error;
     }

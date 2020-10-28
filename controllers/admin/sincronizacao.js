@@ -14,7 +14,7 @@ exports.sincronizarTodos = async (req, res) => {
         await syncLocalidades(url);
         await syncTorneios(url);
         await syncEscaloes(url);
-        // TODO: FALTA O SYNC EQUIPAS
+        await syncEquipas(url);
         req.flash("success", "Todos os dados sincronizados");
         return res.redirect("/admin/sincronizacao");
     } catch(error){
@@ -61,13 +61,11 @@ exports.sincronizarTorneios = async (req, res) => {
 
 exports.sincronizarEquipas = async (req, res) => {
     try {
-        // TODO: Sincronizar Equipas
         const url = req.session.syncUrl;
         await syncEquipas(url);
         req.flash("success", "Equipas sincronizadas");
         return res.redirect("/admin/sincronizacao");
     } catch(error){
-        console.log(error);
         req.flash("error", "Não foi sincronizar as equipas");
         res.redirect("/admin/sincronizacao");
     }

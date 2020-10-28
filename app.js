@@ -11,7 +11,6 @@ const breadcrumbs = require('express-breadcrumbs');
 const util = require('./helpers/util');
 const fileStruct = require('./helpers/fileStruct');
 const configFile = require('./helpers/configFunctions');
-const webApi = require('./helpers/webApi');
 
 let serverConfig = {
     server: {

@@ -55,7 +55,6 @@ if(dialogMessage){
 	const text = dialogMessage.dataset.text;
 	const selfClose = dialogMessage.dataset.selfclose;
 
-	console.log(text, selfClose);
 	const dialogParams = {
 		icon: type,
 		title: title,
